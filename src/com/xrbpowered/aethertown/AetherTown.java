@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.env.ShaderEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
+import com.xrbpowered.aethertown.render.env.StarRenderer;
 import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
 import com.xrbpowered.aethertown.render.tiles.LightTileObjectShader;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -36,14 +37,16 @@ import com.xrbpowered.gl.ui.pane.UITexture;
 import com.xrbpowered.zoomui.UIElement;
 
 public class AetherTown extends UIClient {
-	
+
+	private static final boolean testFps = false;
+	public static final float pawnHeight = 1.6f;
+
 	public static final int season = Seasons.winter;
 	private static int activeEnvironment = 0;
 	private ShaderEnvironment environment = ShaderEnvironment.environments[activeEnvironment];
 
-	private static final boolean testFps = false;
-	
-	public static final float pawnHeight = 1.6f;
+	public static long seed;
+	private static Level level;
 
 	private CameraActor camera;
 	private Controller flyController, walkController;
@@ -55,10 +58,10 @@ public class AetherTown extends UIClient {
 	private StaticMeshActor[] terrainActors;
 	
 	private SkyRenderer sky;
+	private StarRenderer stars;
 	private StaticMeshActor pointActor;
 	private ObjectShader objShader;
 	
-	private static Level level;
 	private int hoverx, hoverz;
 	private boolean showPointer = false;
 	
@@ -105,6 +108,9 @@ public class AetherTown extends UIClient {
 				
 				sky = new SkyRenderer();
 				sky.getShader().setCamera(camera);
+				stars = new StarRenderer();
+				stars.setCamera(camera);
+				stars.createStars(seed);
 				
 				objShader = new ObjectShader(sky);
 				objShader.setCamera(camera);
@@ -155,6 +161,7 @@ public class AetherTown extends UIClient {
 						controllerEnabled = false;
 					}
 				}
+				stars.updateTime(dt);
 				super.updateTime(dt);
 			}
 			
@@ -163,6 +170,8 @@ public class AetherTown extends UIClient {
 				super.renderBuffer(target);
 				sky.render(target);
 				shader.bindSkyTexture();
+				if(environment.renderStars)
+					stars.render();
 				TileComponent.renderer.drawInstances();
 				lightShader.bindSkyTexture();
 				LightTileComponent.renderer.drawInstances();
@@ -215,6 +224,7 @@ public class AetherTown extends UIClient {
 	
 	private void updateEnvironment() {
 		environment.updateShader(sky.getShader());
+		environment.updateShader(stars.getShader());
 		environment.updateShader(objShader);
 		environment.updateShader(shader);
 		environment.updateShader(lightShader);
@@ -269,7 +279,7 @@ public class AetherTown extends UIClient {
 	}
 	
 	public static void main(String[] args) {
-		long seed = System.currentTimeMillis();
+		seed = System.currentTimeMillis();
 		System.out.println("Generating... "+seed);
 		level = new Level();
 		level.generate(new Random(seed));

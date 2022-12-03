@@ -1,0 +1,56 @@
+#version 150 core
+
+#define EXPOSURE (1/3.0)
+#define CONTRAST 1.3
+#define SATURATION (1/2.0)
+#define MAX_SIZE 32
+
+uniform sampler2D texSky;
+
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+
+uniform float lightWash = 0;
+uniform float viewY = 0;
+uniform float cloudTop = 0;
+uniform float cloudBottom = -40;
+
+in vec3 in_Position;
+in float in_Magnitude;
+in vec3 in_Color;
+
+out float pass_Size;
+out float pass_Brightness;
+out vec4 pass_Color;
+
+void main(void) {
+	vec4 pos = modelMatrix * vec4(in_Position, 1);
+	gl_Position = projectionMatrix * viewMatrix * pos;
+	
+	float hdot = dot(pos, vec4(0, 1, 0, 0));
+	// vec4 skyColor = texture(texSky, 0.5+0.5*gl_Position.xy/gl_Position.w);
+	// float skyWash = skyColor.x+skyColor.y+skyColor.z;
+	float mag = in_Magnitude; // + skyWash*skyWash*5;
+	if(hdot<0.2)
+		mag += (0.2-hdot)*50;
+	if(hdot<-0.01)
+		mag += 100;
+	
+	float yfog = clamp((viewY-cloudTop)/(cloudBottom-cloudTop), 0, 1);
+	mag += 10*yfog*yfog + 10*lightWash*lightWash;
+
+	pass_Brightness = 100 * EXPOSURE * pow(10, -0.4 * CONTRAST * mag);
+	pass_Brightness *= (1-yfog)*(1-lightWash);
+	
+	float s = sqrt(pass_Brightness);
+	float full = s;
+	if(pass_Brightness>1) {
+		pass_Brightness = pow(pass_Brightness, SATURATION);
+		full = 16*sqrt(pass_Brightness);
+	}
+	pass_Size = clamp(full, 1, MAX_SIZE);
+	gl_PointSize = pass_Size;
+	
+	pass_Color = vec4(mix(vec3(1, 1, 1), in_Color, clamp(pass_Brightness*0.5, 0, 1)), 1);
+}

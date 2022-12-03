@@ -19,4 +19,17 @@ public class MathUtils {
 		return clamp(x, 0f, 1f);
 	}
 
+	public static double clamp(double x, double min, double max) {
+		if(x<min)
+			return min;
+		else if(x>max)
+			return max;
+		else
+			return x;
+	}
+	
+	public static double clamp(double x) {
+		return clamp(x, 0f, 1f);
+	}
+
 }

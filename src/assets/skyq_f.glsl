@@ -1,7 +1,5 @@
 #version 150 core
 
-#define PI 3.14159265359
-
 uniform float viewY = 0;
 uniform float cloudTop = 0;
 uniform float cloudBottom = -40;

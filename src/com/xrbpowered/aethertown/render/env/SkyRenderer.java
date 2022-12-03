@@ -14,7 +14,7 @@ public class SkyRenderer {
 
 	private static final int skyBufferScale = 8;
 	
-	public static class SkyShader extends CameraShader {
+	public class SkyShader extends CameraShader {
 		public SkyShader() {
 			super(PaneShader.vertexInfo, "skyq_v.glsl", "skyq_f.glsl");
 		}
