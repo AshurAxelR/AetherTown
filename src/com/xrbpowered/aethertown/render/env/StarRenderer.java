@@ -49,7 +49,6 @@ public class StarRenderer {
 			viewMatrixLocation = GL20.glGetUniformLocation(pId, "viewMatrix");
 			modelMatrixLocation = GL20.glGetUniformLocation(pId, "modelMatrix");
 			viewYLocation = GL20.glGetUniformLocation(pId, "viewY");
-			initSamplers("texSky");
 		}
 		@Override
 		public void updateUniforms() {
