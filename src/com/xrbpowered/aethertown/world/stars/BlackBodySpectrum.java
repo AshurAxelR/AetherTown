@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.stars;
+package com.xrbpowered.aethertown.world.stars;
 
 import java.awt.Color;
 

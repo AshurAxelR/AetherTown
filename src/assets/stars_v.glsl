@@ -8,10 +8,10 @@
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
+uniform vec3 cameraPosition;
 
 uniform float lightWashTop = 0;
 uniform float lightWashBottom = 0;
-uniform float viewY = 0;
 uniform float cloudTop = 0;
 uniform float cloudBottom = -40;
 
@@ -33,7 +33,7 @@ void main(void) {
 		lightWash = mix(lightWashBottom, lightWashTop, hdot);
 	else
 		lightWash = mix(lightWashBottom, 1, -hdot*20);
-	float yfog = clamp((viewY-cloudTop)/(cloudBottom-cloudTop), 0, 1);
+	float yfog = clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1);
 	float mag = in_Magnitude + 10*yfog*yfog + 10*lightWash*lightWash;
 
 	pass_Brightness = 100 * EXPOSURE * pow(10, -0.4 * CONTRAST * mag);

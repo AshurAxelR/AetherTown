@@ -3,6 +3,7 @@
 #define MIN_FOG_DIST 4
 
 uniform mat4 viewMatrix;
+uniform vec3 cameraPosition;
 
 uniform sampler2D texSky;
 uniform sampler2D texDiffuse;
@@ -16,7 +17,6 @@ uniform vec4 shadowColor = vec4(0.250, 0.349, 0.6, 1);
 uniform float fogNear = 40;
 uniform float fogFar = 160;
 
-uniform float viewY = 0;
 uniform float cloudTop = 0;
 uniform float cloudBottom = -40;
 uniform float cloudNear = 20;
@@ -53,14 +53,19 @@ void main(void) {
 	// float spec = pow(max(dot(viewDir, normalize(reflect(-lightDir, normal))), 0), specPower);
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
-	if(lightColor.x+lightColor.y+lightColor.z<illumTrigger)
-		out_Color += texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
-	out_Color.a = diffuseColor.a;
+	if(lightColor.x+lightColor.y+lightColor.z<illumTrigger) {
+		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
+		out_Color += illumColor;
+		float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
+		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
+	}
 	
 	vec4 fogColor = texture(texSky, pass_SkyCoord);
 	float lowNear = clamp((viewDist - MIN_FOG_DIST) / (cloudNear - MIN_FOG_DIST), 0, 1);
 	vec4 highColor = mix(out_Color, fogColor, clamp((viewDist - fogNear) / (fogFar - fogNear), 0, 1));
 	highColor = mix(highColor, fogColor, clamp((pass_WorldPosition.y - cloudTop) / (cloudBottom - cloudTop), 0, 1) * lowNear);
 	vec4 lowColor = mix(out_Color, fogColor, lowNear);
-	out_Color = mix(highColor, lowColor, clamp((viewY-cloudTop)/(cloudBottom-cloudTop), 0, 1));
+	out_Color = mix(highColor, lowColor, clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1));
+	
+	out_Color.a = diffuseColor.a;
 }

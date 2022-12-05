@@ -36,7 +36,6 @@ public class TileObjectShader extends CameraShader {
 	@Override
 	protected void storeUniformLocations() {
 		super.storeUniformLocations();
-		viewYLocation = GL20.glGetUniformLocation(pId, "viewY");
 		initSamplers(getSamplerNames());
 	}
 	

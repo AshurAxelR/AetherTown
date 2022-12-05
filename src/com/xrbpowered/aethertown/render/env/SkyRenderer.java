@@ -17,6 +17,7 @@ public class SkyRenderer {
 	public class SkyShader extends CameraShader {
 		public SkyShader() {
 			super(PaneShader.vertexInfo, "skyq_v.glsl", "skyq_f.glsl");
+			followCamera = true;
 		}
 		
 		private int fovLocation, aspectRatioLocation, viewYLocation;

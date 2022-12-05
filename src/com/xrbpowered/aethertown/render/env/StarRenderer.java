@@ -6,19 +6,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 
-import com.xrbpowered.aethertown.stars.BlackBodySpectrum;
-import com.xrbpowered.aethertown.stars.RandomStarData;
-import com.xrbpowered.aethertown.stars.RandomStarData.StarData;
+import com.xrbpowered.aethertown.world.stars.BlackBodySpectrum;
+import com.xrbpowered.aethertown.world.stars.RandomStarData;
+import com.xrbpowered.aethertown.world.stars.RandomStarData.StarData;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
-import com.xrbpowered.gl.res.shader.Shader;
+import com.xrbpowered.gl.res.shader.CameraShader;
 import com.xrbpowered.gl.res.shader.VertexInfo;
-import com.xrbpowered.gl.scene.Actor;
-import com.xrbpowered.gl.scene.CameraActor;
 import com.xrbpowered.gl.ui.pane.PaneShader;
 
 public class StarRenderer {
@@ -27,46 +25,34 @@ public class StarRenderer {
 			.addAttrib("in_Position", 3)
 			.addAttrib("in_Magnitude", 1)
 			.addAttrib("in_Color", 3);
-	
-	private static final double pointDist = 1f;
 
-	public class StarShader extends Shader {
-		private int projectionMatrixLocation;
-		private int viewMatrixLocation;
+	public static final float latitude = (float)Math.PI/4f; // 0 - north pole, PI - south pole
+
+	public class StarShader extends CameraShader {
 		private int modelMatrixLocation;
-		private int viewYLocation;
-		
-		protected final Matrix4f view = new Matrix4f();
-		protected final Matrix4f model = new Matrix4f();
 		
 		public StarShader() {
 			super(PaneShader.vertexInfo, "stars_v.glsl", "stars_f.glsl");
+			followCamera = true;
 		}
 		
 		@Override
 		protected void storeUniformLocations() {
-			projectionMatrixLocation = GL20.glGetUniformLocation(pId, "projectionMatrix");
-			viewMatrixLocation = GL20.glGetUniformLocation(pId, "viewMatrix");
+			super.storeUniformLocations();
 			modelMatrixLocation = GL20.glGetUniformLocation(pId, "modelMatrix");
-			viewYLocation = GL20.glGetUniformLocation(pId, "viewY");
 		}
+		
 		@Override
 		public void updateUniforms() {
+			super.updateUniforms();
+			
 			glDisable(GL_DEPTH_TEST);
 			glEnable(GL20.GL_POINT_SPRITE);
 			glEnable(GL32.GL_PROGRAM_POINT_SIZE);
 			glEnable(GL11.GL_BLEND);
 			glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
 			
-			uniform(projectionMatrixLocation, camera.getProjection());
-			view.identity();
-			Actor.rotateYawPitchRoll(camera.rotation, view);
-			view.invert();
-			uniform(viewMatrixLocation, view);
-			GL20.glUniform1f(viewYLocation, camera.position.y);
-			
-			model.rotation(cycleTime, rotationAxis);
-			uniform(modelMatrixLocation, model);
+			uniform(modelMatrixLocation, transform);
 		}
 		
 		@Override
@@ -78,37 +64,47 @@ public class StarRenderer {
 	}
 	
 	private StarShader starShader;
-	private CameraActor camera = null;
 	private StaticMesh stars = null;
 	
-	public Vector3f rotationAxis = new Vector3f(-0.2f, 0.4f, 0.6f).normalize();
 	public float cycleTime = 0f;
 	
+	protected final Matrix4f transform = new Matrix4f();
+	public final Vector4f sun = new Vector4f();
+
 	public StarRenderer() {
 		starShader = new StarShader();
 	}
 	
-	public void setCamera(CameraActor camera) {
-		this.camera = camera;
-	}
-	
 	public void updateTime(float dt) {
 		cycleTime += dt*0.005f;
+		transform.rotationXYZ(-latitude, -cycleTime, 0);
+		
+		starPos(RandomStarData.sun.ra, RandomStarData.sun.de, sun);
+		transform.transform(sun);
 	}
 	
 	public StarShader getShader() {
 		return starShader;
 	}
 	
+	private static void starPos(double ra, double de, Vector4f pos) {
+		double r = Math.cos(de);
+		pos.x = (float)(Math.sin(ra)*r);
+		pos.y = (float)(Math.sin(de));
+		pos.z = (float)(Math.cos(ra)*r);
+		pos.w = 1;
+	}
+	
 	public static float[] createPointData(ArrayList<StarData> stars) {
 		int numStars = stars.size();
-		float[] data = vertexInfo.createData(numStars);
+		float[] data = vertexInfo.createData(numStars+1);
 		int offs = 0;
+		Vector4f pos = new Vector4f();
 		for(StarData star : stars) {
-			double r = Math.cos(star.de)*pointDist;
-			data[offs++] = (float)(Math.sin(star.ra)*r);
-			data[offs++] = (float)(Math.sin(star.de)*pointDist);
-			data[offs++] = (float)(Math.cos(star.ra)*r);
+			starPos(star.ra, star.de, pos);
+			data[offs++] = pos.x;
+			data[offs++] = pos.y;
+			data[offs++] = pos.z;
 			data[offs++] = star.mag;
 			
 			//data[offs++] = star.temp;
@@ -126,7 +122,7 @@ public class StarRenderer {
 	}
 	
 	public void render() {
-		if(stars==null || camera==null)
+		if(stars==null)
 			return;
 		starShader.use();
 		stars.draw();

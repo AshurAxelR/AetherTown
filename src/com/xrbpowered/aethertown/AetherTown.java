@@ -8,8 +8,8 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.Seasons;
-import com.xrbpowered.aethertown.render.env.ShaderEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.env.StarRenderer;
 import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
@@ -42,8 +42,8 @@ public class AetherTown extends UIClient {
 	public static final float pawnHeight = 1.6f;
 
 	public static final int season = Seasons.winter;
-	private static int activeEnvironment = 0;
-	private ShaderEnvironment environment = ShaderEnvironment.environments[activeEnvironment];
+	// private static int activeEnvironment = 0;
+	private DaytimeEnvironment environment = new DaytimeEnvironment(); // ShaderEnvironment.environments[activeEnvironment];
 
 	public static long seed;
 	private static Level level;
@@ -97,7 +97,7 @@ public class AetherTown extends UIClient {
 				camera = new CameraActor.Perspective().setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
 				camera.position.x = Level.levelSize/2*Tile.size;
 				camera.position.z = Level.levelSize/2*Tile.size;
-				camera.rotation.y = (float)(-Math.PI*0.75);
+				camera.rotation.y = 0; // (float)(-Math.PI*0.75);
 				camera.updateTransform();
 				
 				walkController = new WalkController(input).setActor(camera);
@@ -109,7 +109,7 @@ public class AetherTown extends UIClient {
 				sky = new SkyRenderer();
 				sky.getShader().setCamera(camera);
 				stars = new StarRenderer();
-				stars.setCamera(camera);
+				stars.getShader().setCamera(camera);
 				stars.createStars(seed);
 				
 				objShader = new ObjectShader(sky);
@@ -161,7 +161,16 @@ public class AetherTown extends UIClient {
 						controllerEnabled = false;
 					}
 				}
-				stars.updateTime(dt);
+				
+				float dtDay = dt;
+				if(input.isKeyDown(KeyEvent.VK_OPEN_BRACKET))
+					dtDay = -100*dt;
+				else if(input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET))
+					dtDay = 100*dt;
+				stars.updateTime(dtDay);
+				environment.recalc(stars.sun);
+				updateEnvironment();
+				
 				super.updateTime(dt);
 			}
 			
@@ -268,11 +277,11 @@ public class AetherTown extends UIClient {
 				showPointer = !showPointer;
 				System.out.println("Pointer "+(showPointer ? "on" : "off"));
 				break;
-			case KeyEvent.VK_T:
+			/*case KeyEvent.VK_T:
 				activeEnvironment = (activeEnvironment+1) % ShaderEnvironment.environments.length;
 				environment = ShaderEnvironment.environments[activeEnvironment];
 				updateEnvironment();
-				break;
+				break;*/
 			default:
 				super.keyPressed(c, code);
 		}
