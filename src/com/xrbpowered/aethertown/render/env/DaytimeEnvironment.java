@@ -15,12 +15,12 @@ public class DaytimeEnvironment extends ShaderEnvironment {
 		float c = (float)Math.toDegrees(Math.atan(sun.y));
 		if(c<-18f)
 			copyFrom(clearNight);
-		else if(c<0f)
-			blend(clearNight, dawn, (c+18f)/18f);
-		else if(c<12f)
-			blend(dawn, evening, c/12f);
-		else if(c<24f)
-			blend(evening, clearDay, (c-12f)/24f);
+		else if(c<-6f)
+			blend(clearNight, dawn, (c+18f)/12f);
+		else if(c<6f)
+			blend(dawn, evening, (c+6f)/12f);
+		else if(c<18f)
+			blend(evening, clearDay, (c-6f)/12f);
 		else
 			copyFrom(clearDay);
 		

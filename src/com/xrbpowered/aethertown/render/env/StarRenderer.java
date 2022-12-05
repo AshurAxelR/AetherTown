@@ -1,6 +1,9 @@
 package com.xrbpowered.aethertown.render.env;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glEnable;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,7 +20,6 @@ import com.xrbpowered.aethertown.world.stars.RandomStarData.StarData;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.shader.CameraShader;
 import com.xrbpowered.gl.res.shader.VertexInfo;
-import com.xrbpowered.gl.ui.pane.PaneShader;
 
 public class StarRenderer {
 
@@ -32,7 +34,7 @@ public class StarRenderer {
 		private int modelMatrixLocation;
 		
 		public StarShader() {
-			super(PaneShader.vertexInfo, "stars_v.glsl", "stars_f.glsl");
+			super(vertexInfo, "stars_v.glsl", "stars_f.glsl");
 			followCamera = true;
 		}
 		
@@ -66,7 +68,7 @@ public class StarRenderer {
 	private StarShader starShader;
 	private StaticMesh stars = null;
 	
-	public float cycleTime = 0f;
+	public float cycleTime = RandomStarData.dayOfYear * (float)Math.PI * 2f;
 	
 	protected final Matrix4f transform = new Matrix4f();
 	public final Vector4f sun = new Vector4f();
