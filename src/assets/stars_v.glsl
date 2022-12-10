@@ -27,7 +27,7 @@ void main(void) {
 	vec4 pos = modelMatrix * vec4(in_Position, 1);
 	gl_Position = projectionMatrix * viewMatrix * pos;
 	
-	float hdot = dot(pos, vec4(0, 1, 0, 0));
+	float hdot = pos.y;
 	float lightWash = 0;
 	if(hdot>0)
 		lightWash = mix(lightWashBottom, lightWashTop, hdot);

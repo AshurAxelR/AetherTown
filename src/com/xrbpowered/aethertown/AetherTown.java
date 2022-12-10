@@ -6,16 +6,14 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import org.lwjgl.opengl.GL11;
+
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
-import com.xrbpowered.aethertown.render.env.StarRenderer;
-import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
-import com.xrbpowered.aethertown.render.tiles.LightTileObjectShader;
-import com.xrbpowered.aethertown.render.tiles.TileComponent;
-import com.xrbpowered.aethertown.render.tiles.TileObjectShader;
+import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
@@ -53,15 +51,14 @@ public class AetherTown extends UIClient {
 	private Controller activeController = null;
 	private boolean controllerEnabled = false;
 	
-	private TileObjectShader shader;
-	private LightTileObjectShader lightShader;
-	private StaticMeshActor[] terrainActors;
-	
 	private SkyRenderer sky;
-	private StarRenderer stars;
-	private StaticMeshActor pointActor;
-	private ObjectShader objShader;
+	private TileRenderer tiles;
 	
+	private ObjectShader objShader;
+	private StaticMeshActor[] terrainActors;
+
+	private StaticMeshActor pointActor;
+
 	private int hoverx, hoverz;
 	private boolean showPointer = false;
 	
@@ -87,7 +84,7 @@ public class AetherTown extends UIClient {
 			
 			@Override
 			protected OffscreenBuffer createOffscreenBuffer(int w, int h) {
-				sky.createBuffer(w, h);
+				sky.buffer.createBuffer(w, h);
 				return super.createOffscreenBuffer(w, h);
 			}
 			
@@ -106,33 +103,22 @@ public class AetherTown extends UIClient {
 				flyController.moveSpeed = 24f;
 				activeController = walkController;
 				
-				sky = new SkyRenderer();
-				sky.getShader().setCamera(camera);
-				stars = new StarRenderer();
-				stars.getShader().setCamera(camera);
-				stars.createStars(seed);
+				sky = new SkyRenderer().setCamera(camera);
+				sky.stars.createStars(seed);
 				
-				objShader = new ObjectShader(sky);
+				objShader = new ObjectShader(sky.buffer);
 				objShader.setCamera(camera);
 
 				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, objShader.info, null), objShader, new Texture(Color.RED));
 				
-				shader = new TileObjectShader(sky);
-				shader.setCamera(camera);
-				lightShader = new LightTileObjectShader(sky);
-				lightShader.setCamera(camera);
-
-				TileComponent.createRenderer(shader);
-				LightTileComponent.createRenderer(lightShader);
+				tiles = new TileRenderer(sky.buffer).setCamera(camera);
 				Template.createAllComponents();
 				
-				TileComponent.renderer.startCreateInstances();
-				LightTileComponent.renderer.startCreateInstances();
+				tiles.startCreateInstances();
 				TerrainBuilder terrainBuilder = new TerrainBuilder(level);
 				level.createGeometry(terrainBuilder);
 				terrainActors = terrainBuilder.createActors(objShader);
-				TileComponent.renderer.finishCreateInstances();
-				LightTileComponent.renderer.finishCreateInstances();
+				tiles.finishCreateInstances();
 
 				updateEnvironment();
 				updateWalkY();
@@ -167,8 +153,8 @@ public class AetherTown extends UIClient {
 					dtDay = -100*dt;
 				else if(input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET))
 					dtDay = 100*dt;
-				stars.updateTime(dtDay);
-				environment.recalc(stars.sun);
+				sky.updateTime(dtDay);
+				environment.recalc(sky.sun.position);
 				updateEnvironment();
 				
 				super.updateTime(dt);
@@ -178,15 +164,16 @@ public class AetherTown extends UIClient {
 			protected void renderBuffer(RenderTarget target) {
 				super.renderBuffer(target);
 				sky.render(target);
-				shader.bindSkyTexture();
-				if(environment.renderStars)
-					stars.render();
-				TileComponent.renderer.drawInstances();
-				lightShader.bindSkyTexture();
-				LightTileComponent.renderer.drawInstances();
+				
+				GL11.glDisable(GL11.GL_CULL_FACE);
+				tiles.shader.bindSkyTexture();
+				tiles.lightShader.bindSkyTexture();
+				tiles.drawInstances();
+				
 				objShader.bindSkyTexture();
 				for(StaticMeshActor actor : terrainActors)
 					actor.draw();
+				
 				if(showPointer)
 					pointActor.draw();
 			}
@@ -232,11 +219,9 @@ public class AetherTown extends UIClient {
 	}
 	
 	private void updateEnvironment() {
-		environment.updateShader(sky.getShader());
-		environment.updateShader(stars.getShader());
+		sky.updateEnvironment(environment);
 		environment.updateShader(objShader);
-		environment.updateShader(shader);
-		environment.updateShader(lightShader);
+		tiles.updateEnvironment(environment);
 	}
 	
 	@Override

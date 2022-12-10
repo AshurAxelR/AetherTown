@@ -2,7 +2,7 @@ package com.xrbpowered.aethertown.render;
 
 import org.lwjgl.opengl.GL20;
 
-import com.xrbpowered.aethertown.render.env.SkyRenderer;
+import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.gl.res.shader.ActorShader;
 import com.xrbpowered.gl.res.shader.VertexInfo;
 
@@ -15,10 +15,10 @@ public class ObjectShader extends ActorShader {
 	
 	public static final String[] samplerNames = {"texSky", "texDiffuse"};
 	
-	public final SkyRenderer sky;
+	public final SkyBuffer sky;
 	private int viewYLocation;
 
-	public ObjectShader(SkyRenderer sky) {
+	public ObjectShader(SkyBuffer sky) {
 		super(vertexInfo, "placeobj_v.glsl", "obj_f.glsl");
 		this.sky = sky;
 	}

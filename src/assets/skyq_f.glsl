@@ -12,13 +12,12 @@ uniform vec3 lightSkyDirection = vec3(-0.55f, -0.25f, -0.45f);
 uniform vec4 lightSkyColor = vec4(1, 0.95, 0.85, 0);
 
 in vec3 pass_Position;
-in vec2 pass_TexCoord;
 
 out vec4 out_Color;
 
 void main(void) {
 	vec3 pos = normalize(pass_Position);
-	float hdot = dot(pos, vec3(0, 1, 0));
+	float hdot = pos.y;
 	float ldot = max(dot(pos, normalize(lightSkyDirection)), 0) * lightSkyColor.a;
 	if(hdot>0) {
 		out_Color = mix(bgColor, lightSkyColor, ldot*ldot);

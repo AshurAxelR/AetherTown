@@ -1,7 +1,6 @@
 package com.xrbpowered.aethertown.render.tiles;
 
 import com.xrbpowered.gl.res.mesh.StaticMesh;
-import com.xrbpowered.gl.res.shader.Shader;
 import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.scene.comp.ComponentRenderer;
 import com.xrbpowered.gl.scene.comp.InstancedMeshList;
@@ -9,16 +8,6 @@ import com.xrbpowered.gl.scene.comp.InstancedMeshList;
 public class LightTileComponent extends InstancedMeshList<LightTileObjectInfo> {
 
 	public static ComponentRenderer<LightTileComponent> renderer;
-
-	public static ComponentRenderer<LightTileComponent> createRenderer(final LightTileObjectShader shader) {
-		renderer = new ComponentRenderer<LightTileComponent>() {
-			@Override
-			protected Shader getShader() {
-				return shader;
-			}
-		};
-		return renderer;
-	}
 	
 	public LightTileComponent(StaticMesh mesh, Texture diffuse, Texture illum) {
 		super(LightTileObjectShader.instanceInfo);

@@ -71,13 +71,12 @@ public class StarRenderer {
 	public float cycleTime = RandomStarData.dayOfYear * (float)Math.PI * 2f;
 	
 	protected final Matrix4f transform = new Matrix4f();
-	public final Vector4f sun = new Vector4f();
 
 	public StarRenderer() {
 		starShader = new StarShader();
 	}
 	
-	public void updateTime(float dt) {
+	public void updateTime(float dt, Vector4f sun) {
 		cycleTime += dt*0.005f;
 		transform.rotationXYZ(-latitude, -cycleTime, 0);
 		

@@ -1,83 +1,45 @@
 package com.xrbpowered.aethertown.render.env;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL20;
-
-import com.xrbpowered.gl.res.buffer.OffscreenBuffer;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
-import com.xrbpowered.gl.res.mesh.StaticMesh;
-import com.xrbpowered.gl.res.shader.CameraShader;
-import com.xrbpowered.gl.scene.CameraActor.Perspective;
-import com.xrbpowered.gl.ui.pane.PaneShader;
+import com.xrbpowered.gl.scene.CameraActor;
 
 public class SkyRenderer {
 
-	private static final int skyBufferScale = 8;
+	public final SkyBuffer buffer;
+	public final StarRenderer stars;
+	public final SunRenderer sun;
 	
-	public class SkyShader extends CameraShader {
-		public SkyShader() {
-			super(PaneShader.vertexInfo, "skyq_v.glsl", "skyq_f.glsl");
-			followCamera = true;
-		}
-		
-		private int fovLocation, aspectRatioLocation, viewYLocation;
-		@Override
-		protected void storeUniformLocations() {
-			super.storeUniformLocations();
-			fovLocation = GL20.glGetUniformLocation(pId, "fov");
-			aspectRatioLocation = GL20.glGetUniformLocation(pId, "aspectRatio");
-			viewYLocation = GL20.glGetUniformLocation(pId, "viewY");
-		}
-		
-		@Override
-		public void updateUniforms() {
-			super.updateUniforms();
-			GL20.glUniform1f(fovLocation, (float)Math.toRadians(((Perspective)camera).getFov()));
-			GL20.glUniform1f(aspectRatioLocation, camera.getAspectRatio());
-			GL20.glUniform1f(viewYLocation, camera.position.y);
-		}
-	}
-	
-	private StaticMesh screenQuad;
-	private SkyShader shader;
-	private OffscreenBuffer buffer = null;
+	private boolean renderStars;
 
 	public SkyRenderer() {
-		screenQuad = new StaticMesh(PaneShader.vertexInfo, new float[] {
-				-1, -1, 0, 0,
-				1, -1, 1, 0,
-				1, 1, 1, 1,
-				-1, 1, 0, 1
-		}, new short[] {
-				0, 1, 2, 0, 2, 3
-		});
-		shader = new SkyShader();
+		buffer = new SkyBuffer();
+		stars = new StarRenderer();
+		sun = new SunRenderer();
 	}
 	
-	public void createBuffer(int w, int h) {
-		if(buffer!=null)
-			buffer.release();
-		buffer = new OffscreenBuffer(w/skyBufferScale, h/skyBufferScale, false);
+	public SkyRenderer setCamera(CameraActor camera) {
+		buffer.getShader().setCamera(camera);
+		stars.getShader().setCamera(camera);
+		sun.getShader().setCamera(camera);
+		return this;
 	}
 	
-	public SkyShader getShader() {
-		return shader;
+	public void updateEnvironment(ShaderEnvironment environment) {
+		environment.updateShader(buffer.getShader());
+		environment.updateShader(stars.getShader());
+		environment.updateShader(sun.getShader());
+		renderStars = environment.renderStars;
+	}
+	
+	public void updateTime(float dt) {
+		stars.updateTime(dt, sun.position);
 	}
 	
 	public void render(RenderTarget target) {
-		buffer.use();
-		GL11.glDepthMask(false);
-		shader.use();
-		screenQuad.draw();
-		shader.unuse();
-		GL11.glDepthMask(true);
-		buffer.resolve();
-		RenderTarget.blit(buffer, target, true);
-		target.use();
+		buffer.render(target);
+		if(renderStars)
+			stars.render();
+		sun.render();
 	}
-	
-	public void bindTexture(int index) {
-		buffer.bindColorBuffer(index);
-	}
-	
+
 }

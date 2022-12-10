@@ -3,7 +3,7 @@ package com.xrbpowered.aethertown.render.tiles;
 import org.lwjgl.opengl.GL20;
 
 import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.env.SkyRenderer;
+import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.gl.res.shader.CameraShader;
 import com.xrbpowered.gl.res.shader.InstanceInfo;
 
@@ -17,15 +17,15 @@ public class TileObjectShader extends CameraShader {
 	
 	public static final String[] samplerNames = {"texSky", "texDiffuse"};
 	
-	public final SkyRenderer sky;
+	public final SkyBuffer sky;
 	private int viewYLocation;
 	
-	protected TileObjectShader(InstanceInfo info, String pathVS, String pathFS, SkyRenderer sky) {
+	protected TileObjectShader(InstanceInfo info, String pathVS, String pathFS, SkyBuffer sky) {
 		super(info, pathVS, pathFS);
 		this.sky = sky;
 	} 
 	
-	public TileObjectShader(SkyRenderer sky) {
+	public TileObjectShader(SkyBuffer sky) {
 		this(instanceInfo, "tileobj_v.glsl", "obj_f.glsl", sky);
 	}
 

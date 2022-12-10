@@ -1,7 +1,7 @@
 package com.xrbpowered.aethertown.render.tiles;
 
 import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.env.SkyRenderer;
+import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.gl.res.shader.InstanceInfo;
 
 public class LightTileObjectShader extends TileObjectShader {
@@ -15,7 +15,7 @@ public class LightTileObjectShader extends TileObjectShader {
 	
 	public static final String[] samplerNames = {"texSky", "texDiffuse", "texIllum"};
 	
-	public LightTileObjectShader(SkyRenderer sky) {
+	public LightTileObjectShader(SkyBuffer sky) {
 		super(instanceInfo, "lighttileobj_v.glsl", "lightobj_f.glsl", sky);
 	}
 

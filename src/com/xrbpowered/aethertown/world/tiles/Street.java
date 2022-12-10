@@ -5,6 +5,8 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
+import com.xrbpowered.aethertown.render.sprites.SpriteInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -19,6 +21,7 @@ public class Street extends TileTemplate {
 	public static final Color streetColor = new Color(0xb5b5aa);
 	
 	private static TileComponent street;
+	private static SpriteComponent sprite;
 
 	public Street() {
 		super(streetColor);
@@ -29,12 +32,15 @@ public class Street extends TileTemplate {
 		street = new TileComponent(
 				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
 				new Texture(streetColor));
+		sprite = new SpriteComponent(new Texture("checker.png"));
 	}
 
 	@Override
 	public void createGeometry(Tile tile, TerrainBuilder terrain, Random random) {
 		terrain.addWalls(tile);
 		street.addInstance(new TileObjectInfo(tile));
+		// if(tile.x%2==0 && tile.z%2==0)
+		// 	sprite.addInstance(new SpriteInfo(tile).size(Tile.size));
 	}
 	
 	@Override
