@@ -1,9 +1,6 @@
 package com.xrbpowered.aethertown.render.env;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,8 +12,9 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 
 import com.xrbpowered.aethertown.world.stars.BlackBodySpectrum;
-import com.xrbpowered.aethertown.world.stars.RandomStarData;
-import com.xrbpowered.aethertown.world.stars.RandomStarData.StarData;
+import com.xrbpowered.aethertown.world.stars.StarData;
+import com.xrbpowered.aethertown.world.stars.StarData.Star;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.shader.CameraShader;
 import com.xrbpowered.gl.res.shader.VertexInfo;
@@ -28,7 +26,7 @@ public class StarRenderer {
 			.addAttrib("in_Magnitude", 1)
 			.addAttrib("in_Color", 3);
 
-	public static final float latitude = (float)Math.PI/4f; // 0 - north pole, PI - south pole
+	public static final float latitude = (float)Math.toRadians(45); // 0 - north pole, 180 - south pole
 
 	public class StarShader extends CameraShader {
 		private int modelMatrixLocation;
@@ -68,19 +66,15 @@ public class StarRenderer {
 	private StarShader starShader;
 	private StaticMesh stars = null;
 	
-	public float cycleTime = RandomStarData.dayOfYear * (float)Math.PI * 2f;
-	
 	protected final Matrix4f transform = new Matrix4f();
 
 	public StarRenderer() {
 		starShader = new StarShader();
 	}
 	
-	public void updateTime(float dt, Vector4f sun) {
-		cycleTime += dt*0.005f;
-		transform.rotationXYZ(-latitude, -cycleTime, 0);
-		
-		starPos(RandomStarData.sun.ra, RandomStarData.sun.de, sun);
+	public void update(Vector4f sun) {
+		transform.rotationXYZ(-latitude, -WorldTime.cycleTime, 0);
+		starPos(StarData.sun.ra, StarData.sun.de, sun);
 		transform.transform(sun);
 	}
 	
@@ -96,12 +90,12 @@ public class StarRenderer {
 		pos.w = 1;
 	}
 	
-	public static float[] createPointData(ArrayList<StarData> stars) {
+	public static float[] createPointData(ArrayList<Star> stars) {
 		int numStars = stars.size();
 		float[] data = vertexInfo.createData(numStars+1);
 		int offs = 0;
 		Vector4f pos = new Vector4f();
-		for(StarData star : stars) {
+		for(Star star : stars) {
 			starPos(star.ra, star.de, pos);
 			data[offs++] = pos.x;
 			data[offs++] = pos.y;
@@ -118,7 +112,7 @@ public class StarRenderer {
 	
 	public void createStars(long seed) {
 		Random random = new Random(seed);
-		ArrayList<StarData> data = RandomStarData.generate(random);
+		ArrayList<Star> data = StarData.generate(random);
 		stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
 	}
 	

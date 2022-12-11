@@ -17,7 +17,7 @@ out vec2 pass_TexCoord;
 
 void main(void) {
 	gl_Position = projectionMatrix * viewMatrix * position;
-	vec2 pos = -in_Position*size;//*fovFactor;
+	vec2 pos = -in_Position*size;
 	pass_Position = position.xyz;
 	pass_Position.xy += pos;
 	

@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
@@ -11,12 +12,12 @@ import org.lwjgl.opengl.GL11;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
-import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
@@ -31,15 +32,17 @@ import com.xrbpowered.gl.scene.WalkController;
 import com.xrbpowered.gl.ui.UINode;
 import com.xrbpowered.gl.ui.common.UIFpsOverlay;
 import com.xrbpowered.gl.ui.pane.UIOffscreen;
+import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.gl.ui.pane.UITexture;
+import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIElement;
+import com.xrbpowered.zoomui.std.UIButton;
 
 public class AetherTown extends UIClient {
 
 	private static final boolean testFps = false;
 	public static final float pawnHeight = 1.6f;
 
-	public static final int season = Seasons.winter;
 	// private static int activeEnvironment = 0;
 	private DaytimeEnvironment environment = new DaytimeEnvironment(); // ShaderEnvironment.environments[activeEnvironment];
 
@@ -62,8 +65,10 @@ public class AetherTown extends UIClient {
 	private int hoverx, hoverz;
 	private boolean showPointer = false;
 	
+	private Font uiFont = UIButton.font;
 	private UINode uiRoot;
 	private UITexture uiMinimap;
+	private UIPane uiTime;
 
 	public AetherTown() {
 		super("Aether Town", 1f);
@@ -154,6 +159,7 @@ public class AetherTown extends UIClient {
 				else if(input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET))
 					dtDay = 100*dt;
 				sky.updateTime(dtDay);
+				uiTime.repaint();
 				environment.recalc(sky.sun.position);
 				updateEnvironment();
 				
@@ -186,6 +192,7 @@ public class AetherTown extends UIClient {
 			@Override
 			public void layout() {
 				uiMinimap.setLocation(getWidth()-uiMinimap.getWidth()-20, getHeight()-uiMinimap.getHeight()-20);
+				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
 				super.layout();
 			}
 		};
@@ -202,6 +209,19 @@ public class AetherTown extends UIClient {
 			}
 		};
 		uiMinimap.setSize(Level.levelSize*2, Level.levelSize*2);
+		
+		uiTime = new UIPane(uiRoot, false) {
+			private Font font = uiFont.deriveFont(28f);
+			@Override
+			protected void paintSelf(GraphAssist g) {
+				clear(g);
+				g.setColor(Color.WHITE);
+				g.setFont(font);
+				String s = WorldTime.getFormattedTime();
+				g.drawString(s, 0, getHeight()/2, GraphAssist.LEFT, GraphAssist.CENTER);
+			}
+		};
+		uiTime.setSize(120, 32);
 	}
 	
 	private void updateWalkY() {

@@ -37,7 +37,7 @@ public class HouseGenerator extends PlotGenerator {
 	@Override
 	protected void placeAt(Token t, int i, int j, Random random) {
 		new SubTile(this, t.d, Template.house, i, j).place(t);
-		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 3, 2);
+		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 2, 3);
 	}
 	
 	@Override

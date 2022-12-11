@@ -3,15 +3,13 @@ package com.xrbpowered.aethertown.world.stars;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class RandomStarData {
+public class StarData {
 
 	public static final float axialTilt = (float)Math.toRadians(23.45);
-	public static final float dayOfYear = 0.75f;
-
 	public static final int numStars = 100000;
 	public static final boolean debugSun = false;
 	
-	public static class StarData {
+	public static class Star {
 		public double ra, de;
 		public float mag, temp;
 	}
@@ -72,12 +70,12 @@ public class RandomStarData {
 		}
 	}
 
-	public static StarData sun = null;
+	public static Star sun = null;
 	
-	public static ArrayList<StarData> generate(Random random) {
-		ArrayList<StarData> stars = new ArrayList<>();
+	public static ArrayList<Star> generate(Random random) {
+		ArrayList<Star> stars = new ArrayList<>();
 		for(int i=0; i<numStars; i++) {
-			StarData star = new StarData();
+			Star star = new Star();
 			star.ra = random.nextDouble()*2.0*Math.PI;
 			star.de = Math.asin(2.0*random.nextDouble()-1.0);
 			star.mag = (float) magRand.next(random);
@@ -86,8 +84,8 @@ public class RandomStarData {
 				stars.add(star);
 		}
 
-		sun = new StarData(); // sun
-		sun.ra = dayOfYear*Math.PI*2f;
+		sun = new Star(); // sun
+		sun.ra = WorldTime.dayOfYear*Math.PI*2f;
 		sun.de = axialTilt*Math.sin(sun.ra);
 		sun.mag = -10;
 		sun.temp = 5500;
