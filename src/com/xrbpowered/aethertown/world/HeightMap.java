@@ -1,15 +1,21 @@
 package com.xrbpowered.aethertown.world;
 
-import static com.xrbpowered.aethertown.world.Level.levelSize;
-
 import com.xrbpowered.aethertown.utils.Corner;
 
 import static com.xrbpowered.aethertown.utils.MathUtils.lerp;
 
 public class HeightMap {
 
-	public int[][] y = new int[levelSize+1][levelSize+1];
-	public boolean[][] diag = new boolean[levelSize][levelSize];
+	public final int levelSize;
+	
+	public int[][] y;
+	public boolean[][] diag;
+
+	public HeightMap(int levelSize) {
+		this.levelSize = levelSize;
+		this.y = new int[levelSize+1][levelSize+1];
+		this.diag = new boolean[levelSize][levelSize];
+	}
 	
 	public boolean isFlat(int x, int z) {
 		return y[x][z]==y[x+1][z] && y[x][z]==y[x][z+1] && y[x][z]==y[x+1][z+1];
@@ -41,7 +47,7 @@ public class HeightMap {
 		int minf = 0;
 		boolean firstf = true;
 		for(Corner c : Corner.values()) {
-			if(Level.isInside(x+c.tx, z+c.tz)) {
+			if(level.isInside(x+c.tx, z+c.tz)) {
 				Tile t = level.map[x+c.tx][z+c.tz];
 				if(t==null)
 					continue;

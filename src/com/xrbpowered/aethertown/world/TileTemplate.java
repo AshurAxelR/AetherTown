@@ -12,10 +12,14 @@ public abstract class TileTemplate extends Template implements Generator {
 	protected void updateHeightLimit(Token t) {
 		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 3);
 	}
+
+	protected boolean canGenerate(Token t) {
+		return t.fits() && t.isFree();
+	}
 	
 	@Override
 	public boolean generate(Token t, Random random) {
-		if(t.fits() && t.isFree()) {
+		if(canGenerate(t)) {
 			new Tile(this, t.d).place(t);
 			updateHeightLimit(t);
 			return true;

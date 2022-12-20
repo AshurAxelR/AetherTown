@@ -1,7 +1,5 @@
 package com.xrbpowered.aethertown.world;
 
-import static com.xrbpowered.aethertown.world.Level.levelSize;
-
 import com.xrbpowered.aethertown.utils.Dir;
 
 public class HeightLimiter {
@@ -11,10 +9,17 @@ public class HeightLimiter {
 	public static int maxCliff = 18; //24;
 	public static int maxWall = 12; //8;
 	
-	public int[][] miny = new int[levelSize][levelSize];
-	public int[][] maxy = new int[levelSize][levelSize];
+	public final Level level;
+	public final int levelSize;
 	
-	public HeightLimiter() {
+	public int[][] miny;
+	public int[][] maxy;
+	
+	public HeightLimiter(Level level) {
+		this.level = level;
+		this.levelSize = level.levelSize;
+		this.miny = new int[levelSize][levelSize];
+		this.maxy = new int[levelSize][levelSize];
 		reset();
 	}
 	
@@ -26,6 +31,10 @@ public class HeightLimiter {
 			}
 	}
 	
+	public boolean isInside(int x, int z) {
+		return x>=0 && x<levelSize && z>=0 && z<levelSize;
+	}
+
 	public void updateAt(int cx, int cy, int cz, int limDown, int limUp, int limR) {
 		int diffDown = 0;
 		int diffUp = 0;
@@ -42,7 +51,7 @@ public class HeightLimiter {
 				for(int i=0; i<q*2; i++) {
 					int x = x0 + i*d.dx;
 					int z = z0 + i*d.dz;
-					if(!Level.isInside(x, z))
+					if(!level.isInside(x, z))
 						continue;
 					if(miny[x][z]<low) {
 						miny[x][z] = low;

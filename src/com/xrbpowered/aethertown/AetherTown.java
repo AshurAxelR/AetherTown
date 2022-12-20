@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.lwjgl.opengl.GL11;
@@ -58,7 +59,7 @@ public class AetherTown extends UIClient {
 	private TileRenderer tiles;
 	
 	private ObjectShader objShader;
-	private StaticMeshActor[] terrainActors;
+	private ArrayList<StaticMeshActor> terrainActors;
 
 	private StaticMeshActor pointActor;
 
@@ -97,9 +98,9 @@ public class AetherTown extends UIClient {
 			public void setupResources() {
 				clearColor = environment.bgColor;
 				camera = new CameraActor.Perspective().setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
-				camera.position.x = Level.levelSize/2*Tile.size;
-				camera.position.z = Level.levelSize/2*Tile.size;
-				camera.rotation.y = 0; // (float)(-Math.PI*0.75);
+				camera.position.x = level.getStartX()*Tile.size;
+				camera.position.z = level.getStartZ()*Tile.size;
+				camera.rotation.y = 0;
 				camera.updateTransform();
 				
 				walkController = new WalkController(input).setActor(camera);
@@ -200,7 +201,7 @@ public class AetherTown extends UIClient {
 		uiMinimap = new UITexture(uiRoot) {
 			@Override
 			public void setupResources() {
-				BufferedImage img = new BufferedImage(Level.levelSize*2, Level.levelSize*2, BufferedImage.TYPE_INT_RGB);
+				BufferedImage img = new BufferedImage(level.levelSize*2, level.levelSize*2, BufferedImage.TYPE_INT_RGB);
 				Graphics2D g = (Graphics2D) img.getGraphics();
 				level.drawMinimap(g, 2);
 				g.setColor(Color.BLACK);
@@ -208,7 +209,8 @@ public class AetherTown extends UIClient {
 				setTexture(new Texture(img, false, false));
 			}
 		};
-		uiMinimap.setSize(Level.levelSize*2, Level.levelSize*2);
+		uiMinimap.setSize(level.levelSize*2, level.levelSize*2);
+		uiMinimap.setVisible(false);
 		
 		uiTime = new UIPane(uiRoot, false) {
 			private Font font = uiFont.deriveFont(28f);
@@ -229,7 +231,7 @@ public class AetherTown extends UIClient {
 		hoverz = (int)((camera.position.z+Tile.size/2)/Tile.size);
 		pointActor.position.x = camera.position.x;
 		pointActor.position.z = camera.position.z;
-		pointActor.position.y = Level.isInside(hoverx, hoverz) ? level.gety(camera.position.x, camera.position.z) : 0;
+		pointActor.position.y = level.isInside(hoverx, hoverz) ? level.gety(camera.position.x, camera.position.z) : 0;
 		pointActor.updateTransform();
 		
 		if(activeController==walkController) {
@@ -264,7 +266,7 @@ public class AetherTown extends UIClient {
 					activeController.setMouseLook(true);
 				break;
 			case KeyEvent.VK_F1: {
-					if(Level.isInside(hoverx, hoverz)) {
+					if(level.isInside(hoverx, hoverz)) {
 						Tile tile = level.map[hoverx][hoverz];
 						System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
 						System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
@@ -287,6 +289,10 @@ public class AetherTown extends UIClient {
 				environment = ShaderEnvironment.environments[activeEnvironment];
 				updateEnvironment();
 				break;*/
+			case KeyEvent.VK_M:
+				uiMinimap.setVisible(!uiMinimap.isVisible());
+				uiMinimap.repaint();
+				break;
 			default:
 				super.keyPressed(c, code);
 		}
@@ -295,7 +301,7 @@ public class AetherTown extends UIClient {
 	public static void main(String[] args) {
 		seed = System.currentTimeMillis();
 		System.out.println("Generating... "+seed);
-		level = new Level();
+		level = new Level(256);
 		level.generate(new Random(seed));
 		System.gc();
 		System.out.println("Done.");

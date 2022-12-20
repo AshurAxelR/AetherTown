@@ -35,6 +35,11 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
+	protected boolean canGenerate(Token t) {
+		return t.level.isInside(t.x, t.z) && t.level.fitsHeight(t.x, t.y, t.z, false);
+	}
+	
+	@Override
 	public void createComponents() {
 	}
 	

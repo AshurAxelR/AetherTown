@@ -37,6 +37,9 @@ public class HillsGenerator extends TokenGenerator {
 			if(t.y<miny)
 				t.y = miny;
 		}
+		else {
+			t.y = (miny+maxy)/2;
+		}
 		return true;
 	}
 	
@@ -46,16 +49,5 @@ public class HillsGenerator extends TokenGenerator {
 			addToken(t.next(d, random.nextInt(maxdy-mindy+1)+mindy));
 		}
 	}
-
-/*	@Override
-	protected boolean place(Generator gen, Token t, Random random) {
-		if(super.place(gen, t, random)) {
-			t.level.heightLimiter.updateAt(t.x, t.y, t.z);
-			return true;
-		}
-		else {
-			return false;
-		}
-	}*/
 	
 }

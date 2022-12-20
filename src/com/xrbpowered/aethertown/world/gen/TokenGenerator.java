@@ -1,7 +1,5 @@
 package com.xrbpowered.aethertown.world.gen;
 
-import static com.xrbpowered.aethertown.world.Level.isInside;
-
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -59,7 +57,7 @@ public abstract class TokenGenerator implements Generator {
 		while(countTokens>0) {
 			Token t = tokens.remove(random.nextInt(countTokens));
 			countTokens--;
-			if(!isInside(t.x, t.z) || t.level.map[t.x][t.z]!=null)
+			if(!t.level.isInside(t.x, t.z) || t.level.map[t.x][t.z]!=null)
 				continue;
 			if(!checkToken(t))
 				continue;

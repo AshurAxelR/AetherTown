@@ -11,13 +11,27 @@ import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 
 public class Level {
 
-	public static final int levelSize = 80;
+	public final int levelSize;
 	
 	private Random random;
-	public Tile[][] map = new Tile[levelSize][levelSize];
+	public Tile[][] map;
 	public HeightLimiter heightLimiter = null;
-	public HeightMap h = new HeightMap();
+	public HeightMap h;
 	
+	public Level(int size) {
+		this.levelSize = size;
+		this.map = new Tile[levelSize][levelSize];
+		this.h = new HeightMap(levelSize);
+	}
+	
+	public int getStartX() {
+		return levelSize/2;
+	}
+
+	public int getStartZ() {
+		return levelSize/2;
+	}
+
 	private void expandTokens(HillsGenerator gen, Random random, int skip) {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
@@ -60,8 +74,8 @@ public class Level {
 	
 	public void generate(Random random) {
 		this.random = random;
-		heightLimiter = new HeightLimiter();
-		new StreetLayoutGenerator(0).generate(new Token(this, levelSize/2, 0, levelSize/2, Dir.north), random);
+		heightLimiter = new HeightLimiter(this);
+		new StreetLayoutGenerator(0).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
 		
 		HillsGenerator hillsGen = new HillsGenerator(0).setAmp(-2, 2);
 		expandTokens(hillsGen, random, 10);
@@ -136,28 +150,34 @@ public class Level {
 	public Tile getAdj(int tx, int tz, Dir d) {
 		int x = tx + d.dx;
 		int z = tz + d.dz;
-		return Level.isInside(x, z) ? map[x][z] : null; 
+		return isInside(x, z) ? map[x][z] : null; 
 	}
 	
 	public boolean fits(int x, int y, int z) {
 		return isInside(x, z) && fitsHeight(x, y, z);
 	}
-
-	public boolean fitsHeight(int x, int y, int z) {
+	
+	public boolean fitsHeight(int x, int y, int z, boolean strict) {
 		int miny = heightLimiter.miny[x][z];
 		int maxy = heightLimiter.maxy[x][z];
-		if(miny>maxy)
+		if(miny<=maxy)
+			return y>=miny && y<=maxy;
+		else if(!strict)
 			return y>=maxy && y<=miny;
 		else
-			return y>=miny && y<=maxy;
-		// return y>=miny && y<=maxy || miny>maxy; // FIXME reverse height limit
+			return false;
 	}
 
-	public static boolean isInside(int x, int z) {
-		return x>=0 && x<Level.levelSize && z>=0 && z<Level.levelSize;
+	public boolean fitsHeight(int x, int y, int z) {
+		return fitsHeight(x, y, z, true);
+	}
+
+	public boolean isInside(int x, int z) {
+		return x>=0 && x<levelSize && z>=0 && z<levelSize;
 	}
 	
-	public static boolean isInside(int x, int z, int margin) {
-		return x>=margin && x<Level.levelSize-margin && z>=margin && z<Level.levelSize-margin;
+	public boolean isInside(int x, int z, int margin) {
+		return x>=margin && x<levelSize-margin && z>=margin && z<levelSize-margin;
 	}
+	
 }
