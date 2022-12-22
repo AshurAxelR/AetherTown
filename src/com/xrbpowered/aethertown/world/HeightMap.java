@@ -6,13 +6,15 @@ import static com.xrbpowered.aethertown.utils.MathUtils.lerp;
 
 public class HeightMap {
 
+	public final Level level;
 	public final int levelSize;
 	
 	public int[][] y;
 	public boolean[][] diag;
 
-	public HeightMap(int levelSize) {
-		this.levelSize = levelSize;
+	public HeightMap(Level level) {
+		this.level = level;
+		this.levelSize = level.levelSize;
 		this.y = new int[levelSize+1][levelSize+1];
 		this.diag = new boolean[levelSize][levelSize];
 	}
@@ -64,6 +66,24 @@ public class HeightMap {
 		return firstf ? max : minf;
 	}
 	
+	private static int blur(int y, int y1, int y2) {
+		int min = Math.min(y1, y2);
+		int max = Math.max(y1, y2);
+		if(y>min-8 && y>max)
+			return max;
+		if(y>max+2)
+			return max+2;
+		if(y<min-4)
+			return min-4;
+		return y;
+	}
+	
+	private static int blur(int y, int yn, int ye, int ys, int yw) {
+		int yns = blur(y, yn, ys);
+		int yew = blur(y, ye, yw);
+		return (yns+yew)/2;
+	}
+	
 	private static boolean calcDiag(int y00, int y01, int y10, int y11) {
 		int d1 = Math.abs(y00-y11); 
 		int d2 = Math.abs(y01-y10);
@@ -79,11 +99,17 @@ public class HeightMap {
 		return d1<d2;
 	}
 	
-	public void calculate(Level level) {
+	public void calculate(boolean blur) {
 		for(int x=0; x<=levelSize; x++)
 			for(int z=0; z<=levelSize; z++) {
 				this.y[x][z] = calcy(level, x, z);
 			}
+		if(blur) {
+			for(int x=1; x<levelSize; x++)
+				for(int z=1; z<levelSize; z++) {
+					this.y[x][z] = blur(this.y[x][z], this.y[x][z-1], this.y[x+1][z], this.y[x][z+1], this.y[x-1][z]);
+				}
+		}
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
 				this.diag[x][z] = calcDiag(y[x][z], y[x][z+1], y[x+1][z], y[x+1][z+1]);

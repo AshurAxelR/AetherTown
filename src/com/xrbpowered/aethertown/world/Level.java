@@ -21,7 +21,7 @@ public class Level {
 	public Level(int size) {
 		this.levelSize = size;
 		this.map = new Tile[levelSize][levelSize];
-		this.h = new HeightMap(levelSize);
+		this.h = new HeightMap(this);
 	}
 	
 	public int getStartX() {
@@ -58,7 +58,7 @@ public class Level {
 		boolean upd = true;
 		boolean refill = false;
 		while(upd) {
-			h.calculate(this);
+			h.calculate(true);
 			upd = false;
 			for(int x=0; x<levelSize; x++)
 				for(int z=0; z<levelSize; z++) {

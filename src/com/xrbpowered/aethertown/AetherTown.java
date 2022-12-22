@@ -301,7 +301,7 @@ public class AetherTown extends UIClient {
 	public static void main(String[] args) {
 		seed = System.currentTimeMillis();
 		System.out.println("Generating... "+seed);
-		level = new Level(256);
+		level = new Level(128);
 		level.generate(new Random(seed));
 		System.gc();
 		System.out.println("Done.");

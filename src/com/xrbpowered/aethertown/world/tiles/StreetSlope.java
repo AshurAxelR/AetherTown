@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
@@ -70,6 +71,7 @@ public class StreetSlope extends TileTemplate {
 		else {
 			terrain.addWall(tile.x, tile.z, tile.d.cw(), tile.basey, tile.basey-h);
 			terrain.addWall(tile.x, tile.z, tile.d.ccw(), tile.basey-h, tile.basey);
+			Template.street.addLamp(tile, random, -0.5f);
 		}
 		street.addInstance(new TileObjectInfo(tile, 0, -h, 0));
 	}

@@ -15,11 +15,7 @@ import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
 public class StreetGenerator implements Generator, TokenProvider {
 
-	private static final int margin = 96; //20;
-	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.5, 1); // new WRandom(1, 0.5, 0.25, 1);
-	private static final int[] dyopt = {0, -1, 1, -4, 4};
-	private static final WRandom dyoptw = new WRandom(0.1, 0.4, 0.4, 0.5, 0.5);
-
+	private static final int margin = 40; // 96; //20;
 	private int dy, absdy;
 	private Integer targetHeight = null;
 	private boolean perfectMatch = false;
@@ -31,6 +27,8 @@ public class StreetGenerator implements Generator, TokenProvider {
 	private int len;
 	private int[] dylist = null;
 	
+	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.5, 1); // new WRandom(1, 0.5, 0.25, 1);
+
 	public static Generator selectSideGenerator(Random random, int h) {
 		switch(sidew.next(random)) {
 			case 1:
@@ -49,6 +47,9 @@ public class StreetGenerator implements Generator, TokenProvider {
 		if(gen!=null)
 			gen.generate(new Token(level, t.x+side.dx, t.y, t.z+side.dz, side), random);
 	}
+	
+	private static final int[] dyopt = {0, -1, 1, -4, 4};
+	private static final WRandom dyoptw = new WRandom(0.1, 0.4, 0.4, 0.5, 0.5);
 	
 	public StreetGenerator(Random random, int prevdy) {
 		dy = dyopt[dyoptw.next(random)];

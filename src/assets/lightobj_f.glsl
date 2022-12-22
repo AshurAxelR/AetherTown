@@ -55,7 +55,7 @@ void main(void) {
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	if(lightColor.x+lightColor.y+lightColor.z<illumTrigger) {
 		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
-		out_Color += illumColor;
+		out_Color = max(out_Color, illumColor);
 		float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
 		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
 	}
