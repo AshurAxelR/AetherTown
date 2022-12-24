@@ -35,15 +35,15 @@ public class TerrainBuilder {
 			}
 	}
 	
-	public void addHillTile(int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
+	public void addHillTile(Color c, int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
 		int cx = x/chunkSize;
 		int cz = z/chunkSize;
-		chunks[cx][cz].addHillTile(x, z, y00, y01, y10, y11, diag);
+		chunks[cx][cz].addHillTile(c, x, z, y00, y01, y10, y11, diag);
 	}
 	
-	public void addHillTile(int x, int z) {
+	public void addHillTile(Color c, int x, int z) {
 		HeightMap h = level.h;
-		addHillTile(x, z,
+		addHillTile(c, x, z,
 			h.y[x][z],
 			h.y[x][z+1],
 			h.y[x+1][z],
@@ -52,8 +52,24 @@ public class TerrainBuilder {
 		);
 	}
 
-	public void addHillTile(Tile tile) {
-		addHillTile(tile.x, tile.z);
+	public void addHillTile(Color c, Tile tile) {
+		addHillTile(c, tile.x, tile.z);
+	}
+
+	public void addFlatTile(Color c, int x, int y, int z) {
+		addHillTile(c, x, z,
+			y, y, y, y, true
+		);
+	}
+
+	public void addFlatTile(Color c, Tile tile) {
+		addFlatTile(c, tile.x, tile.basey, tile.z);
+	}
+
+	public void addWall(int x, int z, Dir d, int y00, int y01, int y10, int y11) {
+		int cx = x/chunkSize;
+		int cz = z/chunkSize;
+		chunks[cx][cz].addWall(x, z, d, y00, y01, y10, y11);
 	}
 
 	public void addWall(int x, int z, Dir d, int basey0, int basey1) {

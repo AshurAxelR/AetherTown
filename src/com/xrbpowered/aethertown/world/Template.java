@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Park;
@@ -37,8 +37,12 @@ public abstract class Template {
 		this.minimapColor = minimapColor;
 	}
 	
-	public boolean isFixedY() {
-		return true;
+	public int getFixedYStrength() {
+		return 2;
+	}
+	
+	public int getGroundY(Tile tile) {
+		return tile.basey;
 	}
 
 	public float gety(Tile tile, float sx, float sz) {
@@ -50,6 +54,6 @@ public abstract class Template {
 	}
 	
 	public abstract void createComponents();
-	public abstract void createGeometry(Tile tile, TerrainBuilder terrain, Random random);
+	public abstract void createGeometry(Tile tile, LevelRenderer renderer, Random random);
 
 }

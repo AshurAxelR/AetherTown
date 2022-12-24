@@ -13,6 +13,7 @@ public class Tile {
 	public int x, z;
 	public int basey = 0;
 	public Dir d;
+	public Object data = null;
 	
 	public Tile(Template t, Dir d) {
 		this.t = t;
@@ -30,11 +31,11 @@ public class Tile {
 	public void place(Token t) {
 		place(t.level, t.x, t.y, t.z);
 	}
-	
-	public int geth() {
-		return level.h.y[x][z];
-	}
 
+	public int getGroundY() {
+		return t.getGroundY(this);
+	}
+	
 	public Tile getAdj(int dx, int dz) {
 		int x = this.x + dx;
 		int z = this.z + dz;

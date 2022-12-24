@@ -5,16 +5,11 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.Random;
 
-import org.lwjgl.opengl.GL11;
-
-import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
-import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
@@ -56,11 +51,8 @@ public class AetherTown extends UIClient {
 	private boolean controllerEnabled = false;
 	
 	private SkyRenderer sky;
-	private TileRenderer tiles;
+	private LevelRenderer renderer;
 	
-	private ObjectShader objShader;
-	private ArrayList<StaticMeshActor> terrainActors;
-
 	private StaticMeshActor pointActor;
 
 	private int hoverx, hoverz;
@@ -112,19 +104,11 @@ public class AetherTown extends UIClient {
 				sky = new SkyRenderer().setCamera(camera);
 				sky.stars.createStars(seed);
 				
-				objShader = new ObjectShader(sky.buffer);
-				objShader.setCamera(camera);
+				renderer = new LevelRenderer(level, sky.buffer).setCamera(camera);
+				Template.createAllComponents(); // FIXME should not depend on creating level renderer first
+				renderer.createLevelGeometry();
 
-				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, objShader.info, null), objShader, new Texture(Color.RED));
-				
-				tiles = new TileRenderer(sky.buffer).setCamera(camera);
-				Template.createAllComponents();
-				
-				tiles.startCreateInstances();
-				TerrainBuilder terrainBuilder = new TerrainBuilder(level);
-				level.createGeometry(terrainBuilder);
-				terrainActors = terrainBuilder.createActors(objShader);
-				tiles.finishCreateInstances();
+				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, renderer.objShader.info, null), renderer.objShader, new Texture(Color.RED));
 
 				updateEnvironment();
 				updateWalkY();
@@ -171,15 +155,7 @@ public class AetherTown extends UIClient {
 			protected void renderBuffer(RenderTarget target) {
 				super.renderBuffer(target);
 				sky.render(target);
-				
-				GL11.glDisable(GL11.GL_CULL_FACE);
-				tiles.shader.bindSkyTexture();
-				tiles.lightShader.bindSkyTexture();
-				tiles.drawInstances();
-				
-				objShader.bindSkyTexture();
-				for(StaticMeshActor actor : terrainActors)
-					actor.draw();
+				renderer.render(target);
 				
 				if(showPointer)
 					pointActor.draw();
@@ -242,8 +218,7 @@ public class AetherTown extends UIClient {
 	
 	private void updateEnvironment() {
 		sky.updateEnvironment(environment);
-		environment.updateShader(objShader);
-		tiles.updateEnvironment(environment);
+		renderer.updateEnvironment(environment);
 	}
 	
 	@Override
@@ -269,11 +244,17 @@ public class AetherTown extends UIClient {
 					if(level.isInside(hoverx, hoverz)) {
 						Tile tile = level.map[hoverx][hoverz];
 						System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
-						System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
+						if(level.heightLimiter!=null)
+							System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
 						if(tile!=null)
 							System.out.printf("\tbasey=%d\n", tile.basey);
 						else
 							System.out.println("\tnull");
+						int[] yloc = level.h.yloc(hoverx, hoverz);
+						System.out.print("yloc: ");
+						for(int i=0; i<4; i++)
+							System.out.printf("%d; ", yloc[i]);
+						System.out.println();
 					}
 					else {
 						System.out.println("Outside level");

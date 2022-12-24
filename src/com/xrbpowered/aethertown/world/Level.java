@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Random;
 
-import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
@@ -82,18 +82,19 @@ public class Level {
 		hillsGen.limit = hillsGen.tokenCount()*30;
 		hillsGen.generate(random);
 
-		hillsGen = new HillsGenerator(0).setAmp(-2, 4);//.setAmp(-2, 6);
+		hillsGen = new HillsGenerator(0).setAmp(-2, 4);
 		expandTokens(hillsGen, random, 10);
 		hillsGen.limit = hillsGen.tokenCount()*50;
 		hillsGen.generate(random);
 
 		int att = 0;
-		int maxAtt = 100;
+		int maxAtt = 50;
 		for(; att<maxAtt; att++) {
 			hillsGen = new HillsGenerator(0).setAmp(-8, 2);
 			expandTokens(hillsGen, random, 0);
-			if(hillsGen.tokenCount()>0)
+			if(hillsGen.tokenCount()>0) {
 				hillsGen.generate(random);
+			}
 			else if(att>0) {
 				System.err.println("Failed to get refill tokens on att "+att);
 				break;
@@ -104,15 +105,15 @@ public class Level {
 		if(att>=maxAtt)
 			System.err.println("Refill attempts limit reached");
 		
-		// heightLimiter = null;
+		heightLimiter = null;
 	}
 	
-	public void createGeometry(TerrainBuilder terrain) {
+	public void createGeometry(LevelRenderer renderer) {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
 				Tile tile = map[x][z];
 				if(tile!=null)
-					tile.t.createGeometry(tile, terrain, random);
+					tile.t.createGeometry(tile, renderer, random);
 				else {
 					System.err.printf("null tile at [%d, %d]\n", x, z);
 				}
@@ -133,7 +134,7 @@ public class Level {
 		if(!isInside(x, z))
 			return 0;
 		Tile tile = map[x][z];
-		if(tile!=null && tile.t.isFixedY())
+		if(tile!=null)
 			return tile.t.gety(tile, sx, sz);
 		else
 			return h.gety(x, z, sx, sz);

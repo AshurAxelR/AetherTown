@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.tiles;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.BasicGeometry;
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -63,14 +64,21 @@ public class StreetSlope extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, TerrainBuilder terrain, Random random) {
+	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		if(h==4) {
 			side.addInstance(new TileObjectInfo(tile, 0, -h, 0));
-			terrain.addWalls(tile.x, tile.z, tile.basey-h);
+			if(!Template.street.addBridge(tile, tile.basey-h, renderer))
+				renderer.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 		}
 		else {
-			terrain.addWall(tile.x, tile.z, tile.d.cw(), tile.basey, tile.basey-h);
-			terrain.addWall(tile.x, tile.z, tile.d.ccw(), tile.basey-h, tile.basey);
+			if(Template.street.addBridge(tile, tile.basey-h, renderer)) {
+				renderer.terrain.addWall(tile.x, tile.z, tile.d.cw(), tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
+				renderer.terrain.addWall(tile.x, tile.z, tile.d.ccw(), tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
+			}
+			else {
+				renderer.terrain.addWall(tile.x, tile.z, tile.d.cw(), tile.basey, tile.basey-h);
+				renderer.terrain.addWall(tile.x, tile.z, tile.d.ccw(), tile.basey-h, tile.basey);
+			}
 			Template.street.addLamp(tile, random, -0.5f);
 		}
 		street.addInstance(new TileObjectInfo(tile, 0, -h, 0));

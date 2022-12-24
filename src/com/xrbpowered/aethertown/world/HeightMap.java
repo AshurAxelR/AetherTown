@@ -1,11 +1,14 @@
 package com.xrbpowered.aethertown.world;
 
 import com.xrbpowered.aethertown.utils.Corner;
+import com.xrbpowered.aethertown.utils.MathUtils;
 
 import static com.xrbpowered.aethertown.utils.MathUtils.lerp;
 
 public class HeightMap {
 
+	public static final int[] yloc = new int[4];
+	
 	public final Level level;
 	public final int levelSize;
 	
@@ -43,27 +46,47 @@ public class HeightMap {
 		}
 	}
 
+	public int[] yloc(int x, int z) {
+		yloc[0] = y[x][z];
+		yloc[1] = y[x+1][z];
+		yloc[2] = y[x][z+1];
+		yloc[3] = y[x+1][z+1];
+		return yloc;
+	}
+	
 	private static int calcy(Level level, int x, int z) {
 		int max = 0;
 		boolean first = true;
 		int minf = 0;
-		boolean firstf = true;
+		int maxFix = 0;
 		for(Corner c : Corner.values()) {
 			if(level.isInside(x+c.tx, z+c.tz)) {
 				Tile t = level.map[x+c.tx][z+c.tz];
 				if(t==null)
 					continue;
-				if(first || t.basey>max) {
-					max = t.basey;
-					first = false;
+				int fix = t.t.getFixedYStrength();
+				if(fix>0) {
+					if(fix>maxFix || (t.basey<minf && fix==maxFix)) {
+						minf = t.getGroundY();
+						maxFix = fix;
+					}
 				}
-				if(t.t.isFixedY() && (firstf || t.basey<minf)) {
-					minf = t.basey;
-					firstf = false;
+				else {
+					if(first || t.basey>max) {
+						max = t.getGroundY();
+						first = false;
+					}
 				}
 			}
 		}
-		return firstf ? max : minf;
+		if(first)
+			return minf;
+		else if(maxFix==0)
+			return max;
+		else if(minf>max+4)
+			return max+4;
+		else
+			return minf;
 	}
 	
 	private static int blur(int y, int y1, int y2) {
@@ -71,10 +94,10 @@ public class HeightMap {
 		int max = Math.max(y1, y2);
 		if(y>min-8 && y>max)
 			return max;
-		if(y>max+2)
-			return max+2;
-		if(y<min-4)
-			return min-4;
+		if(y>max+1)
+			return max+1;
+		if(y<min-2)
+			return min-2;
 		return y;
 	}
 	
@@ -87,7 +110,7 @@ public class HeightMap {
 	private static boolean calcDiag(int y00, int y01, int y10, int y11) {
 		int d1 = Math.abs(y00-y11); 
 		int d2 = Math.abs(y01-y10);
-		int d = maxDelta(y00, y01, y10, y11);
+		int d = MathUtils.maxDelta(y00, y01, y10, y11);
 		if(d>d1+d2) {
 			int miny1 = Math.min(y00, y11);
 			int miny2 = Math.min(y01, y10);
@@ -116,16 +139,4 @@ public class HeightMap {
 			}
 	}
 
-
-	public static int maxDelta(int... y) {
-		int miny = y[0];
-		int maxy = y[0];
-		for(int i=1; i<y.length; i++) {
-			if(y[i]<miny)
-				miny = y[i];
-			if(y[i]>maxy)
-				maxy = y[i];
-		}
-		return maxy-miny;
-	}
 }

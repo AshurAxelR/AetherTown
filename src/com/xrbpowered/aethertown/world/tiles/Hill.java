@@ -2,10 +2,11 @@ package com.xrbpowered.aethertown.world.tiles;
 
 import java.util.Random;
 
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightLimiter;
-import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
@@ -25,8 +26,13 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
-	public boolean isFixedY() {
-		return false;
+	public float gety(Tile tile, float sx, float sz) {
+		return tile.level.h.gety(tile.x, tile.z, sx, sz);
+	}
+	
+	@Override
+	public int getFixedYStrength() {
+		return 0;
 	}
 	
 	@Override
@@ -44,39 +50,58 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
-	public void createGeometry(Tile tile, TerrainBuilder terrain, Random random) {
-		terrain.addHillTile(tile);
-		HeightMap h = tile.level.h;
-		int maxd = HeightMap.maxDelta(h.y[tile.x][tile.z], h.y[tile.x+1][tile.z], h.y[tile.x][tile.z+1], h.y[tile.x+1][tile.z+1]);
+	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
+		renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+		int maxd = getMaxDelta(tile);
 		if(maxd<10)
 			Template.park.addTrees(tile, random);
 	}
 	
+	public int getMaxDelta(Tile tile) {
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		return MathUtils.maxDelta(yloc);
+		/*if(tile.data==null) {
+			int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+			tile.data = MathUtils.maxDelta(yloc);
+		}
+		return (Integer)tile.data;*/
+	}
+	
 	@Override
 	public boolean finalizeTile(Tile tile, Random random) {
-		HeightMap h = tile.level.h;
-		int maxd = HeightMap.maxDelta(h.y[tile.x][tile.z], h.y[tile.x+1][tile.z], h.y[tile.x][tile.z+1], h.y[tile.x+1][tile.z+1]); // TODO save maxd
+		boolean res = false;
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		int miny = MathUtils.min(yloc);
+		if(miny!=tile.basey) {
+			tile.basey = miny;
+			res = true;
+		}
+		int maxd = MathUtils.maxDelta(yloc);
+		tile.data = maxd;
 		if(maxd>1)
-			return false;
+			return res;
 
-		boolean adjPark = false;
-		for(Dir d : Dir.values()) {
+		Dir adjDir = null;
+		int y = 0;
+		Dir d = Dir.random(random);
+		for(int i=0; i<4; i++) {
 			Tile adj = tile.getAdj(d);
 			Template adjt = (adj==null) ? null : adj.t;
 			if(adjt==Template.park || adjt==Template.street) {
 				if(Math.abs(adj.basey-tile.basey)<=1) {
-					adjPark = true;
+					adjDir = d;
+					y = adj.basey;
 					break;
 				}
 			}
+			d = d.cw();
 		}
-		if(adjPark) {
-			tile.level.map[tile.x][tile.z] = null;
-			Template.park.generate(new Token(tile.level, tile.x, tile.geth(), tile.z, Dir.north), random);
+		if(adjDir!=null) {
+			Template.park.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir), random);
 			return true;
 		}
 		else
-			return false;
+			return res;
 	}
 	
 }

@@ -1,33 +1,35 @@
 package com.xrbpowered.aethertown.render;
 
+import static com.xrbpowered.aethertown.render.TerrainBuilder.chunkSize;
+
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.mesh.AdvancedMeshBuilder;
-import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.mesh.AdvancedMeshBuilder.Edge;
 import com.xrbpowered.gl.res.mesh.AdvancedMeshBuilder.Face;
 import com.xrbpowered.gl.res.mesh.AdvancedMeshBuilder.Quad;
 import com.xrbpowered.gl.res.mesh.AdvancedMeshBuilder.Triangle;
 import com.xrbpowered.gl.res.mesh.AdvancedMeshBuilder.Vertex;
+import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.shader.ActorShader;
 import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.scene.StaticMeshActor;
 
-import static com.xrbpowered.aethertown.render.TerrainBuilder.chunkSize;
-
-import java.awt.Color;
-import java.util.ArrayList;
-
 public class TerrainChunkBuilder {
 
-	public static boolean enableSmooth = false;
-	public static boolean enableDebugNormals = false;
+	private static final boolean enableSmooth = false;
+	private static final boolean enableDebugNormals = false;
 	
 	public final Level level;
 	public final int cx, cz;
@@ -36,14 +38,14 @@ public class TerrainChunkBuilder {
 	private Vertex[][] grassVertexMap;
 	private Vector3f[][] debugNormals;
 	
-	// public BufferedImage color;
+	public BufferedImage color;
 	
 	public TerrainChunkBuilder(Level level, int cx, int cz) {
 		this.level = level;
 		this.cx = cx;
 		this.cz = cz;
 		
-		// color = new BufferedImage(Level.levelSize, Level.levelSize, BufferedImage.TYPE_INT_RGB);
+		color = new BufferedImage(chunkSize, chunkSize, BufferedImage.TYPE_INT_RGB);
 		grassBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
 		cliffBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
 		wallBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
@@ -62,8 +64,8 @@ public class TerrainChunkBuilder {
 		v.setPosition(p);
 		v.setNormal(norm);
 		v.setTexCoord(
-			(p.x/Tile.size+0.5f)/(float)level.levelSize,
-			(p.z/Tile.size+0.5f)/(float)level.levelSize
+			((p.x/Tile.size+0.5f) - cx*chunkSize)/(float)chunkSize,
+			((p.z/Tile.size+0.5f) - cz*chunkSize)/(float)chunkSize
 		);
 	}
 	
@@ -109,8 +111,8 @@ public class TerrainChunkBuilder {
 		v.setPosition(pos(p));
 		v.setNormal(norm);
 		v.setTexCoord(
-				(p.x)/(float)level.levelSize,
-				(p.z)/(float)level.levelSize
+				(p.x - cx*chunkSize)/(float)chunkSize,
+				(p.z - cz*chunkSize)/(float)chunkSize
 			);
 		return v;
 	}
@@ -141,10 +143,10 @@ public class TerrainChunkBuilder {
 	}
 
 	private void addHillTriangle(Vector3i p0, Vector3i p1, Vector3i p2) {
-		addHillTriangle(HeightMap.maxDelta(p0.y, p1.y, p2.y), p0, p1, p2);
+		addHillTriangle(MathUtils.maxDelta(p0.y, p1.y, p2.y), p0, p1, p2);
 	}
 
-	public void addHillTile(int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
+	public void addHillTile(Color c, int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
 		Vector3i p00 = new Vector3i(x, y00, z);
 		Vector3i p01 = new Vector3i(x, y01, z+1);
 		Vector3i p10 = new Vector3i(x+1, y10, z);
@@ -157,7 +159,8 @@ public class TerrainChunkBuilder {
 			addHillTriangle(p00, p01, p10);
 			addHillTriangle(p01, p11, p10);
 		}
-		// color.setRGB(x, z, c.getRGB());
+		color.setRGB(x - cx*chunkSize, z - cz*chunkSize, c.getRGB());
+		// color.setRGB(x - cx*chunkSize, z - cz*chunkSize, new Color((x - cx*chunkSize)*3, (z - cz*chunkSize)*3, 0).getRGB());
 	}
 
 	private void addTriangleVertical(AdvancedMeshBuilder b, Vector3i p0, Vector3i p1, Vector3i p2, Dir d) {
@@ -204,6 +207,16 @@ public class TerrainChunkBuilder {
 		}
 	}
 	
+	public void addWall(int x, int z, Dir d, int y00, int y01, int y10, int y11) {
+		Corner c0 = d.leftCorner();
+		Corner c1 = d.rightCorner();
+		int x0 = x+c0.tx+1;
+		int z0 = z+c0.tz+1;
+		int x1 = x+c1.tx+1;
+		int z1 = z+c1.tz+1;
+		addWall(x0, z0, x1, z1, d, y00, y01, y10, y11);
+	}
+	
 	public void addWall(int x, int z, Dir d, int basey0, int basey1) {
 		Corner c0 = d.leftCorner();
 		Corner c1 = d.rightCorner();
@@ -248,7 +261,7 @@ public class TerrainChunkBuilder {
 		if(enableDebugNormals)
 			actors.add(makeActor(createDebugMesh(Tile.size/2), shader, new Texture(Color.RED)));
 
-		actors.add(makeActor(grassBuilder.create(), shader, TerrainBuilder.grassColor.texture()));
+		actors.add(makeActor(grassBuilder.create(), shader, new Texture(color, true, false)));
 		actors.add(makeActor(cliffBuilder.create(), shader, new Texture(TerrainBuilder.cliffColor)));
 		actors.add(makeActor(wallBuilder.create(), shader, new Texture(TerrainBuilder.wallColor)));
 	}

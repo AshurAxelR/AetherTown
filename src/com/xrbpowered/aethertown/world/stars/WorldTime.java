@@ -4,8 +4,9 @@ import com.xrbpowered.aethertown.render.env.Seasons;
 
 public class WorldTime {
 
-	public static final float dayOfYear = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
-	public static final int season = Seasons.winter;
+	public static final float dayOfYear = 0.8f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
+	@SuppressWarnings("unused")
+	public static final int season = (dayOfYear>0.7f && dayOfYear<0.85f) ? Seasons.winter : Seasons.summer;
 
 	public static final float timeSpeed = 60f;
 

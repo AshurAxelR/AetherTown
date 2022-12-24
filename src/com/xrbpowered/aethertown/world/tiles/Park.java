@@ -4,14 +4,14 @@ import java.awt.Color;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.BasicGeometry;
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
-import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
@@ -22,17 +22,26 @@ public class Park extends TileTemplate {
 	private static final float trunkRadius = 0.065f*Tile.size;
 	private static final float bushRadius = 0.3f*Tile.size;
 	
-	public static TileComponent grass, tree, trunk, bush;
+	public static TileComponent tree, trunk, bush;
 
 	public Park() {
 		super(grassColor.color());
 	}
 	
+	private static boolean isFlex(Tile tile) {
+		return tile.data!=null && (Boolean)tile.data;
+	}
+	
+	@Override
+	public float gety(Tile tile, float sx, float sz) {
+		if(isFlex(tile))
+			return tile.level.h.gety(tile.x, tile.z, sx, sz);
+		else
+			return super.gety(tile, sx, sz);
+	}
+	
 	@Override
 	public void createComponents() {
-		grass = new TileComponent(
-				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
-				grassColor.texture());
 		tree = new TileComponent(
 				BasicGeometry.sphere(treeRadius, 8, -1, ObjectShader.vertexInfo),
 				new Seasons(new Color(0x496d00), new Color(0xe0eef1)).texture());
@@ -45,9 +54,14 @@ public class Park extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, TerrainBuilder terrain, Random random) {
-		terrain.addWalls(tile);
-		grass.addInstance(new TileObjectInfo(tile));
+	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
+		if(isFlex(tile)) {
+			renderer.terrain.addHillTile(grassColor.color(), tile);
+		}
+		else {
+			renderer.terrain.addWalls(tile);
+			renderer.terrain.addFlatTile(grassColor.color(), tile);
+		}
 		addTrees(tile, random);
 	}
 	
@@ -92,6 +106,23 @@ public class Park extends TileTemplate {
 			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
 			bush.addInstance(new TileObjectInfo(x+tx, y0, z+tz).scale(s, sy));
 		}
+	}
+	
+	@Override
+	public boolean finalizeTile(Tile tile, Random random) {
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		int maxy = MathUtils.max(yloc);
+		if(maxy==tile.basey-1) {
+			tile.basey--;
+			return true;
+		}
+		int miny = MathUtils.min(yloc);
+		if(miny>tile.basey) {
+			tile.basey = miny;
+			return true;
+		}
+		tile.data = (miny==tile.basey-1);
+		return false;
 	}
 	
 }

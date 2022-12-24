@@ -28,4 +28,9 @@ public abstract class TileTemplate extends Template implements Generator {
 			return false;
 	}
 
+	public void forceGenerate(Token t, Random random) {
+		new Tile(this, t.d).place(t);
+		updateHeightLimit(t);
+	}
+
 }

@@ -6,13 +6,15 @@ import java.util.Random;
 import org.joml.Vector3f;
 
 import com.xrbpowered.aethertown.render.BasicGeometry;
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
 import com.xrbpowered.aethertown.render.tiles.LightTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.SubTile;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
@@ -30,6 +32,20 @@ public class HouseT extends Template {
 	public HouseT() {
 		super(roofColor.colors[Seasons.summer]);
 	}
+	
+	@Override
+	public int getFixedYStrength() {
+		return 1;
+	}
+	
+	@Override
+	public int getGroundY(Tile tile) {
+		if(tile.data==null)
+			return tile.basey;
+		else
+			return (Integer)tile.data;
+	}
+	
 	@Override
 	public void createComponents() {
 		StaticMesh wall = BasicGeometry.wall(Tile.size, 6*Tile.ysize, ObjectShader.vertexInfo, null);
@@ -65,8 +81,8 @@ public class HouseT extends Template {
 	}
 	
 	@Override
-	public void createGeometry(Tile tile, TerrainBuilder terrain, Random random) {
-		terrain.addWalls(tile);
+	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
+		renderer.terrain.addWalls(tile);
 		
 		SubTile st = (SubTile) tile;
 		HouseGenerator house = (HouseGenerator) st.parent;
@@ -105,6 +121,43 @@ public class HouseT extends Template {
 			if(st.subi==house.right)
 				(st.subj==house.fwd ? roofEndRight : roofEndLeft).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.cw()));
 		}
+	}
+	
+	@Override
+	public boolean finalizeTile(Tile tile, Random random) {
+		int max = tile.basey;
+		int lim = tile.basey+1000;
+		for(Dir d : Dir.values()) {
+			Tile adj = tile.getAdj(d);
+			if(adj==null)
+				continue;
+			if(adj.t==Template.hill && Template.hill.getMaxDelta(adj)>=6) {
+				int[] yloc = tile.level.h.yloc(adj.x, adj.z);
+				int maxy = MathUtils.max(yloc);
+				if(maxy>max) {
+					max = maxy;
+					if(max>lim) max = lim;
+				}
+			}
+			if(adj.t.getFixedYStrength()>1) {
+				int y = adj.getGroundY();
+				if(y<lim) {
+					lim = y;
+					if(max>lim) max = lim;
+				}
+			}
+		}
+		int floors = (max-tile.basey)/6; // TODO match facade floor heights
+		if(floors>0) {
+			if(floors>2)
+				floors = 2;
+			int ground = floors*6+tile.basey;
+			if(ground>getGroundY(tile)) {
+				tile.data = ground;
+				return true;
+			}
+		}
+		return false;
 	}
 	
 }

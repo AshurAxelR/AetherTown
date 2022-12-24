@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.tiles;
 import java.awt.Color;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
@@ -10,6 +11,7 @@ import com.xrbpowered.aethertown.render.tiles.LightTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
@@ -24,6 +26,7 @@ public class Street extends TileTemplate {
 	private static TileComponent street, lampPost;
 	private static LightTileComponent lamp;
 	//private static SpriteComponent sprite;
+	private static TileComponent bridge, bridgeSupport;
 
 	public Street() {
 		super(streetColor);
@@ -42,15 +45,41 @@ public class Street extends TileTemplate {
 		lampPost = new TileComponent(
 				ObjMeshLoader.loadObj("lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(new Color(0x353433)));
+		bridge = new TileComponent(
+				ObjMeshLoader.loadObj("bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				new Texture(TerrainBuilder.wallColor));
+		bridgeSupport = new TileComponent(
+				ObjMeshLoader.loadObj("bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				new Texture(TerrainBuilder.wallColor));
 	}
 
 	@Override
-	public void createGeometry(Tile tile, TerrainBuilder terrain, Random random) {
-		terrain.addWalls(tile);
+	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		street.addInstance(new TileObjectInfo(tile));
+		if(!addBridge(tile, tile.basey, renderer))
+			renderer.terrain.addWalls(tile);
 		// if(tile.x%2==0 && tile.z%2==0)
 		// 	sprite.addInstance(new SpriteInfo(tile).size(Tile.size));
 		addLamp(tile, random, 0);
+	}
+	
+	public boolean addBridge(Tile tile, int basey, LevelRenderer renderer) {
+		int dy0 = basey-tile.basey;
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		int miny = MathUtils.min(yloc);
+		int maxy = MathUtils.max(yloc);
+		Template adjt = tile.getAdjT(tile.d);
+		if((maxy<=basey-3) && (adjt==Template.street || adjt==StreetSlope.template1 || adjt==StreetSlope.template4)) {
+			bridge.addInstance(new TileObjectInfo(tile, 0, dy0-6, 0));
+			int sh = basey-6-miny;
+			if(sh>0)
+				bridgeSupport.addInstance(new TileObjectInfo(tile, 0, dy0-6, 0).scale(1, sh*Tile.ysize));
+			renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	public void addLamp(Tile tile, Random random, float dy) {

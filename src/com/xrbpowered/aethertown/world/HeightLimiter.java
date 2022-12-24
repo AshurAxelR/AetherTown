@@ -4,7 +4,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 
 public class HeightLimiter {
 
-	private static final int hardLimit = 2000;
+	private static final int hardLimit = 100;
 	private static final int maxUpdate = 120;
 	public static int maxCliff = 18; //24;
 	public static int maxWall = 12; //8;
