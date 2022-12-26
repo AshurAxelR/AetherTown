@@ -2,7 +2,6 @@ package com.xrbpowered.aethertown.render;
 
 import org.lwjgl.opengl.GL20;
 
-import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.gl.res.shader.ActorShader;
 import com.xrbpowered.gl.res.shader.VertexInfo;
 
@@ -13,14 +12,12 @@ public class ObjectShader extends ActorShader {
 			.addAttrib("in_Normal", 3)
 			.addAttrib("in_TexCoord", 2);
 	
-	public static final String[] samplerNames = {"texSky", "texDiffuse"};
+	public static final String[] samplerNames = {"texSky", "dataPointLights", "texDiffuse"};
 	
-	public final SkyBuffer sky;
 	private int viewYLocation;
 
-	public ObjectShader(SkyBuffer sky) {
+	public ObjectShader() {
 		super(vertexInfo, "placeobj_v.glsl", "obj_f.glsl");
-		this.sky = sky;
 	}
 	
 	@Override
@@ -36,8 +33,12 @@ public class ObjectShader extends ActorShader {
 		GL20.glUniform1f(viewYLocation, camera.position.y);
 	}
 	
-	public void bindSkyTexture() {
-		sky.bindTexture(0);
+	public void setLevel(LevelRenderer level) {
+		int pId = getProgramId();
+		GL20.glUseProgram(pId);
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level.level.levelSize);
+		level.sky.bindTexture(0);
+		level.pointLights.bind(1);
 	}
 	
 }

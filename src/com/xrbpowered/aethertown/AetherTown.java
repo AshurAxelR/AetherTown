@@ -5,11 +5,13 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
+import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
@@ -32,13 +34,14 @@ import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.gl.ui.pane.UITexture;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIElement;
-import com.xrbpowered.zoomui.std.UIButton;
 
 public class AetherTown extends UIClient {
 
 	private static final boolean testFps = false;
 	public static final float pawnHeight = 1.6f;
 
+	public static final Color bgColor = new Color(0x22000000, true);
+	
 	// private static int activeEnvironment = 0;
 	private DaytimeEnvironment environment = new DaytimeEnvironment(); // ShaderEnvironment.environments[activeEnvironment];
 
@@ -56,13 +59,28 @@ public class AetherTown extends UIClient {
 	private StaticMeshActor pointActor;
 
 	private int hoverx, hoverz;
+	private String lookAtInfo = null;
 	private boolean showPointer = false;
 	
-	private Font uiFont = UIButton.font;
 	private UINode uiRoot;
 	private UITexture uiMinimap;
-	private UIPane uiTime;
+	private UIPane uiTime, uiLookInfo;
 
+	public static Font fontSmall;
+	public static Font fontLarge;
+	
+	private static void initFonts() {
+		try {
+			fontSmall = AssetManager.defaultAssets.loadFont("font/RobotoCondensed-Regular.ttf").deriveFont(16f);
+			fontLarge = AssetManager.defaultAssets.loadFont("font/RobotoCondensed-Bold.ttf").deriveFont(24f);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+			fontSmall = null;
+			fontLarge = null;
+		}
+	}
+	
 	public AetherTown() {
 		super("Aether Town", 1f);
 		AssetManager.defaultAssets = new FileAssetManager("assets", AssetManager.defaultAssets);
@@ -72,6 +90,8 @@ public class AetherTown extends UIClient {
 			vsync = false;
 			noVsyncSleep = 2;
 		}
+		
+		initFonts();
 		
 		new UIOffscreen(getContainer()) {
 			@Override
@@ -170,6 +190,7 @@ public class AetherTown extends UIClient {
 			public void layout() {
 				uiMinimap.setLocation(getWidth()-uiMinimap.getWidth()-20, getHeight()-uiMinimap.getHeight()-20);
 				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
+				uiLookInfo.setLocation(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
 				super.layout();
 			}
 		};
@@ -189,22 +210,52 @@ public class AetherTown extends UIClient {
 		uiMinimap.setVisible(false);
 		
 		uiTime = new UIPane(uiRoot, false) {
-			private Font font = uiFont.deriveFont(28f);
 			@Override
 			protected void paintSelf(GraphAssist g) {
-				clear(g);
+				clear(g, bgColor);
 				g.setColor(Color.WHITE);
-				g.setFont(font);
+				g.setFont(fontLarge);
 				String s = WorldTime.getFormattedTime();
-				g.drawString(s, 0, getHeight()/2, GraphAssist.LEFT, GraphAssist.CENTER);
+				g.drawString(s, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
 		};
-		uiTime.setSize(120, 32);
+		uiTime.setSize(100, 32);
+		
+		uiLookInfo = new UIPane(uiRoot, false) {
+			@Override
+			protected void paintSelf(GraphAssist g) {
+				clear(g, bgColor);
+				g.setColor(Color.WHITE);
+				g.setFont(fontSmall);
+				g.drawString(lookAtInfo, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
+			}
+		};
+		uiLookInfo.setSize(400, 32);
+		uiLookInfo.setVisible(false);
 	}
 	
 	private void updateWalkY() {
 		hoverx = (int)((camera.position.x+Tile.size/2)/Tile.size);
 		hoverz = (int)((camera.position.z+Tile.size/2)/Tile.size);
+		
+		String info = "";
+		if(activeController==walkController) {
+			Dir d = Dir.values()[(int)Math.round(-camera.rotation.y*2.0/Math.PI) & 0x03];
+			Tile look = level.getAdj(hoverx, hoverz, d);
+			if(look!=null)
+				info = look.t.getTileInfo(look);
+		}
+		if(!info.equals(lookAtInfo)) {
+			lookAtInfo = info;
+			if(info.isEmpty()) {
+				uiLookInfo.setVisible(false);
+			}
+			else {
+				uiLookInfo.setVisible(true);
+				uiLookInfo.getParent().repaint();
+			}
+		}
+		
 		pointActor.position.x = camera.position.x;
 		pointActor.position.z = camera.position.z;
 		pointActor.position.y = level.isInside(hoverx, hoverz) ? level.gety(camera.position.x, camera.position.z) : 0;
@@ -247,11 +298,11 @@ public class AetherTown extends UIClient {
 						if(level.heightLimiter!=null)
 							System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
 						if(tile!=null)
-							System.out.printf("\tbasey=%d\n", tile.basey);
+							System.out.printf("\tbasey=%d, ground=%d, d=%s\n", tile.basey, tile.getGroundY() , tile.d.name());
 						else
 							System.out.println("\tnull");
 						int[] yloc = level.h.yloc(hoverx, hoverz);
-						System.out.print("yloc: ");
+						System.out.print("\tyloc: ");
 						for(int i=0; i<4; i++)
 							System.out.printf("%d; ", yloc[i]);
 						System.out.println();
@@ -281,7 +332,7 @@ public class AetherTown extends UIClient {
 	
 	public static void main(String[] args) {
 		seed = System.currentTimeMillis();
-		System.out.println("Generating... "+seed);
+		System.out.printf("Generating... %dL\n", seed);
 		level = new Level(128);
 		level.generate(new Random(seed));
 		System.gc();

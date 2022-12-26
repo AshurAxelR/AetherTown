@@ -60,7 +60,7 @@ public class Street extends TileTemplate {
 			renderer.terrain.addWalls(tile);
 		// if(tile.x%2==0 && tile.z%2==0)
 		// 	sprite.addInstance(new SpriteInfo(tile).size(Tile.size));
-		addLamp(tile, random, 0);
+		addLamp(tile, renderer, random, 0);
 	}
 	
 	public boolean addBridge(Tile tile, int basey, LevelRenderer renderer) {
@@ -69,7 +69,7 @@ public class Street extends TileTemplate {
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
 		Template adjt = tile.getAdjT(tile.d);
-		if((maxy<=basey-3) && (adjt==Template.street || adjt==StreetSlope.template1 || adjt==StreetSlope.template4)) {
+		if((maxy<=basey-3) && (adjt==Template.street || (adjt instanceof StreetSlope))) {
 			bridge.addInstance(new TileObjectInfo(tile, 0, dy0-6, 0));
 			int sh = basey-6-miny;
 			if(sh>0)
@@ -82,7 +82,7 @@ public class Street extends TileTemplate {
 		}
 	}
 	
-	public void addLamp(Tile tile, Random random, float dy) {
+	public void addLamp(Tile tile, LevelRenderer renderer, Random random, float dy) {
 		if((tile.x+tile.z)%2==0)
 			return;
 		
@@ -101,11 +101,12 @@ public class Street extends TileTemplate {
 			Dir d = Dir.random(random);
 			for(int i=0; i<4; i++) {
 				Template adjt = tile.getAdjT(d);
-				if(adjt!=Template.street && adjt!=StreetSlope.template1 && adjt!=StreetSlope.template4) {
+				if(adjt!=Template.street && !(adjt instanceof StreetSlope)) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
 					lamp.addInstance(new LightTileObjectInfo(tile, dx, dy, dz));
 					lampPost.addInstance(new TileObjectInfo(tile, dx, dy, dz));
+					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz);
 					break;
 				}
 				d = d.cw();
@@ -115,7 +116,7 @@ public class Street extends TileTemplate {
 	
 	@Override
 	public boolean finalizeTile(Tile tile, Random random) {
-		if(random.nextInt(4)==0)
+		if(random.nextInt(4)==0 || (tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
 			return false;
 		
 		boolean adjSlope = false;
@@ -127,7 +128,7 @@ public class Street extends TileTemplate {
 			//	return false;
 			if(adjt==Template.street)
 				countStreet++;
-			else if(adjt==StreetSlope.template1 || adjt==StreetSlope.template4)
+			else if(adjt instanceof StreetSlope)
 				adjSlope = true;
 			else if(adjt==Template.house)
 				adjHouse = true;

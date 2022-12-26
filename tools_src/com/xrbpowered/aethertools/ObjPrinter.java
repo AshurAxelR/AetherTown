@@ -97,8 +97,8 @@ public class ObjPrinter {
 		return fIdx-1;
 	}
 	
-	public void printStairs4() {
-		final int numSteps = 12;
+	public void printStairs(int h) {
+		final int numSteps = h*3;
 		final float steph = 0.175f;
 		final float stepd = 0.25f;
 		float db = d-0.5f;
@@ -133,11 +133,11 @@ public class ObjPrinter {
 		quad(bottomPosIdx+1, 0, 1, 0, numSteps*4+1, 0, topPosIdx+1, 0, slopeNormIdx);
 		
 		texDummy();
-		finish("Stairs4");
+		finish(String.format("Stairs%d", h));
 	}
 
-	public void printStairs4side() {
-		final int numSteps = 12;
+	public void printStairsSide(int h) {
+		final int numSteps = h*3;
 		final float steph = 0.175f;
 		final float stepd = 0.25f;
 		pos(-d, 0, -d);
@@ -155,12 +155,12 @@ public class ObjPrinter {
 		quad(3, 0, 1, 0, topPosIdx+1, 0, topPosIdx+3, 0, left);
 		
 		texDummy();
-		finish("Stairs4side");
+		finish(String.format("Stairs%dside", h));
 	}
 
 	public static void main(String[] args) {
-		// new ObjPrinter("assets/stairs4.obj").printStairs4();
-		new ObjPrinter("assets/stairs4side.obj").printStairs4side();
+		// new ObjPrinter("assets/stairs2.obj").printStairs(2);
+		// new ObjPrinter("assets/stairs2side.obj").printStairsSide(2);
 	}
 
 }

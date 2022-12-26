@@ -17,8 +17,9 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class StreetSlope extends TileTemplate {
 
-	public static final StreetSlope template1 = new StreetSlope(1);
-	public static final StreetSlope template4 = new StreetSlope(4);
+	private static final StreetSlope template1 = new StreetSlope(1);
+	private static final StreetSlope template2 = new StreetSlope(2);
+	private static final StreetSlope template4 = new StreetSlope(4);
 
 	public final int h;
 	private TileComponent street, side;
@@ -41,6 +42,10 @@ public class StreetSlope extends TileTemplate {
 			s = MathUtils.clamp((s-0.25f)/0.75f);
 			return MathUtils.lerp(y0, y1, s);
 		}
+		else if(h==2) {
+			s = MathUtils.clamp((s-0.5f)/0.5f);
+			return MathUtils.lerp(y0, y1, s);
+		}
 		else {
 			return MathUtils.lerp(y0, y1, s);
 		}
@@ -56,6 +61,14 @@ public class StreetSlope extends TileTemplate {
 					ObjMeshLoader.loadObj("stairs4side.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					new Texture(TerrainBuilder.wallColor));
 		}
+		else if(h==2) {
+			street = new TileComponent(
+					ObjMeshLoader.loadObj("stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					new Texture(Street.streetColor));
+			side = new TileComponent(
+					ObjMeshLoader.loadObj("stairs2side.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					new Texture(TerrainBuilder.wallColor));
+		}
 		else {
 			street = new TileComponent(
 					BasicGeometry.slope(Tile.size, Tile.ysize*h, ObjectShader.vertexInfo, null),
@@ -65,7 +78,7 @@ public class StreetSlope extends TileTemplate {
 
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
-		if(h==4) {
+		if(h>1) {
 			side.addInstance(new TileObjectInfo(tile, 0, -h, 0));
 			if(!Template.street.addBridge(tile, tile.basey-h, renderer))
 				renderer.terrain.addWalls(tile.x, tile.z, tile.basey-h);
@@ -79,19 +92,23 @@ public class StreetSlope extends TileTemplate {
 				renderer.terrain.addWall(tile.x, tile.z, tile.d.cw(), tile.basey, tile.basey-h);
 				renderer.terrain.addWall(tile.x, tile.z, tile.d.ccw(), tile.basey-h, tile.basey);
 			}
-			Template.street.addLamp(tile, random, -0.5f);
+			Template.street.addLamp(tile, renderer, random, -0.5f);
 		}
 		street.addInstance(new TileObjectInfo(tile, 0, -h, 0));
 	}
 	
-	public static StreetSlope getTemplate(int h) {
+	public static TileTemplate getTemplate(int h) {
 		switch(h) {
+			case 0:
+				return Template.street;
 			case 1:
 				return template1;
+			case 2:
+				return template2;
 			case 4:
 				return template4;
 			default:
-				return null;
+				throw new RuntimeException("No template for slope "+h);
 		}
 	}
 

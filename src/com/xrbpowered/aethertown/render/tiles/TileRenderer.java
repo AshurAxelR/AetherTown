@@ -1,7 +1,6 @@
 package com.xrbpowered.aethertown.render.tiles;
 
 import com.xrbpowered.aethertown.render.env.ShaderEnvironment;
-import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
 import com.xrbpowered.aethertown.render.sprites.SpriteShader;
 import com.xrbpowered.gl.res.shader.Shader;
@@ -16,9 +15,9 @@ public class TileRenderer {
 
 	public ComponentRenderer<?>[] renderers;
 	
-	public TileRenderer(SkyBuffer sky) {
-		shader = new TileObjectShader(sky);
-		lightShader = new LightTileObjectShader(sky);
+	public TileRenderer() {
+		shader = new TileObjectShader();
+		lightShader = new LightTileObjectShader();
 		spriteShader = new SpriteShader();
 		
 		TileComponent.renderer = new ComponentRenderer<TileComponent>() {

@@ -20,13 +20,16 @@ public class LevelRenderer {
 	public final TileRenderer tiles;
 
 	public TerrainBuilder terrain = null;
+	public SkyBuffer sky;
+	public PointLightArray pointLights = null;
 	
 	private ArrayList<StaticMeshActor> terrainActors = null;
 
 	public LevelRenderer(Level level, SkyBuffer sky) {
 		this.level = level;
-		objShader = new ObjectShader(sky);
-		tiles = new TileRenderer(sky);
+		this.sky = sky;
+		objShader = new ObjectShader();
+		tiles = new TileRenderer();
 	}
 
 	public LevelRenderer setCamera(CameraActor camera) {
@@ -41,21 +44,30 @@ public class LevelRenderer {
 	}
 	
 	public void createLevelGeometry() {
+		pointLights = new PointLightArray(level.levelSize);
 		tiles.startCreateInstances();
 		terrain = new TerrainBuilder(level);
 		level.createGeometry(this);
 		terrainActors = terrain.createActors(objShader);
 		tiles.finishCreateInstances();
 		terrain = null;
+		
+		/*for(int x=0; x<level.levelSize; x++)
+			for(int z=0; z<level.levelSize; z++) {
+				Tile tile = level.map[x][z];
+				if(tile!=null)
+					pointLights.setLight(tile, 0, 2, 0);
+			}*/
+		pointLights.finish();
 	}
 	
 	public void render(RenderTarget target) {
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		tiles.shader.bindSkyTexture();
-		tiles.lightShader.bindSkyTexture();
+		tiles.shader.setLevel(this);
+		tiles.lightShader.setLevel(this);
 		tiles.drawInstances();
 		
-		objShader.bindSkyTexture();
+		objShader.setLevel(this);
 		for(StaticMeshActor actor : terrainActors)
 			actor.draw();
 

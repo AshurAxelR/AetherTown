@@ -2,8 +2,8 @@ package com.xrbpowered.aethertown.render.tiles;
 
 import org.lwjgl.opengl.GL20;
 
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.gl.res.shader.CameraShader;
 import com.xrbpowered.gl.res.shader.InstanceInfo;
 
@@ -15,18 +15,16 @@ public class TileObjectShader extends CameraShader {
 			.addAttrib("ins_ScaleY", 1)
 			.addAttrib("ins_Rotation", 1);
 	
-	public static final String[] samplerNames = {"texSky", "texDiffuse"};
+	public static final String[] samplerNames = {"texSky", "dataPointLights", "texDiffuse"};
 	
-	public final SkyBuffer sky;
 	private int viewYLocation;
 	
-	protected TileObjectShader(InstanceInfo info, String pathVS, String pathFS, SkyBuffer sky) {
+	protected TileObjectShader(InstanceInfo info, String pathVS, String pathFS) {
 		super(info, pathVS, pathFS);
-		this.sky = sky;
 	} 
 	
-	public TileObjectShader(SkyBuffer sky) {
-		this(instanceInfo, "tileobj_v.glsl", "obj_f.glsl", sky);
+	public TileObjectShader() {
+		this(instanceInfo, "tileobj_v.glsl", "obj_f.glsl");
 	}
 
 	protected String[] getSamplerNames() {
@@ -45,8 +43,12 @@ public class TileObjectShader extends CameraShader {
 		GL20.glUniform1f(viewYLocation, camera.position.y);
 	}
 	
-	public void bindSkyTexture() {
-		sky.bindTexture(0);
+	public void setLevel(LevelRenderer level) {
+		int pId = getProgramId();
+		GL20.glUseProgram(pId);
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level.level.levelSize);
+		level.sky.bindTexture(0);
+		level.pointLights.bind(1);
 	}
 
 }

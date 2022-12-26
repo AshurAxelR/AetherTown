@@ -21,15 +21,15 @@ public abstract class PlotGenerator implements Generator {
 	
 	protected abstract boolean findSize(Random random);
 	
-	protected Token tokenAt(int i, int j) {
+	public Token tokenAt(int i, int j) {
 		return new Token(startToken.level,
 				startToken.x + j*d.dx + i*dr.dx,
 				startToken.y,
 				startToken.z + j*d.dz + i*dr.dz,
 				startToken.d);
 	}
-	
-	protected boolean isFree() {
+
+	public boolean isFree(int left, int right, int fwd) {
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
 				Token t = tokenAt(i, j);
@@ -37,6 +37,10 @@ public abstract class PlotGenerator implements Generator {
 					return false;
 			}
 		return true;
+	}
+
+	public boolean isFree() {
+		return isFree(left, right, fwd);
 	}
 
 	protected abstract void placeAt(Token t, int i, int j, Random random);

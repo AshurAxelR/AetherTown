@@ -248,7 +248,7 @@ public class TerrainChunkBuilder {
 		StaticMeshActor actor =  new StaticMeshActor() {
 			@Override
 			protected void bindTextures() {
-				Texture.bindAll(1, textures);
+				Texture.bindAll(2, textures);
 			}
 		};
 		actor.setMesh(mesh);

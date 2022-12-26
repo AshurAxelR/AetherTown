@@ -37,6 +37,10 @@ public abstract class Template {
 		this.minimapColor = minimapColor;
 	}
 	
+	public String getTileInfo(Tile tile) {
+		return "";
+	}
+	
 	public int getFixedYStrength() {
 		return 2;
 	}

@@ -48,8 +48,8 @@ public class StreetGenerator implements Generator, TokenProvider {
 			gen.generate(new Token(level, t.x+side.dx, t.y, t.z+side.dz, side), random);
 	}
 	
-	private static final int[] dyopt = {0, -1, 1, -4, 4};
-	private static final WRandom dyoptw = new WRandom(0.1, 0.4, 0.4, 0.5, 0.5);
+	private static final int[] dyopt = {0, -1, 1, -2, 2, -4, 4};
+	private static final WRandom dyoptw = new WRandom(0.1, 0.4, 0.4, 0.3, 0.3, 0.2, 0.2);
 	
 	public StreetGenerator(Random random, int prevdy) {
 		dy = dyopt[dyoptw.next(random)];
@@ -133,6 +133,8 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
+	private static final int[] planOpt = {2, 4};
+
 	private int[] planHeight(Random random) {
 		int maxContSlope = absdy>1 ? 2 : 3;
 		if(targetHeight!=null) {
@@ -144,9 +146,15 @@ public class StreetGenerator implements Generator, TokenProvider {
 				int sign = (targetHeight>startToken.y) ? 1 : -1;
 				int h = Math.abs(targetHeight-startToken.y);
 				if(h>(len-1)) {
-					if(h>(len-1)*4 || h%4!=0)
+					dy = 0;
+					for(int dh : planOpt) {
+						if(!(h>(len-1)*dh || h%dh!=0)) {
+							dy = dh*sign;
+							break;
+						}
+					}
+					if(dy==0)
 						return null;
-					dy = 4*sign;
 				}
 				else {
 					dy = sign;

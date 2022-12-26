@@ -2,11 +2,13 @@ package com.xrbpowered.aethertown.world;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
+import com.xrbpowered.aethertown.world.gen.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 
 public class Level {
@@ -17,6 +19,8 @@ public class Level {
 	public Tile[][] map;
 	public HeightLimiter heightLimiter = null;
 	public HeightMap h;
+	
+	public ArrayList<HouseGenerator> houses = null;
 	
 	public Level(int size) {
 		this.levelSize = size;
@@ -105,6 +109,7 @@ public class Level {
 		if(att>=maxAtt)
 			System.err.println("Refill attempts limit reached");
 		
+		houses = HouseGenerator.listHouses(this);
 		heightLimiter = null;
 	}
 	

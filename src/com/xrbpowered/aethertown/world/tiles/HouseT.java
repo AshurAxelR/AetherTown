@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
+import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
 import com.xrbpowered.aethertown.render.tiles.LightTileObjectInfo;
@@ -26,11 +27,17 @@ public class HouseT extends Template {
 
 	private static final Seasons roofColor = new Seasons(new Color(0x57554a), new Color(0xe0eef1));
 	
-	private static LightTileComponent groundWall, groundWallDoor, upperWall;
+	private static LightTileComponent groundWall, groundWallDoor, groundWallBlank, upperWall, upperWallBlank;
 	private static TileComponent roof, roofEndLeft, roofEndRight;
 	
 	public HouseT() {
 		super(roofColor.colors[Seasons.summer]);
+	}
+	
+	@Override
+	public String getTileInfo(Tile tile) {
+		HouseGenerator house = (HouseGenerator) ((SubTile) tile).parent;
+		return String.format("House %d", house.index+1);
 	}
 	
 	@Override
@@ -55,9 +62,15 @@ public class HouseT extends Template {
 		groundWallDoor = new LightTileComponent(wall,
 				new Texture("ground_wall_door.png", false, true, false),
 				new Texture("ground_wall_door_illum.png", false, true, false));
+		groundWallBlank = new LightTileComponent(wall,
+				new Texture("ground_wall_blank.png", false, true, false),
+				TexColor.get(Color.BLACK));
 		upperWall = new LightTileComponent(wall,
 				new Texture("upper_wall.png", false, true, false),
 				new Texture("upper_wall_illum.png", false, true, false));
+		upperWallBlank = new LightTileComponent(wall,
+				new Texture("upper_wall_blank.png", false, true, false),
+				TexColor.get(Color.BLACK));
 		roof = new TileComponent(
 				BasicGeometry.slope(Tile.size, 8*Tile.ysize, ObjectShader.vertexInfo, null),
 				roofColor.texture());
@@ -80,32 +93,41 @@ public class HouseT extends Template {
 		return new Vector3f(r, g, b).mul(on ? 1f : 0.04f);
 	}
 	
+	private static boolean isObstructed(Tile tile, int[] yloc, int y, Dir d) {
+		int y0 = yloc[d.leftCorner().ordinal()];
+		int y1 = yloc[d.rightCorner().ordinal()];
+		int gy = tile.getAdj(d).getGroundY();
+		return (y0>=y) || (y1>=y) || (gy>=y);
+	}
+	
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		renderer.terrain.addWalls(tile);
 		
+		int basey = tile.basey;
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		SubTile st = (SubTile) tile;
 		HouseGenerator house = (HouseGenerator) st.parent;
 		int left = -house.left;
 		Vector3f illum = randomIllumMod(random, house.illum);
 		if(st.subj==0)
-			(st.subi==0 && st.subj==0 ? groundWallDoor : groundWall).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
+			(st.subi==0 && st.subj==0 ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(st.subi==left)
-			groundWall.addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.ccw()));
+			(isObstructed(tile, yloc, basey+2, tile.d.ccw()) ? groundWallBlank : groundWall).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.ccw()));
 		if(st.subi==house.right)
-			groundWall.addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.cw()));
+			(isObstructed(tile, yloc, basey+2, tile.d.cw()) ? groundWallBlank : groundWall).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.cw()));
 		if(st.subj==house.fwd)
-			groundWall.addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum));
+			(isObstructed(tile, yloc, basey+2, tile.d) ? groundWallBlank : groundWall).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum));
 		
 		illum = randomIllumMod(random, house.illum);
 		if(st.subj==0)
-			upperWall.addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.flip()));
+			(isObstructed(tile, yloc, basey+7, tile.d.flip()) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(st.subi==left)
-			upperWall.addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.ccw()));
+			(isObstructed(tile, yloc, basey+7, tile.d.ccw()) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.ccw()));
 		if(st.subi==house.right)
-			upperWall.addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.cw()));
+			(isObstructed(tile, yloc, basey+7, tile.d.cw()) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.cw()));
 		if(st.subj==house.fwd)
-			upperWall.addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum));
+			(isObstructed(tile, yloc, basey+7, tile.d) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum));
 		
 		if(house.alignStraight) {
 			roof.addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(st.subi==left ? tile.d.ccw() : tile.d.cw()));

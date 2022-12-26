@@ -49,8 +49,8 @@ public class HeightMap {
 	public int[] yloc(int x, int z) {
 		yloc[0] = y[x][z];
 		yloc[1] = y[x+1][z];
-		yloc[2] = y[x][z+1];
-		yloc[3] = y[x+1][z+1];
+		yloc[2] = y[x+1][z+1];
+		yloc[3] = y[x][z+1];
 		return yloc;
 	}
 	

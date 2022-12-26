@@ -18,7 +18,7 @@ public class LightTileComponent extends InstancedMeshList<LightTileObjectInfo> {
 
 	@Override
 	protected void bindTextures() {
-		Texture.bindAll(1, textures);
+		Texture.bindAll(2, textures);
 	}
 	
 	@Override
