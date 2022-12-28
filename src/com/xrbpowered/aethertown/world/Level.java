@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 
 public class Level {
@@ -17,11 +18,14 @@ public class Level {
 	
 	private Random random;
 	public Tile[][] map;
-	public HeightLimiter heightLimiter = null;
 	public HeightMap h;
 	
 	public ArrayList<HouseGenerator> houses = null;
-	
+
+	// available only during generation
+	public HeightLimiter heightLimiter = null;
+	public ArrayList<PlotGenerator> plots = null;
+
 	public Level(int size) {
 		this.levelSize = size;
 		this.map = new Tile[levelSize][levelSize];
@@ -36,28 +40,6 @@ public class Level {
 		return levelSize/2;
 	}
 
-	private void expandTokens(HillsGenerator gen, Random random, int skip) {
-		for(int x=0; x<levelSize; x++)
-			for(int z=0; z<levelSize; z++) {
-				if(map[x][z]!=null)
-					continue;
-				boolean hasAdj = false;
-				Dir d = Dir.random(random);
-				int y = 0;
-				for(int di=0; di<4; di++) {
-					Tile adj = getAdj(x, z, d);
-					if(adj!=null) {
-						hasAdj = true;
-						y = adj.basey;
-						break;
-					}
-					d = d.cw();
-				}
-				if(hasAdj && random.nextInt(skip+1)==0)
-					gen.addToken(new Token(this, x, y, z, Dir.north));
-			}
-	}
-	
 	private boolean finalizeTiles(Random random) {
 		boolean upd = true;
 		boolean refill = false;
@@ -79,36 +61,28 @@ public class Level {
 	public void generate(Random random) {
 		this.random = random;
 		heightLimiter = new HeightLimiter(this);
+		plots = new ArrayList<>();
 		new StreetLayoutGenerator(0).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
+		StreetLayoutGenerator.finishLayout(this, random);
 		
-		HillsGenerator hillsGen = new HillsGenerator(0).setAmp(-2, 2);
-		expandTokens(hillsGen, random, 10);
-		hillsGen.limit = hillsGen.tokenCount()*30;
-		hillsGen.generate(random);
-
-		hillsGen = new HillsGenerator(0).setAmp(-2, 4);
-		expandTokens(hillsGen, random, 10);
-		hillsGen.limit = hillsGen.tokenCount()*50;
-		hillsGen.generate(random);
-
+		HillsGenerator.expand(this, random, 10, 30, -2, 2);
+		HillsGenerator.expand(this, random, 10, 50, -2, 4);
+		
 		int att = 0;
-		int maxAtt = 50;
+		int maxAtt = 10;
 		for(; att<maxAtt; att++) {
-			hillsGen = new HillsGenerator(0).setAmp(-8, 2);
-			expandTokens(hillsGen, random, 0);
-			if(hillsGen.tokenCount()>0) {
-				hillsGen.generate(random);
-			}
-			else if(att>0) {
+			if(!HillsGenerator.expand(this, random, 0, 0, -8, 2) && att>0) {
 				System.err.println("Failed to get refill tokens on att "+att);
 				break;
 			}
 			if(finalizeTiles(random))
 				break;
 		}
+		System.out.printf("Completed %d refill cycles\n", att+1);
 		if(att>=maxAtt)
 			System.err.println("Refill attempts limit reached");
 		
+		plots = null;
 		houses = HouseGenerator.listHouses(this);
 		heightLimiter = null;
 	}

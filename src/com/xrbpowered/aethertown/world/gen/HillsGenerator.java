@@ -4,7 +4,9 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Generator;
+import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 
 public class HillsGenerator extends TokenGenerator {
@@ -47,6 +49,41 @@ public class HillsGenerator extends TokenGenerator {
 	protected void spreadTokens(Token t, Random random) {
 		for(Dir d : Dir.values()) {
 			addToken(t.next(d, random.nextInt(maxdy-mindy+1)+mindy));
+		}
+	}
+	
+	private static void expandTokens(Level level, HillsGenerator gen, Random random, int skip) {
+		for(int x=0; x<level.levelSize; x++)
+			for(int z=0; z<level.levelSize; z++) {
+				if(level.map[x][z]!=null)
+					continue;
+				boolean hasAdj = false;
+				Dir d = Dir.random(random);
+				int y = 0;
+				for(int di=0; di<4; di++) {
+					Tile adj = level.getAdj(x, z, d);
+					if(adj!=null) {
+						hasAdj = true;
+						y = adj.basey;
+						break;
+					}
+					d = d.cw();
+				}
+				if(hasAdj && random.nextInt(skip+1)==0)
+					gen.addToken(new Token(level, x, y, z, Dir.north));
+			}
+	}
+
+	public static boolean expand(Level level, Random random, int skip, int limit, int mindy, int maxdy) {
+		HillsGenerator hillsGen = new HillsGenerator(0).setAmp(mindy, maxdy);
+		expandTokens(level, hillsGen, random, skip);
+		if(hillsGen.tokenCount()>0) {
+			hillsGen.limit = hillsGen.tokenCount()*limit;
+			hillsGen.generate(random);
+			return true;
+		}
+		else {
+			return false;
 		}
 	}
 	

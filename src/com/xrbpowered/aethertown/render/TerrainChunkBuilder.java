@@ -160,7 +160,6 @@ public class TerrainChunkBuilder {
 			addHillTriangle(p01, p11, p10);
 		}
 		color.setRGB(x - cx*chunkSize, z - cz*chunkSize, c.getRGB());
-		// color.setRGB(x - cx*chunkSize, z - cz*chunkSize, new Color((x - cx*chunkSize)*3, (z - cz*chunkSize)*3, 0).getRGB());
 	}
 
 	private void addTriangleVertical(AdvancedMeshBuilder b, Vector3i p0, Vector3i p1, Vector3i p2, Dir d) {

@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
@@ -110,12 +111,22 @@ public class Park extends TileTemplate {
 	
 	@Override
 	public boolean finalizeTile(Tile tile, Random random) {
-		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-		int maxy = MathUtils.max(yloc);
-		if(maxy==tile.basey-1) {
-			tile.basey--;
+		boolean remove = true;
+		for(Dir d : Dir.values()) {
+			if(d==tile.d.flip())
+				continue;
+			Tile adj = tile.getAdj(d);
+			if(adj!=null && adj.basey>tile.basey-2) {
+				remove = false;
+				break;
+			}
+		}
+		if(remove) {
+			tile.level.map[tile.x][tile.z] = null;
 			return true;
 		}
+		
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		if(miny>tile.basey) {
 			tile.basey = miny;

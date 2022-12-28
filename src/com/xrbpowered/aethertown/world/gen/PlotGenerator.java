@@ -4,6 +4,9 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Generator;
+import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.Template;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 
 public abstract class PlotGenerator implements Generator {
@@ -45,11 +48,16 @@ public abstract class PlotGenerator implements Generator {
 
 	protected abstract void placeAt(Token t, int i, int j, Random random);
 
+	protected void registerPlot() {
+		startToken.level.plots.add(this);
+	}
+	
 	protected void place(Random random) {
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
 				placeAt(tokenAt(i, j), i, j, random);
 			}
+		registerPlot();
 	}
 	
 	@Override
@@ -61,6 +69,37 @@ public abstract class PlotGenerator implements Generator {
 			return false;
 		place(random);
 		return true;
+	}
+	
+	public void fillStreet(Random random) {
+		Level level = startToken.level;
+		Dir dl = dr.flip();
+		int y = startToken.y;
+		for(int i=-1; i>=-left; i--) {
+			Token t = tokenAt(i, -1);
+			t.d = dl;
+			t.y = y;
+			Tile tile = level.map[t.x][t.z];
+			if(tile==null)
+				Template.street.generate(t, random);
+			else if(tile.t==Template.street)
+				y = tile.basey;
+			else
+				break;
+		}
+		y = startToken.y;
+		for(int i=1; i<=right; i++) {
+			Token t = tokenAt(i, -1);
+			t.d = dr;
+			t.y = y;
+			Tile tile = level.map[t.x][t.z];
+			if(tile==null)
+				Template.street.generate(t, random);
+			else if(tile.t==Template.street)
+				y = tile.basey;
+			else
+				break;
+		}
 	}
 
 }

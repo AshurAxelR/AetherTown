@@ -114,32 +114,56 @@ public class Street extends TileTemplate {
 		}
 	}
 	
-	@Override
-	public boolean finalizeTile(Tile tile, Random random) {
-		if(random.nextInt(4)==0 || (tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
-			return false;
-		
-		boolean adjSlope = false;
-		boolean adjHouse = false;
-		int countStreet = 0;
-		for(Dir d : Dir.values()) { // FIXME orphan parks after street trimming
-			Template adjt = tile.getAdjT(d);
-			// if(adjt==null)
-			//	return false;
-			if(adjt==Template.street)
-				countStreet++;
-			else if(adjt instanceof StreetSlope)
-				adjSlope = true;
-			else if(adjt==Template.house)
-				adjHouse = true;
+	/**
+	 * @return 0: trim not needed, 1: can't trim, 2: trimmed 
+	 */
+	public static int trimStreet(Tile tile, Random random) {
+		Dir dsrc = tile.d.flip();
+		Tile src = tile.getAdj(dsrc);
+		int res = 2;
+		for(Dir d : Dir.values()) {
+			if(d==dsrc)
+				continue;
+			Tile adj = tile.getAdj(d);
+			if(adj==null)
+				continue;
+			if(adj.d==d) {
+				if(adj.t!=Template.park)
+					return 0;
+				res = 1; // TODO make park tile "important"
+			}
+			if((adj.t==Template.street || (adj.t instanceof StreetSlope)) && (adj.d==d || adj.d==d.flip()) && src!=null)
+				return 0;
 		}
-		if(countStreet<2 && !adjHouse) {
-			if(!adjSlope) {
-				tile.level.map[tile.x][tile.z] = null;
-				return true;
+		if(res<2)
+			return res;
+		
+		if((tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
+			return 1;
+		
+		if(src!=null && (src.t instanceof StreetSlope)) {
+			int dy = ((StreetSlope)src.t).h;
+			Dir align = src.d; 
+			if(dy==1) {
+				Tile t = src;
+				final Dir[] dcheck = { align.cw(), align.ccw() };
+				while(t!=null && t.d==align && (t.t instanceof StreetSlope)) {
+					for(Dir d : dcheck) {
+						Tile adj = t.getAdj(d);
+						if(adj!=null && adj.d==d)
+							return 1;
+					}
+					t = t.getAdj(dsrc);
+				}
+			}
+			Tile t = src;
+			while(t!=null && t.d==align && (t.t instanceof StreetSlope)) {
+				tile.level.map[t.x][t.z] = null;
+				t = t.getAdj(dsrc);
 			}
 		}
-		return false;
+		tile.level.map[tile.x][tile.z] = null;
+		return 2;
 	}
 	
 }

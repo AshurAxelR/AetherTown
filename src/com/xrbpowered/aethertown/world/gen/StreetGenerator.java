@@ -15,7 +15,8 @@ import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
 public class StreetGenerator implements Generator, TokenProvider {
 
-	private static final int margin = 40; // 96; //20;
+	private static final int streetMargin = 40; // 96; //20;
+
 	private int dy, absdy;
 	private Integer targetHeight = null;
 	private boolean perfectMatch = false;
@@ -27,7 +28,10 @@ public class StreetGenerator implements Generator, TokenProvider {
 	private int len;
 	private int[] dylist = null;
 	
-	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.5, 1); // new WRandom(1, 0.5, 0.25, 1);
+	private int margin = streetMargin;
+	public boolean generateSides = true;
+	
+	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.5, 1);
 
 	public static Generator selectSideGenerator(Random random, int h) {
 		switch(sidew.next(random)) {
@@ -48,14 +52,36 @@ public class StreetGenerator implements Generator, TokenProvider {
 			gen.generate(new Token(level, t.x+side.dx, t.y, t.z+side.dz, side), random);
 	}
 	
+	public static int getPrevDy(Token t) {
+		if(t.context instanceof StreetGenerator)
+			return ((StreetGenerator) t.context).getDy();
+		else
+			return 0;
+	}
+	
 	private static final int[] dyopt = {0, -1, 1, -2, 2, -4, 4};
 	private static final WRandom dyoptw = new WRandom(0.1, 0.4, 0.4, 0.3, 0.3, 0.2, 0.2);
+	
+	public StreetGenerator() {
+		dy = 0;
+		absdy = 0;
+	}
 	
 	public StreetGenerator(Random random, int prevdy) {
 		dy = dyopt[dyoptw.next(random)];
 		absdy = Math.abs(dy);
 		if(dy*prevdy<0)
 			dy = -dy;
+	}
+	
+	public StreetGenerator setMargin(int margin) {
+		this.margin = margin;
+		return this;
+	}
+	
+	public StreetGenerator setGenerateSides(boolean generateSides) {
+		this.generateSides = generateSides;
+		return this;
 	}
 	
 	public int getDy() {
@@ -66,13 +92,19 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return perfectMatch;
 	}
 	
-	private boolean fitLength(Random random) {
-		final int maxLen = (absdy>1) ? 2+random.nextInt(4) : 3+random.nextInt(5);
-		final int minLen = (absdy>1) ? 2 : 3;
+	private boolean fitLength(Random random, Integer targetLength) {
+		int maxLen = (absdy>1) ? 2+random.nextInt(4) : 3+random.nextInt(5);
+		int minLen = (absdy>1) ? 2 : 3;
+		int checkLen = maxLen+2;
+		if(targetLength!=null) {
+			maxLen = targetLength+1;
+			minLen = targetLength;
+			checkLen = maxLen;
+		}
 		final Dir[] checkDirs = {dleft, dright};
 		
 		Token t = startToken;
-		for(len=0; len<maxLen+2; len++) { 
+		for(len=0; len<checkLen; len++) { 
 			if(!level.isInside(t.x, t.z, margin)) {
 				len--;
 				if(len>=maxLen)
@@ -133,7 +165,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
-	private static final int[] planOpt = {2, 4};
+	private static final int[] planOpt = {4, 2};
 
 	private int[] planHeight(Random random) {
 		int maxContSlope = absdy>1 ? 2 : 3;
@@ -145,7 +177,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 			else {
 				int sign = (targetHeight>startToken.y) ? 1 : -1;
 				int h = Math.abs(targetHeight-startToken.y);
-				if(h>(len-1)) {
+				if(h>len) {
 					dy = 0;
 					for(int dh : planOpt) {
 						if(!(h>(len-1)*dh || h%dh!=0)) {
@@ -153,8 +185,9 @@ public class StreetGenerator implements Generator, TokenProvider {
 							break;
 						}
 					}
-					if(dy==0)
+					if(dy==0) {
 						return null;
+					}
 				}
 				else {
 					dy = sign;
@@ -167,13 +200,20 @@ public class StreetGenerator implements Generator, TokenProvider {
 		int contSlope = 0;
 		Token t = startToken;
 		for(int i=0; i<=len; i++) {
-			if(!t.fitsHeight() || !level.fitsHeight(t.x, t.y+this.dy, t.z))
+			if(targetHeight==null && (!t.fitsHeight() || !level.fitsHeight(t.x, t.y+this.dy, t.z))) {
 				return null;
+			}
 			int dy = 0;
-			if(i>0 && i<len) {
-				int h = targetHeight==null ? 0 : Math.abs(targetHeight-t.y);
-				if(h>=len-i-1 || random.nextInt(4)>0)
-					dy = this.dy;
+			if(i<len) {
+				if(targetHeight==null) {
+					if(random.nextInt(3)>0)
+						dy = this.dy;
+				}
+				else if(t.y!=targetHeight) {
+					float dh = Math.abs(targetHeight-t.y)/(float)(len-1-i);
+					if(absdy<=1 && dh-random.nextFloat()*0.25f>0.5f || dh>0.67f*absdy)
+						dy = this.dy;
+				}
 			}
 			if(dy!=0) {
 				contSlope++;
@@ -208,51 +248,55 @@ public class StreetGenerator implements Generator, TokenProvider {
 			t = t.next(d, dylist[i]);
 			
 			TileTemplate temp = (dylist[i]==0) ? Template.street : slope;
-			if(!temp.generate(ts, random)) {
-				System.err.println("Should not happen here!");
-				return null;
-			}
+			temp.forceGenerate(ts, random);
 		}
 		endToken = t;
 		return tlist;
 	}
 	
 	private void generateSides(Token[] tlist, Random random) {
+		if(!generateSides || Math.abs(dy)>=2)
+			return;
 		for(int i=0; i<len; i++) {
 			Token ts = tlist[i];
 			int h = Math.abs(dylist[i]);
-			if(Math.abs(dy)<2) {
-				placeSide(level, ts, dright, random, h);
-				placeSide(level, ts, dleft, random, h);
-			}
+			placeSide(level, ts, dright, random, h);
+			placeSide(level, ts, dleft, random, h);
 		}
 	}
 	
-	public boolean checkFit(Token startToken, Random random) {
+	public boolean checkFit(Token startToken, Random random, Integer targetLength, Integer targetHeight) {
 		this.startToken = startToken;
 		level = startToken.level;
 		d = startToken.d;
 		dleft = d.ccw();
 		dright = d.cw();
+		this.targetHeight = targetHeight;
 		
-		if(!fitLength(random))
+		if(!fitLength(random, targetLength))
+			return false;
+		if(targetLength!=null && len!=targetLength)
 			return false;
 		
 		dylist = planHeight(random);
 		return dylist!=null;
 	}
-	
+
+	public boolean checkFit(Token startToken, Random random) {
+		return checkFit(startToken, random, null, null);
+	}
+
 	@Override
 	public boolean generate(Token startToken, Random random) {
 		if(dylist==null || this.startToken!=startToken) {
-			if(!checkFit(startToken, random))
+			if(!checkFit(startToken, random, null, null))
 				return false;
 		}
 		Token[] tlist = generateStreet(random);
 		generateSides(tlist, random);
 		
 		if(endToken.isFree())
-			Template.street.generate(endToken, random);
+			Template.street.forceGenerate(endToken, random);
 		return true;
 	}
 	

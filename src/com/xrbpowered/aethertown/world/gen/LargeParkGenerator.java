@@ -18,4 +18,8 @@ public class LargeParkGenerator extends PlotGenerator {
 		Template.park.generate(t, random);
 	}
 
+	@Override
+	public void fillStreet(Random random) {
+	}
+	
 }
