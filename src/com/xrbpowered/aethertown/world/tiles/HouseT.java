@@ -20,6 +20,7 @@ import com.xrbpowered.aethertown.world.SubTile;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -149,6 +150,7 @@ public class HouseT extends Template {
 	public boolean finalizeTile(Tile tile, Random random) {
 		int max = tile.basey;
 		int lim = tile.basey+1000;
+		int maxGround = tile.basey;
 		for(Dir d : Dir.values()) {
 			Tile adj = tile.getAdj(d);
 			if(adj==null)
@@ -167,7 +169,15 @@ public class HouseT extends Template {
 					lim = y;
 					if(max>lim) max = lim;
 				}
+				if(y>maxGround)
+					maxGround = y;
 			}
+		}
+		if(maxGround>tile.basey+12) {
+			HouseGenerator house = (HouseGenerator) ((SubTile)tile).parent;
+			house.remove();
+			StreetLayoutGenerator.trimStreets(tile.level, random);
+			return true;
 		}
 		int floors = (max-tile.basey)/6; // TODO match facade floor heights
 		if(floors>0) {

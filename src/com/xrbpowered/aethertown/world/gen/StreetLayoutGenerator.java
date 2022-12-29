@@ -35,7 +35,19 @@ public class StreetLayoutGenerator extends TokenGenerator {
 			return StreetGenerator.selectSideGenerator(random, 0);
 	}
 
-	private static void trimStreets(Level level, Random random) {
+	private static boolean addPointOfInterest(Level level, Tile tile, Random random) {
+		Dir[] dirs = random.nextBoolean() ?
+				new Dir[] {tile.d, tile.d.cw(), tile.d.ccw()} :
+				new Dir[] {tile.d, tile.d.ccw(), tile.d.cw()};
+		for(Dir d : dirs) {
+			Token t = new Token(level, tile.x+d.dx, tile.basey, tile.z+d.dz, d);
+			if(Template.monument.generate(t, random))
+				return true;
+		}
+		return false;
+	}
+	
+	public static void trimStreets(Level level, Random random) {
 		boolean upd = true;
 		while(upd) {
 			// TODO recalc height limiter
@@ -49,7 +61,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 								upd = true;
 								break;
 							case 1:
-								// TODO add something
+								upd |= addPointOfInterest(level, tile, random);
 								break;
 							default:
 						}
@@ -58,18 +70,22 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 	}
 	
+	private static void reconnectStreets(Level level, Random random) {
+		boolean upd = true;
+		while(upd) {
+			upd = false;
+			Dir d = Dir.random(random);
+			for(int i=0; i<4; i++) {
+				upd |= new StreetConnector(level, d).connectAll(random);
+				d = d.cw();
+			}
+		}
+	}
+	
 	public static void finishLayout(Level level, Random random) {
 		trimStreets(level, random);
 		for(PlotGenerator plot : level.plots)
 			plot.fillStreet(random);
-		
-		boolean upd = true;
-		while(upd) {
-			upd = false;
-			upd |= new StreetConnector(level, Dir.north).connectAll(random);
-			upd |= new StreetConnector(level, Dir.south).connectAll(random);
-			upd |= new StreetConnector(level, Dir.east).connectAll(random);
-			upd |= new StreetConnector(level, Dir.west).connectAll(random);
-		}
+		reconnectStreets(level, random);
 	}
 }

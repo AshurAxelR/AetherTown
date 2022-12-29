@@ -6,6 +6,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
 import com.xrbpowered.aethertown.render.tiles.LightTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -23,7 +24,9 @@ public class Street extends TileTemplate {
 
 	public static final Color streetColor = new Color(0xb5b5aa);
 	
-	private static TileComponent street, lampPost;
+	public static TileComponent street;
+	
+	private static TileComponent lampPost;
 	private static LightTileComponent lamp;
 	//private static SpriteComponent sprite;
 	private static TileComponent bridge, bridgeSupport;
@@ -44,7 +47,7 @@ public class Street extends TileTemplate {
 				new Texture("lamp_illum.png", false, true, false));
 		lampPost = new TileComponent(
 				ObjMeshLoader.loadObj("lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture(new Color(0x353433)));
+				TexColor.get(0x353433));
 		bridge = new TileComponent(
 				ObjMeshLoader.loadObj("bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(TerrainBuilder.wallColor));
@@ -101,7 +104,7 @@ public class Street extends TileTemplate {
 			Dir d = Dir.random(random);
 			for(int i=0; i<4; i++) {
 				Template adjt = tile.getAdjT(d);
-				if(adjt!=Template.street && !(adjt instanceof StreetSlope)) {
+				if(adjt!=Template.street && !(adjt instanceof StreetSlope) && adjt!=Template.monument) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
 					lamp.addInstance(new LightTileObjectInfo(tile, dx, dy, dz));
@@ -128,11 +131,13 @@ public class Street extends TileTemplate {
 			if(adj==null)
 				continue;
 			if(adj.d==d) {
+				if(adj.t==Template.hill)
+					continue;
 				if(adj.t!=Template.park)
 					return 0;
 				res = 1; // TODO make park tile "important"
 			}
-			if((adj.t==Template.street || (adj.t instanceof StreetSlope)) && (adj.d==d || adj.d==d.flip()) && src!=null)
+			if((adj.t==Template.street || (adj.t instanceof StreetSlope)) && src!=null)
 				return 0;
 		}
 		if(res<2)

@@ -71,6 +71,15 @@ public abstract class PlotGenerator implements Generator {
 		return true;
 	}
 	
+	public void remove() {
+		for(int j=0; j<=fwd; j++)
+			for(int i=-left; i<=right; i++) {
+				Token t = tokenAt(i, j);
+				startToken.level.map[t.x][t.z] = null;
+			}
+		startToken.level.plots.remove(this);
+	}
+	
 	public void fillStreet(Random random) {
 		Level level = startToken.level;
 		Dir dl = dr.flip();

@@ -7,7 +7,7 @@ import com.xrbpowered.gl.res.texture.FloatDataTexture;
 
 public class PointLightArray extends FloatDataTexture {
 
-	public static final float pointLightRadius = 5f;
+	public static final float pointLightRadius = 4.5f;
 	
 	public Vector4f[][] positions;
 	
@@ -23,8 +23,12 @@ public class PointLightArray extends FloatDataTexture {
 		positions[mx][mz].set(x, y, z, radius);
 	}
 	
+	public void setLight(Tile tile, float dx, float dy, float dz, float radius) {
+		setLight(tile.x, tile.z, (tile.x+dx)*Tile.size, (tile.basey+dy)*Tile.ysize, (tile.z+dz)*Tile.size, radius);
+	}
+
 	public void setLight(Tile tile, float dx, float dy, float dz) {
-		setLight(tile.x, tile.z, (tile.x+dx)*Tile.size, (tile.basey+dy)*Tile.ysize, (tile.z+dz)*Tile.size, pointLightRadius);
+		setLight(tile, dx, dy, dz, pointLightRadius);
 	}
 
 	public FloatDataTexture finish() {

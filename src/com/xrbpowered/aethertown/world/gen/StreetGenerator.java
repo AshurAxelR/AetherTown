@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
 public class StreetGenerator implements Generator, TokenProvider {
 
+	public static final int streetGap = 1;
 	private static final int streetMargin = 40; // 96; //20;
 
 	private int dy, absdy;
@@ -94,7 +95,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 	
 	private boolean fitLength(Random random, Integer targetLength) {
 		int maxLen = (absdy>1) ? 2+random.nextInt(4) : 3+random.nextInt(5);
-		int minLen = (absdy>1) ? 2 : 3;
+		int minLen = (absdy>1) ? streetGap : 3;
 		int checkLen = maxLen+2;
 		if(targetLength!=null) {
 			maxLen = targetLength+1;
@@ -138,7 +139,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 			
 			for(Dir cd : checkDirs) {
 				boolean free = true;
-				for(int i=1; i<=2; i++) {
+				for(int i=1; i<=streetGap; i++) {
 					tile = Tile.getAdj(level, t.x, t.z, i*cd.dx, i*cd.dz);
 					if(tile!=null) {
 						if(tile.t==Template.street) {
@@ -180,7 +181,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 				if(h>len) {
 					dy = 0;
 					for(int dh : planOpt) {
-						if(!(h>(len-1)*dh || h%dh!=0)) {
+						if(!(h>len*dh || h%dh!=0)) {
 							dy = dh*sign;
 							break;
 						}

@@ -7,6 +7,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
+import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
@@ -17,6 +18,7 @@ public abstract class Template {
 	public static final Street street = new Street();
 	public static final Park park = new Park();
 	public static final Hill hill = new Hill();
+	public static final Monument monument = new Monument();
 
 	public static final HouseT house = new HouseT();
 

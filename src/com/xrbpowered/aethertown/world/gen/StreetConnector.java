@@ -5,11 +5,14 @@ import java.util.LinkedList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
+
+import static com.xrbpowered.aethertown.world.gen.StreetGenerator.streetGap;
 
 public class StreetConnector {
 
@@ -42,6 +45,11 @@ public class StreetConnector {
 		
 		public int mdisty(ConnPoint conn) {
 			return Math.abs(x-conn.x) + Math.abs(z-conn.z) + lenForH(Math.abs(basey-conn.basey));
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("[%d,%d]:%d", x, z, basey);
 		}
 	}
 	
@@ -173,15 +181,19 @@ public class StreetConnector {
 					if(tile.t==Template.street && i>=margin && i<levelSize-margin)
 						connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
 					if(isAnyStreet(tile))
-						j -= 2;
+						j -= streetGap;
 					break;
 				}
-				if(isAnyStreet(xj+dl.dx, zj+dl.dz) ||
-						isAnyStreet(xj+dr.dx, zj+dr.dz) ||
-						isAnyStreet(xj+2*dl.dx, zj+2*dl.dz) ||
-						isAnyStreet(xj+2*dr.dx, zj+2*dr.dz)) {
-					break;
+				boolean stop = false;
+				for(int k=1; k<=streetGap; k++) {
+					if(isAnyStreet(xj+k*dl.dx, zj+k*dl.dz) || isAnyStreet(xj+k*dr.dx, zj+k*dr.dz)) {
+						stop = true;
+						// TODO sideways connection point?
+						break;
+					}
 				}
+				if(stop)
+					break;
 			}
 			j--;
 			wopen[i] = j;
@@ -195,17 +207,17 @@ public class StreetConnector {
 				outj = wopen[i];
 		}
 		outj -= addj;
-		if(outj<=margin) {
+		if(outj<=margin)
 			return null;
-		}
 		
 		int lenS = connS.j - outj - 1;
 		int lenOut = connD.i - connS.i - 1;
 		int lenD = connD.j - outj - 1;
 		int len = lenS + lenOut + lenD;
-		if(len>=20){
+		if(len>=20)
 			return null;
-		}
+		if(len>11 && (lenD>(lenS+lenOut)*2 || lenS>(lenD+lenOut)*2))
+			return null;
 		
 		int hsign = (connS.basey>connD.basey) ? -1 : 1;
 		int hdiff = Math.abs(connS.basey - connD.basey);
@@ -225,8 +237,8 @@ public class StreetConnector {
 					djS = dj1;
 					djD = dj0;
 				}
-				ConnPoint connAdjS = connS.moveOut(djS+1, djS*hsign);
-				ConnPoint connAdjD = connD.moveOut(djD+1, -djD*hsign);
+				ConnPoint connAdjS = djS==0 ? connS : connS.moveOut(djS+1, djS*hsign);
+				ConnPoint connAdjD = djD==0 ? connD : connD.moveOut(djD+1, -djD*hsign);
 				
 				addj = addj-Math.min(djS, djD)-1;
 				if(addj<0) addj = 0;
@@ -234,31 +246,26 @@ public class StreetConnector {
 				if(pieces==null)
 					return null;
 				
-				ConnPiece pieceAdjS = new ConnPiece(dout).connect(connS, connAdjS);
-				if(!pieceAdjS.check(random)) {
+				ConnPiece pieceAdjS = (connS!=connAdjS) ? new ConnPiece(dout).connect(connS, connAdjS) : null;
+				ConnPiece pieceAdjD = (connD!=connAdjD) ? new ConnPiece(din).connect(connAdjD, connD) : null;
+				if(pieceAdjS!=null && !pieceAdjS.check(random) || pieceAdjD!=null && !pieceAdjD.check(random))
 					return null;
-				}
-				ConnPiece pieceAdjD = new ConnPiece(din).connect(connAdjD, connD);
-				if(!pieceAdjD.check(random)) {
-					return null;
-				}
+				
 				return new ConnPiece[] {pieceAdjS, pieces[0], pieces[1], pieces[2], pieceAdjD};
 			}
 			
 			dy = 4;
 			int lenH = lenForH(hdiff);
-			if(lenH>=30){
+			if(lenH>=30)
 				return null;
-			}
 			if(lenH>len) {
 				int add = (lenH-len+1)/2;
 				lenS += add;
 				lenD += add;
 				len += add*2;
 				outj -= add;
-				if(outj<=margin) {
+				if(outj<=margin)
 					return null;
-				}
 			}
 		}
 		
@@ -266,17 +273,14 @@ public class StreetConnector {
 		int hD = (int)Math.ceil(hdiff*((lenS+lenOut)/(float)len)/dy)*dy;
 		
 		ConnPiece pieceS = new ConnPiece(dout).setLen(lenS).setStart(connS).setTargetY(connS.basey+hS*hsign);
-		if(!pieceS.check(random)) {
+		if(!pieceS.check(random))
 			return null;
-		}
 		ConnPiece pieceOut = new ConnPiece(dnext).setLen(lenOut).setStart(pieceS).setTargetY(connS.basey+hD*hsign);
-		if(!pieceOut.check(random)) {
+		if(!pieceOut.check(random))
 			return prepareUConnection(connS, connD, addj+1, random);
-		}
 		ConnPiece pieceD = new ConnPiece(din).setLen(lenD).setStart(pieceOut).setTargetY(connD.basey);
-		if(!pieceD.check(random)) {
+		if(!pieceD.check(random))
 			return null;
-		}
 		
 		return new ConnPiece[] {pieceS, pieceOut, pieceD};
 	}
@@ -285,8 +289,10 @@ public class StreetConnector {
 		ConnPiece[] pieces = prepareUConnection(connS, connD, 0, random);
 		if(pieces==null)
 			return false;
-		for(ConnPiece p : pieces)
-			p.generate(random);
+		for(ConnPiece p : pieces) {
+			if(p!=null)
+				p.generate(random);
+		}
 		return true;
 	}
 	
@@ -295,20 +301,21 @@ public class StreetConnector {
 		boolean upd = false;
 		int iblock = 0;
 		int[][] wdistMap = new int[levelSize][levelSize];
-		for(int p=1; p<connPoints.size(); p++) {
+		for(int p=1; p<connPoints.size()-1; p++) {
 			ConnPoint conn = connPoints.get(p);
-			if(conn.i<iblock+2)
+			if(conn.i<iblock+streetGap)
 				continue;
 			ConnPoint connL = connPoints.get(p-1);
-			ConnPoint connR = connPoints.get(p-1);
+			ConnPoint connR = connPoints.get(p+1);
 			int mdistL = conn.mdisty(connL);
 			int mdistR = conn.mdisty(connR);
-			if(mdistL<4 && mdistR<4)
+			if(mdistL<3 && mdistR<3)
 				continue;
-			calcWDist(conn.x, conn.z, wdistMap, Math.max(mdistL, mdistR));
+			int maxWdist = MathUtils.max(mdistL, mdistR, 12);
+			calcWDist(conn.x, conn.z, wdistMap, maxWdist);
 			int wdistL = wdistMap[connL.x][connL.z]; 
 			int wdistR = wdistMap[connR.x][connR.z]; 
-			if(wdistL>10 && wdistL>mdistL && conn.mdist(connL)<20 && wdistL>=wdistR) {
+			if(connL.i>=iblock+streetGap && wdistL>10 && wdistL>mdistL && conn.mdist(connL)<20 && wdistL>=wdistR) {
 				if(makeUConnection(connL, conn, random)) {
 					iblock = conn.i;
 					upd = true;
