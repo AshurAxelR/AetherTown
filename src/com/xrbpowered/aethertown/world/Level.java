@@ -77,6 +77,7 @@ public class Level {
 			}
 			if(finalizeTiles(random))
 				break;
+			StreetLayoutGenerator.trimStreets(this, random);
 		}
 		System.out.printf("Completed %d refill cycles\n", att+1);
 		if(att>=maxAtt)
@@ -146,6 +147,15 @@ public class Level {
 			return y>=maxy && y<=miny;
 		else
 			return false;
+	}
+	
+	public boolean overlapsHeight(int x, int y, int z, int dy) {
+		int miny = heightLimiter.miny[x][z];
+		int maxy = heightLimiter.maxy[x][z];
+		if(miny<=maxy)
+			return y+dy>=miny && y-dy<=maxy;
+		else
+			return y+dy>=maxy && y-dy<=miny;
 	}
 
 	public boolean fitsHeight(int x, int y, int z) {

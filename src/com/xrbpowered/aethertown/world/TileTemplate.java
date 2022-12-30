@@ -20,7 +20,7 @@ public abstract class TileTemplate extends Template implements Generator {
 	@Override
 	public boolean generate(Token t, Random random) {
 		if(canGenerate(t)) {
-			new Tile(this, t.d).place(t);
+			createTile().place(t);
 			updateHeightLimit(t);
 			return true;
 		}
@@ -28,9 +28,11 @@ public abstract class TileTemplate extends Template implements Generator {
 			return false;
 	}
 
-	public void forceGenerate(Token t, Random random) {
-		new Tile(this, t.d).place(t);
+	public Tile forceGenerate(Token t, Random random) {
+		Tile tile = createTile();
+		tile.place(t);
 		updateHeightLimit(t);
+		return tile;
 	}
 
 }

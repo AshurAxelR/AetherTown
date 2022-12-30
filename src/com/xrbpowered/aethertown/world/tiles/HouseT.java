@@ -16,11 +16,11 @@ import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
-import com.xrbpowered.aethertown.world.SubTile;
+import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
-import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -31,13 +31,32 @@ public class HouseT extends Template {
 	private static LightTileComponent groundWall, groundWallDoor, groundWallBlank, upperWall, upperWallBlank;
 	private static TileComponent roof, roofEndLeft, roofEndRight;
 	
+	public class HouseTile extends Tile {
+		public int groundy;
+
+		public HouseTile() {
+			super(HouseT.this);
+		}
+		
+		@Override
+		public void place(Level level, int x, int y, int z, Dir d) {
+			super.place(level, x, y, z, d);
+			groundy = basey;
+		}
+	}
+	
 	public HouseT() {
 		super(roofColor.colors[Seasons.summer]);
 	}
 	
 	@Override
+	public Tile createTile() {
+		return new HouseTile();
+	}
+	
+	@Override
 	public String getTileInfo(Tile tile) {
-		HouseGenerator house = (HouseGenerator) ((SubTile) tile).parent;
+		HouseGenerator house = (HouseGenerator) tile.sub.parent;
 		return String.format("House %d", house.index+1);
 	}
 	
@@ -48,10 +67,7 @@ public class HouseT extends Template {
 	
 	@Override
 	public int getGroundY(Tile tile) {
-		if(tile.data==null)
-			return tile.basey;
-		else
-			return (Integer)tile.data;
+		return ((HouseTile) tile).groundy;
 	}
 	
 	@Override
@@ -106,48 +122,49 @@ public class HouseT extends Template {
 		renderer.terrain.addWalls(tile);
 		
 		int basey = tile.basey;
+		SubInfo sub = tile.sub;
+		HouseGenerator house = (HouseGenerator) sub.parent;
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-		SubTile st = (SubTile) tile;
-		HouseGenerator house = (HouseGenerator) st.parent;
 		int left = -house.left;
 		Vector3f illum = randomIllumMod(random, house.illum);
-		if(st.subj==0)
-			(st.subi==0 && st.subj==0 ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
-		if(st.subi==left)
+		if(sub.j==0)
+			(sub.i==0 && sub.j==0 ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
+		if(sub.i==left)
 			(isObstructed(tile, yloc, basey+2, tile.d.ccw()) ? groundWallBlank : groundWall).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.ccw()));
-		if(st.subi==house.right)
+		if(sub.i==house.right)
 			(isObstructed(tile, yloc, basey+2, tile.d.cw()) ? groundWallBlank : groundWall).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.cw()));
-		if(st.subj==house.fwd)
+		if(sub.j==house.fwd)
 			(isObstructed(tile, yloc, basey+2, tile.d) ? groundWallBlank : groundWall).addInstance(new LightTileObjectInfo(tile, 0, 0, 0).illumMod(illum));
 		
 		illum = randomIllumMod(random, house.illum);
-		if(st.subj==0)
+		if(sub.j==0)
 			(isObstructed(tile, yloc, basey+7, tile.d.flip()) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.flip()));
-		if(st.subi==left)
+		if(sub.i==left)
 			(isObstructed(tile, yloc, basey+7, tile.d.ccw()) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.ccw()));
-		if(st.subi==house.right)
+		if(sub.i==house.right)
 			(isObstructed(tile, yloc, basey+7, tile.d.cw()) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.cw()));
-		if(st.subj==house.fwd)
+		if(sub.j==house.fwd)
 			(isObstructed(tile, yloc, basey+7, tile.d) ? upperWallBlank : upperWall).addInstance(new LightTileObjectInfo(tile, 0, 6, 0).illumMod(illum));
 		
 		if(house.alignStraight) {
-			roof.addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(st.subi==left ? tile.d.ccw() : tile.d.cw()));
-			if(st.subj==0)
-				(st.subi==left ? roofEndLeft : roofEndRight).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.flip()));
-			if(st.subj==house.fwd)
-				(st.subi==left ? roofEndRight : roofEndLeft).addInstance(new TileObjectInfo(tile, 0, 12, 0));
+			roof.addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(sub.i==left ? tile.d.ccw() : tile.d.cw()));
+			if(sub.j==0)
+				(sub.i==left ? roofEndLeft : roofEndRight).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.flip()));
+			if(sub.j==house.fwd)
+				(sub.i==left ? roofEndRight : roofEndLeft).addInstance(new TileObjectInfo(tile, 0, 12, 0));
 		}
 		else {
-			roof.addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(st.subj==0 ? tile.d.flip() : tile.d));
-			if(st.subi==left)
-				(st.subj==house.fwd ? roofEndLeft : roofEndRight).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.ccw()));
-			if(st.subi==house.right)
-				(st.subj==house.fwd ? roofEndRight : roofEndLeft).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.cw()));
+			roof.addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(sub.j==0 ? tile.d.flip() : tile.d));
+			if(sub.i==left)
+				(sub.j==house.fwd ? roofEndLeft : roofEndRight).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.ccw()));
+			if(sub.i==house.right)
+				(sub.j==house.fwd ? roofEndRight : roofEndLeft).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.cw()));
 		}
 	}
 	
 	@Override
-	public boolean finalizeTile(Tile tile, Random random) {
+	public boolean finalizeTile(Tile atile, Random random) {
+		HouseTile tile = (HouseTile) atile;
 		int max = tile.basey;
 		int lim = tile.basey+1000;
 		int maxGround = tile.basey;
@@ -174,9 +191,8 @@ public class HouseT extends Template {
 			}
 		}
 		if(maxGround>tile.basey+12) {
-			HouseGenerator house = (HouseGenerator) ((SubTile)tile).parent;
+			HouseGenerator house = (HouseGenerator) tile.sub.parent;
 			house.remove();
-			StreetLayoutGenerator.trimStreets(tile.level, random);
 			return true;
 		}
 		int floors = (max-tile.basey)/6; // TODO match facade floor heights
@@ -185,7 +201,7 @@ public class HouseT extends Template {
 				floors = 2;
 			int ground = floors*6+tile.basey;
 			if(ground>getGroundY(tile)) {
-				tile.data = ground;
+				tile.groundy = ground;
 				return true;
 			}
 		}

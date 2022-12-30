@@ -25,12 +25,25 @@ public class Park extends TileTemplate {
 	
 	public static TileComponent tree, trunk, bush;
 
+	public class ParkTile extends Tile {
+		public boolean flex = false;
+		
+		public ParkTile() {
+			super(Park.this);
+		}
+	}
+	
 	public Park() {
 		super(grassColor.color());
 	}
 	
+	@Override
+	public Tile createTile() {
+		return new ParkTile();
+	}
+	
 	private static boolean isFlex(Tile tile) {
-		return tile.data!=null && (Boolean)tile.data;
+		return ((ParkTile) tile).flex;
 	}
 	
 	@Override
@@ -110,7 +123,8 @@ public class Park extends TileTemplate {
 	}
 	
 	@Override
-	public boolean finalizeTile(Tile tile, Random random) {
+	public boolean finalizeTile(Tile atile, Random random) {
+		ParkTile tile = (ParkTile) atile;
 		boolean remove = true;
 		for(Dir d : Dir.values()) {
 			if(d==tile.d.flip())
@@ -132,7 +146,7 @@ public class Park extends TileTemplate {
 			tile.basey = miny;
 			return true;
 		}
-		tile.data = (miny==tile.basey-1);
+		tile.flex = (miny==tile.basey-1);
 		return false;
 	}
 	

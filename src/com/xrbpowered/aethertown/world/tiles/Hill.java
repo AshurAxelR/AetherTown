@@ -14,15 +14,21 @@ import com.xrbpowered.aethertown.world.Token;
 
 public class Hill extends TileTemplate {
 
+	public class HillTile extends Tile {
+		public Integer maxDelta = null;
+		
+		public HillTile() {
+			super(Hill.this);
+		}
+	}
+	
 	public Hill() {
 		super(TerrainBuilder.grassColor.color());
 	}
 	
 	@Override
-	public boolean generate(Token t, Random random) {
-		new Tile(this, t.d).place(t);
-		updateHeightLimit(t);
-		return true;
+	public Tile createTile() {
+		return new HillTile();
 	}
 	
 	@Override
@@ -57,18 +63,18 @@ public class Hill extends TileTemplate {
 			Template.park.addTrees(tile, random);
 	}
 	
-	public int getMaxDelta(Tile tile) {
-		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-		return MathUtils.maxDelta(yloc);
-		/*if(tile.data==null) {
+	public int getMaxDelta(Tile atile) {
+		HillTile tile = (HillTile) atile;
+		if(tile.maxDelta==null) {
 			int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-			tile.data = MathUtils.maxDelta(yloc);
+			tile.maxDelta = MathUtils.maxDelta(yloc);
 		}
-		return (Integer)tile.data;*/
+		return tile.maxDelta;
 	}
 	
 	@Override
-	public boolean finalizeTile(Tile tile, Random random) {
+	public boolean finalizeTile(Tile atile, Random random) {
+		HillTile tile = (HillTile) atile;
 		boolean res = false;
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
@@ -76,15 +82,13 @@ public class Hill extends TileTemplate {
 			tile.basey = miny;
 			res = true;
 		}
-		int maxd = MathUtils.maxDelta(yloc);
-		tile.data = maxd;
-		if(maxd>1)
+		tile.maxDelta = MathUtils.maxDelta(yloc);
+		if(tile.maxDelta>1)
 			return res;
 
 		Dir adjDir = null;
 		int y = 0;
-		Dir d = Dir.random(random);
-		for(int i=0; i<4; i++) {
+		for(Dir d : Dir.shuffle(random)) {
 			Tile adj = tile.getAdj(d);
 			Template adjt = (adj==null) ? null : adj.t;
 			if(adjt==Template.park || adjt==Template.street) {
@@ -94,7 +98,6 @@ public class Hill extends TileTemplate {
 					break;
 				}
 			}
-			d = d.cw();
 		}
 		if(adjDir!=null) {
 			Template.park.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir), random);

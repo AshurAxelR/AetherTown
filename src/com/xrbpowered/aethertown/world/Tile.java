@@ -7,29 +7,42 @@ public class Tile {
 	public static final float size = 4f; // 4m = 160px = 16x25cm stairs
 	public static final float ysize = 0.525f; // 52.5cm = 3*17.5cm stairs or 21px = 3*7px stairs. 1 floor = 6y = 315cm = 126px = 18 stairs
 	
+	public class SubInfo {
+		public int i, j;
+		public Generator parent;
+	}
+	
 	public final Template t;
 
 	public Level level = null;
 	public int x, z;
 	public int basey = 0;
 	public Dir d;
-	public Object data = null;
+	public SubInfo sub = null;
 	
-	public Tile(Template t, Dir d) {
+	protected Tile(Template t) {
 		this.t = t;
-		this.d = d;
 	}
 	
-	public void place(Level level, int x, int y, int z) {
+	public Tile makeSub(Generator parent, int i, int j) {
+		sub = new SubInfo();
+		sub.parent = parent;
+		sub.i = i;
+		sub.j = j;
+		return this;
+	}
+	
+	public void place(Level level, int x, int y, int z, Dir d) {
 		this.level = level;
 		this.x = x;
 		this.basey = y;
 		this.z = z;
+		this.d = d;
 		level.map[x][z] = this;
 	}
 
 	public void place(Token t) {
-		place(t.level, t.x, t.y, t.z);
+		place(t.level, t.x, t.y, t.z, t.d);
 	}
 
 	public int getGroundY() {

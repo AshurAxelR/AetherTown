@@ -40,7 +40,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 				new Dir[] {tile.d, tile.d.cw(), tile.d.ccw()} :
 				new Dir[] {tile.d, tile.d.ccw(), tile.d.cw()};
 		for(Dir d : dirs) {
-			Token t = new Token(level, tile.x+d.dx, tile.basey, tile.z+d.dz, d);
+			Token t = Token.forAdj(tile, d);
 			if(Template.monument.generate(t, random))
 				return true;
 		}
@@ -74,10 +74,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		boolean upd = true;
 		while(upd) {
 			upd = false;
-			Dir d = Dir.random(random);
-			for(int i=0; i<4; i++) {
+			for(Dir d : Dir.shuffle(random)) {
 				upd |= new StreetConnector(level, d).connectAll(random);
-				d = d.cw();
 			}
 		}
 	}

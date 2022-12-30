@@ -47,11 +47,42 @@ public enum Dir {
 	public static Dir random(Random random) {
 		return values()[random.nextInt(4)];
 	}
-	
+
+	public static Dir[] shuffle(Random random) {
+		return permutations[random.nextInt(permutations.length)];
+	}
+
 	public static final Dir[][] next = {
 		{north, east, west},
 		{east, south, north},
 		{south, west, east},
 		{west, north, south}
+	};
+	
+	private static final Dir[][] permutations = {
+		{north, east, south, west},
+		{east, north, south, west},
+		{south, north, east, west},
+		{north, south, east, west},
+		{east, south, north, west},
+		{south, east, north, west},
+		{south, east, west, north},
+		{east, south, west, north},
+		{west, south, east, north},
+		{south, west, east, north},
+		{east, west, south, north},
+		{west, east, south, north},
+		{west, north, south, east},
+		{north, west, south, east},
+		{south, west, north, east},
+		{west, south, north, east},
+		{north, south, west, east},
+		{south, north, west, east},
+		{east, north, west, south},
+		{north, east, west, south},
+		{west, east, north, south},
+		{east, west, north, south},
+		{north, west, east, south},
+		{west, north, east, south}
 	};
 }

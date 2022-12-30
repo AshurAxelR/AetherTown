@@ -16,6 +16,8 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.gen.LargeParkGenerator;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -101,8 +103,7 @@ public class Street extends TileTemplate {
 		}
 		
 		if(hasLamp) {
-			Dir d = Dir.random(random);
-			for(int i=0; i<4; i++) {
+			for(Dir d : Dir.shuffle(random)) {
 				Template adjt = tile.getAdjT(d);
 				if(adjt!=Template.street && !(adjt instanceof StreetSlope) && adjt!=Template.monument) {
 					float dx = d.dx*0.45f;
@@ -112,7 +113,6 @@ public class Street extends TileTemplate {
 					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz);
 					break;
 				}
-				d = d.cw();
 			}
 		}
 	}
@@ -124,7 +124,9 @@ public class Street extends TileTemplate {
 		Dir dsrc = tile.d.flip();
 		Tile src = tile.getAdj(dsrc);
 		int res = 2;
-		for(Dir d : Dir.values()) {
+		Tile park = null;
+		
+		for(Dir d : Dir.shuffle(random)) {
 			if(d==dsrc)
 				continue;
 			Tile adj = tile.getAdj(d);
@@ -135,13 +137,32 @@ public class Street extends TileTemplate {
 					continue;
 				if(adj.t!=Template.park)
 					return 0;
-				res = 1; // TODO make park tile "important"
+				res = 1;
+				park = adj;
 			}
 			if((adj.t==Template.street || (adj.t instanceof StreetSlope)) && src!=null)
 				return 0;
 		}
-		if(res<2)
+		
+		if(res==1) {
+			if(park!=null) {
+				if(park.sub==null) {
+					Template.monument.forceGenerate(Token.forTile(park), random);
+					return 0;
+				}
+				else if(park.sub.parent instanceof LargeParkGenerator) {
+					((LargeParkGenerator) park.sub.parent).promote(random);
+					return 0;
+				}
+				else
+					return 0;
+			}
+			else
+				return 1;
+		}
+		else if(res<2) {
 			return res;
+		}
 		
 		if((tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
 			return 1;

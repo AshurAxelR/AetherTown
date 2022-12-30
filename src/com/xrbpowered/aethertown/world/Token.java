@@ -43,4 +43,12 @@ public class Token {
 	public boolean isFree() {
 		return level.map[x][z]==null;
 	}
+	
+	public static Token forTile(Tile tile) {
+		return new Token(tile.level, tile.x, tile.basey, tile.z, tile.d);
+	}
+	
+	public static Token forAdj(Tile tile, Dir d) {
+		return new Token(tile.level, tile.x+d.dx, tile.basey, tile.z+d.dz, d);
+	}
 }

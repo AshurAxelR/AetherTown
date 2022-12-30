@@ -7,9 +7,9 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.SubTile;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
@@ -42,8 +42,13 @@ public class HouseGenerator extends PlotGenerator {
 	}
 
 	@Override
+	protected Dir alignToken(int i, int j) {
+		return d;
+	}
+	
+	@Override
 	protected void placeAt(Token t, int i, int j, Random random) {
-		new SubTile(this, t.d, Template.house, i, j).place(t);
+		Template.house.createTile().makeSub(this, i, j).place(t);
 		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 2, 3);
 	}
 	
@@ -65,9 +70,9 @@ public class HouseGenerator extends PlotGenerator {
 			for(Dir d : Dir.values()) {
 				Tile adj = tile.getAdj(d);
 				if(adj!=null && adj.t==Template.house && adj.d==d) {
-					SubTile st = (SubTile) adj;
+					SubInfo st = adj.sub;
 					HouseGenerator house = (HouseGenerator)st.parent;
-					if(st.subi==0 && st.subj==0 && house.index<0) {
+					if(st.i==0 && st.j==0 && house.index<0) {
 						house.index = houses.size();
 						houses.add(house);
 					}

@@ -50,7 +50,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 	public static void placeSide(Level level, Token t, Dir side, Random random, int h) {
 		Generator gen = selectSideGenerator(random, h);
 		if(gen!=null)
-			gen.generate(new Token(level, t.x+side.dx, t.y, t.z+side.dz, side), random);
+			gen.generate(t.next(side, 0), random);
 	}
 	
 	public static int getPrevDy(Token t) {

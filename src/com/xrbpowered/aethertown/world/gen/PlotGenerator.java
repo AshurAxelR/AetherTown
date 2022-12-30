@@ -24,15 +24,24 @@ public abstract class PlotGenerator implements Generator {
 	
 	protected abstract boolean findSize(Random random);
 	
+	protected Dir alignToken(int i, int j) {
+		if(i==0)
+			return d;
+		else if(i>0)
+			return dr;
+		else
+			return dr.flip();
+	}
+	
 	public Token tokenAt(int i, int j) {
 		return new Token(startToken.level,
 				startToken.x + j*d.dx + i*dr.dx,
 				startToken.y,
 				startToken.z + j*d.dz + i*dr.dz,
-				startToken.d);
+				alignToken(i, j));
 	}
 
-	public boolean isFree(int left, int right, int fwd) {
+	public boolean fits(int left, int right, int fwd) {
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
 				Token t = tokenAt(i, j);
@@ -42,8 +51,8 @@ public abstract class PlotGenerator implements Generator {
 		return true;
 	}
 
-	public boolean isFree() {
-		return isFree(left, right, fwd);
+	public boolean fits() {
+		return fits(left, right, fwd);
 	}
 
 	protected abstract void placeAt(Token t, int i, int j, Random random);
@@ -65,7 +74,7 @@ public abstract class PlotGenerator implements Generator {
 		this.startToken = startToken;
 		d = startToken.d;
 		dr = startToken.d.cw();
-		if(!findSize(random) || !isFree())
+		if(!findSize(random) || !fits())
 			return false;
 		place(random);
 		return true;
