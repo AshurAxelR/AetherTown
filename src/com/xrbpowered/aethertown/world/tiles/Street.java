@@ -44,17 +44,17 @@ public class Street extends TileTemplate {
 				new Texture(streetColor));
 		//sprite = new SpriteComponent(new Texture("checker.png"));
 		lamp = new LightTileComponent(
-				ObjMeshLoader.loadObj("lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture("lamp.png", false, true, false),
-				new Texture("lamp_illum.png", false, true, false));
+				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				new Texture("models/lamp/lamp.png", false, true, false),
+				new Texture("models/lamp/lamp_illum.png", false, true, false));
 		lampPost = new TileComponent(
-				ObjMeshLoader.loadObj("lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/lamp/lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(0x353433));
 		bridge = new TileComponent(
-				ObjMeshLoader.loadObj("bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/bridge/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(TerrainBuilder.wallColor));
 		bridgeSupport = new TileComponent(
-				ObjMeshLoader.loadObj("bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(TerrainBuilder.wallColor));
 	}
 

@@ -18,7 +18,7 @@ public class SunRenderer {
 		private int positionLocation;
 		
 		public SunShader() {
-			super(SpriteShader.vertexInfo, "sun_v.glsl", "sun_f.glsl");
+			super(SpriteShader.vertexInfo, "shaders/env/sun_v.glsl", "shaders/env/sun_f.glsl");
 			followCamera = true;
 		}
 		

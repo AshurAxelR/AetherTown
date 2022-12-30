@@ -71,8 +71,8 @@ public class AetherTown extends UIClient {
 	
 	private static void initFonts() {
 		try {
-			fontSmall = AssetManager.defaultAssets.loadFont("font/RobotoCondensed-Regular.ttf").deriveFont(16f);
-			fontLarge = AssetManager.defaultAssets.loadFont("font/RobotoCondensed-Bold.ttf").deriveFont(24f);
+			fontSmall = AssetManager.defaultAssets.loadFont("fonts/RobotoCondensed-Regular.ttf").deriveFont(16f);
+			fontLarge = AssetManager.defaultAssets.loadFont("fonts/RobotoCondensed-Bold.ttf").deriveFont(24f);
 		}
 		catch(IOException e) {
 			e.printStackTrace();
@@ -83,7 +83,7 @@ public class AetherTown extends UIClient {
 	
 	public AetherTown() {
 		super("Aether Town", 1f);
-		AssetManager.defaultAssets = new FileAssetManager("assets", AssetManager.defaultAssets);
+		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		windowedWidth = 1920;
 		windowedHeight = 1080;
 		if(testFps) {

@@ -15,7 +15,7 @@ public class LightTileObjectShader extends TileObjectShader {
 	public static final String[] samplerNames = {"texSky", "dataPointLights", "texDiffuse", "texIllum"};
 	
 	public LightTileObjectShader() {
-		super(instanceInfo, "lighttileobj_v.glsl", "lightobj_f.glsl");
+		super(instanceInfo, "shaders/tiles/lighttileobj_v.glsl", "shaders/tiles/lightobj_f.glsl");
 	}
 
 	protected String[] getSamplerNames() {

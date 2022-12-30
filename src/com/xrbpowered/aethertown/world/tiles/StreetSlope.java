@@ -55,18 +55,18 @@ public class StreetSlope extends TileTemplate {
 	public void createComponents() {
 		if(h==4) {
 			street = new TileComponent(
-					ObjMeshLoader.loadObj("stairs4.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/stairs/stairs4.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					new Texture(Street.streetColor));
 			side = new TileComponent(
-					ObjMeshLoader.loadObj("stairs4side.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/stairs/stairs4side.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					new Texture(TerrainBuilder.wallColor));
 		}
 		else if(h==2) {
 			street = new TileComponent(
-					ObjMeshLoader.loadObj("stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					new Texture(Street.streetColor));
 			side = new TileComponent(
-					ObjMeshLoader.loadObj("stairs2side.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/stairs/stairs2side.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					new Texture(TerrainBuilder.wallColor));
 		}
 		else {

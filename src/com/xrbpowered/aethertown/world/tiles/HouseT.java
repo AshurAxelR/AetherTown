@@ -74,19 +74,19 @@ public class HouseT extends Template {
 	public void createComponents() {
 		StaticMesh wall = BasicGeometry.wall(Tile.size, 6*Tile.ysize, ObjectShader.vertexInfo, null);
 		groundWall = new LightTileComponent(wall,
-				new Texture("ground_wall.png", false, true, false),
-				new Texture("ground_wall_illum.png", false, true, false));
+				new Texture("models/house/ground_wall.png", false, true, false),
+				new Texture("models/house/ground_wall_illum.png", false, true, false));
 		groundWallDoor = new LightTileComponent(wall,
-				new Texture("ground_wall_door.png", false, true, false),
-				new Texture("ground_wall_door_illum.png", false, true, false));
+				new Texture("models/house/ground_wall_door.png", false, true, false),
+				new Texture("models/house/ground_wall_door_illum.png", false, true, false));
 		groundWallBlank = new LightTileComponent(wall,
-				new Texture("ground_wall_blank.png", false, true, false),
+				new Texture("models/house/ground_wall_blank.png", false, true, false),
 				TexColor.get(Color.BLACK));
 		upperWall = new LightTileComponent(wall,
-				new Texture("upper_wall.png", false, true, false),
-				new Texture("upper_wall_illum.png", false, true, false));
+				new Texture("models/house/upper_wall.png", false, true, false),
+				new Texture("models/house/upper_wall_illum.png", false, true, false));
 		upperWallBlank = new LightTileComponent(wall,
-				new Texture("upper_wall_blank.png", false, true, false),
+				new Texture("models/house/upper_wall_blank.png", false, true, false),
 				TexColor.get(Color.BLACK));
 		roof = new TileComponent(
 				BasicGeometry.slope(Tile.size, 8*Tile.ysize, ObjectShader.vertexInfo, null),

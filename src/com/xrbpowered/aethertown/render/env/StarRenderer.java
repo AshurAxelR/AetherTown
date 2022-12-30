@@ -32,7 +32,7 @@ public class StarRenderer {
 		private int modelMatrixLocation;
 		
 		public StarShader() {
-			super(vertexInfo, "stars_v.glsl", "stars_f.glsl");
+			super(vertexInfo, "shaders/env/stars_v.glsl", "shaders/env/stars_f.glsl");
 			followCamera = true;
 		}
 		

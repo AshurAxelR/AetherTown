@@ -24,7 +24,7 @@ public class TileObjectShader extends CameraShader {
 	} 
 	
 	public TileObjectShader() {
-		this(instanceInfo, "tileobj_v.glsl", "obj_f.glsl");
+		this(instanceInfo, "shaders/tiles/tileobj_v.glsl", "shaders/tiles/obj_f.glsl");
 	}
 
 	protected String[] getSamplerNames() {

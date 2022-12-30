@@ -27,7 +27,7 @@ public class SpriteShader extends CameraShader {
 	} 
 	
 	public SpriteShader() {
-		super(instanceInfo, "sprite_v.glsl", "sprite_f.glsl");
+		super(instanceInfo, "shaders/tiles/sprite_v.glsl", "shaders/tiles/sprite_f.glsl");
 	}
 
 	protected String[] getSamplerNames() {

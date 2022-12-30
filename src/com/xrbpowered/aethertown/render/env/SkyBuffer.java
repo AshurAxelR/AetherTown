@@ -17,7 +17,7 @@ public class SkyBuffer {
 	
 	public class SkyShader extends CameraShader {
 		public SkyShader() {
-			super(PaneShader.vertexInfo, "skyq_v.glsl", "skyq_f.glsl");
+			super(PaneShader.vertexInfo, "shaders/env/skyq_v.glsl", "shaders/env/skyq_f.glsl");
 			followCamera = true;
 		}
 		

@@ -17,7 +17,7 @@ public class ObjectShader extends ActorShader {
 	private int viewYLocation;
 
 	public ObjectShader() {
-		super(vertexInfo, "placeobj_v.glsl", "obj_f.glsl");
+		super(vertexInfo, "shaders/tiles/placeobj_v.glsl", "shaders/tiles/obj_f.glsl");
 	}
 	
 	@Override
