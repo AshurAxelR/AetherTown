@@ -45,6 +45,9 @@ public abstract class TokenGenerator implements Generator {
 		return gen.generate(t, random);
 	}
 
+	protected void flushTokens() {
+	}
+	
 	@Override
 	public boolean generate(Token startToken, Random random) {
 		clearTokens();
@@ -76,7 +79,7 @@ public abstract class TokenGenerator implements Generator {
 			}
 		}
 		if(countTokens>0) {
-			// TODO finalize remaining tokens
+			flushTokens();
 		}
 		return placed>0;
 	}

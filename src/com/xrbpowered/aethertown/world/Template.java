@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
@@ -57,7 +58,11 @@ public abstract class Template {
 		return tile.basey;
 	}
 
-	public float gety(Tile tile, float sx, float sz) {
+	public int getFenceY(Tile tile, Corner c) {
+		return tile.basey;
+	}
+	
+	public float getYAt(Tile tile, float sx, float sz) {
 		return Tile.ysize*tile.basey;
 	}
 

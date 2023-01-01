@@ -115,7 +115,7 @@ public class Level {
 			return 0;
 		Tile tile = map[x][z];
 		if(tile!=null)
-			return tile.t.gety(tile, sx, sz);
+			return tile.t.getYAt(tile, sx, sz);
 		else
 			return h.gety(x, z, sx, sz);
 	}

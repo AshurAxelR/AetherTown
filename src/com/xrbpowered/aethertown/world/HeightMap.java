@@ -138,5 +138,12 @@ public class HeightMap {
 				this.diag[x][z] = calcDiag(y[x][z], y[x][z+1], y[x+1][z], y[x+1][z+1]);
 			}
 	}
+	
+	public static int tiley(Tile tile, Corner c) {
+		int x = tile.x+c.tx+1;
+		int z = tile.z+c.tz+1;
+		return tile.level.h.y[x][z];
+	}
+
 
 }

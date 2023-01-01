@@ -9,8 +9,11 @@ import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.HeightMap;
+import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -47,11 +50,19 @@ public class Park extends TileTemplate {
 	}
 	
 	@Override
-	public float gety(Tile tile, float sx, float sz) {
+	public float getYAt(Tile tile, float sx, float sz) {
 		if(isFlex(tile))
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
 		else
-			return super.gety(tile, sx, sz);
+			return super.getYAt(tile, sx, sz);
+	}
+	
+	@Override
+	public int getFenceY(Tile tile, Corner c) {
+		if(isFlex(tile))
+			return HeightMap.tiley(tile, c);
+		else
+			return super.getFenceY(tile, c);
 	}
 	
 	@Override
@@ -75,6 +86,7 @@ public class Park extends TileTemplate {
 		else {
 			renderer.terrain.addWalls(tile);
 			renderer.terrain.addFlatTile(grassColor.color(), tile);
+			Template.street.addHandrails(tile);
 		}
 		addTrees(tile, random);
 	}

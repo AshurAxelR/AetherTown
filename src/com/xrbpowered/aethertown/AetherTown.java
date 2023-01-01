@@ -11,6 +11,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
@@ -64,7 +65,7 @@ public class AetherTown extends UIClient {
 	
 	private UINode uiRoot;
 	private UITexture uiMinimap;
-	private UIPane uiTime, uiLookInfo;
+	private UIPane uiTime, uiCompass, uiLookInfo;
 
 	public static Font fontSmall;
 	public static Font fontLarge;
@@ -188,9 +189,10 @@ public class AetherTown extends UIClient {
 		uiRoot = new UINode(getContainer()) {
 			@Override
 			public void layout() {
-				uiMinimap.setLocation(getWidth()-uiMinimap.getWidth()-20, getHeight()-uiMinimap.getHeight()-20);
 				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
+				uiCompass.setLocation(getWidth()-uiCompass.getWidth()-20, uiTime.getY());
 				uiLookInfo.setLocation(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
+				uiMinimap.setLocation(getWidth()-uiMinimap.getWidth()-20, uiTime.getY()-uiMinimap.getHeight()-20);
 				super.layout();
 			}
 		};
@@ -221,6 +223,18 @@ public class AetherTown extends UIClient {
 		};
 		uiTime.setSize(100, 32);
 		
+		uiCompass = new UIPane(uiRoot, false) {
+			@Override
+			protected void paintSelf(GraphAssist g) {
+				clear(g, bgColor);
+				g.setColor(Color.WHITE);
+				g.setFont(fontLarge);
+				String s = compassDirs[compass];
+				g.drawString(s, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
+			}
+		};
+		uiCompass.setSize(100, 32);
+		
 		uiLookInfo = new UIPane(uiRoot, false) {
 			@Override
 			protected void paintSelf(GraphAssist g) {
@@ -233,6 +247,9 @@ public class AetherTown extends UIClient {
 		uiLookInfo.setSize(400, 32);
 		uiLookInfo.setVisible(false);
 	}
+	
+	private int compass = -1;
+	private static final String[] compassDirs = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
 	
 	private void updateWalkY() {
 		hoverx = (int)((camera.position.x+Tile.size/2)/Tile.size);
@@ -255,6 +272,11 @@ public class AetherTown extends UIClient {
 				uiLookInfo.getParent().repaint();
 			}
 		}
+		int comp = (int)Math.round(-camera.rotation.y*4.0/Math.PI) & 0x07;
+		if(comp!=compass) {
+			compass = comp;
+			uiCompass.repaint();
+		}
 		
 		pointActor.position.x = camera.position.x;
 		pointActor.position.z = camera.position.z;
@@ -270,6 +292,25 @@ public class AetherTown extends UIClient {
 	private void updateEnvironment() {
 		sky.updateEnvironment(environment);
 		renderer.updateEnvironment(environment);
+	}
+	
+	private static void printTileDebug(int hoverx, int hoverz, Tile tile) {
+		System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
+		if(level.heightLimiter!=null)
+			System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
+		if(tile!=null)
+			System.out.printf("\tbasey=%d, ground=%d, d=%s\n", tile.basey, tile.getGroundY() , tile.d.name());
+		else
+			System.out.println("\tnull");
+		int[] yloc = level.h.yloc(hoverx, hoverz);
+		System.out.print("\tyloc: ");
+		for(int i=0; i<4; i++)
+			System.out.printf("%d; ", yloc[i]);
+		System.out.println();
+		System.out.print("\tfenceY: ");
+		for(Corner c : Corner.values())
+			System.out.printf("(%s)%d; ", c.name(), tile.t.getFenceY(tile, c));
+		System.out.println();
 	}
 	
 	@Override
@@ -293,19 +334,7 @@ public class AetherTown extends UIClient {
 				break;
 			case KeyEvent.VK_F1: {
 					if(level.isInside(hoverx, hoverz)) {
-						Tile tile = level.map[hoverx][hoverz];
-						System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
-						if(level.heightLimiter!=null)
-							System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
-						if(tile!=null)
-							System.out.printf("\tbasey=%d, ground=%d, d=%s\n", tile.basey, tile.getGroundY() , tile.d.name());
-						else
-							System.out.println("\tnull");
-						int[] yloc = level.h.yloc(hoverx, hoverz);
-						System.out.print("\tyloc: ");
-						for(int i=0; i<4; i++)
-							System.out.printf("%d; ", yloc[i]);
-						System.out.println();
+						printTileDebug(hoverx, hoverz, level.map[hoverx][hoverz]);
 					}
 					else {
 						System.out.println("Outside level");
@@ -331,7 +360,7 @@ public class AetherTown extends UIClient {
 	}
 	
 	public static void main(String[] args) {
-		seed = System.currentTimeMillis();
+		seed = 1672593760108L; // System.currentTimeMillis();
 		System.out.printf("Generating... %dL\n", seed);
 		level = new Level(128);
 		level.generate(new Random(seed));

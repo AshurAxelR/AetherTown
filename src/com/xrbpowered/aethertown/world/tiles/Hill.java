@@ -4,9 +4,11 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightLimiter;
+import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
@@ -32,13 +34,18 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
-	public float gety(Tile tile, float sx, float sz) {
+	public float getYAt(Tile tile, float sx, float sz) {
 		return tile.level.h.gety(tile.x, tile.z, sx, sz);
 	}
 	
 	@Override
 	public int getFixedYStrength() {
 		return 0;
+	}
+
+	@Override
+	public int getFenceY(Tile tile, Corner c) {
+		return HeightMap.tiley(tile, c);
 	}
 	
 	@Override
@@ -88,19 +95,25 @@ public class Hill extends TileTemplate {
 
 		Dir adjDir = null;
 		int y = 0;
+		int countUp = 0;
 		for(Dir d : Dir.shuffle(random)) {
 			Tile adj = tile.getAdj(d);
-			Template adjt = (adj==null) ? null : adj.t;
-			if(adjt==Template.park || adjt==Template.street) {
+			if(adj==null)
+				continue;
+			if(adj.t==Template.park || adj.t==Template.street) {
 				if(Math.abs(adj.basey-tile.basey)<=1) {
-					adjDir = d;
-					y = adj.basey;
-					break;
+					if(adjDir==null || adj.t==Template.street) {
+						adjDir = d;
+						y = adj.basey;
+					}
 				}
 			}
+			if(adj!=null && adj.basey>tile.basey-2) {
+				countUp++;
+			}
 		}
-		if(adjDir!=null) {
-			Template.park.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir), random);
+		if(adjDir!=null && countUp>1) {
+			Template.park.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()), random);
 			return true;
 		}
 		else

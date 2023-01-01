@@ -14,6 +14,7 @@ import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
 import com.xrbpowered.aethertown.render.tiles.LightTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Level;
@@ -68,6 +69,11 @@ public class HouseT extends Template {
 	@Override
 	public int getGroundY(Tile tile) {
 		return ((HouseTile) tile).groundy;
+	}
+	
+	@Override
+	public int getFenceY(Tile tile, Corner c) {
+		return tile.basey+11;
 	}
 	
 	@Override

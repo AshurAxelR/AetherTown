@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
 import com.xrbpowered.aethertown.render.tiles.LightTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Template;
@@ -26,12 +27,13 @@ public class Street extends TileTemplate {
 
 	public static final Color streetColor = new Color(0xb5b5aa);
 	
-	public static TileComponent street;
+	public static TileComponent street, handrailPole;
 	
 	private static TileComponent lampPost;
 	private static LightTileComponent lamp;
 	//private static SpriteComponent sprite;
 	private static TileComponent bridge, bridgeSupport;
+	private static TileComponent handrail;
 
 	public Street() {
 		super(streetColor);
@@ -56,6 +58,12 @@ public class Street extends TileTemplate {
 		bridgeSupport = new TileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(TerrainBuilder.wallColor));
+		handrail = new TileComponent(
+				ObjMeshLoader.loadObj("models/fences/handrail.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				new Texture("models/fences/handrail.png", false, true, false));
+		handrailPole = new TileComponent(
+				ObjMeshLoader.loadObj("models/fences/handrail_pole.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(0xd5ceba));
 	}
 
 	@Override
@@ -63,9 +71,56 @@ public class Street extends TileTemplate {
 		street.addInstance(new TileObjectInfo(tile));
 		if(!addBridge(tile, tile.basey, renderer))
 			renderer.terrain.addWalls(tile);
+		addHandrails(tile);
 		// if(tile.x%2==0 && tile.z%2==0)
 		// 	sprite.addInstance(new SpriteInfo(tile).size(Tile.size));
 		addLamp(tile, renderer, random, 0);
+	}
+	
+	public static boolean needsHandrail(Tile tile, Dir d, int dy0, int dy1) {
+		Corner c0 = d.leftCorner();
+		Corner c1 = d.rightCorner();
+		Tile adj = tile.getAdj(d);
+		if(adj==null)
+			return false;
+		if(adj.t==Template.hill && tile.basey>=adj.basey+4)
+			return true;
+		return tile.t.getFenceY(tile, c0)>adj.t.getFenceY(adj, c0.flipOver(d))+dy0 ||
+				tile.t.getFenceY(tile, c1)>adj.t.getFenceY(adj, c1.flipOver(d))+dy1;
+	}
+
+	public static boolean needsHandrail(Tile tile, Dir d) {
+		return needsHandrail(tile, d, 0, 0);
+	}
+
+	public static void addHandrailPoles(Tile tile, Dir d, int dy0, int dy1) {
+		Corner c0 = d.leftCorner();
+		handrailPole.addInstance(new TileObjectInfo(tile, 0.5f*c0.dx, dy0, 0.5f*c0.dz));
+		Corner c1 = d.rightCorner();
+		handrailPole.addInstance(new TileObjectInfo(tile, 0.5f*c1.dx, dy1, 0.5f*c1.dz));
+	}
+	
+	public void addHandrail(Tile tile, Dir d) {
+		if(needsHandrail(tile, d)) {
+			handrail.addInstance(new TileObjectInfo(tile).rotate(d));
+			addHandrailPoles(tile, d, 0, 0);
+		}
+	}
+	
+	public void addHandrails(Tile tile) {
+		Dir dsrc = tile.d.flip();
+		for(Dir d : Dir.values()) {
+			if(d!=dsrc)
+				addHandrail(tile, d);
+			else {
+				Tile src = tile.getAdj(d);
+				if(src!=null && needsHandrail(tile, d, 1, 1))
+					handrail.addInstance(new TileObjectInfo(tile).rotate(d));
+				else {
+					// TODO add entry stairs in place of handrails
+				}
+			}
+		}
 	}
 	
 	public boolean addBridge(Tile tile, int basey, LevelRenderer renderer) {
@@ -105,7 +160,7 @@ public class Street extends TileTemplate {
 		if(hasLamp) {
 			for(Dir d : Dir.shuffle(random)) {
 				Template adjt = tile.getAdjT(d);
-				if(adjt!=Template.street && !(adjt instanceof StreetSlope) && adjt!=Template.monument) {
+				if(adjt!=Template.street && !(adjt instanceof StreetSlope) && !(adjt instanceof Plaza)) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
 					lamp.addInstance(new LightTileObjectInfo(tile, dx, dy, dz));

@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 
@@ -26,6 +27,7 @@ public class Plaza extends TileTemplate {
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		Street.street.addInstance(new TileObjectInfo(tile));
 		renderer.terrain.addWalls(tile);
+		Template.street.addHandrails(tile);
 	}
 
 }
