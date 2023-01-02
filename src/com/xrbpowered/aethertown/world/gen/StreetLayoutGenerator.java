@@ -19,9 +19,12 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	@Override
 	public boolean generate(Token startToken, Random random) {
 		clearTokens();
-		Template.street.generate(startToken, random);
+		/*Template.street.generate(startToken, random);
 		for(Dir d : Dir.values())
-			addToken(startToken.next(d, 0).setGenerator(new StreetGenerator(random, 0)));
+			addToken(startToken.next(d, 0).setGenerator(new StreetGenerator(random, 0)));*/
+		Crossroads start = new Crossroads();
+		start.generate(startToken, random);
+		start.collectTokens(this, random);
 		return generate(random);
 	}
 	

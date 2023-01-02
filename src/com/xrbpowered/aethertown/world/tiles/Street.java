@@ -7,8 +7,8 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.TexColor;
-import com.xrbpowered.aethertown.render.tiles.LightTileComponent;
-import com.xrbpowered.aethertown.render.tiles.LightTileObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
+import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
@@ -30,7 +30,7 @@ public class Street extends TileTemplate {
 	public static TileComponent street, handrailPole;
 	
 	private static TileComponent lampPost;
-	private static LightTileComponent lamp;
+	private static IllumTileComponent lamp;
 	//private static SpriteComponent sprite;
 	private static TileComponent bridge, bridgeSupport;
 	private static TileComponent handrail;
@@ -45,7 +45,7 @@ public class Street extends TileTemplate {
 				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
 				new Texture(streetColor));
 		//sprite = new SpriteComponent(new Texture("checker.png"));
-		lamp = new LightTileComponent(
+		lamp = new IllumTileComponent(
 				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture("models/lamp/lamp.png", false, true, false),
 				new Texture("models/lamp/lamp_illum.png", false, true, false));
@@ -163,7 +163,7 @@ public class Street extends TileTemplate {
 				if(adjt!=Template.street && !(adjt instanceof StreetSlope) && !(adjt instanceof Plaza)) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
-					lamp.addInstance(new LightTileObjectInfo(tile, dx, dy, dz));
+					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));
 					lampPost.addInstance(new TileObjectInfo(tile, dx, dy, dz));
 					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz);
 					break;

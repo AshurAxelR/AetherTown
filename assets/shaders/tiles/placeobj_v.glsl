@@ -20,6 +20,6 @@ void main(void) {
 	gl_Position = projectionMatrix * pass_Position;
 	pass_SkyCoord = 0.5+0.5*gl_Position.xy/gl_Position.w;
 	
-	pass_Normal = normalize(vec3(viewMatrix * modelMatrix * vec4(in_Normal, 0)));
+	pass_Normal = normalize(vec3(modelMatrix * vec4(in_Normal, 0)));
 	pass_TexCoord = in_TexCoord;
 }

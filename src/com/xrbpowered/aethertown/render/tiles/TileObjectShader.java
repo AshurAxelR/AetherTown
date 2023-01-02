@@ -19,12 +19,12 @@ public class TileObjectShader extends CameraShader {
 	
 	private int viewYLocation;
 	
-	protected TileObjectShader(InstanceInfo info, String pathVS, String pathFS) {
-		super(info, pathVS, pathFS);
+	protected TileObjectShader(InstanceInfo info, String pathVS, String pathFS, String[] defs) {
+		super(info, pathVS, pathFS, defs);
 	} 
 	
 	public TileObjectShader() {
-		this(instanceInfo, "shaders/tiles/tileobj_v.glsl", "shaders/tiles/obj_f.glsl");
+		this(instanceInfo, "shaders/tiles/tileobj_v.glsl", "shaders/tiles/obj_f.glsl", null);
 	}
 
 	protected String[] getSamplerNames() {

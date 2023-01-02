@@ -10,14 +10,14 @@ import com.xrbpowered.gl.scene.comp.ComponentRenderer;
 public class TileRenderer {
 
 	public final TileObjectShader shader;
-	public final LightTileObjectShader lightShader;
+	public final IllumTileObjectShader lightShader;
 	public final SpriteShader spriteShader;
 
 	public ComponentRenderer<?>[] renderers;
 	
 	public TileRenderer() {
 		shader = new TileObjectShader();
-		lightShader = new LightTileObjectShader();
+		lightShader = new IllumTileObjectShader();
 		spriteShader = new SpriteShader();
 		
 		TileComponent.renderer = new ComponentRenderer<TileComponent>() {
@@ -26,7 +26,7 @@ public class TileRenderer {
 				return shader;
 			}
 		};
-		LightTileComponent.renderer = new ComponentRenderer<LightTileComponent>() {
+		IllumTileComponent.renderer = new ComponentRenderer<IllumTileComponent>() {
 			@Override
 			protected Shader getShader() {
 				return lightShader;
@@ -41,7 +41,7 @@ public class TileRenderer {
 		
 		renderers = new ComponentRenderer<?>[] {
 			TileComponent.renderer,
-			LightTileComponent.renderer,
+			IllumTileComponent.renderer,
 			SpriteComponent.renderer
 		};
 	}

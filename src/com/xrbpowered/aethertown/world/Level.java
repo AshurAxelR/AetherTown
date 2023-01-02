@@ -21,6 +21,7 @@ public class Level {
 	public HeightMap h;
 	
 	public ArrayList<HouseGenerator> houses = null;
+	public String name;
 
 	// available only during generation
 	public HeightLimiter heightLimiter = null;
@@ -85,6 +86,7 @@ public class Level {
 		
 		plots = null;
 		houses = HouseGenerator.listHouses(this);
+		name = LevelNames.next(random, houses.size());
 		heightLimiter = null;
 	}
 	

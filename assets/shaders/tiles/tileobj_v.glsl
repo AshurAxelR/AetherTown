@@ -11,12 +11,18 @@ in vec3 ins_Position;
 in float ins_ScaleXZ;
 in float ins_ScaleY;
 in float ins_Rotation;
+#ifdef ILLUM_TILE
+in vec3 ins_illumMod;
+#endif
 
 out vec4 pass_Position;
 out vec3 pass_Normal;
 out vec2 pass_TexCoord;
 out vec4 pass_WorldPosition;
 out vec2 pass_SkyCoord;
+#ifdef ILLUM_TILE
+out vec3 pass_illumMod;
+#endif
 
 mat4 translationMatrix(vec3 t) {
 	mat4 m = mat4(1);
@@ -40,6 +46,7 @@ mat4 scaleMatrix(float xz, float y) {
 	m[2][2] = xz;
 	return m;
 }
+
 void main(void) {
 	mat4 modelMatrix = translationMatrix(ins_Position) * rotationYMatrix(ins_Rotation) * scaleMatrix(ins_ScaleXZ, ins_ScaleY);
 	pass_WorldPosition = modelMatrix * vec4(in_Position, 1);
@@ -47,6 +54,9 @@ void main(void) {
 	gl_Position = projectionMatrix * pass_Position;
 	pass_SkyCoord = 0.5+0.5*gl_Position.xy/gl_Position.w;
 	
-	pass_Normal = normalize(vec3(viewMatrix * modelMatrix * vec4(in_Normal, 0)));
+	pass_Normal = normalize(vec3(modelMatrix * vec4(in_Normal, 0)));
 	pass_TexCoord = in_TexCoord;
+	#ifdef ILLUM_TILE
+	pass_illumMod = ins_illumMod;
+	#endif
 }

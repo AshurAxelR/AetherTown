@@ -13,7 +13,9 @@ import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.LevelNames;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
@@ -23,6 +25,7 @@ import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.gl.res.buffer.OffscreenBuffer;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
+import com.xrbpowered.gl.res.shader.Shader;
 import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.scene.CameraActor;
 import com.xrbpowered.gl.scene.Controller;
@@ -38,7 +41,7 @@ import com.xrbpowered.zoomui.UIElement;
 
 public class AetherTown extends UIClient {
 
-	private static final boolean testFps = false;
+	private static final boolean testFps = true;
 	public static final float pawnHeight = 1.6f;
 
 	public static final Color bgColor = new Color(0x22000000, true);
@@ -84,7 +87,6 @@ public class AetherTown extends UIClient {
 	
 	public AetherTown() {
 		super("Aether Town", 1f);
-		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		windowedWidth = 1920;
 		windowedHeight = 1080;
 		if(testFps) {
@@ -109,6 +111,9 @@ public class AetherTown extends UIClient {
 			
 			@Override
 			public void setupResources() {
+				Shader.resolveIncludes = true;
+				Shader.xunifyDefs = true;
+				
 				clearColor = environment.bgColor;
 				camera = new CameraActor.Perspective().setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
 				camera.position.x = level.getStartX()*Tile.size;
@@ -229,7 +234,7 @@ public class AetherTown extends UIClient {
 				clear(g, bgColor);
 				g.setColor(Color.WHITE);
 				g.setFont(fontLarge);
-				String s = compassDirs[compass];
+				String s = Dir8.values()[compass].name().toUpperCase();
 				g.drawString(s, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
 		};
@@ -249,7 +254,6 @@ public class AetherTown extends UIClient {
 	}
 	
 	private int compass = -1;
-	private static final String[] compassDirs = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
 	
 	private void updateWalkY() {
 		hoverx = (int)((camera.position.x+Tile.size/2)/Tile.size);
@@ -360,7 +364,10 @@ public class AetherTown extends UIClient {
 	}
 	
 	public static void main(String[] args) {
-		seed = 1672593760108L; // System.currentTimeMillis();
+		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
+		LevelNames.load();
+
+		seed = System.currentTimeMillis();
 		System.out.printf("Generating... %dL\n", seed);
 		level = new Level(128);
 		level.generate(new Random(seed));

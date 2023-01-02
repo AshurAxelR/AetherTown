@@ -3,7 +3,7 @@ package com.xrbpowered.aethertown.render.tiles;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.gl.res.shader.InstanceInfo;
 
-public class LightTileObjectShader extends TileObjectShader {
+public class IllumTileObjectShader extends TileObjectShader {
 
 	public static final InstanceInfo instanceInfo = new InstanceInfo(ObjectShader.vertexInfo)
 			.addAttrib("ins_Position", 3)
@@ -13,9 +13,10 @@ public class LightTileObjectShader extends TileObjectShader {
 			.addAttrib("ins_illumMod", 3);
 	
 	public static final String[] samplerNames = {"texSky", "dataPointLights", "texDiffuse", "texIllum"};
+	public static final String[] shaderDefs = {"ILLUM_TILE"};
 	
-	public LightTileObjectShader() {
-		super(instanceInfo, "shaders/tiles/lighttileobj_v.glsl", "shaders/tiles/lightobj_f.glsl");
+	public IllumTileObjectShader() {
+		super(instanceInfo, "shaders/tiles/tileobj_v.glsl", "shaders/tiles/obj_f.glsl", shaderDefs);
 	}
 
 	protected String[] getSamplerNames() {

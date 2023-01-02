@@ -3,12 +3,14 @@
 #define MIN_FOG_DIST 4
 #define POINT_LIGHT_R 1
 
-uniform mat4 viewMatrix;
 uniform vec3 cameraPosition;
 
 uniform sampler2D texSky;
 uniform sampler2D dataPointLights;
 uniform sampler2D texDiffuse;
+#ifdef ILLUM_TILE
+uniform sampler2D texIllum;
+#endif
 
 uniform float levelSize;
 
@@ -33,6 +35,9 @@ in vec2 pass_TexCoord;
 
 in vec4 pass_WorldPosition;
 in vec2 pass_SkyCoord;
+#ifdef ILLUM_TILE
+in vec3 pass_illumMod;
+#endif
 
 out vec4 out_Color;
 
@@ -40,7 +45,7 @@ vec4 calcPointLight(vec2 index, vec3 normal) {
 	vec4 lightPos = texture(dataPointLights, index/levelSize);
 	float radius = lightPos.w;
 	lightPos.w = 1;
-	vec3 lightVec = (viewMatrix * (lightPos - pass_WorldPosition)).xyz;
+	vec3 lightVec = (lightPos - pass_WorldPosition).xyz;
 	
 	float dist = length(lightVec);
 	float falloff = clamp((radius-dist)/(radius+dist), 0, 1);
@@ -49,8 +54,8 @@ vec4 calcPointLight(vec2 index, vec3 normal) {
 }
 
 vec4 calcPointLights(vec3 normal) {
-	vec4 light = vec4(0);
 	vec2 center = vec2(floor(pass_WorldPosition.x/4+0.5), floor(pass_WorldPosition.z/4+0.5));
+	vec4 light = vec4(0);
 	for(int dx=-POINT_LIGHT_R; dx<=POINT_LIGHT_R; dx++)
 		for(int dz=-POINT_LIGHT_R; dz<=POINT_LIGHT_R; dz++) {
 			light += calcPointLight(center+vec2(dx, dz), normal);
@@ -73,7 +78,7 @@ void main(void) {
 	vec3 viewDir = normalize(-pass_Position.xyz);
 	
 	float illum = lightColor.x+lightColor.y+lightColor.z;
-	vec3 lightDir = normalize((viewMatrix * vec4(-lightDirection, 0)).xyz);
+	vec3 lightDir = normalize(-lightDirection);
 	float diffuse = dot(normal, lightDir);
 	vec4 diffuseLight = diffuse>=0 ? mix(midColor, lightColor, diffuse) : mix(midColor, shadowColor, -diffuse);
 	// float spec = pow(max(dot(viewDir, normalize(reflect(-lightDir, normal))), 0), specPower);
@@ -83,7 +88,14 @@ void main(void) {
 	}
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
-	out_Color.a = diffuseColor.a;
+	#ifdef ILLUM_TILE
+	if(illum<illumTrigger) {
+		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
+		out_Color = max(out_Color, illumColor);
+		float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
+		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
+	}
+	#endif
 	
 	vec4 fogColor = texture(texSky, pass_SkyCoord);
 	float lowNear = clamp((viewDist - MIN_FOG_DIST) / (cloudNear - MIN_FOG_DIST), 0, 1);
@@ -91,4 +103,6 @@ void main(void) {
 	highColor = mix(highColor, fogColor, clamp((pass_WorldPosition.y - cloudTop) / (cloudBottom - cloudTop), 0, 1) * lowNear);
 	vec4 lowColor = mix(out_Color, fogColor, lowNear);
 	out_Color = mix(highColor, lowColor, clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1));
+	
+	out_Color.a = diffuseColor.a;
 }
