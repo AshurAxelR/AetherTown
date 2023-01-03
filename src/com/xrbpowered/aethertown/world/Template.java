@@ -62,6 +62,10 @@ public abstract class Template {
 		return tile.basey;
 	}
 	
+	public int getLightBlockY(Tile tile) {
+		return tile.basey;
+	}
+	
 	public float getYAt(Tile tile, float sx, float sz) {
 		return Tile.ysize*tile.basey;
 	}

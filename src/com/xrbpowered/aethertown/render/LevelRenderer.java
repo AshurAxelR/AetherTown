@@ -46,7 +46,7 @@ public class LevelRenderer {
 	
 	public void createLevelGeometry() {
 		pointLights = new PointLightArray(level.levelSize);
-		blockLighting = new BlockLighting(level.levelSize);
+		blockLighting = new BlockLighting(level);
 		tiles.startCreateInstances();
 		terrain = new TerrainBuilder(level);
 		level.createGeometry(this);

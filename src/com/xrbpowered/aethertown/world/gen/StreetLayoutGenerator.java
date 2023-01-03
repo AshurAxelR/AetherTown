@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.gen;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
@@ -28,14 +29,17 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		return generate(random);
 	}
 	
+	private static final WRandom nextw = new WRandom(0.5, 0.1, 0.5, 1);
+	
 	@Override
 	protected Generator selectGenerator(Token t, Random random) {
 		StreetGenerator street = new StreetGenerator(random, StreetGenerator.getPrevDy(t));
 		boolean fit = street.checkFit(t, random);
 		if(fit && (street.isPerfectMatch() || tokenCount()<2 || random.nextInt(10)>0))
 			return street;
-		else
-			return StreetGenerator.selectSideGenerator(random, 0);
+		else {
+			return StreetGenerator.selectSideGenerator(nextw, random, 0);
+		}
 	}
 
 	private static boolean addPointOfInterest(Level level, Tile tile, Random random) {

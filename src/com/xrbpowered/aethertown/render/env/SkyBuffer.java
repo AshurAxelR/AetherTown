@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.render.env;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
 import com.xrbpowered.gl.res.buffer.OffscreenBuffer;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
@@ -21,13 +22,13 @@ public class SkyBuffer {
 			followCamera = true;
 		}
 		
-		private int fovLocation, aspectRatioLocation, viewYLocation;
+		private int fovLocation, aspectRatioLocation;
 		@Override
 		protected void storeUniformLocations() {
 			super.storeUniformLocations();
 			fovLocation = GL20.glGetUniformLocation(pId, "fov");
 			aspectRatioLocation = GL20.glGetUniformLocation(pId, "aspectRatio");
-			viewYLocation = GL20.glGetUniformLocation(pId, "viewY");
+			initSamplers(new String[] {"dataBlockLighting"});
 		}
 		
 		@Override
@@ -35,7 +36,6 @@ public class SkyBuffer {
 			super.updateUniforms();
 			GL20.glUniform1f(fovLocation, (float)Math.toRadians(((Perspective)camera).getFov()));
 			GL20.glUniform1f(aspectRatioLocation, camera.getAspectRatio());
-			GL20.glUniform1f(viewYLocation, camera.position.y);
 		}
 	}
 	
@@ -58,8 +58,16 @@ public class SkyBuffer {
 		return shader;
 	}
 	
-	public void render(RenderTarget target) {
+	public void setLevel(LevelRenderer level) {
+		int pId = shader.getProgramId();
+		GL20.glUseProgram(pId);
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level.level.levelSize);
+		level.blockLighting.bind(0);
+	}
+	
+	public void render(RenderTarget target, LevelRenderer level) {
 		buffer.use();
+		setLevel(level);
 		GL11.glDepthMask(false);
 		shader.use();
 		screenQuad.draw();

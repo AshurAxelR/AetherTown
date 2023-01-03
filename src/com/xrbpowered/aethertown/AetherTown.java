@@ -111,6 +111,7 @@ public class AetherTown extends UIClient {
 			
 			@Override
 			public void setupResources() {
+				System.out.println("Loading resources...");
 				Shader.resolveIncludes = true;
 				Shader.xunifyDefs = true;
 				
@@ -130,9 +131,12 @@ public class AetherTown extends UIClient {
 				sky = new SkyRenderer().setCamera(camera);
 				sky.stars.createStars(seed);
 				
+				System.out.println("Creating components...");
 				renderer = new LevelRenderer(level, sky.buffer).setCamera(camera);
 				Template.createAllComponents(); // FIXME should not depend on creating level renderer first
+				System.out.println("Building geometry...");
 				renderer.createLevelGeometry();
+				System.out.println("Done.");
 
 				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, renderer.objShader.info, null), renderer.objShader, new Texture(Color.RED));
 
@@ -180,7 +184,7 @@ public class AetherTown extends UIClient {
 			@Override
 			protected void renderBuffer(RenderTarget target) {
 				super.renderBuffer(target);
-				sky.render(target);
+				sky.render(target, renderer);
 				renderer.render(target);
 				
 				if(showPointer)

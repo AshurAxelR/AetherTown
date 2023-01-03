@@ -26,7 +26,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 public class Street extends TileTemplate {
 
 	public static final Color streetColor = new Color(0xb5b5aa);
-	public static final Color lampLightColor = new Color(0xfffae5);
+	public static final Color lampLightColor = new Color(0xfff0b4); // new Color(0xfffae5);
 	
 	public static TileComponent street, handrailPole;
 	
@@ -36,10 +36,23 @@ public class Street extends TileTemplate {
 	private static TileComponent bridge, bridgeSupport;
 	private static TileComponent handrail;
 
+	public class StreetTile extends Tile {
+		public boolean allowConnections = true;
+		
+		public StreetTile() {
+			super(Street.this);
+		}
+	}
+	
 	public Street() {
 		super(streetColor);
 	}
-	
+
+	@Override
+	public Tile createTile() {
+		return new StreetTile();
+	}
+
 	@Override
 	public void createComponents() {
 		street = new TileComponent(
@@ -167,7 +180,7 @@ public class Street extends TileTemplate {
 					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));
 					lampPost.addInstance(new TileObjectInfo(tile, dx, dy, dz));
 					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz);
-					renderer.blockLighting.addLight(tile, lampLightColor, 0.5f);
+					renderer.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.45f, false);
 					break;
 				}
 			}

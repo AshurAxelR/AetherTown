@@ -1,6 +1,12 @@
 #version 150 core
 
-uniform float viewY = 0;
+uniform vec3 cameraPosition;
+
+uniform sampler2D dataBlockLighting;
+uniform float levelSize;
+uniform float illumTrigger = 2;
+uniform vec4 lightColor = vec4(1, 0.949, 0.850, 1);
+
 uniform float cloudTop = 0;
 uniform float cloudBottom = -40;
 
@@ -28,6 +34,11 @@ void main(void) {
 		out_Color = mix(out_Color, lightSkyColor, ldot*ldot);
 	}
 
-	// out_Color += lightColor * ((pow(ldot, 1500) + pow(ldot, 8)) * 0.2);
-	out_Color = mix(out_Color, cloudColor, clamp((viewY-cloudTop)/(cloudBottom-cloudTop), 0, 1));
+	vec4 blockLight = vec4(0);
+	float illum = lightColor.x+lightColor.y+lightColor.z;
+	if(illum<illumTrigger) {
+		blockLight = texture(dataBlockLighting, (cameraPosition.xz/4+0.5)/levelSize)*(1-illum/illumTrigger);
+	}
+	vec4 fogColor = cloudColor + 0.15*blockLight;
+	out_Color = mix(out_Color, fogColor, clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1));
 }

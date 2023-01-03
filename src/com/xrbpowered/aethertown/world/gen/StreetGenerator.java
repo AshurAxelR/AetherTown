@@ -34,8 +34,8 @@ public class StreetGenerator implements Generator, TokenProvider {
 	
 	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.5, 1);
 
-	public static Generator selectSideGenerator(Random random, int h) {
-		switch(sidew.next(random)) {
+	public static Generator selectSideGenerator(WRandom w, Random random, int h) {
+		switch(w.next(random)) {
 			case 1:
 				return Template.park;
 			case 2:
@@ -46,7 +46,11 @@ public class StreetGenerator implements Generator, TokenProvider {
 				return null;
 		}
 	}
-	
+
+	public static Generator selectSideGenerator(Random random, int h) {
+		return selectSideGenerator(sidew, random, h);
+	}
+
 	public static void placeSide(Level level, Token t, Dir side, Random random, int h) {
 		Generator gen = selectSideGenerator(random, h);
 		if(gen!=null)
@@ -303,10 +307,15 @@ public class StreetGenerator implements Generator, TokenProvider {
 	
 	@Override
 	public void collectTokens(TokenGenerator out, Random random) {
-		out.addToken(endToken.next(endToken.d.cw(), 0).setContext(this));
-		out.addToken(endToken.next(endToken.d.ccw(), 0).setContext(this));
-		if(random.nextInt(3)==0)
-			out.addToken(endToken.next(endToken.d, 0).setContext(this));
+		if(random.nextInt(20)==0) {
+			out.addToken(endToken.next(endToken.d, 0).setGenerator(new Crossroads()));
+		}
+		else {
+			out.addToken(endToken.next(endToken.d.cw(), 0).setContext(this));
+			out.addToken(endToken.next(endToken.d.ccw(), 0).setContext(this));
+			if(random.nextInt(3)==0)
+				out.addToken(endToken.next(endToken.d, 0).setContext(this));
+		}
 	}
 
 }

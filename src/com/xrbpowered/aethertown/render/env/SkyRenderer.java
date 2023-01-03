@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.render.env;
 
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
 import com.xrbpowered.gl.scene.CameraActor;
@@ -37,8 +38,8 @@ public class SkyRenderer {
 		stars.update(sun.position);
 	}
 	
-	public void render(RenderTarget target) {
-		buffer.render(target);
+	public void render(RenderTarget target, LevelRenderer level) {
+		buffer.render(target, level);
 		if(renderStars)
 			stars.render();
 		sun.render();

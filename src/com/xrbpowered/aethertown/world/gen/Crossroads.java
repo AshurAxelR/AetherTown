@@ -4,9 +4,11 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Template;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TokenProvider;
+import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class Crossroads extends PlotGenerator implements TokenProvider {
 
@@ -40,7 +42,9 @@ public class Crossroads extends PlotGenerator implements TokenProvider {
 		}
 		else
 			temp = Template.street;
-		temp.forceGenerate(t, random).makeSub(this, i, j);
+		Tile tile = temp.forceGenerate(t, random).makeSub(this, i, j);
+		if(tile.t==Template.street)
+			((Street.StreetTile) tile).allowConnections = (i==0 || j==1);
 	}
 
 	@Override

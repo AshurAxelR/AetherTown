@@ -77,6 +77,11 @@ public class HouseT extends Template {
 	}
 	
 	@Override
+	public int getLightBlockY(Tile tile) {
+		return tile.basey+15;
+	}
+	
+	@Override
 	public void createComponents() {
 		StaticMesh wall = BasicGeometry.wall(Tile.size, 6*Tile.ysize, ObjectShader.vertexInfo, null);
 		groundWall = new IllumTileComponent(wall,
@@ -133,6 +138,7 @@ public class HouseT extends Template {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int left = -house.left;
 		Vector3f illum = randomIllumMod(random, house.illum);
+		renderer.blockLighting.addLight(tile, tile.basey, illum, 0.35f, true);
 		if(sub.j==0)
 			(sub.i==0 && sub.j==0 ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(sub.i==left)
@@ -143,6 +149,7 @@ public class HouseT extends Template {
 			(isObstructed(tile, yloc, basey+2, tile.d) ? groundWallBlank : groundWall).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum));
 		
 		illum = randomIllumMod(random, house.illum);
+		renderer.blockLighting.addLight(tile, tile.basey+6, illum, 0.35f, true);
 		if(sub.j==0)
 			(isObstructed(tile, yloc, basey+7, tile.d.flip()) ? upperWallBlank : upperWall).addInstance(new IllumTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(sub.i==left)

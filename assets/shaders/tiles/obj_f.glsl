@@ -84,10 +84,11 @@ void main(void) {
 	vec4 diffuseLight = diffuse>=0 ? mix(midColor, lightColor, diffuse) : mix(midColor, shadowColor, -diffuse);
 	// float spec = pow(max(dot(viewDir, normalize(reflect(-lightDir, normal))), 0), specPower);
 	
+	vec4 blockLight = vec4(0);
 	if(illum<illumTrigger) {
 		diffuseLight += calcPointLights(normal);
-		vec4 blockLight = texture(dataBlockLighting, (pass_WorldPosition.xz/4+0.5+normal.xz)/levelSize);
-		diffuseLight += 0.5*blockLight;
+		blockLight = texture(dataBlockLighting, (pass_WorldPosition.xz/4+0.5+0.5*normal.xz)/levelSize)*(1-illum/illumTrigger);
+		diffuseLight += 0.4*blockLight;
 	}
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
@@ -103,7 +104,7 @@ void main(void) {
 	vec4 fogColor = texture(texSky, pass_SkyCoord);
 	float lowNear = clamp((viewDist - MIN_FOG_DIST) / (cloudNear - MIN_FOG_DIST), 0, 1);
 	vec4 highColor = mix(out_Color, fogColor, clamp((viewDist - fogNear) / (fogFar - fogNear), 0, 1));
-	highColor = mix(highColor, fogColor, clamp((pass_WorldPosition.y - cloudTop) / (cloudBottom - cloudTop), 0, 1) * lowNear);
+	highColor = mix(highColor, fogColor+0.075*blockLight, clamp((pass_WorldPosition.y - cloudTop) / (cloudBottom - cloudTop), 0, 1) * lowNear);
 	vec4 lowColor = mix(out_Color, fogColor, lowNear);
 	out_Color = mix(highColor, lowColor, clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1));
 	

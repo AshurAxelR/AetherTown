@@ -10,6 +10,7 @@ import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
 import static com.xrbpowered.aethertown.world.gen.StreetGenerator.streetGap;
@@ -178,8 +179,11 @@ public class StreetConnector {
 			for(int xj=xi, zj=zi; j<levelSize; j++, xj+=din.dx, zj+=din.dz) {
 				Tile tile = level.map[xj][zj];
 				if(tile!=null) {
-					if(tile.t==Template.street && i>=margin && i<levelSize-margin)
+					if(tile.t==Template.street &&
+							i>=margin && i<levelSize-margin &&
+							((Street.StreetTile) tile).allowConnections) {
 						connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
+					}
 					if(isAnyStreet(tile))
 						j -= streetGap;
 					break;

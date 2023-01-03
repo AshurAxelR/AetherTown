@@ -7,7 +7,6 @@ Golden
 Copper
 Green
 Emerald
-Malachite
 Azure
 Blue
 Sapphire

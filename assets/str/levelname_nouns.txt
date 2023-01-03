@@ -6,7 +6,7 @@ Wolf
 Fox
 Lynx
 
-Stead
+Horse
 Bull
 Cat
 Hound

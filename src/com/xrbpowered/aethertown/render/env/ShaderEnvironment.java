@@ -32,6 +32,8 @@ public class ShaderEnvironment {
 	public float lightWashBottom = 1f;
 	public float lightSkyWash = 1f;
 	
+	// FIXME cloudTop, cloudButtom? via LevelRenderer?
+	
 	public ShaderEnvironment() {
 	}
 	
@@ -164,10 +166,10 @@ public class ShaderEnvironment {
 
 	public static ShaderEnvironment clearNight = new ShaderEnvironment(
 			new Vector3f(-0.55f, -1.75f, -0.45f),
-			new Color(0x111527),
-			new Color(0x020407),
+			new Color(0x03040b), // 0x111527 // 0x03040b
+			new Color(0x010103), // 0x020407 // 0x010103
 			new Color(0x000000),
-			new Color(0x0e1520), // 171c22),
+			new Color(0x0e1520), // 0x0e1520 // 171c22),
 			new Color(0x050b13),
 			new Color(0x000204),
 			new Color(0x00050e19, true)
