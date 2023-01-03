@@ -12,7 +12,7 @@ public class IllumTileObjectShader extends TileObjectShader {
 			.addAttrib("ins_Rotation", 1)
 			.addAttrib("ins_illumMod", 3);
 	
-	public static final String[] samplerNames = {"texSky", "dataPointLights", "texDiffuse", "texIllum"};
+	public static final String[] samplerNames = {"texSky", "dataPointLights", "dataBlockLighting", "texDiffuse", "texIllum"};
 	public static final String[] shaderDefs = {"ILLUM_TILE"};
 	
 	public IllumTileObjectShader() {

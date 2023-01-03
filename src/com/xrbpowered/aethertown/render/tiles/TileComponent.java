@@ -18,7 +18,7 @@ public class TileComponent extends InstancedMeshList<TileObjectInfo> {
 
 	@Override
 	protected void bindTextures() {
-		Texture.bindAll(2, textures);
+		Texture.bindAll(TileObjectShader.numGlobalSamplers, textures);
 	}
 	
 	@Override

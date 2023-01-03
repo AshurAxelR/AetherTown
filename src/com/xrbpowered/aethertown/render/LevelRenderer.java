@@ -22,6 +22,7 @@ public class LevelRenderer {
 	public TerrainBuilder terrain = null;
 	public SkyBuffer sky;
 	public PointLightArray pointLights = null;
+	public BlockLighting blockLighting = null;
 	
 	private ArrayList<StaticMeshActor> terrainActors = null;
 
@@ -45,6 +46,7 @@ public class LevelRenderer {
 	
 	public void createLevelGeometry() {
 		pointLights = new PointLightArray(level.levelSize);
+		blockLighting = new BlockLighting(level.levelSize);
 		tiles.startCreateInstances();
 		terrain = new TerrainBuilder(level);
 		level.createGeometry(this);
@@ -59,6 +61,7 @@ public class LevelRenderer {
 					pointLights.setLight(tile, 0, 2, 0);
 			}*/
 		pointLights.finish();
+		blockLighting.finish();
 	}
 	
 	public void render(RenderTarget target) {

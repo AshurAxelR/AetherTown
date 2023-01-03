@@ -18,7 +18,7 @@ public class IllumTileComponent extends InstancedMeshList<IllumTileObjectInfo> {
 
 	@Override
 	protected void bindTextures() {
-		Texture.bindAll(2, textures);
+		Texture.bindAll(TileObjectShader.numGlobalSamplers, textures);
 	}
 	
 	@Override

@@ -13,10 +13,7 @@ public class PointLightArray extends FloatDataTexture {
 	
 	public PointLightArray(int levelSize) {
 		super(levelSize, levelSize, false);
-		positions = new Vector4f[levelSize][levelSize];
-		for(int x=0; x<levelSize; x++)
-			for(int z=0; z<levelSize; z++)
-				positions[x][z] = new Vector4f(0, 0, 0, 0);
+		positions = createVectors(levelSize, new Vector4f(0, 0, 0, 0));
 	}
 
 	public void setLight(int mx, int mz, float x, float y, float z, float radius) {
@@ -35,6 +32,14 @@ public class PointLightArray extends FloatDataTexture {
 		setData(positions).freeBuffer();
 		positions = null;
 		return this;
+	}
+	
+	public static Vector4f[][] createVectors(int size, Vector4f init) {
+		Vector4f[][] v = new Vector4f[size][size];
+		for(int x=0; x<size; x++)
+			for(int z=0; z<size; z++)
+				v[x][z] = new Vector4f(init);
+		return v;
 	}
 
 }

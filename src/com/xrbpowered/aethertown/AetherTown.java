@@ -41,7 +41,7 @@ import com.xrbpowered.zoomui.UIElement;
 
 public class AetherTown extends UIClient {
 
-	private static final boolean testFps = true;
+	private static final boolean testFps = false;
 	public static final float pawnHeight = 1.6f;
 
 	public static final Color bgColor = new Color(0x22000000, true);

@@ -7,6 +7,7 @@ uniform vec3 cameraPosition;
 
 uniform sampler2D texSky;
 uniform sampler2D dataPointLights;
+uniform sampler2D dataBlockLighting;
 uniform sampler2D texDiffuse;
 #ifdef ILLUM_TILE
 uniform sampler2D texIllum;
@@ -41,7 +42,7 @@ in vec3 pass_illumMod;
 
 out vec4 out_Color;
 
-vec4 calcPointLight(vec2 index, vec3 normal) {
+float calcPointLight(vec2 index, vec3 normal) {
 	vec4 lightPos = texture(dataPointLights, index/levelSize);
 	float radius = lightPos.w;
 	lightPos.w = 1;
@@ -50,17 +51,17 @@ vec4 calcPointLight(vec2 index, vec3 normal) {
 	float dist = length(lightVec);
 	float falloff = clamp((radius-dist)/(radius+dist), 0, 1);
 	float angle = clamp(dot(normal, normalize(lightVec)), 0, 1);
-	return pointLightColor*angle*falloff;
+	return angle*falloff;
 }
 
 vec4 calcPointLights(vec3 normal) {
 	vec2 center = vec2(floor(pass_WorldPosition.x/4+0.5), floor(pass_WorldPosition.z/4+0.5));
-	vec4 light = vec4(0);
+	float light = 0;
 	for(int dx=-POINT_LIGHT_R; dx<=POINT_LIGHT_R; dx++)
 		for(int dz=-POINT_LIGHT_R; dz<=POINT_LIGHT_R; dz++) {
 			light += calcPointLight(center+vec2(dx, dz), normal);
 		}
-	return light;
+	return pointLightColor*light;
 }
 
 void main(void) {
@@ -85,6 +86,8 @@ void main(void) {
 	
 	if(illum<illumTrigger) {
 		diffuseLight += calcPointLights(normal);
+		vec4 blockLight = texture(dataBlockLighting, (pass_WorldPosition.xz/4+0.5+normal.xz)/levelSize);
+		diffuseLight += 0.5*blockLight;
 	}
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;

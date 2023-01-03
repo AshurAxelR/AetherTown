@@ -26,6 +26,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 public class Street extends TileTemplate {
 
 	public static final Color streetColor = new Color(0xb5b5aa);
+	public static final Color lampLightColor = new Color(0xfffae5);
 	
 	public static TileComponent street, handrailPole;
 	
@@ -166,6 +167,7 @@ public class Street extends TileTemplate {
 					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));
 					lampPost.addInstance(new TileObjectInfo(tile, dx, dy, dz));
 					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz);
+					renderer.blockLighting.addLight(tile, lampLightColor, 0.5f);
 					break;
 				}
 			}

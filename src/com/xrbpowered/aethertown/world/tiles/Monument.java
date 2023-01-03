@@ -42,7 +42,8 @@ public class Monument extends Plaza {
 		TileObjectInfo info = new TileObjectInfo(tile);
 		pillar.addInstance(info);
 		statue.addInstance(info);
-		renderer.pointLights.setLight(tile, -0.35f*tile.d.dx, 9f, -0.35f*tile.d.dz, 6f);
+		renderer.pointLights.setLight(tile, -0.35f*tile.d.dx, 9f, -0.35f*tile.d.dz, 5f);
+		renderer.blockLighting.addLight(tile, Street.lampLightColor, 0.4f);
 	}
 	
 }

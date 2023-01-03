@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.xrbpowered.aethertown.render.tiles.TileObjectShader;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
@@ -247,7 +248,7 @@ public class TerrainChunkBuilder {
 		StaticMeshActor actor =  new StaticMeshActor() {
 			@Override
 			protected void bindTextures() {
-				Texture.bindAll(2, textures);
+				Texture.bindAll(TileObjectShader.numGlobalSamplers, textures);
 			}
 		};
 		actor.setMesh(mesh);

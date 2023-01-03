@@ -15,7 +15,8 @@ public class TileObjectShader extends CameraShader {
 			.addAttrib("ins_ScaleY", 1)
 			.addAttrib("ins_Rotation", 1);
 	
-	public static final String[] samplerNames = {"texSky", "dataPointLights", "texDiffuse"};
+	public static final String[] samplerNames = {"texSky", "dataPointLights", "dataBlockLighting", "texDiffuse"};
+	public static final int numGlobalSamplers = 3;
 	
 	private int viewYLocation;
 	
@@ -49,6 +50,7 @@ public class TileObjectShader extends CameraShader {
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level.level.levelSize);
 		level.sky.bindTexture(0);
 		level.pointLights.bind(1);
+		level.blockLighting.bind(2);
 	}
 
 }

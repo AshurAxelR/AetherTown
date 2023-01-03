@@ -12,7 +12,7 @@ public class ObjectShader extends ActorShader {
 			.addAttrib("in_Normal", 3)
 			.addAttrib("in_TexCoord", 2);
 	
-	public static final String[] samplerNames = {"texSky", "dataPointLights", "texDiffuse"};
+	public static final String[] samplerNames = {"texSky", "dataPointLights", "dataBlockLighting", "texDiffuse"};
 	
 	private int viewYLocation;
 
