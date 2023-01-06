@@ -10,21 +10,25 @@ public abstract class LevelNames {
 	private static String[] nouns;
 	private static String[] adjectives;
 	
+	public static final String[] rankNames = {"Inn", "Outpost", "Village", "Town", "City"};
+	
+	public static int levelRank(int numHouses) {
+		if(numHouses<5)
+			return 0;
+		else if(numHouses<15)
+			return 1;
+		else if(numHouses<40)
+			return 2;
+		else if(numHouses<100)
+			return 3;
+		else
+			return 4;
+	}
+	
 	public static String next(Random random, int numHouses) {
 		String noun = nouns[random.nextInt(nouns.length)];
 		String adj = adjectives[random.nextInt(adjectives.length)];
-		String rank;
-		if(numHouses<5)
-			rank = "Inn";
-		else if(numHouses<15)
-			rank = "Outpost";
-		else if(numHouses<40)
-			rank = "Village";
-		else if(numHouses<100)
-			rank = "Town";
-		else
-			rank = "City";
-		return String.format("%s %s %s", adj, noun, rank);
+		return String.format("%s %s %s", adj, noun, rankNames[levelRank(numHouses)]);
 	}
 	
 	public static void load() {

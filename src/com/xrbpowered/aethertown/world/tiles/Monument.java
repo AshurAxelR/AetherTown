@@ -16,6 +16,8 @@ public class Monument extends Plaza {
 
 	private static final Color statueColor = new Color(0x75abae); // new Color(0x353433);
 	
+	public static final Monument template = new Monument();
+	
 	public static TileComponent pillar, statue;
 
 	public Monument() {

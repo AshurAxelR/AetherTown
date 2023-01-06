@@ -5,6 +5,7 @@ Bear
 Wolf
 Fox
 Lynx
+Rabbit
 
 Horse
 Bull
@@ -21,14 +22,16 @@ Hill
 Ridge
 Creek
 Brook
+Springs
 Valley
 Meadows
 Field
+Woods
 Lake
 River
+Falls
 
 Blossom
 Rose
 Oak
-Maple
 Tree

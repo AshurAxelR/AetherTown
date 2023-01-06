@@ -12,7 +12,7 @@ public class Tile {
 		public Generator parent;
 	}
 	
-	public final Template t;
+	public final TileTemplate t;
 
 	public Level level = null;
 	public int x, z;
@@ -20,7 +20,7 @@ public class Tile {
 	public Dir d;
 	public SubInfo sub = null;
 	
-	protected Tile(Template t) {
+	protected Tile(TileTemplate t) {
 		this.t = t;
 	}
 	
@@ -61,12 +61,12 @@ public class Tile {
 		return level.isInside(x, z) ? level.map[x][z] : null; 
 	}
 
-	public Template getAdjT(int dx, int dz) {
+	public TileTemplate getAdjT(int dx, int dz) {
 		Tile tile = getAdj(dx, dz);
 		return tile!=null ? tile.t : null; 
 	}
 
-	public Template getAdjT(Dir d) {
+	public TileTemplate getAdjT(Dir d) {
 		Tile tile = getAdj(d);
 		return tile!=null ? tile.t : null; 
 	}
@@ -83,12 +83,12 @@ public class Tile {
 		return level.isInside(x, z) ? level.map[x][z] : null; 
 	}
 
-	public static Template getAdjT(Level level, int tx, int tz, int dx, int dz) {
+	public static TileTemplate getAdjT(Level level, int tx, int tz, int dx, int dz) {
 		Tile tile = getAdj(level, tx, tz, dx, dz);
 		return tile!=null ? tile.t : null; 
 	}
 
-	public static Template getAdjT(Level level, int tx, int tz, Dir d) {
+	public static TileTemplate getAdjT(Level level, int tx, int tz, Dir d) {
 		Tile tile = getAdj(level, tx, tz, d);
 		return tile!=null ? tile.t : null; 
 	}

@@ -7,7 +7,6 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
@@ -16,6 +15,8 @@ import com.xrbpowered.gl.res.texture.Texture;
 public class Plaza extends TileTemplate {
 
 	public static final Color plazaColor = new Color(0xd5ceba);
+	
+	public static final Plaza template = new Plaza();
 	
 	private static TileComponent plaza;
 	
@@ -38,7 +39,7 @@ public class Plaza extends TileTemplate {
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		plaza.addInstance(new TileObjectInfo(tile));
 		renderer.terrain.addWalls(tile);
-		Template.street.addHandrails(tile);
+		Street.template.addHandrails(tile);
 	}
 
 }

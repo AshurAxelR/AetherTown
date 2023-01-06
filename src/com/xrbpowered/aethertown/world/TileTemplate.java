@@ -3,13 +3,54 @@ package com.xrbpowered.aethertown.world;
 import java.awt.Color;
 import java.util.Random;
 
-public abstract class TileTemplate extends Template implements Generator {
+import com.xrbpowered.aethertown.render.LevelRenderer;
+import com.xrbpowered.aethertown.utils.Corner;
 
+public abstract class TileTemplate implements Generator {
+
+	public final Color minimapColor;
+	
 	public TileTemplate(Color minimapColor) {
-		super(minimapColor);
+		// FIXME registerTemplate(this);
+		this.minimapColor = minimapColor;
 	}
 
-	protected void updateHeightLimit(Token t) {
+	public Tile createTile() {
+		return new Tile(this);
+	}
+
+	public String getTileInfo(Tile tile) {
+		return "";
+	}
+	
+	public int getFixedYStrength() {
+		return 2;
+	}
+	
+	public int getGroundY(Tile tile) {
+		return tile.basey;
+	}
+
+	public int getFenceY(Tile tile, Corner c) {
+		return tile.basey;
+	}
+	
+	public int getLightBlockY(Tile tile) {
+		return tile.basey;
+	}
+	
+	public float getYAt(Tile tile, float sx, float sz) {
+		return Tile.ysize*tile.basey;
+	}
+
+	public boolean finalizeTile(Tile tile, Random random) {
+		return false;
+	}
+	
+	public abstract void createComponents();
+	public abstract void createGeometry(Tile tile, LevelRenderer renderer, Random random);
+	
+	public void updateHeightLimit(Token t) {
 		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 3);
 	}
 
@@ -33,6 +74,10 @@ public abstract class TileTemplate extends Template implements Generator {
 		tile.place(t);
 		updateHeightLimit(t);
 		return tile;
+	}
+	
+	public boolean canExpandFill(Tile tile) {
+		return true;
 	}
 
 }

@@ -5,9 +5,10 @@ import java.util.Random;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.tiles.Hill;
+import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class HillsGenerator extends TokenGenerator {
 
@@ -26,11 +27,22 @@ public class HillsGenerator extends TokenGenerator {
 	
 	@Override
 	protected Generator selectGenerator(Token t, Random random) {
-		return Template.hill;
+		return Hill.template;
 	}
 
 	@Override
 	protected boolean checkToken(Token t) {
+		Tile tile = t.level.map[t.x][t.z];
+		if(tile!=null) {
+			if(tile.t==Street.template &&  t.y<tile.basey+4 && tile.getAdj(t.d)==null) {
+				t.x = t.x + t.d.dx;
+				t.z = t.z + t.d.dz;
+				return checkToken(t);
+			}
+			else
+				return false;
+		}
+		
 		int miny = t.level.heightLimiter.miny[t.x][t.z];
 		int maxy = t.level.heightLimiter.maxy[t.x][t.z];
 		if(miny<=maxy) {
@@ -58,16 +70,19 @@ public class HillsGenerator extends TokenGenerator {
 				if(level.map[x][z]!=null)
 					continue;
 				Dir adjDir = null;
+				boolean expand = false;
 				int y = 0;
 				for(Dir d : Dir.shuffle(random)) {
 					Tile adj = level.getAdj(x, z, d);
 					if(adj!=null) {
 						adjDir = d;
+						expand = adj.t.canExpandFill(adj) || random.nextInt(5)>0;
 						y = adj.basey;
-						break;
+						if(expand)
+							break;
 					}
 				}
-				if(adjDir!=null && random.nextInt(skip+1)==0)
+				if(adjDir!=null && (skip==0 || expand) && random.nextInt(skip+1)==0)
 					gen.addToken(new Token(level, x, y, z, adjDir));
 			}
 	}

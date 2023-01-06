@@ -11,7 +11,6 @@ import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
@@ -19,9 +18,9 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class StreetSlope extends TileTemplate {
 
-	private static final StreetSlope template1 = new StreetSlope(1);
-	private static final StreetSlope template2 = new StreetSlope(2);
-	private static final StreetSlope template4 = new StreetSlope(4);
+	public static final StreetSlope template1 = new StreetSlope(1);
+	public static final StreetSlope template2 = new StreetSlope(2);
+	public static final StreetSlope template4 = new StreetSlope(4);
 
 	public final int h;
 	private TileComponent street, side, handrailL, handrailR;
@@ -29,6 +28,11 @@ public class StreetSlope extends TileTemplate {
 	public StreetSlope(int h) {
 		super(Street.streetColor);
 		this.h = h;
+	}
+	
+	@Override
+	public Tile createTile() {
+		return new Street.StreetTile(this);
 	}
 	
 	@Override
@@ -62,6 +66,11 @@ public class StreetSlope extends TileTemplate {
 			return (c==Corner.ne || c==Corner.nw) ? tile.basey : tile.basey-h;
 	}
 
+	@Override
+	public boolean canExpandFill(Tile tile) {
+		return false;
+	}
+	
 	@Override
 	public void createComponents() {
 		Texture handrailTex = new Texture("models/fences/handrail.png", false, true, false);
@@ -110,7 +119,7 @@ public class StreetSlope extends TileTemplate {
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		if(h>1) {
 			side.addInstance(new TileObjectInfo(tile, 0, -h, 0));
-			if(!Template.street.addBridge(tile, tile.basey-h, renderer))
+			if(!Street.template.addBridge(tile, tile.basey-h, renderer))
 				renderer.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
 			Dir dl = tile.d.ccw();
@@ -129,7 +138,7 @@ public class StreetSlope extends TileTemplate {
 		else {
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
-			if(Template.street.addBridge(tile, tile.basey-h, renderer)) {
+			if(Street.template.addBridge(tile, tile.basey-h, renderer)) {
 				renderer.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
 				renderer.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
 			}
@@ -145,7 +154,7 @@ public class StreetSlope extends TileTemplate {
 				handrailR.addInstance(new TileObjectInfo(tile).rotate(dr));
 				Street.addHandrailPoles(tile, dr, 0, -1);
 			}
-			Template.street.addLamp(tile, renderer, random, -0.5f);
+			Street.template.addLamp(tile, renderer, random, -0.5f);
 		}
 		street.addInstance(new TileObjectInfo(tile, 0, -h, 0));
 	}
@@ -153,7 +162,7 @@ public class StreetSlope extends TileTemplate {
 	public static TileTemplate getTemplate(int h) {
 		switch(h) {
 			case 0:
-				return Template.street;
+				return Street.template;
 			case 1:
 				return template1;
 			case 2:

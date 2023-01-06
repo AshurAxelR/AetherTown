@@ -18,16 +18,18 @@ import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
+import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
-public class HouseT extends Template {
+public class HouseT extends TileTemplate {
 
 	private static final Seasons roofColor = new Seasons(new Color(0x57554a), new Color(0xe0eef1));
+	
+	public static final HouseT template = new HouseT();
 	
 	private static IllumTileComponent groundWall, groundWallDoor, groundWallBlank, upperWall, upperWallBlank;
 	private static TileComponent roof, roofEndLeft, roofEndRight;
@@ -124,7 +126,10 @@ public class HouseT extends Template {
 	private static boolean isObstructed(Tile tile, int[] yloc, int y, Dir d) {
 		int y0 = yloc[d.leftCorner().ordinal()];
 		int y1 = yloc[d.rightCorner().ordinal()];
-		int gy = tile.getAdj(d).getGroundY();
+		int gy = y;
+		Tile adj = tile.getAdj(d);
+		if(adj!=null)
+			gy = adj.getGroundY();
 		return (y0>=y) || (y1>=y) || (gy>=y);
 	}
 	
@@ -185,13 +190,15 @@ public class HouseT extends Template {
 			Tile adj = tile.getAdj(d);
 			if(adj==null)
 				continue;
-			if(adj.t==Template.hill && Template.hill.getMaxDelta(adj)>=6) {
+			if(adj.t==Hill.template && Hill.template.getMaxDelta(adj)>=6) {
 				int[] yloc = tile.level.h.yloc(adj.x, adj.z);
 				int maxy = MathUtils.max(yloc);
 				if(maxy>max) {
 					max = maxy;
 					if(max>lim) max = lim;
 				}
+				if(maxy>maxGround)
+					maxGround = maxy;
 			}
 			if(adj.t.getFixedYStrength()>1) {
 				int y = adj.getGroundY();

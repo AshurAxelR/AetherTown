@@ -20,6 +20,7 @@ public class Level {
 	public Tile[][] map;
 	public HeightMap h;
 	
+	public int houseCount = 0;
 	public ArrayList<HouseGenerator> houses = null;
 	public String name;
 
@@ -63,22 +64,24 @@ public class Level {
 		this.random = random;
 		heightLimiter = new HeightLimiter(this);
 		plots = new ArrayList<>();
-		new StreetLayoutGenerator(0).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
+		houseCount = 0;
+		new StreetLayoutGenerator(30).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
 		StreetLayoutGenerator.finishLayout(this, random);
 		
-		HillsGenerator.expand(this, random, 10, 30, -2, 2);
-		HillsGenerator.expand(this, random, 10, 50, -2, 4);
+		HillsGenerator.expand(this, random, 5, 15, -2, 2);
+		HillsGenerator.expand(this, random, 5, 25, -2, 4);
 		
 		int att = 0;
 		int maxAtt = 10;
 		for(; att<maxAtt; att++) {
+			heightLimiter.revalidate();
 			if(!HillsGenerator.expand(this, random, 0, 0, -8, 2) && att>0) {
 				System.err.println("Failed to get refill tokens on att "+att);
 				break;
 			}
 			if(finalizeTiles(random))
 				break;
-			StreetLayoutGenerator.trimStreets(this, random);
+			StreetLayoutGenerator.trimStreets(this, random); // in case of removed plots
 		}
 		System.out.printf("Completed %d refill cycles\n", att+1);
 		if(att>=maxAtt)
@@ -86,7 +89,8 @@ public class Level {
 		
 		plots = null;
 		houses = HouseGenerator.listHouses(this);
-		name = LevelNames.next(random, houses.size());
+		houseCount = houses.size();
+		name = LevelNames.next(random, houseCount);
 		heightLimiter = null;
 	}
 	

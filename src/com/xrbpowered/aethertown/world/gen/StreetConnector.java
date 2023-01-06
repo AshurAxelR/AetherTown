@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.world.gen;
 
+import static com.xrbpowered.aethertown.world.gen.StreetGenerator.streetGap;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
@@ -7,13 +9,9 @@ import java.util.Random;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Street;
-import com.xrbpowered.aethertown.world.tiles.StreetSlope;
-
-import static com.xrbpowered.aethertown.world.gen.StreetGenerator.streetGap;
 
 public class StreetConnector {
 
@@ -106,7 +104,7 @@ public class StreetConnector {
 		}
 		
 		public void generate(Random random) {
-			street.generate(startToken, random);
+			street.finish(random);
 		}
 	}
 	
@@ -158,10 +156,7 @@ public class StreetConnector {
 	}
 	
 	private static boolean isAnyStreet(Tile tile) {
-		if(tile==null)
-			return false;
-		else
-			return (tile.t==Template.street || (tile.t instanceof StreetSlope));
+		return tile==null ? false : Street.isAnyStreet(tile.t);
 	}
 
 	private boolean isAnyStreet(int x, int z) {
@@ -179,7 +174,7 @@ public class StreetConnector {
 			for(int xj=xi, zj=zi; j<levelSize; j++, xj+=din.dx, zj+=din.dz) {
 				Tile tile = level.map[xj][zj];
 				if(tile!=null) {
-					if(tile.t==Template.street &&
+					if(tile.t==Street.template &&
 							i>=margin && i<levelSize-margin &&
 							((Street.StreetTile) tile).allowConnections) {
 						connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
@@ -272,6 +267,8 @@ public class StreetConnector {
 					return null;
 			}
 		}
+		if(lenS-lenOut>7 || lenD-lenOut>7)
+			return null;
 		
 		int hS = (int)Math.ceil(hdiff*(lenS/(float)len)/dy)*dy;
 		int hD = (int)Math.ceil(hdiff*((lenS+lenOut)/(float)len)/dy)*dy;

@@ -3,9 +3,12 @@ package com.xrbpowered.aethertown.world.gen;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.WRandom;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.Park;
+import com.xrbpowered.aethertown.world.tiles.Plaza;
+import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class LargeParkGenerator extends PlotGenerator {
 
@@ -25,18 +28,18 @@ public class LargeParkGenerator extends PlotGenerator {
 		TileTemplate temp;
 		if(i==0 && j<2) {
 			if(type==0)
-				temp = Template.park;
+				temp = Park.template;
 			else if(j==0)
-				temp = Template.street;
+				temp = Street.template;
 			else if(type==3)
-				temp = Template.park;
+				temp = Park.template;
 			else
-				temp = Template.monument;
+				temp = Monument.template;
 		}
 		else if(type<2)
-			temp = Template.park;
+			temp = Park.template;
 		else
-			temp = Template.plaza;
+			temp = Plaza.template;
 		temp.forceGenerate(t, random).makeSub(this, i, j);
 	}
 	

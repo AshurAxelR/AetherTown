@@ -14,6 +14,8 @@ public class HeightLimiter {
 	
 	public int[][] miny;
 	public int[][] maxy;
+
+	private boolean dirty;
 	
 	public HeightLimiter(Level level) {
 		this.level = level;
@@ -21,6 +23,7 @@ public class HeightLimiter {
 		this.miny = new int[levelSize][levelSize];
 		this.maxy = new int[levelSize][levelSize];
 		reset();
+		dirty = false;
 	}
 	
 	public void reset() {
@@ -29,6 +32,28 @@ public class HeightLimiter {
 				miny[x][z] = -hardLimit;
 				maxy[x][z] = hardLimit;
 			}
+	}
+	
+	public void invalidate() {
+		dirty = true;
+	}
+	
+	public boolean isDirty() {
+		return dirty;
+	}
+	
+	public void revalidate() {
+		if(!dirty)
+			return;
+		reset();
+		for(int x=0; x<levelSize; x++)
+			for(int z=0; z<levelSize; z++) {
+				Tile tile = level.map[x][z];
+				if(tile==null)
+					continue;
+				((TileTemplate) tile.t).updateHeightLimit(new Token(level, x, tile.basey, z, tile.d));
+			}
+		dirty = false;
 	}
 	
 	public boolean isInside(int x, int z) {

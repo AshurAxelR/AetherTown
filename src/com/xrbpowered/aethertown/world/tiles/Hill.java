@@ -9,13 +9,14 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.HeightMap;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 
 public class Hill extends TileTemplate {
 
+	public static final Hill template = new Hill();
+	
 	public class HillTile extends Tile {
 		public Integer maxDelta = null;
 		
@@ -49,7 +50,7 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
-	protected void updateHeightLimit(Token t) {
+	public void updateHeightLimit(Token t) {
 		HeightLimiter.updateAt(t, HeightLimiter.maxCliff, 0);
 	}
 	
@@ -67,7 +68,7 @@ public class Hill extends TileTemplate {
 		renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
 		int maxd = getMaxDelta(tile);
 		if(maxd<10)
-			Template.park.addTrees(tile, random);
+			Park.template.addTrees(tile, random);
 	}
 	
 	public int getMaxDelta(Tile atile) {
@@ -100,9 +101,9 @@ public class Hill extends TileTemplate {
 			Tile adj = tile.getAdj(d);
 			if(adj==null)
 				continue;
-			if(adj.t==Template.park || adj.t==Template.street) {
+			if(adj.t==Park.template || adj.t==Street.template) {
 				if(Math.abs(adj.basey-tile.basey)<=1) {
-					if(adjDir==null || adj.t==Template.street) {
+					if(adjDir==null || adj.t==Street.template) {
 						adjDir = d;
 						y = adj.basey;
 					}
@@ -113,7 +114,7 @@ public class Hill extends TileTemplate {
 			}
 		}
 		if(adjDir!=null && countUp>1) {
-			Template.park.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()), random);
+			Park.template.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()), random);
 			return true;
 		}
 		else

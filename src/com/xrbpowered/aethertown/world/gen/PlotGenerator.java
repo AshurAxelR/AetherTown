@@ -5,9 +5,9 @@ import java.util.Random;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.tiles.Street;
 
 public abstract class PlotGenerator implements Generator {
 
@@ -85,12 +85,14 @@ public abstract class PlotGenerator implements Generator {
 	}
 	
 	public void remove() {
+		Level level = startToken.level;
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
 				Token t = tokenAt(i, j);
-				startToken.level.map[t.x][t.z] = null;
+				level.map[t.x][t.z] = null;
 			}
-		startToken.level.plots.remove(this);
+		level.plots.remove(this);
+		level.heightLimiter.invalidate();
 	}
 	
 	public void fillStreet(Random random) {
@@ -102,8 +104,8 @@ public abstract class PlotGenerator implements Generator {
 			t.y = y;
 			Tile tile = level.map[t.x][t.z];
 			if(tile==null)
-				Template.street.generate(t, random);
-			else if(tile.t==Template.street)
+				Street.template.generate(t, random);
+			else if(tile.t==Street.template)
 				y = tile.basey;
 			else
 				break;
@@ -114,8 +116,8 @@ public abstract class PlotGenerator implements Generator {
 			t.y = y;
 			Tile tile = level.map[t.x][t.z];
 			if(tile==null)
-				Template.street.generate(t, random);
-			else if(tile.t==Template.street)
+				Street.template.generate(t, random);
+			else if(tile.t==Street.template)
 				y = tile.basey;
 			else
 				break;

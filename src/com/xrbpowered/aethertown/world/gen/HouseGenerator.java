@@ -7,11 +7,11 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.Token;
-import com.xrbpowered.aethertown.world.tiles.StreetSlope;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
+import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class HouseGenerator extends PlotGenerator {
 
@@ -48,7 +48,7 @@ public class HouseGenerator extends PlotGenerator {
 	
 	@Override
 	protected void placeAt(Token t, int i, int j, Random random) {
-		Template.house.createTile().makeSub(this, i, j).place(t);
+		HouseT.template.createTile().makeSub(this, i, j).place(t);
 		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 2, 3);
 	}
 	
@@ -56,7 +56,13 @@ public class HouseGenerator extends PlotGenerator {
 	protected void place(Random random) {
 		super.place(random);
 		illum = (random.nextInt(3)>0);
-		
+		startToken.level.houseCount++;
+	}
+	
+	@Override
+	public void remove() {
+		super.remove();
+		startToken.level.houseCount--;
 	}
 
 	private static void listHousesRec(Level level, int x, int z, boolean[][] visited, ArrayList<HouseGenerator> houses) {
@@ -66,10 +72,10 @@ public class HouseGenerator extends PlotGenerator {
 		Tile tile = level.map[x][z];
 		if(tile==null)
 			return;
-		if(tile.t==Template.street || (tile.t instanceof StreetSlope)) {
+		if(Street.isAnyStreet(tile.t)) {
 			for(Dir d : Dir.values()) {
 				Tile adj = tile.getAdj(d);
-				if(adj!=null && adj.t==Template.house && adj.d==d) {
+				if(adj!=null && adj.t==HouseT.template && adj.d==d) {
 					SubInfo st = adj.sub;
 					HouseGenerator house = (HouseGenerator)st.parent;
 					if(st.i==0 && st.j==0 && house.index<0) {

@@ -13,8 +13,8 @@ import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
@@ -28,6 +28,8 @@ public class Street extends TileTemplate {
 	public static final Color streetColor = new Color(0xb5b5aa);
 	public static final Color lampLightColor = new Color(0xfff0b4); // new Color(0xfffae5);
 	
+	public static final Street template = new Street();
+	
 	public static TileComponent street, handrailPole;
 	
 	private static TileComponent lampPost;
@@ -36,11 +38,12 @@ public class Street extends TileTemplate {
 	private static TileComponent bridge, bridgeSupport;
 	private static TileComponent handrail;
 
-	public class StreetTile extends Tile {
+	public static class StreetTile extends Tile {
 		public boolean allowConnections = true;
+		public boolean lamp = false;
 		
-		public StreetTile() {
-			super(Street.this);
+		public StreetTile(TileTemplate t) {
+			super(t);
 		}
 	}
 	
@@ -50,9 +53,9 @@ public class Street extends TileTemplate {
 
 	@Override
 	public Tile createTile() {
-		return new StreetTile();
+		return new StreetTile(this);
 	}
-
+	
 	@Override
 	public void createComponents() {
 		street = new TileComponent(
@@ -97,7 +100,7 @@ public class Street extends TileTemplate {
 		Tile adj = tile.getAdj(d);
 		if(adj==null)
 			return false;
-		if(adj.t==Template.hill && tile.basey>=adj.basey+4)
+		if(adj.t==Hill.template && tile.basey>=adj.basey+4)
 			return true;
 		return tile.t.getFenceY(tile, c0)>adj.t.getFenceY(adj, c0.flipOver(d))+dy0 ||
 				tile.t.getFenceY(tile, c1)>adj.t.getFenceY(adj, c1.flipOver(d))+dy1;
@@ -142,10 +145,10 @@ public class Street extends TileTemplate {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
-		Template adjt = tile.getAdjT(tile.d);
-		if((maxy<=basey-3) && (adjt==Template.street || (adjt instanceof StreetSlope))) {
+		TileTemplate adjt = tile.getAdjT(tile.d);
+		int sh = basey-6-miny;
+		if((maxy<=basey-3) && (Street.isAnyStreet(adjt) || (adjt instanceof Plaza)) && sh<18) {
 			bridge.addInstance(new TileObjectInfo(tile, 0, dy0-6, 0));
-			int sh = basey-6-miny;
 			if(sh>0)
 				bridgeSupport.addInstance(new TileObjectInfo(tile, 0, dy0-6, 0).scale(1, sh*Tile.ysize));
 			renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
@@ -156,15 +159,14 @@ public class Street extends TileTemplate {
 		}
 	}
 	
-	public void addLamp(Tile tile, LevelRenderer renderer, Random random, float dy) {
-		if((tile.x+tile.z)%2==0)
-			return;
+	public void addLamp(Tile atile, LevelRenderer renderer, Random random, float dy) {
+		StreetTile tile = (StreetTile) atile;
 		
-		boolean hasLamp = random.nextInt(3)==0;
+		boolean hasLamp = tile.lamp || random.nextInt(4)==0;
 		if(!hasLamp) {
 			for(Dir d : Dir.values()) {
-				Template adjt = tile.getAdjT(d);
-				if(adjt==Template.house) {
+				TileTemplate adjt = tile.getAdjT(d);
+				if(adjt==HouseT.template) {
 					hasLamp = random.nextInt(4)>0;
 					break;
 				}
@@ -172,19 +174,34 @@ public class Street extends TileTemplate {
 		}
 		
 		if(hasLamp) {
+			for(Dir8 d : Dir8.values()) {
+				Tile adj = tile.getAdj(d.dx, d.dz);
+				if(adj!=null && (adj instanceof StreetTile) && ((StreetTile) adj).lamp) {
+					tile.lamp = false;
+					return;
+				}
+			}
 			for(Dir d : Dir.shuffle(random)) {
-				Template adjt = tile.getAdjT(d);
-				if(adjt!=Template.street && !(adjt instanceof StreetSlope) && !(adjt instanceof Plaza)) {
+				TileTemplate adjt = tile.getAdjT(d);
+				if(!Street.isAnyStreet(adjt) && !(adjt instanceof Plaza)) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
 					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));
 					lampPost.addInstance(new TileObjectInfo(tile, dx, dy, dz));
-					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz);
+					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
 					renderer.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.45f, false);
+					tile.lamp = true;
 					break;
 				}
 			}
 		}
+	}
+	
+	@Override
+	public boolean canExpandFill(Tile tile) {
+		TileTemplate adjtL = tile.getAdjT(tile.d.cw());
+		TileTemplate adjtR = tile.getAdjT(tile.d.ccw());
+		return (adjtR!=null && isAnyStreet(adjtR) || adjtL!=null && isAnyStreet(adjtL));
 	}
 	
 	/**
@@ -203,21 +220,21 @@ public class Street extends TileTemplate {
 			if(adj==null)
 				continue;
 			if(adj.d==d) {
-				if(adj.t==Template.hill)
+				if(adj.t==Hill.template)
 					continue;
-				if(adj.t!=Template.park)
+				if(adj.t!=Park.template)
 					return 0;
 				res = 1;
 				park = adj;
 			}
-			if((adj.t==Template.street || (adj.t instanceof StreetSlope)) && src!=null)
+			if(Street.isAnyStreet(adj.t) && src!=null)
 				return 0;
 		}
 		
 		if(res==1) {
 			if(park!=null) {
 				if(park.sub==null) {
-					Template.monument.forceGenerate(Token.forTile(park), random);
+					Monument.template.forceGenerate(Token.forTile(park), random);
 					return 0;
 				}
 				else if(park.sub.parent instanceof LargeParkGenerator) {
@@ -255,11 +272,18 @@ public class Street extends TileTemplate {
 			Tile t = src;
 			while(t!=null && t.d==align && (t.t instanceof StreetSlope)) {
 				tile.level.map[t.x][t.z] = null;
+				tile.level.heightLimiter.invalidate();
 				t = t.getAdj(dsrc);
 			}
 		}
 		tile.level.map[tile.x][tile.z] = null;
+		tile.level.heightLimiter.invalidate();
 		return 2;
 	}
 	
+
+	public static boolean isAnyStreet(TileTemplate t) {
+		return t==Street.template || (t instanceof StreetSlope);
+	}
+
 }

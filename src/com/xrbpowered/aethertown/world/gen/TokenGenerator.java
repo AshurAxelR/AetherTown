@@ -35,7 +35,7 @@ public abstract class TokenGenerator implements Generator {
 	}
 	
 	protected boolean checkToken(Token t) {
-		return true;
+		return t.level.map[t.x][t.z]==null;
 	}
 	
 	protected void spreadTokens(Token t, Random random) {
@@ -60,7 +60,7 @@ public abstract class TokenGenerator implements Generator {
 		while(countTokens>0) {
 			Token t = tokens.remove(random.nextInt(countTokens));
 			countTokens--;
-			if(!t.level.isInside(t.x, t.z) || t.level.map[t.x][t.z]!=null)
+			if(!t.level.isInside(t.x, t.z))
 				continue;
 			if(!checkToken(t))
 				continue;

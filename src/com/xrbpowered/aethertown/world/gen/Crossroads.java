@@ -3,12 +3,14 @@ package com.xrbpowered.aethertown.world.gen;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TokenProvider;
+import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Street;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
 public class Crossroads extends PlotGenerator implements TokenProvider {
 
@@ -36,15 +38,19 @@ public class Crossroads extends PlotGenerator implements TokenProvider {
 		TileTemplate temp;
 		if(i==0 && j==1) {
 			if(type==0)
-				temp = Template.park;
+				temp = Park.template;
 			else
-				temp = Template.monument;
+				temp = Monument.template;
 		}
 		else
-			temp = Template.street;
-		Tile tile = temp.forceGenerate(t, random).makeSub(this, i, j);
-		if(tile.t==Template.street)
-			((Street.StreetTile) tile).allowConnections = (i==0 || j==1);
+			temp = Street.template;
+		
+		Tile atile = temp.forceGenerate(t, random).makeSub(this, i, j);
+		if(atile.t==Street.template) {
+			StreetTile tile = (StreetTile) atile;
+			tile.allowConnections = (i==0 || j==1);
+			tile.lamp = !tile.allowConnections;
+		}
 	}
 
 	@Override

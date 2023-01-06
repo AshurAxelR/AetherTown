@@ -13,7 +13,6 @@ import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightMap;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -25,6 +24,8 @@ public class Park extends TileTemplate {
 	private static final float treeRadius = 0.6f*Tile.size;
 	private static final float trunkRadius = 0.065f*Tile.size;
 	private static final float bushRadius = 0.3f*Tile.size;
+	
+	public static final Park template = new Park();
 	
 	public static TileComponent tree, trunk, bush;
 
@@ -86,7 +87,7 @@ public class Park extends TileTemplate {
 		else {
 			renderer.terrain.addWalls(tile);
 			renderer.terrain.addFlatTile(grassColor.color(), tile);
-			Template.street.addHandrails(tile);
+			Street.template.addHandrails(tile);
 		}
 		addTrees(tile, random);
 	}
@@ -149,6 +150,7 @@ public class Park extends TileTemplate {
 		}
 		if(remove) {
 			tile.level.map[tile.x][tile.z] = null;
+			tile.level.heightLimiter.invalidate();
 			return true;
 		}
 		

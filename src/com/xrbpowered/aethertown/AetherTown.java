@@ -11,12 +11,12 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
+import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.LevelNames;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
@@ -74,6 +74,7 @@ public class AetherTown extends UIClient {
 	public static Font fontLarge;
 	
 	private static void initFonts() {
+		System.out.println("Loading fonts...");
 		try {
 			fontSmall = AssetManager.defaultAssets.loadFont("fonts/RobotoCondensed-Regular.ttf").deriveFont(16f);
 			fontLarge = AssetManager.defaultAssets.loadFont("fonts/RobotoCondensed-Bold.ttf").deriveFont(24f);
@@ -83,6 +84,7 @@ public class AetherTown extends UIClient {
 			fontSmall = null;
 			fontLarge = null;
 		}
+		System.out.println("Done.");
 	}
 	
 	public AetherTown() {
@@ -133,7 +135,7 @@ public class AetherTown extends UIClient {
 				
 				System.out.println("Creating components...");
 				renderer = new LevelRenderer(level, sky.buffer).setCamera(camera);
-				Template.createAllComponents(); // FIXME should not depend on creating level renderer first
+				ComponentLibrary.createAllComponents(); // FIXME should not depend on creating level renderer first
 				System.out.println("Building geometry...");
 				renderer.createLevelGeometry();
 				System.out.println("Done.");
@@ -306,18 +308,19 @@ public class AetherTown extends UIClient {
 		System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
 		if(level.heightLimiter!=null)
 			System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
-		if(tile!=null)
-			System.out.printf("\tbasey=%d, ground=%d, d=%s\n", tile.basey, tile.getGroundY() , tile.d.name());
+		if(tile!=null) {
+			System.out.printf("\t%s: basey=%d, ground=%d, d=%s\n", tile.t.getClass().getSimpleName(), tile.basey, tile.getGroundY() , tile.d.name());
+			System.out.print("\tfenceY: ");
+			for(Corner c : Corner.values())
+				System.out.printf("(%s)%d; ", c.name(), tile.t.getFenceY(tile, c));
+			System.out.println();
+		}
 		else
 			System.out.println("\tnull");
 		int[] yloc = level.h.yloc(hoverx, hoverz);
 		System.out.print("\tyloc: ");
 		for(int i=0; i<4; i++)
 			System.out.printf("%d; ", yloc[i]);
-		System.out.println();
-		System.out.print("\tfenceY: ");
-		for(Corner c : Corner.values())
-			System.out.printf("(%s)%d; ", c.name(), tile.t.getFenceY(tile, c));
 		System.out.println();
 	}
 	

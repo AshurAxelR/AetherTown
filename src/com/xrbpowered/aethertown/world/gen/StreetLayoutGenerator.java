@@ -6,15 +6,18 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class StreetLayoutGenerator extends TokenGenerator {
 
+	public final int houseLimit;
+	
 	public StreetLayoutGenerator(int limit) {
-		super(limit);
+		super(0);
+		houseLimit = limit;
 	}
 
 	@Override
@@ -30,15 +33,16 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	}
 	
 	private static final WRandom nextw = new WRandom(0.5, 0.1, 0.5, 1);
+	private static final WRandom nextwLim = new WRandom(1.5, 0.3, 0.2, 0);
 	
 	@Override
 	protected Generator selectGenerator(Token t, Random random) {
 		StreetGenerator street = new StreetGenerator(random, StreetGenerator.getPrevDy(t));
-		boolean fit = street.checkFit(t, random);
+		boolean fit = (t.level.houseCount>=houseLimit) ? false : street.checkFit(t, random);
 		if(fit && (street.isPerfectMatch() || tokenCount()<2 || random.nextInt(10)>0))
 			return street;
 		else {
-			return StreetGenerator.selectSideGenerator(nextw, random, 0);
+			return StreetGenerator.selectSideGenerator((t.level.houseCount>=houseLimit) ? nextwLim : nextw, random, 0);
 		}
 	}
 
@@ -48,7 +52,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 				new Dir[] {tile.d, tile.d.ccw(), tile.d.cw()};
 		for(Dir d : dirs) {
 			Token t = Token.forAdj(tile, d);
-			if(Template.monument.generate(t, random))
+			if(Monument.template.generate(t, random))
 				return true;
 		}
 		return false;
@@ -57,12 +61,11 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	public static void trimStreets(Level level, Random random) {
 		boolean upd = true;
 		while(upd) {
-			// TODO recalc height limiter
 			upd = false;
 			for(int x=0; x<level.levelSize; x++)
 				for(int z=0; z<level.levelSize; z++) {
 					Tile tile = level.map[x][z];
-					if(tile!=null && tile.t==Template.street) {
+					if(tile!=null && tile.t==Street.template) {
 						switch(Street.trimStreet(tile, random)) {
 							case 2:
 								upd = true;
@@ -92,5 +95,6 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		for(PlotGenerator plot : level.plots)
 			plot.fillStreet(random);
 		reconnectStreets(level, random);
+		level.heightLimiter.revalidate();
 	}
 }

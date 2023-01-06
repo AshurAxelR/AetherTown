@@ -5,29 +5,32 @@ import java.util.Random;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Generator;
+import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.Template;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TokenProvider;
+import com.xrbpowered.aethertown.world.tiles.Park;
+import com.xrbpowered.aethertown.world.tiles.Street;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
 public class StreetGenerator implements Generator, TokenProvider {
 
 	public static final int streetGap = 1;
-	private static final int streetMargin = 40; // 96; //20;
+	private static final int streetMargin = 40;
 
 	private int dy, absdy;
 	private Integer targetHeight = null;
 	private boolean perfectMatch = false;
 
-	private Token startToken;
+	public Token startToken;
 	private Token endToken = null;
 	private Level level;
 	private Dir d, dleft, dright;
 	private int len;
-	private int[] dylist = null;
+	public int[] dylist = null;
 	
 	private int margin = streetMargin;
 	public boolean generateSides = true;
@@ -37,7 +40,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 	public static Generator selectSideGenerator(WRandom w, Random random, int h) {
 		switch(w.next(random)) {
 			case 1:
-				return Template.park;
+				return Park.template;
 			case 2:
 				return (h==0) ? new LargeParkGenerator() : null;
 			case 3:
@@ -47,12 +50,10 @@ public class StreetGenerator implements Generator, TokenProvider {
 		}
 	}
 
-	public static Generator selectSideGenerator(Random random, int h) {
-		return selectSideGenerator(sidew, random, h);
-	}
-
-	public static void placeSide(Level level, Token t, Dir side, Random random, int h) {
-		Generator gen = selectSideGenerator(random, h);
+	public static void placeSide(Level level, Token t, Dir side, WRandom w, Random random, int h) {
+		if(h>1)
+			return;
+		Generator gen = selectSideGenerator(w, random, h);
 		if(gen!=null)
 			gen.generate(t.next(side, 0), random);
 	}
@@ -119,7 +120,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 			
 			Tile tile = level.map[t.x][t.z];
 			if(tile!=null) {
-				if(tile.t==Template.street) {
+				if(tile.t==Street.template) {
 					if(len>=maxLen) {
 						len -= 4;
 						return len>=minLen;
@@ -146,7 +147,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 				for(int i=1; i<=streetGap; i++) {
 					tile = Tile.getAdj(level, t.x, t.z, i*cd.dx, i*cd.dz);
 					if(tile!=null) {
-						if(tile.t==Template.street) {
+						if(tile.t==Street.template) {
 							if(len>=maxLen || !free) {
 								len -= 4;
 								return len>=minLen;
@@ -205,9 +206,10 @@ public class StreetGenerator implements Generator, TokenProvider {
 		int contSlope = 0;
 		Token t = startToken;
 		for(int i=0; i<=len; i++) {
-			if(targetHeight==null && (!t.fitsHeight() || !level.fitsHeight(t.x, t.y+this.dy, t.z))) {
+			if(targetHeight==null && (!t.fitsHeight() || !level.fitsHeight(t.x, t.y+this.dy, t.z)))
 				return null;
-			}
+			if(targetHeight!=null && !level.overlapsHeight(t.x, t.y, t.z, HeightLimiter.maxWall))
+				return null;
 			int dy = 0;
 			if(i<len) {
 				if(targetHeight==null) {
@@ -252,21 +254,22 @@ public class StreetGenerator implements Generator, TokenProvider {
 			tlist[i] = ts;
 			t = t.next(d, dylist[i]);
 			
-			TileTemplate temp = (dylist[i]==0) ? Template.street : slope;
-			temp.forceGenerate(ts, random);
+			TileTemplate temp = (dylist[i]==0) ? Street.template : slope;
+			StreetTile tile = (StreetTile) temp.forceGenerate(ts, random);
+			if(absdy>1 && dylist[i]==0)
+				tile.lamp = true;
 		}
 		endToken = t;
 		return tlist;
 	}
 	
-	private void generateSides(Token[] tlist, Random random) {
-		if(!generateSides || Math.abs(dy)>=2)
-			return;
+	public void generateSide(Dir dside, Token[] tlist, WRandom w, Random random) {
+		//if(Math.abs(dy)>=2)
+		//	return;
 		for(int i=0; i<len; i++) {
 			Token ts = tlist[i];
 			int h = Math.abs(dylist[i]);
-			placeSide(level, ts, dright, random, h);
-			placeSide(level, ts, dleft, random, h);
+			placeSide(level, ts, dside, w, random, h);
 		}
 	}
 	
@@ -291,17 +294,26 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return checkFit(startToken, random, null, null);
 	}
 
+	public Token[] finish(Random random) {
+		Token[] tlist = generateStreet(random);
+		if(generateSides && absdy<2) {
+			generateSide(dright, tlist, sidew, random);
+			generateSide(dleft, tlist, sidew, random);
+		}
+		if(endToken.isFree()) {
+			StreetTile tile = (StreetTile) Street.template.forceGenerate(endToken, random);
+			tile.lamp = true;
+		}
+		return tlist;
+	}
+
 	@Override
 	public boolean generate(Token startToken, Random random) {
 		if(dylist==null || this.startToken!=startToken) {
 			if(!checkFit(startToken, random, null, null))
 				return false;
 		}
-		Token[] tlist = generateStreet(random);
-		generateSides(tlist, random);
-		
-		if(endToken.isFree())
-			Template.street.forceGenerate(endToken, random);
+		finish(random);
 		return true;
 	}
 	

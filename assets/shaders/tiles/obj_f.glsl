@@ -2,6 +2,7 @@
 
 #define MIN_FOG_DIST 4
 #define POINT_LIGHT_R 1
+#define EPSILON 0.001
 
 uniform vec3 cameraPosition;
 
@@ -55,7 +56,7 @@ float calcPointLight(vec2 index, vec3 normal) {
 }
 
 vec4 calcPointLights(vec3 normal) {
-	vec2 center = vec2(floor(pass_WorldPosition.x/4+0.5), floor(pass_WorldPosition.z/4+0.5));
+	vec2 center = vec2(floor(pass_WorldPosition.x/4+(0.5+EPSILON)), floor(pass_WorldPosition.z/4+(0.5+EPSILON)));
 	float light = 0;
 	for(int dx=-POINT_LIGHT_R; dx<=POINT_LIGHT_R; dx++)
 		for(int dz=-POINT_LIGHT_R; dz<=POINT_LIGHT_R; dz++) {
