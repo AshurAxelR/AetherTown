@@ -21,7 +21,7 @@ public class Plaza extends TileTemplate {
 	private static TileComponent plaza;
 	
 	public Plaza() {
-		super(Street.streetColor);
+		super(plazaColor);
 	}
 
 	public Plaza(Color minimapColor) {

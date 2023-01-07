@@ -42,7 +42,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		if(fit && (street.isPerfectMatch() || tokenCount()<2 || random.nextInt(10)>0))
 			return street;
 		else {
-			return StreetGenerator.selectSideGenerator((t.level.houseCount>=houseLimit) ? nextwLim : nextw, random, 0);
+			return StreetGenerator.selectSideGenerator(t.level, (t.level.houseCount>=houseLimit) ? nextwLim : nextw, random, 0);
 		}
 	}
 

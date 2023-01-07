@@ -11,6 +11,8 @@ import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
+import com.xrbpowered.aethertown.world.region.HouseAssignment;
+import com.xrbpowered.aethertown.world.region.LevelNames;
 
 public class Level {
 
@@ -21,6 +23,7 @@ public class Level {
 	public HeightMap h;
 	
 	public int houseCount = 0;
+	public int churchCount = 0;
 	public ArrayList<HouseGenerator> houses = null;
 	public String name;
 
@@ -65,7 +68,8 @@ public class Level {
 		heightLimiter = new HeightLimiter(this);
 		plots = new ArrayList<>();
 		houseCount = 0;
-		new StreetLayoutGenerator(30).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
+		churchCount = 0;
+		new StreetLayoutGenerator(60).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
 		StreetLayoutGenerator.finishLayout(this, random);
 		
 		HillsGenerator.expand(this, random, 5, 15, -2, 2);
@@ -91,6 +95,7 @@ public class Level {
 		houses = HouseGenerator.listHouses(this);
 		houseCount = houses.size();
 		name = LevelNames.next(random, houseCount);
+		HouseAssignment.assignHouses(this, random);
 		heightLimiter = null;
 	}
 	
@@ -110,9 +115,11 @@ public class Level {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
 				Tile tile = map[x][z];
-				Color c = (tile==null) ? Color.WHITE : tile.t.minimapColor;
-				g.setColor(c);
-				g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
+				Color c = (tile==null) ? null : tile.t.minimapColor;
+				if(c!=null) {
+					g.setColor(c);
+					g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
+				}
 			}
 	}
 	

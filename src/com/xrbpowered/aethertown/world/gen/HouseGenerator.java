@@ -10,10 +10,11 @@ import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.region.HouseRole;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
-public class HouseGenerator extends PlotGenerator {
+public class HouseGenerator extends HouseGeneratorBase {
 
 	private static final int[][] sizes = {
 		{0, 1, 1}, {0, 1, 2}, {0, 1, 3}, {1, 0, 1}, {1, 0, 2}, {1, 0, 3},
@@ -24,10 +25,20 @@ public class HouseGenerator extends PlotGenerator {
 		1.5, 0.25, 0.25
 	);
 	
-	public boolean alignStraight;
-	public boolean illum;
-	
 	public int index = -1;
+	public HouseRole role = null;
+	
+	public static HouseGeneratorBase select(Level level) {
+		if(level.churchCount<(level.houseCount+26)/30)
+			return new ChurchGenerator();
+		else
+			return new HouseGenerator();
+	}
+	
+	@Override
+	public String getInfo() {
+		return String.format("%d, %s: %s", index+1, startToken.level.name, role.title);
+	}
 	
 	@Override
 	protected boolean findSize(Random random) {
@@ -40,11 +51,6 @@ public class HouseGenerator extends PlotGenerator {
 			alignStraight = (fwd>w);
 		return true;
 	}
-
-	@Override
-	protected Dir alignToken(int i, int j) {
-		return d;
-	}
 	
 	@Override
 	protected void placeAt(Token t, int i, int j, Random random) {
@@ -55,7 +61,6 @@ public class HouseGenerator extends PlotGenerator {
 	@Override
 	protected void place(Random random) {
 		super.place(random);
-		illum = (random.nextInt(3)>0);
 		startToken.level.houseCount++;
 	}
 	
@@ -75,7 +80,7 @@ public class HouseGenerator extends PlotGenerator {
 		if(Street.isAnyStreet(tile.t)) {
 			for(Dir d : Dir.values()) {
 				Tile adj = tile.getAdj(d);
-				if(adj!=null && adj.t==HouseT.template && adj.d==d) {
+				if(adj!=null && adj.t==HouseT.template && adj.d==d && (adj.sub.parent instanceof HouseGenerator)) {
 					SubInfo st = adj.sub;
 					HouseGenerator house = (HouseGenerator)st.parent;
 					if(st.i==0 && st.j==0 && house.index<0) {

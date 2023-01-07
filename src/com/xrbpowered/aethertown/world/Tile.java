@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.world;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.gen.PlotGenerator;
 
 public class Tile {
 
@@ -9,7 +10,7 @@ public class Tile {
 	
 	public class SubInfo {
 		public int i, j;
-		public Generator parent;
+		public PlotGenerator parent;
 	}
 	
 	public final TileTemplate t;
@@ -24,7 +25,7 @@ public class Tile {
 		this.t = t;
 	}
 	
-	public Tile makeSub(Generator parent, int i, int j) {
+	public Tile makeSub(PlotGenerator parent, int i, int j) {
 		sub = new SubInfo();
 		sub.parent = parent;
 		sub.i = i;

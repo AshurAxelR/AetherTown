@@ -23,6 +23,8 @@ Marble
 
 Stone
 Wooden
+Ice
+Fire
 
 Frozen
 Sleeping

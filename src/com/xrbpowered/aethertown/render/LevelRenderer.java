@@ -54,12 +54,6 @@ public class LevelRenderer {
 		tiles.finishCreateInstances();
 		terrain = null;
 		
-		/*for(int x=0; x<level.levelSize; x++)
-			for(int z=0; z<level.levelSize; z++) {
-				Tile tile = level.map[x][z];
-				if(tile!=null)
-					pointLights.setLight(tile, 0, 2, 0);
-			}*/
 		pointLights.finish();
 		blockLighting.finish();
 	}

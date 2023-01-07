@@ -1,23 +1,22 @@
 package com.xrbpowered.aethertown;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
+import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.LevelNames;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -70,23 +69,6 @@ public class AetherTown extends UIClient {
 	private UITexture uiMinimap;
 	private UIPane uiTime, uiCompass, uiLookInfo;
 
-	public static Font fontSmall;
-	public static Font fontLarge;
-	
-	private static void initFonts() {
-		System.out.println("Loading fonts...");
-		try {
-			fontSmall = AssetManager.defaultAssets.loadFont("fonts/RobotoCondensed-Regular.ttf").deriveFont(16f);
-			fontLarge = AssetManager.defaultAssets.loadFont("fonts/RobotoCondensed-Bold.ttf").deriveFont(24f);
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-			fontSmall = null;
-			fontLarge = null;
-		}
-		System.out.println("Done.");
-	}
-	
 	public AetherTown() {
 		super("Aether Town", 1f);
 		windowedWidth = 1920;
@@ -96,7 +78,7 @@ public class AetherTown extends UIClient {
 			noVsyncSleep = 2;
 		}
 		
-		initFonts();
+		Fonts.load();
 		
 		new UIOffscreen(getContainer()) {
 			@Override
@@ -211,11 +193,13 @@ public class AetherTown extends UIClient {
 		uiMinimap = new UITexture(uiRoot) {
 			@Override
 			public void setupResources() {
-				BufferedImage img = new BufferedImage(level.levelSize*2, level.levelSize*2, BufferedImage.TYPE_INT_RGB);
+				BufferedImage img = new BufferedImage(level.levelSize*2, level.levelSize*2, BufferedImage.TYPE_INT_ARGB);
 				Graphics2D g = (Graphics2D) img.getGraphics();
+				g.setBackground(bgColor);
+				g.clearRect(0, 0, img.getWidth(), img.getHeight());
 				level.drawMinimap(g, 2);
-				g.setColor(Color.BLACK);
-				g.drawRect(0, 0, img.getWidth()-1, img.getHeight()-1);
+				// g.setColor(Color.BLACK);
+				// g.drawRect(0, 0, img.getWidth()-1, img.getHeight()-1);
 				setTexture(new Texture(img, false, false));
 			}
 		};
@@ -227,7 +211,7 @@ public class AetherTown extends UIClient {
 			protected void paintSelf(GraphAssist g) {
 				clear(g, bgColor);
 				g.setColor(Color.WHITE);
-				g.setFont(fontLarge);
+				g.setFont(Fonts.large);
 				String s = WorldTime.getFormattedTime();
 				g.drawString(s, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
@@ -239,7 +223,7 @@ public class AetherTown extends UIClient {
 			protected void paintSelf(GraphAssist g) {
 				clear(g, bgColor);
 				g.setColor(Color.WHITE);
-				g.setFont(fontLarge);
+				g.setFont(Fonts.large);
 				String s = Dir8.values()[compass].name().toUpperCase();
 				g.drawString(s, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
@@ -251,7 +235,7 @@ public class AetherTown extends UIClient {
 			protected void paintSelf(GraphAssist g) {
 				clear(g, bgColor);
 				g.setColor(Color.WHITE);
-				g.setFont(fontSmall);
+				g.setFont(Fonts.small);
 				g.drawString(lookAtInfo, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
 		};
@@ -370,16 +354,22 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
-	public static void main(String[] args) {
-		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
-		LevelNames.load();
-
-		seed = System.currentTimeMillis();
+	public static Level generateLevel(long seed) {
+		AetherTown.seed = seed;
 		System.out.printf("Generating... %dL\n", seed);
 		level = new Level(128);
 		level.generate(new Random(seed));
 		System.gc();
 		System.out.println("Done.");
+		return level;
+	}
+	
+	public static void main(String[] args) {
+		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
+		LevelNames.load();
+
+		long seed = System.currentTimeMillis();
+		generateLevel(seed);
 
 		new AetherTown().run();
 	}

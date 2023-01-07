@@ -37,14 +37,14 @@ public class StreetGenerator implements Generator, TokenProvider {
 	
 	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.5, 1);
 
-	public static Generator selectSideGenerator(WRandom w, Random random, int h) {
+	public static Generator selectSideGenerator(Level level, WRandom w, Random random, int h) {
 		switch(w.next(random)) {
 			case 1:
 				return Park.template;
 			case 2:
 				return (h==0) ? new LargeParkGenerator() : null;
 			case 3:
-				return new HouseGenerator();
+				return HouseGenerator.select(level);
 			default:
 				return null;
 		}
@@ -53,7 +53,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 	public static void placeSide(Level level, Token t, Dir side, WRandom w, Random random, int h) {
 		if(h>1)
 			return;
-		Generator gen = selectSideGenerator(w, random, h);
+		Generator gen = selectSideGenerator(level, w, random, h);
 		if(gen!=null)
 			gen.generate(t.next(side, 0), random);
 	}

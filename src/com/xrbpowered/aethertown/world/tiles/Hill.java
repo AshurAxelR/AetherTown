@@ -26,7 +26,7 @@ public class Hill extends TileTemplate {
 	}
 	
 	public Hill() {
-		super(TerrainBuilder.grassColor.color());
+		super(null);
 	}
 	
 	@Override

@@ -22,6 +22,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.HouseGeneratorBase;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -59,8 +60,7 @@ public class HouseT extends TileTemplate {
 	
 	@Override
 	public String getTileInfo(Tile tile) {
-		HouseGenerator house = (HouseGenerator) tile.sub.parent;
-		return String.format("%d, %s", house.index+1, tile.level.name);
+		return ((HouseGeneratorBase) tile.sub.parent).getInfo();
 	}
 	
 	@Override
@@ -139,43 +139,48 @@ public class HouseT extends TileTemplate {
 		
 		int basey = tile.basey;
 		SubInfo sub = tile.sub;
-		HouseGenerator house = (HouseGenerator) sub.parent;
+		HouseGeneratorBase house = (HouseGeneratorBase) sub.parent;
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-		int left = -house.left;
+		
+		int left = -house.left+house.marginLeft;
+		int right = house.right-house.marginRight;
+		int front = house.marginFront;
+		int back = house.fwd-house.marginBack;
+		
 		Vector3f illum = randomIllumMod(random, house.illum);
 		renderer.blockLighting.addLight(tile, tile.basey, illum, 0.35f, true);
-		if(sub.j==0)
-			(sub.i==0 && sub.j==0 ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
+		if(sub.j==front)
+			(sub.i==0 && sub.j==front ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(sub.i==left)
 			(isObstructed(tile, yloc, basey+2, tile.d.ccw()) ? groundWallBlank : groundWall).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.ccw()));
-		if(sub.i==house.right)
+		if(sub.i==right)
 			(isObstructed(tile, yloc, basey+2, tile.d.cw()) ? groundWallBlank : groundWall).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.cw()));
-		if(sub.j==house.fwd)
+		if(sub.j==back)
 			(isObstructed(tile, yloc, basey+2, tile.d) ? groundWallBlank : groundWall).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum));
 		
 		illum = randomIllumMod(random, house.illum);
 		renderer.blockLighting.addLight(tile, tile.basey+6, illum, 0.35f, true);
-		if(sub.j==0)
+		if(sub.j==front)
 			(isObstructed(tile, yloc, basey+7, tile.d.flip()) ? upperWallBlank : upperWall).addInstance(new IllumTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(sub.i==left)
 			(isObstructed(tile, yloc, basey+7, tile.d.ccw()) ? upperWallBlank : upperWall).addInstance(new IllumTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.ccw()));
-		if(sub.i==house.right)
+		if(sub.i==right)
 			(isObstructed(tile, yloc, basey+7, tile.d.cw()) ? upperWallBlank : upperWall).addInstance(new IllumTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.cw()));
-		if(sub.j==house.fwd)
+		if(sub.j==back)
 			(isObstructed(tile, yloc, basey+7, tile.d) ? upperWallBlank : upperWall).addInstance(new IllumTileObjectInfo(tile, 0, 6, 0).illumMod(illum));
 		
 		if(house.alignStraight) {
 			roof.addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(sub.i==left ? tile.d.ccw() : tile.d.cw()));
-			if(sub.j==0)
+			if(sub.j==front)
 				(sub.i==left ? roofEndLeft : roofEndRight).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.flip()));
-			if(sub.j==house.fwd)
+			if(sub.j==back)
 				(sub.i==left ? roofEndRight : roofEndLeft).addInstance(new TileObjectInfo(tile, 0, 12, 0));
 		}
 		else {
 			roof.addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(sub.j==0 ? tile.d.flip() : tile.d));
 			if(sub.i==left)
 				(sub.j==house.fwd ? roofEndLeft : roofEndRight).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.ccw()));
-			if(sub.i==house.right)
+			if(sub.i==right)
 				(sub.j==house.fwd ? roofEndRight : roofEndLeft).addInstance(new TileObjectInfo(tile, 0, 12, 0).rotate(tile.d.cw()));
 		}
 	}
