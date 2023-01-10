@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.world.tiles;
 
+import java.awt.Color;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
@@ -26,7 +27,7 @@ public class Hill extends TileTemplate {
 	}
 	
 	public Hill() {
-		super(null);
+		super(new Color(0xfafafa));
 	}
 	
 	@Override

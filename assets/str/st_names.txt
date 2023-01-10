@@ -1,57 +1,119 @@
-Gabriel
-Michael
-Raphael
+1 Gabriel
+2 Michael
+0.5 Raphael
 
-Andrew
-Anne
-Barnabas
-Bartholomew
-James
-Joachim
-John
-Joseph
-Judas
-Luke
-Mark
-Mary
-Matthew
-Matthias
-Paul
-Peter
-Philip
-Silas
-Simon
-Stephen
-Thomas
-Timothy
-Titus
-Veronica
+2 Andrew
+2 Anne
+0.3 Bartholomew
+2 James
+0.1 Joachim
+3 John
+2 Joseph
+1 Luke
+1 Mark
+2 Mary
+2 Matthew
+0.2 Matthias
+3 Paul
+2 Peter
+1 Philip
+0.5 Simon
+0.3 Stephen
+1 Thomas
+0.2 Timothy
+0.1 Titus
+1.5 Veronica
 
-Vanessa
-Wendy
-Aaron
+1 Vanessa
+1 Wendy
+1 Aaron
 
-Agnes
-Anastasius
-Cecilia
-Celestine
-Christopher
-Clement
-Constantine
-Cornelius
-Crispin
-Eustace
-Fabian
-Felix
-Gaius
-George
-Helena
-Jerome
-Julius
-Lawrence
-Lucius
-Sebastian
-Stephen
-Sylvester
-Valentine
-Victor
+0.3 Agnes
+0.1 Anastasius
+0.3 Cecilia
+0.3 Celestine
+1 Christopher
+0.3 Clement
+0.2 Constantine
+0.3 Cornelius
+0.1 Crispin
+0.1 Fabian
+0.1 Felix
+2 George
+1 Helena
+0.2 Jerome
+0.1 Julius
+0.2 Lawrence
+0.3 Lucius
+0.3 Sebastian
+0.2 Sylvester
+0.5 Valentine
+0.1 Victor
+
+0.3 Adelaide
+0.3 Adrian
+0.2 Agatha
+0.2 Aidan
+0.3 Alexander
+0.2 Angela
+0.1 Antoninus
+0.5 Augustine
+0.2 Barbara
+0.1 Bede
+0.5 Benedict
+0.2 Bernadette
+0.3 Bernard
+0.1 Bernardine
+0.3 Boniface
+0.5 Catherine
+0.3 Charles
+0.2 Clare
+0.2 Claude
+0.1 Colette
+0.3 Cuthbert
+0.2 David
+0.2 Denis
+0.1 Dunstan
+0.1 Edmund
+0.3 Edward
+0.5 Elizabeth
+0.1 Eugenius
+0.3 Francis
+0.2 Genevieve
+0.3 Gerard
+0.3 Gilbert
+0.2 Giuseppe
+0.5 Gregory
+0.2 Hilary
+0.1 Hilda
+0.5 Isaac
+0.3 Jane
+0.2 Jean
+0.3 Joan
+0.2 Katharine
+0.2 Kenneth
+0.2 Kevin
+0.1 Laurentius
+0.1 Leo
+0.2 Louis
+0.1 Louise
+0.2 Lucy
+0.2 Madeleine
+0.3 Margaret
+0.5 Martin
+0.5 Nicholas
+0.3 Oliver
+0.2 Oswald
+0.5 Patrick
+0.3 Richard
+0.2 Robert
+0.3 Rose
+0.1 Sergius
+0.1 Silverius
+0.3 Theodore
+0.3 Therese
+0.1 Ursula
+0.3 Vincent
+0.2 Wilfrid
+0.2 Zaccaria
+0.1 Zacharias

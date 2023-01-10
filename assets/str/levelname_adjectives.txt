@@ -26,6 +26,5 @@ Wooden
 Ice
 Fire
 
-Frozen
 Sleeping
 Dancing

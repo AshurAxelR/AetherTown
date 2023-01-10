@@ -29,6 +29,8 @@ import com.xrbpowered.gl.scene.StaticMeshActor;
 
 public class TerrainChunkBuilder {
 
+	public static final int cliffDelta = 10;
+	
 	private static final boolean enableSmooth = false;
 	private static final boolean enableDebugNormals = false;
 	
@@ -135,7 +137,7 @@ public class TerrainChunkBuilder {
 	}
 
 	private void addHillTriangle(int d, Vector3i p0, Vector3i p1, Vector3i p2) {
-		if(d>=10)
+		if(d>=cliffDelta)
 			addTriangleFlat(cliffBuilder, p0, p1, p2);
 		else if(enableSmooth)
 			addTriangleSmooth(level.h, grassBuilder, grassVertexMap, p0, p1, p2);

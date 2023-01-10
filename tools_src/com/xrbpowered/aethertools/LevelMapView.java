@@ -8,8 +8,13 @@ import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.gen.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.PlotGenerator;
+import com.xrbpowered.aethertown.world.region.HouseRole;
 import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.tiles.ChurchT;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
@@ -24,11 +29,14 @@ public class LevelMapView extends UIElement {
 
 	public static final int tileSize = 16;
 	
-	public static final Color colorBg = new Color(0xf5f5f5);
-	public static final Color colorLabelBg = new Color(0x22000000, true);
-	public static final Color colorLabel = Color.WHITE;
+	public static final Color colorBg = new Color(0xeeeeee);
+	public static final Color colorStreetBorder = new Color(0x999999);
+	public static final Color colorTextBg = new Color(0xbbffffff, true);
+	public static final Color colorText = new Color(0x777777);
 
 	public static Level level;
+	
+	private static int hoverx, hoverz;
 	
 	public LevelMapView(UIContainer parent) {
 		super(new UIPanView(parent) {
@@ -39,7 +47,27 @@ public class LevelMapView extends UIElement {
 			@Override
 			protected void paintChildren(GraphAssist g) {
 				super.paintChildren(g);
-				// render general UI text
+
+				if(level.isInside(hoverx, hoverz)) {
+					g.fillRect(10, 10, 350, 55, colorTextBg);
+					int x = 20;
+					int y = 35;
+					int h = 18;
+					g.setFont(Fonts.small);
+					g.setColor(colorText);
+					g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, level.name), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
+					Tile tile = level.map[hoverx][hoverz];
+					if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
+						String info = null;
+						if(tile.sub.parent instanceof HouseGenerator)
+							info = ((HouseGenerator) tile.sub.parent).role.title;
+						else if(tile.sub.parent instanceof ChurchGenerator)
+							info = tile.t.getTileInfo(tile);
+						g.setFont(Fonts.smallBold);
+						g.setColor(Color.BLACK);
+						g.drawString(info, x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
+					}
+				}
 			}
 		});
 		((UIPanView) getParent()).pan(
@@ -82,8 +110,11 @@ public class LevelMapView extends UIElement {
 			for(int z=0; z<level.levelSize; z++) {
 				Tile tile = level.map[x][z];
 				Color c = (tile==null) ? null : tile.t.minimapColor;
-				if(tile!=null && tile.sub!=null && (tile.sub.parent instanceof HouseGenerator)) {
-					c = ((HouseGenerator) tile.sub.parent).role.previewColor;
+				if(tile!=null && tile.sub!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
+					if(tile.sub.parent instanceof HouseGenerator)
+						c = ((HouseGenerator) tile.sub.parent).role.previewColor;
+					else if(tile.sub.parent instanceof ChurchGenerator)
+						c = HouseRole.colorChurch;
 				}
 				if(c==null)
 					continue;
@@ -93,19 +124,19 @@ public class LevelMapView extends UIElement {
 				if(tile==null)
 					continue;
 				if(Street.isAnyStreet(tile.t)) {
-					g.setColor(new Color(0x999999));
+					g.setColor(colorStreetBorder);
 					for(Dir d : Dir.values()) {
 						Tile adj = tile.getAdj(d);
 						if(!(adj!=null && Street.isAnyStreet(adj.t)))
 							drawBorder(g, x, z, d);
 					}
 				}
-				else if(tile.sub!=null && (tile.sub.parent instanceof HouseGenerator)) {
-					HouseGenerator house = (HouseGenerator) tile.sub.parent;
+				else if(tile.sub!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
+					PlotGenerator plot =  tile.sub.parent;
 					g.setColor(Color.WHITE);
 					for(Dir d : Dir.values()) {
 						Tile adj = tile.getAdj(d);
-						if(!(adj!=null && adj.sub!=null && adj.sub.parent==house))
+						if(!(adj!=null && adj.t==tile.t && adj.sub!=null && adj.sub.parent==plot))
 							drawBorder(g, x, z, d);
 					}
 				}
@@ -117,7 +148,7 @@ public class LevelMapView extends UIElement {
 				Tile tile = level.map[x][z];
 				if(tile!=null && tile.sub!=null && (tile.sub.parent instanceof HouseGenerator) && tile.sub.i==0 && tile.sub.j==0) {
 					HouseGenerator house = (HouseGenerator) tile.sub.parent;
-					g.setColor(colorLabel);
+					g.setColor(Color.WHITE);
 					g.drawString(Integer.toString(house.index+1),
 							(x + house.d.dx*house.fwd/2f + house.dr.dx*(house.right-house.left)/2f)*tileSize+tileSize/2,
 							(z + house.d.dz*house.fwd/2f + house.dr.dz*(house.right-house.left)/2f)*tileSize+tileSize/2,
@@ -126,6 +157,13 @@ public class LevelMapView extends UIElement {
 			}
 
 		g.popAntialiasing();
+	}
+	
+	@Override
+	public void onMouseMoved(float x, float y, int mods) {
+		hoverx = (int)(x/tileSize);
+		hoverz = (int)(y/tileSize);
+		repaint();
 	}
 
 	public static void main(String[] args) {

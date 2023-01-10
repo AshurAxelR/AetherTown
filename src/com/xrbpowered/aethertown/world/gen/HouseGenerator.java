@@ -29,7 +29,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 	public HouseRole role = null;
 	
 	public static HouseGeneratorBase select(Level level) {
-		if(level.churchCount<(level.houseCount+26)/30)
+		if(level.churches.size()<(level.houseCount+26)/30)
 			return new ChurchGenerator();
 		else
 			return new HouseGenerator();

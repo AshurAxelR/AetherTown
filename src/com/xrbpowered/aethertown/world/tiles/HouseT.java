@@ -28,7 +28,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class HouseT extends TileTemplate {
 
-	private static final Seasons roofColor = new Seasons(new Color(0x57554a), new Color(0xe0eef1));
+	public static final Seasons roofColor = new Seasons(new Color(0x57554a), new Color(0xe0eef1));
 	
 	public static final HouseT template = new HouseT();
 	
@@ -148,7 +148,7 @@ public class HouseT extends TileTemplate {
 		int back = house.fwd-house.marginBack;
 		
 		Vector3f illum = randomIllumMod(random, house.illum);
-		renderer.blockLighting.addLight(tile, tile.basey, illum, 0.35f, true);
+		renderer.blockLighting.addLight(tile, tile.basey+4, illum, 0.35f, true);
 		if(sub.j==front)
 			(sub.i==0 && sub.j==front ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(sub.i==left)
@@ -159,7 +159,7 @@ public class HouseT extends TileTemplate {
 			(isObstructed(tile, yloc, basey+2, tile.d) ? groundWallBlank : groundWall).addInstance(new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum));
 		
 		illum = randomIllumMod(random, house.illum);
-		renderer.blockLighting.addLight(tile, tile.basey+6, illum, 0.35f, true);
+		renderer.blockLighting.addLight(tile, tile.basey+10, illum, 0.35f, true);
 		if(sub.j==front)
 			(isObstructed(tile, yloc, basey+7, tile.d.flip()) ? upperWallBlank : upperWall).addInstance(new IllumTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.flip()));
 		if(sub.i==left)

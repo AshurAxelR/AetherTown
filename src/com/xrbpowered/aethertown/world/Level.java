@@ -7,6 +7,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.gen.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 import com.xrbpowered.aethertown.world.gen.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.PlotGenerator;
@@ -22,9 +23,9 @@ public class Level {
 	public Tile[][] map;
 	public HeightMap h;
 	
-	public int houseCount = 0;
-	public int churchCount = 0;
+	public ArrayList<ChurchGenerator> churches = null;
 	public ArrayList<HouseGenerator> houses = null;
+	public int houseCount = 0;
 	public String name;
 
 	// available only during generation
@@ -68,7 +69,7 @@ public class Level {
 		heightLimiter = new HeightLimiter(this);
 		plots = new ArrayList<>();
 		houseCount = 0;
-		churchCount = 0;
+		churches = new ArrayList<>();
 		new StreetLayoutGenerator(60).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
 		StreetLayoutGenerator.finishLayout(this, random);
 		

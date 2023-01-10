@@ -38,7 +38,7 @@ public class Park extends TileTemplate {
 	}
 	
 	public Park() {
-		super(null);
+		super(new Color(0xddeebb));
 	}
 	
 	@Override

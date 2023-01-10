@@ -3,10 +3,11 @@ package com.xrbpowered.aethertown.world.gen;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.world.HeightLimiter;
+import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.region.LevelNames;
-import com.xrbpowered.aethertown.world.tiles.HouseT;
+import com.xrbpowered.aethertown.world.tiles.ChurchT;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 
@@ -16,7 +17,7 @@ public class ChurchGenerator extends HouseGeneratorBase {
 	
 	@Override
 	public String getInfo() {
-		return String.format("St. %s Cathederal", name);
+		return String.format("St. %s's Cathederal", name);
 	}
 	
 	@Override
@@ -38,25 +39,34 @@ public class ChurchGenerator extends HouseGeneratorBase {
 			temp = Park.template;
 		else if(j==0)
 			temp = Plaza.template;
-		else { 
-			HouseT.template.createTile().makeSub(this, i, j).place(t);
+		else {
+			ChurchT.template.createTile().makeSub(this, i, j).place(t);
 			HeightLimiter.updateAt(t, HeightLimiter.maxWall, 2, 3);
 			return;
 		}
 		temp.forceGenerate(t, random).makeSub(this, i, j);
 	}
 	
+	private static String selectName(Level level, Random random) {
+		String name = LevelNames.nextSaint(random);
+		for(ChurchGenerator church : level.churches) {
+			if(church.name.equals(name))
+				return selectName(level, random);
+		}
+		return name;
+	}
+	
 	@Override
 	protected void place(Random random) {
 		super.place(random);
-		startToken.level.churchCount++;
-		name = LevelNames.nextSaint(random);
+		name = selectName(startToken.level, random);
+		startToken.level.churches.add(this);
 	}
 	
 	@Override
 	public void remove() {
 		super.remove();
-		startToken.level.churchCount--;
+		startToken.level.churches.remove(this);
 	}
 
 }
