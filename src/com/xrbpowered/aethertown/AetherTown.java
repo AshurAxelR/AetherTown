@@ -2,7 +2,6 @@ package com.xrbpowered.aethertown;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.util.Random;
 
 import com.xrbpowered.aethertools.LevelMapView;
 import com.xrbpowered.aethertown.render.LevelRenderer;
@@ -15,7 +14,9 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -102,8 +103,9 @@ public class AetherTown extends UIClient {
 				
 				clearColor = environment.bgColor;
 				camera = new CameraActor.Perspective().setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
-				camera.position.x = level.getStartX()*Tile.size;
-				camera.position.z = level.getStartZ()*Tile.size;
+				LevelConnection lc = level.info.conns.get(0);
+				camera.position.x = lc.getX()*Tile.size;
+				camera.position.z = lc.getZ()*Tile.size;
 				camera.rotation.y = 0;
 				camera.updateTransform();
 				
@@ -312,6 +314,8 @@ public class AetherTown extends UIClient {
 			System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
 		if(tile!=null) {
 			System.out.printf("\t%s: basey=%d, ground=%d, d=%s\n", tile.t.getClass().getSimpleName(), tile.basey, tile.getGroundY() , tile.d.name());
+			if(tile.sub!=null)
+				System.out.printf("\t%s: [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.sub.i, tile.sub.j);
 			System.out.print("\tfenceY: ");
 			for(Corner c : Corner.values())
 				System.out.printf("(%s)%d; ", c.name(), tile.t.getFenceY(tile, c));
@@ -380,8 +384,13 @@ public class AetherTown extends UIClient {
 	public static Level generateLevel(long seed) {
 		AetherTown.seed = seed;
 		System.out.printf("Generating... %dL\n", seed);
-		level = new Level(128);
-		level.generate(new Random(seed));
+		
+		LevelInfo info = new LevelInfo(2, seed);
+		info.addConn(Dir.west, 1);
+		info.addConn(Dir.east, 1);
+		level = new Level(info);
+		level.generate();
+		
 		System.gc();
 		System.out.println("Done.");
 		return level;

@@ -33,7 +33,7 @@ public abstract class PlotGenerator implements Generator {
 			return dr.flip();
 	}
 	
-	protected Token tokenAt(int i, int j, Dir td) {
+	public Token tokenAt(int i, int j, Dir td) {
 		return new Token(startToken.level,
 				startToken.x + j*d.dx + i*dr.dx,
 				startToken.y,
@@ -41,7 +41,7 @@ public abstract class PlotGenerator implements Generator {
 				td);
 	}
 	
-	protected Token tokenAt(int i, int j) {
+	public Token tokenAt(int i, int j) {
 		return tokenAt(i, j, alignToken(i, j));
 	}
 

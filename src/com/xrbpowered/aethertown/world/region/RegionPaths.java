@@ -53,7 +53,7 @@ public class RegionPaths {
 			if(d.dx<0)
 				x0 -= s-1;
 		}
-		LevelInfo level = new LevelInfo(region, x0, z0, s);
+		LevelInfo level = new LevelInfo(region, x0, z0, s, random.nextLong());
 		if(!level.isFree()) {
 			if(s==1)
 				return null;

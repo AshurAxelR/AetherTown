@@ -32,6 +32,11 @@ public class Token {
 		return new Token(level, x+d.dx, y+dy, z+d.dz, d);
 	}
 	
+	public Token offsY(int dy) {
+		y += dy;
+		return this;
+	}
+	
 	public boolean fits() {
 		return level.fits(x, y, z);
 	}

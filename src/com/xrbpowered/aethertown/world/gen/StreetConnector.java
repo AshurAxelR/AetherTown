@@ -11,11 +11,12 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class StreetConnector {
 
-	private static final int margin = 3;
+	private static final int reconnectMargin = 3;
 	private static final float ascFactor = 2.67f;
 	
 	private static int lenForH(int h) {
@@ -33,11 +34,19 @@ public class StreetConnector {
 			this.z = z;
 			this.basey = basey;
 		}
-		
+
+		public ConnPoint(int i, int j, int basey) {
+			this(i, j, calcx(i, j), calcz(i, j), basey);
+		}
+
 		public ConnPoint moveOut(int dj, int dy) {
 			return new ConnPoint(i, j-dj, x + dj*dout.dx, z + dj*dout.dz, basey+dy);
 		}
-		
+
+		public ConnPoint moveIn(int dj, int dy) {
+			return new ConnPoint(i, j+dj, x + dj*din.dx, z + dj*din.dz, basey+dy);
+		}
+
 		public int mdist(ConnPoint conn) {
 			return Math.abs(x-conn.x) + Math.abs(z-conn.z);
 		}
@@ -138,15 +147,17 @@ public class StreetConnector {
 	
 	public final Level level;
 	public final int levelSize;
+	public final int margin;
 	public final Dir din, dout, dnext;
 	
 	private int startx, startz;
 	private int[] wopen;
 	private ArrayList<ConnPoint> connPoints = new ArrayList<>();
 	
-	public StreetConnector(Level level, Dir d) {
+	public StreetConnector(Level level, Dir d, int margin) {
 		this.level = level;
 		this.levelSize = level.levelSize;
+		this.margin = margin;
 		this.din = d.flip();
 		this.dout = d;
 		this.dnext = d.cw();
@@ -154,7 +165,11 @@ public class StreetConnector {
 		this.startz = d.rightCorner().dz<0 ? 0 : levelSize-1;
 		this.wopen = new int[levelSize];
 	}
-	
+
+	public StreetConnector(Level level, Dir d) {
+		this(level, d, reconnectMargin);
+	}
+
 	private static boolean isAnyStreet(Tile tile) {
 		return tile==null ? false : Street.isAnyStreet(tile.t);
 	}
@@ -164,6 +179,14 @@ public class StreetConnector {
 			return false;
 		else
 			return isAnyStreet(level.map[x][z]);
+	}
+
+	private int calcx(int i, int j) {
+		return startx + i*dnext.dx + j*din.dx;
+	}
+
+	private int calcz(int i, int j) {
+		return startz + i*dnext.dz + j*din.dz;
 	}
 
 	private void scanOpen() {
@@ -199,13 +222,20 @@ public class StreetConnector {
 		}
 	}
 	
-	private ConnPiece[] prepareUConnection(ConnPoint connS, ConnPoint connD, int addj, Random random) {
-		int outj = Math.min(connS.j, connD.j)-1;
-		for(int i=connS.i; i<=connD.i; i++) {
+	private int calcOutJ(ConnPoint connS, ConnPoint connD, int max, int addj) {
+		int outj = max;
+		int i0 = Math.min(connS.i, connD.i);
+		int i1 = Math.max(connS.i, connD.i);
+		for(int i=i0; i<=i1; i++) {
 			if(wopen[i]<outj)
 				outj = wopen[i];
 		}
 		outj -= addj;
+		return outj;
+	}
+	
+	private ConnPiece[] prepareUConnection(ConnPoint connS, ConnPoint connD, int addj, Random random) {
+		int outj = calcOutJ(connS, connD, Math.min(connS.j, connD.j)-1, addj);
 		if(outj<=margin)
 			return null;
 		
@@ -297,6 +327,88 @@ public class StreetConnector {
 		return true;
 	}
 	
+	private ConnPiece[] prepareZConnection(ConnPoint connS, ConnPoint connD, int addj, Random random) {
+		int outj = calcOutJ(connS, connD, connS.j-1, addj);
+		if(outj<=margin+addj) // Z vs U
+			return null;
+		outj -= random.nextInt(outj-margin-addj)/2; // Z vs U
+		
+		int lenS = connS.j - outj - 1;
+		int lenOut = Math.abs(connD.i - connS.i) - 1; // Z vs U
+		int lenD = outj - connD.j - 1; // Z vs U
+		int len = lenS + lenOut + lenD;
+		// Z vs U
+		
+		int hsign = (connS.basey>connD.basey) ? -1 : 1;
+		int hdiff = Math.abs(connS.basey - connD.basey);
+		int dy = 1;
+		if(hdiff>len/2) {
+			
+			int hmod = hdiff % 4;
+			if(hmod>0) {
+				int djS, djD;
+				int dj0 = hmod/2;
+				int dj1 = hmod - dj0;
+				if((connS.j<connD.j) ^ (dj0<dj1)) {
+					djS = dj0;
+					djD = dj1;
+				}
+				else {
+					djS = dj1;
+					djD = dj0;
+				}
+				ConnPoint connAdjS = djS==0 ? connS : connS.moveOut(djS+1, djS*hsign);
+				ConnPoint connAdjD = djD==0 ? connD : connD.moveIn(djD+1, -djD*hsign); // Z vs U
+				
+				addj = addj-Math.min(djS, djD)-1;
+				if(addj<0) addj = 0;
+				ConnPiece[] pieces = prepareUConnection(connAdjS, connAdjD, addj, random);
+				if(pieces==null)
+					return null;
+				
+				ConnPiece pieceAdjS = (connS!=connAdjS) ? new ConnPiece(dout).connect(connS, connAdjS) : null;
+				ConnPiece pieceAdjD = (connD!=connAdjD) ? new ConnPiece(dout).connect(connAdjD, connD) : null;
+				if(pieceAdjS!=null && !pieceAdjS.check(random) || pieceAdjD!=null && !pieceAdjD.check(random))
+					return null;
+				
+				return new ConnPiece[] {pieceAdjS, pieces[0], pieces[1], pieces[2], pieceAdjD};
+			}
+			
+			dy = 4;
+			int lenH = lenForH(hdiff);
+			if(lenH>=len) // Z vs U
+				return null;
+		}
+		// Z vs U
+		
+		int hS = (int)Math.ceil(hdiff*(lenS/(float)len)/dy)*dy;
+		int hD = (int)Math.ceil(hdiff*((lenS+lenOut)/(float)len)/dy)*dy;
+		
+		ConnPiece pieceS = new ConnPiece(dout).setLen(lenS).setStart(connS).setTargetY(connS.basey+hS*hsign);
+		if(!pieceS.check(random))
+			return null;
+		Dir d = connD.i > connS.i ? dnext : dnext.flip(); // Z vs U
+		ConnPiece pieceOut = new ConnPiece(d).setLen(lenOut).setStart(pieceS).setTargetY(connS.basey+hD*hsign);
+		if(!pieceOut.check(random))
+			return prepareUConnection(connS, connD, addj+1, random);
+		ConnPiece pieceD = new ConnPiece(dout).setLen(lenD).setStart(pieceOut).setTargetY(connD.basey);
+		if(!pieceD.check(random))
+			return null;
+		
+		return new ConnPiece[] {pieceS, pieceOut, pieceD};
+	}
+	
+	private boolean makeZConnection(ConnPoint connS, ConnPoint connD, Random random) {
+		ConnPiece[] pieces = prepareZConnection(connS, connD, 0, random);
+		if(pieces==null)
+			return false;
+		for(ConnPiece p : pieces) {
+			if(p!=null)
+				p.generate(random);
+		}
+		return true;
+	}
+	
 	public boolean connectAll(Random random) {
 		scanOpen();
 		boolean upd = false;
@@ -330,6 +442,32 @@ public class StreetConnector {
 			}
 		}
 		return upd;
+	}
+	
+	public boolean connectOut(LevelConnection lc, Random random) {
+		ConnPoint connOut = new ConnPoint(lc.getLevelI(), 0, lc.basey);
+		scanOpen();
+		boolean res = false;
+		while(!res) {
+			ConnPoint connS = null;
+			int minDist = level.levelSize*3;
+			for(int p=1; p<connPoints.size()-1; p++) {
+				ConnPoint conn = connPoints.get(p);
+				int mdist = conn.mdisty(connOut);
+				if(Math.abs(conn.i - connOut.i)<2)
+					continue;
+				if(mdist<minDist) {
+					connS = conn;
+					minDist = mdist;
+				}
+			}
+			if(connS==null)
+				return false;
+			res = makeZConnection(connS, connOut, random);
+			if(!res)
+				connPoints.remove(connS);
+		}
+		return true;
 	}
 
 }

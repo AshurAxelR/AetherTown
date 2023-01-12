@@ -55,7 +55,7 @@ public class HouseRole {
 		new HouseRole("Indian Restaurant", colorFood),
 		new HouseRole("Western-European Restaurant", colorFood),
 		new HouseRole("Eastern-European Restaurant", colorFood),
-		new HouseRole("Mediterranean Restaurant", colorFood),
+		new HouseRole("Spanish Tapas", colorFood),
 		new HouseRole("Turkish Restaurant", colorFood),
 	};
 

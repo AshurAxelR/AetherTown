@@ -13,10 +13,12 @@ import com.xrbpowered.aethertown.world.gen.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 import com.xrbpowered.aethertown.world.region.HouseAssignment;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 
 public class Level {
 
+	public final LevelInfo info;
 	public final int levelSize;
 	
 	private Random random;
@@ -32,8 +34,9 @@ public class Level {
 	public HeightLimiter heightLimiter = null;
 	public ArrayList<PlotGenerator> plots = null;
 
-	public Level(int size) {
-		this.levelSize = size;
+	public Level(LevelInfo info) {
+		this.info = info;
+		this.levelSize = info.getLevelSize();
 		this.map = new Tile[levelSize][levelSize];
 		this.h = new HeightMap(this);
 	}
@@ -63,8 +66,12 @@ public class Level {
 		}
 		return !refill;
 	}
-	
-	public void generate(Random random) {
+
+	public void generate() {
+		generate(new Random(info.seed));
+	}
+
+	protected void generate(Random random) {
 		this.random = random;
 		heightLimiter = new HeightLimiter(this);
 		plots = new ArrayList<>();

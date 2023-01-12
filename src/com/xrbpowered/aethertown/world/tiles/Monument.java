@@ -14,7 +14,7 @@ import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 
 public class Monument extends Plaza {
 
-	private static final Color statueColor = new Color(0x75abae); // new Color(0x353433);
+	private static final Color statueColor = new Color(0xf2f4ea); // new Color(0x75abae); // new Color(0x353433);
 	
 	public static final Monument template = new Monument();
 	
@@ -34,7 +34,7 @@ public class Monument extends Plaza {
 				ObjMeshLoader.loadObj("models/monument/pillar.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(0xd5ceba));
 		statue = new TileComponent(
-				ObjMeshLoader.loadObj("models/monument/statue_cube.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/monument/angel.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(statueColor));
 	}
 
@@ -43,7 +43,7 @@ public class Monument extends Plaza {
 		super.createGeometry(tile, renderer, random);
 		TileObjectInfo info = new TileObjectInfo(tile);
 		pillar.addInstance(info);
-		statue.addInstance(info);
+		statue.addInstance(new TileObjectInfo(tile, 0, 10.3f, 0));
 		renderer.pointLights.setLight(tile, -0.35f*tile.d.dx, 9f, -0.35f*tile.d.dz, 5f);
 		renderer.blockLighting.addLight(tile, tile.basey+9, Street.lampLightColor, 0.4f, false);
 	}

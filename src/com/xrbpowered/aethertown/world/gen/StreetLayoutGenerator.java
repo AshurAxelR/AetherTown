@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
@@ -32,7 +33,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		return generate(random);
 	}
 	
-	private static final WRandom nextw = new WRandom(0.5, 0.1, 0.5, 1);
+	private static final WRandom nextw = new WRandom(0.5, 0.1, 0.3, 1);
 	private static final WRandom nextwLim = new WRandom(1.5, 0.3, 0.2, 0);
 	
 	@Override
@@ -87,6 +88,11 @@ public class StreetLayoutGenerator extends TokenGenerator {
 			for(Dir d : Dir.shuffle(random)) {
 				upd |= new StreetConnector(level, d).connectAll(random);
 			}
+		}
+		
+		for(LevelConnection lc : level.info.conns) {
+			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random))
+				System.out.printf("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
 		}
 	}
 	

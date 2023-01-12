@@ -32,6 +32,10 @@ public enum Dir {
 		return values()[(ordinal()+d.ordinal())%4];
 	}
 
+	public Dir unapply(Dir d) {
+		return values()[(ordinal()+4-d.ordinal())%4];
+	}
+
 	public Dir[] next() {
 		return next[ordinal()];
 	}

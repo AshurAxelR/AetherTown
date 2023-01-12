@@ -35,7 +35,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 	private int margin = streetMargin;
 	public boolean generateSides = true;
 	
-	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.5, 1);
+	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.3, 1);
 
 	public static Generator selectSideGenerator(Level level, WRandom w, Random random, int h) {
 		switch(w.next(random)) {
@@ -317,17 +317,25 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
+	private static final WRandom wcross = new WRandom(0.1, 0, 0.7); // FIXME re-enable bridges after fix
+	
 	@Override
 	public void collectTokens(TokenGenerator out, Random random) {
-		if(random.nextInt(20)==0) {
-			out.addToken(endToken.next(endToken.d, 0).setGenerator(new Crossroads()));
+		if(dylist[len-1]==0 && (len<2 || dylist[len-2]==0)) {
+			switch(wcross.next(random)) {
+				case 0:
+					out.addToken(endToken.next(endToken.d, 0).setGenerator(new Crossroads()));
+					return;
+				case 1:
+					out.addToken(endToken.next(endToken.d, 0).setGenerator(new BridgePresetGenerator()));
+					return;
+				default:
+			}
 		}
-		else {
-			out.addToken(endToken.next(endToken.d.cw(), 0).setContext(this));
-			out.addToken(endToken.next(endToken.d.ccw(), 0).setContext(this));
-			if(random.nextInt(3)==0)
-				out.addToken(endToken.next(endToken.d, 0).setContext(this));
-		}
+		out.addToken(endToken.next(endToken.d.cw(), 0).setContext(this));
+		out.addToken(endToken.next(endToken.d.ccw(), 0).setContext(this));
+		if(random.nextInt(3)==0)
+			out.addToken(endToken.next(endToken.d, 0).setContext(this));
 	}
 
 }

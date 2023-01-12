@@ -119,7 +119,7 @@ public class StreetSlope extends TileTemplate {
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		if(h>1) {
 			side.addInstance(new TileObjectInfo(tile, 0, -h, 0));
-			if(!Street.template.addBridge(tile, tile.basey-h, renderer))
+			if(!Street.template.addAutoHillBridge(tile, tile.basey-h, renderer))
 				renderer.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
 			Dir dl = tile.d.ccw();
@@ -138,7 +138,7 @@ public class StreetSlope extends TileTemplate {
 		else {
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
-			if(Street.template.addBridge(tile, tile.basey-h, renderer)) {
+			if(Street.template.addAutoHillBridge(tile, tile.basey-h, renderer)) {
 				renderer.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
 				renderer.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
 			}

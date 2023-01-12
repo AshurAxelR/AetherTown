@@ -86,7 +86,7 @@ public class Street extends TileTemplate {
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		street.addInstance(new TileObjectInfo(tile));
-		if(!addBridge(tile, tile.basey, renderer))
+		if(!addAutoHillBridge(tile, tile.basey, renderer))
 			renderer.terrain.addWalls(tile);
 		addHandrails(tile);
 		// if(tile.x%2==0 && tile.z%2==0)
@@ -131,8 +131,10 @@ public class Street extends TileTemplate {
 				addHandrail(tile, d);
 			else {
 				Tile src = tile.getAdj(d);
-				if(src!=null && needsHandrail(tile, d, 1, 1))
+				if(src!=null && needsHandrail(tile, d, 1, 1)) {
 					handrail.addInstance(new TileObjectInfo(tile).rotate(d));
+					addHandrailPoles(tile, d, 0, 0);
+				}
 				else {
 					// TODO add entry stairs in place of handrails
 				}
@@ -140,17 +142,21 @@ public class Street extends TileTemplate {
 		}
 	}
 	
-	public boolean addBridge(Tile tile, int basey, LevelRenderer renderer) {
-		int dy0 = basey-tile.basey;
+	public void addBridge(Tile tile, int basey, int lowy) {
+		int dy = basey-tile.basey;
+		int sh = basey-6-lowy;
+		bridge.addInstance(new TileObjectInfo(tile, 0, dy-6, 0));
+		if(sh>0)
+			bridgeSupport.addInstance(new TileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
+	}
+	
+	public boolean addAutoHillBridge(Tile tile, int basey, LevelRenderer renderer) {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
 		TileTemplate adjt = tile.getAdjT(tile.d);
-		int sh = basey-6-miny;
-		if((maxy<=basey-3) && (Street.isAnyStreet(adjt) || (adjt instanceof Plaza)) && sh<18) {
-			bridge.addInstance(new TileObjectInfo(tile, 0, dy0-6, 0));
-			if(sh>0)
-				bridgeSupport.addInstance(new TileObjectInfo(tile, 0, dy0-6, 0).scale(1, sh*Tile.ysize));
+		if((maxy<=basey-3) && (Street.isAnyStreet(adjt) || (adjt instanceof Plaza)) && basey-miny<24 && tile.getAdj(tile.d.cw()).getGroundY()<basey && tile.getAdj(tile.d.ccw()).getGroundY()<basey) {
+			addBridge(tile, basey, miny);
 			renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
 			return true;
 		}
@@ -208,6 +214,9 @@ public class Street extends TileTemplate {
 	 * @return 0: trim not needed, 1: can't trim, 2: trimmed 
 	 */
 	public static int trimStreet(Tile tile, Random random) {
+		if(tile.x==0 || tile.x==tile.level.levelSize-1 || tile.z==0 || tile.z==tile.level.levelSize-1)
+			return 0;
+		
 		Dir dsrc = tile.d.flip();
 		Tile src = tile.getAdj(dsrc);
 		int res = 2;
@@ -253,6 +262,14 @@ public class Street extends TileTemplate {
 		
 		if((tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
 			return 1;
+		if(tile.sub!=null) {
+			Token t = tile.sub.parent.tokenAt(0, 0);
+			Tile root = t.level.map[t.x][t.z];
+			if(root!=null && root.sub.parent==tile.sub.parent)
+				return 1;
+			else
+				System.err.printf("Orphan %s sub street at [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.x, tile.z);
+		}
 		
 		if(src!=null && (src.t instanceof StreetSlope)) {
 			int dy = ((StreetSlope)src.t).h;
@@ -283,7 +300,7 @@ public class Street extends TileTemplate {
 	
 
 	public static boolean isAnyStreet(TileTemplate t) {
-		return t==Street.template || (t instanceof StreetSlope);
+		return t==Street.template || (t instanceof StreetSlope) || t==Bridge.template;
 	}
 
 }
