@@ -1,11 +1,10 @@
 package com.xrbpowered.aethertown;
 
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import com.xrbpowered.aethertools.LevelMapView;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
@@ -34,7 +33,6 @@ import com.xrbpowered.gl.ui.UINode;
 import com.xrbpowered.gl.ui.common.UIFpsOverlay;
 import com.xrbpowered.gl.ui.pane.UIOffscreen;
 import com.xrbpowered.gl.ui.pane.UIPane;
-import com.xrbpowered.gl.ui.pane.UITexture;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIElement;
 
@@ -65,9 +63,12 @@ public class AetherTown extends UIClient {
 	private String lookAtInfo = null;
 	private boolean showPointer = false;
 	
+	private UIOffscreen uiRender;
 	private UINode uiRoot;
-	private UITexture uiMinimap;
+	// private UITexture uiMinimap;
 	private UIPane uiTime, uiCompass, uiLookInfo;
+	private UIPane uiLevelMap;
+	private LevelMapView uiLevelMapView;
 
 	public AetherTown() {
 		super("Aether Town", 1f);
@@ -80,7 +81,7 @@ public class AetherTown extends UIClient {
 		
 		Fonts.load();
 		
-		new UIOffscreen(getContainer()) {
+		uiRender = new UIOffscreen(getContainer()) {
 			@Override
 			public void setSize(float width, float height) {
 				super.setSize(width, height);
@@ -141,6 +142,9 @@ public class AetherTown extends UIClient {
 			
 			@Override
 			public void updateTime(float dt) {
+				if(!uiRender.isVisible())
+					return;
+				
 				if(controllerEnabled) {
 					if(input.isMouseDown(1)) {
 						activeController.update(dt);
@@ -185,12 +189,12 @@ public class AetherTown extends UIClient {
 				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
 				uiCompass.setLocation(getWidth()-uiCompass.getWidth()-20, uiTime.getY());
 				uiLookInfo.setLocation(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
-				uiMinimap.setLocation(getWidth()-uiMinimap.getWidth()-20, uiTime.getY()-uiMinimap.getHeight()-20);
+				// uiMinimap.setLocation(getWidth()-uiMinimap.getWidth()-20, uiTime.getY()-uiMinimap.getHeight()-20);
 				super.layout();
 			}
 		};
 		
-		uiMinimap = new UITexture(uiRoot) {
+		/*uiMinimap = new UITexture(uiRoot) {
 			@Override
 			public void setupResources() {
 				BufferedImage img = new BufferedImage(level.levelSize*2, level.levelSize*2, BufferedImage.TYPE_INT_ARGB);
@@ -204,7 +208,7 @@ public class AetherTown extends UIClient {
 			}
 		};
 		uiMinimap.setSize(level.levelSize*2, level.levelSize*2);
-		uiMinimap.setVisible(false);
+		uiMinimap.setVisible(false);*/
 		
 		uiTime = new UIPane(uiRoot, false) {
 			@Override
@@ -241,6 +245,20 @@ public class AetherTown extends UIClient {
 		};
 		uiLookInfo.setSize(400, 32);
 		uiLookInfo.setVisible(false);
+		
+		uiLevelMap = new UIPane(getContainer(), true) {
+			@Override
+			public void layout() {
+				for(UIElement c : children) {
+					c.setLocation(0, 0);
+					c.setSize(getWidth(), getHeight());
+					c.layout();
+				}
+			}
+		};
+		LevelMapView.level = level;
+		uiLevelMapView = new LevelMapView(uiLevelMap);
+		uiLevelMap.setVisible(false);
 	}
 	
 	private int compass = -1;
@@ -308,11 +326,22 @@ public class AetherTown extends UIClient {
 		System.out.println();
 	}
 	
+	private void showLevelMap(boolean show) {
+		uiLevelMap.setVisible(show);
+		if(show)
+			uiLevelMapView.centerAt(level.getStartX(), level.getStartZ());
+		uiRender.setVisible(!show);
+		getContainer().repaint();
+	}
+	
 	@Override
 	public void keyPressed(char c, int code) {
 		switch(code) {
 			case KeyEvent.VK_ESCAPE:
-				requestExit();
+				if(uiLevelMap.isVisible())
+					showLevelMap(false);
+				else
+					requestExit();
 				break;
 			case KeyEvent.VK_TAB:
 				if(controllerEnabled)
@@ -340,14 +369,8 @@ public class AetherTown extends UIClient {
 				showPointer = !showPointer;
 				System.out.println("Pointer "+(showPointer ? "on" : "off"));
 				break;
-			/*case KeyEvent.VK_T:
-				activeEnvironment = (activeEnvironment+1) % ShaderEnvironment.environments.length;
-				environment = ShaderEnvironment.environments[activeEnvironment];
-				updateEnvironment();
-				break;*/
 			case KeyEvent.VK_M:
-				uiMinimap.setVisible(!uiMinimap.isVisible());
-				uiMinimap.repaint();
+				showLevelMap(!uiLevelMap.isVisible());
 				break;
 			default:
 				super.keyPressed(c, code);

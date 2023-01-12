@@ -93,7 +93,7 @@ public class Level {
 			System.err.println("Refill attempts limit reached");
 		
 		plots = null;
-		houses = HouseGenerator.listHouses(this);
+		houses = HouseGenerator.listHouses(this, random);
 		houseCount = houses.size();
 		name = LevelNames.next(random, houseCount);
 		HouseAssignment.assignHouses(this, random);

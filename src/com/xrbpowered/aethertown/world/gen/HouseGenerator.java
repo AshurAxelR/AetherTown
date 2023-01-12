@@ -70,7 +70,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 		startToken.level.houseCount--;
 	}
 
-	private static void listHousesRec(Level level, int x, int z, boolean[][] visited, ArrayList<HouseGenerator> houses) {
+	private static void listHousesRec(Level level, Random random, int x, int z, boolean[][] visited, ArrayList<HouseGenerator> houses) {
 		if(!level.isInside(x, z) || visited[x][z])
 			return;
 		visited[x][z] = true;
@@ -78,7 +78,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 		if(tile==null)
 			return;
 		if(Street.isAnyStreet(tile.t)) {
-			for(Dir d : Dir.values()) {
+			for(Dir d : Dir.shuffle(random)) {
 				Tile adj = tile.getAdj(d);
 				if(adj!=null && adj.t==HouseT.template && adj.d==d && (adj.sub.parent instanceof HouseGenerator)) {
 					SubInfo st = adj.sub;
@@ -90,15 +90,15 @@ public class HouseGenerator extends HouseGeneratorBase {
 				}
 			}
 			for(Dir d : Dir.values()) {
-				listHousesRec(level, x+d.dx, z+d.dz, visited, houses);
+				listHousesRec(level, random, x+d.dx, z+d.dz, visited, houses);
 			}
 		}
 	}
 	
-	public static ArrayList<HouseGenerator> listHouses(Level level) {
+	public static ArrayList<HouseGenerator> listHouses(Level level, Random random) {
 		ArrayList<HouseGenerator> houses = new ArrayList<>();
 		boolean[][] visited = new boolean[level.levelSize][level.levelSize];
-		listHousesRec(level, level.getStartX(), level.getStartZ(), visited, houses);
+		listHousesRec(level, random, level.getStartX(), level.getStartZ(), visited, houses);
 		System.out.printf("%d houses\n", houses.size());
 		return houses;
 	}

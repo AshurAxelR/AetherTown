@@ -115,9 +115,9 @@ public class ChurchT extends TileTemplate {
 		if(sub.j==1)
 			renderer.blockLighting.addLight(tile, tile.basey+8, Street.lampLightColor, 0.4f, false);
 		else if(sub.j==sub.parent.fwd-2)
-			renderer.blockLighting.addLight(tile, tile.basey+10, blockLightColor, 0.8f, true);
+			renderer.blockLighting.addLight(tile, tile.basey+10, blockLightColor, 0.7f, true);
 		else
-			renderer.blockLighting.addLight(tile, tile.basey+8, backLightColor, 0.5f, true);
+			renderer.blockLighting.addLight(tile, tile.basey+8, backLightColor, 0.4f, true);
 	}
 
 }

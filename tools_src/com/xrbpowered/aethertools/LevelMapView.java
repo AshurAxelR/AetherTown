@@ -47,32 +47,42 @@ public class LevelMapView extends UIElement {
 			@Override
 			protected void paintChildren(GraphAssist g) {
 				super.paintChildren(g);
-
-				if(level.isInside(hoverx, hoverz)) {
-					g.fillRect(10, 10, 350, 55, colorTextBg);
-					int x = 20;
-					int y = 35;
-					int h = 18;
-					g.setFont(Fonts.small);
-					g.setColor(colorText);
-					g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, level.name), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
-					Tile tile = level.map[hoverx][hoverz];
-					if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
-						String info = null;
-						if(tile.sub.parent instanceof HouseGenerator)
-							info = ((HouseGenerator) tile.sub.parent).role.title;
-						else if(tile.sub.parent instanceof ChurchGenerator)
-							info = tile.t.getTileInfo(tile);
-						g.setFont(Fonts.smallBold);
-						g.setColor(Color.BLACK);
-						g.drawString(info, x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
-					}
-				}
+				paintInfo(g);
 			}
 		});
-		((UIPanView) getParent()).pan(
-				-level.levelSize*tileSize/2+getBase().getWindow().getClientWidth()/2,
-				-level.levelSize*tileSize/2+getBase().getWindow().getClientHeight()/2);
+		UIPanView view = (UIPanView) getParent();
+		view.setSize(getBase().getWindow().getClientWidth(), getBase().getWindow().getClientHeight());
+		centerAt(level.getStartX(), level.getStartZ());
+	}
+	
+	private static void paintInfo(GraphAssist g) {
+		if(!level.isInside(hoverx, hoverz))
+			return;
+		g.fillRect(10, 10, 350, 55, colorTextBg);
+		int x = 20;
+		int y = 35;
+		int h = 18;
+		g.setFont(Fonts.small);
+		g.setColor(colorText);
+		g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, level.name), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
+		Tile tile = level.map[hoverx][hoverz];
+		if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
+			String info = null;
+			if(tile.sub.parent instanceof HouseGenerator)
+				info = ((HouseGenerator) tile.sub.parent).role.title;
+			else if(tile.sub.parent instanceof ChurchGenerator)
+				info = tile.t.getTileInfo(tile);
+			g.setFont(Fonts.smallBold);
+			g.setColor(Color.BLACK);
+			g.drawString(info, x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
+		}
+	}
+	
+	public void centerAt(int x, int z) {
+		UIPanView view = (UIPanView) getParent();
+		view.setPan(
+				x*tileSize-view.getWidth()/2,
+				z*tileSize-view.getHeight()/2);
 	}
 	
 	@Override
