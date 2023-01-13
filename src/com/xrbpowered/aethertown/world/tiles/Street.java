@@ -154,15 +154,20 @@ public class Street extends TileTemplate {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
-		TileTemplate adjt = tile.getAdjT(tile.d);
-		if((maxy<=basey-3) && (Street.isAnyStreet(adjt) || (adjt instanceof Plaza)) && basey-miny<24 && tile.getAdj(tile.d.cw()).getGroundY()<basey && tile.getAdj(tile.d.ccw()).getGroundY()<basey) {
-			addBridge(tile, basey, miny);
-			renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
-			return true;
-		}
-		else {
+		if(maxy>basey-3 || basey-miny>=24)
 			return false;
-		}
+		TileTemplate adjt = tile.getAdjT(tile.d);
+		if(adjt==null || !(Street.isAnyStreet(adjt) || (adjt instanceof Plaza)))
+			return false;
+		Tile adjcw = tile.getAdj(tile.d.cw());
+		if(adjcw==null || adjcw.getGroundY()>=basey)
+			return false;
+		Tile adjccw = tile.getAdj(tile.d.ccw());
+		if(adjccw==null || adjccw.getGroundY()>=basey)
+			return false;
+		addBridge(tile, basey, miny);
+		renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+		return true;
 	}
 	
 	public void addLamp(Tile atile, LevelRenderer renderer, Random random, float dy) {

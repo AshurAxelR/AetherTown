@@ -43,7 +43,7 @@ public class BridgePresetGenerator extends PlotGenerator implements TokenProvide
 				basey = 0;
 				break;
 			case east:
-				left = -1;
+				left = 1;
 				right = 1;
 				fwd = 4;
 				basey = 8;
@@ -138,7 +138,7 @@ public class BridgePresetGenerator extends PlotGenerator implements TokenProvide
 		if(temp!=null)
 			temp.forceGenerate(t, random).makeSub(this, i, j);
 	}
-	
+
 	@Override
 	public void fillStreet(Random random) {
 	}

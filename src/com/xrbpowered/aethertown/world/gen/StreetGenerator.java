@@ -317,7 +317,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
-	private static final WRandom wcross = new WRandom(0.1, 0, 0.7); // FIXME re-enable bridges after fix
+	private static final WRandom wcross = new WRandom(0.1, 0.3, 0.6);
 	
 	@Override
 	public void collectTokens(TokenGenerator out, Random random) {
