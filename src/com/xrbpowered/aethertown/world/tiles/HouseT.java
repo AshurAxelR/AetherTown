@@ -20,9 +20,9 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
 import com.xrbpowered.aethertown.world.TileTemplate;
-import com.xrbpowered.aethertown.world.gen.HouseGenerator;
-import com.xrbpowered.aethertown.world.gen.HouseGeneratorBase;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 

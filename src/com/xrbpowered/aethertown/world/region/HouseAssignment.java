@@ -5,7 +5,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.gen.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 
 public abstract class HouseAssignment {
 

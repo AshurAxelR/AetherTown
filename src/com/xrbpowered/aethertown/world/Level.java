@@ -7,11 +7,11 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.world.gen.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
-import com.xrbpowered.aethertown.world.gen.HouseGenerator;
-import com.xrbpowered.aethertown.world.gen.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.HouseAssignment;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;

@@ -18,7 +18,7 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
-import com.xrbpowered.aethertown.world.gen.LargeParkGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -204,7 +204,7 @@ public class Street extends TileTemplate {
 			}
 			for(Dir d : Dir.shuffle(random)) {
 				TileTemplate adjt = tile.getAdjT(d);
-				if(adjt!=null && !Street.isAnyPath(adjt)) {
+				if(adjt!=null && !Street.isAnyPath(adjt) && !(adjt instanceof Plaza)) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
 					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));

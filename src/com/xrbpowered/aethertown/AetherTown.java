@@ -106,7 +106,7 @@ public class AetherTown extends UIClient {
 				LevelConnection lc = level.info.conns.get(0);
 				camera.position.x = lc.getX()*Tile.size;
 				camera.position.z = lc.getZ()*Tile.size;
-				camera.rotation.y = 0;
+				camera.rotation.y = -(float)Math.PI/2f;
 				camera.updateTransform();
 				
 				walkController = new WalkController(input).setActor(camera);
@@ -410,7 +410,7 @@ public class AetherTown extends UIClient {
 		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		LevelNames.load();
 
-		long seed = 1673810487944L; // System.currentTimeMillis();
+		long seed = System.currentTimeMillis();
 		generateLevel(seed);
 
 		new AetherTown().run();

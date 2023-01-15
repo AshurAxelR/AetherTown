@@ -15,8 +15,8 @@ import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
 import com.xrbpowered.aethertown.world.TileTemplate;
-import com.xrbpowered.aethertown.world.gen.HouseGeneratorBase;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 

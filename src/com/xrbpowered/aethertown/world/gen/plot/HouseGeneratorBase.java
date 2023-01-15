@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.world.gen;
+package com.xrbpowered.aethertown.world.gen.plot;
 
 import com.xrbpowered.aethertown.utils.Dir;
 

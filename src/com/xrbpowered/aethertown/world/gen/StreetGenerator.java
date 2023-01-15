@@ -11,6 +11,10 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TokenProvider;
+import com.xrbpowered.aethertown.world.gen.plot.BridgePresetGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.Crossroads;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
@@ -319,7 +323,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
-	private static final WRandom wcross = new WRandom(0.1, 0.3, 0.6);
+	private static final WRandom wcross = new WRandom(0.2, 0.3, 0.5);
 	
 	@Override
 	public void collectTokens(TokenGenerator out, Random random) {

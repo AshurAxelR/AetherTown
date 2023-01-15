@@ -8,6 +8,9 @@ import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.gen.plot.Crossroads;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
@@ -53,6 +56,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 				new Dir[] {tile.d, tile.d.ccw(), tile.d.cw()};
 		for(Dir d : dirs) {
 			Token t = Token.forAdj(tile, d);
+			if(new HouseGenerator().generate(t, random))
+				return true;
 			if(Monument.template.generate(t, random))
 				return true;
 		}
@@ -92,7 +97,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		
 		for(LevelConnection lc : level.info.conns) {
 			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random))
-				System.out.printf("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
+				System.err.printf("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
 		}
 	}
 	

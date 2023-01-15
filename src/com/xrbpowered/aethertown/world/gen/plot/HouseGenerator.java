@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.world.gen;
+package com.xrbpowered.aethertown.world.gen.plot;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -53,9 +53,11 @@ public class HouseGenerator extends HouseGeneratorBase {
 	}
 	
 	@Override
-	protected void placeAt(Token t, int i, int j, Random random) {
-		HouseT.template.createTile().makeSub(this, i, j).place(t);
+	protected Tile placeAt(Token t, int i, int j, Random random) {
+		Tile tile = HouseT.template.createTile().makeSub(this, i, j);
+		tile.place(t);
 		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 2, 3);
+		return tile;
 	}
 	
 	@Override

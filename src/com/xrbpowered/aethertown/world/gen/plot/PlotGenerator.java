@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.world.gen;
+package com.xrbpowered.aethertown.world.gen.plot;
 
 import java.util.Random;
 
@@ -65,7 +65,7 @@ public abstract class PlotGenerator implements Generator {
 		return fits(left, right, fwd);
 	}
 
-	protected abstract void placeAt(Token t, int i, int j, Random random);
+	protected abstract Tile placeAt(Token t, int i, int j, Random random);
 
 	protected void registerPlot() {
 		startToken.level.plots.add(this);

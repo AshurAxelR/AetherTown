@@ -1,8 +1,9 @@
-package com.xrbpowered.aethertown.world.gen;
+package com.xrbpowered.aethertown.world.gen.plot;
 
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.WRandom;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Monument;
@@ -29,7 +30,7 @@ public class LargeParkGenerator extends PlotGenerator {
 	}
 
 	@Override
-	protected void placeAt(Token t, int i, int j, Random random) {
+	protected Tile placeAt(Token t, int i, int j, Random random) {
 		TileTemplate temp;
 		if(i==0 && j<2) {
 			if(type==0)
@@ -45,7 +46,7 @@ public class LargeParkGenerator extends PlotGenerator {
 			temp = Park.template;
 		else
 			temp = Plaza.template;
-		temp.forceGenerate(t, random).makeSub(this, i, j);
+		return temp.forceGenerate(t, random).makeSub(this, i, j);
 	}
 	
 	@Override

@@ -1,9 +1,10 @@
-package com.xrbpowered.aethertown.world.gen;
+package com.xrbpowered.aethertown.world.gen.plot;
 
 import java.util.Random;
 
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.region.LevelNames;
@@ -33,18 +34,19 @@ public class ChurchGenerator extends HouseGeneratorBase {
 	}
 
 	@Override
-	protected void placeAt(Token t, int i, int j, Random random) {
+	protected Tile placeAt(Token t, int i, int j, Random random) {
 		TileTemplate temp;
 		if(i==-left || i==right || j>fwd-marginBack)
 			temp = Park.template;
 		else if(j==0)
 			temp = Plaza.template;
 		else {
-			ChurchT.template.createTile().makeSub(this, i, j).place(t);
+			Tile tile = ChurchT.template.createTile().makeSub(this, i, j);
+			tile.place(t);
 			HeightLimiter.updateAt(t, HeightLimiter.maxWall, 2, 3);
-			return;
+			return tile;
 		}
-		temp.forceGenerate(t, random).makeSub(this, i, j);
+		return temp.forceGenerate(t, random).makeSub(this, i, j);
 	}
 	
 	private static String selectName(Level level, Random random) {

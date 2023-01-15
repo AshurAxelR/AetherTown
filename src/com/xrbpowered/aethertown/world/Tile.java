@@ -1,7 +1,7 @@
 package com.xrbpowered.aethertown.world;
 
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.world.gen.PlotGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 
 public class Tile {
 
