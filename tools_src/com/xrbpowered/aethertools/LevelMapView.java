@@ -15,6 +15,8 @@ import com.xrbpowered.aethertown.world.region.HouseRole;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
+import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
@@ -133,11 +135,11 @@ public class LevelMapView extends UIElement {
 				g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
 				if(tile==null)
 					continue;
-				if(Street.isAnyStreet(tile.t)) {
+				if(Street.isAnyPath(tile.t)) {
 					g.setColor(colorStreetBorder);
 					for(Dir d : Dir.values()) {
 						Tile adj = tile.getAdj(d);
-						if(!(adj!=null && Street.isAnyStreet(adj.t)))
+						if(adj==null || !Street.isAnyPath(adj.t))
 							drawBorder(g, x, z, d);
 					}
 				}
@@ -149,6 +151,10 @@ public class LevelMapView extends UIElement {
 						if(!(adj!=null && adj.t==tile.t && adj.sub!=null && adj.sub.parent==plot))
 							drawBorder(g, x, z, d);
 					}
+				}
+				else if(tile.t==Monument.template) {
+					g.setColor(Plaza.plazaColor);
+					g.drawRect(x*tileSize, z*tileSize, tileSize-1, tileSize-1);
 				}
 			}
 

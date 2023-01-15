@@ -29,6 +29,7 @@ public class Street extends TileTemplate {
 	public static final Color lampLightColor = new Color(0xfff0b4); // new Color(0xfffae5);
 	
 	public static final Street template = new Street();
+	public static final Street subTemplate = new Street();
 	
 	public static TileComponent street, handrailPole;
 	
@@ -39,8 +40,8 @@ public class Street extends TileTemplate {
 	private static TileComponent handrail;
 
 	public static class StreetTile extends Tile {
-		public boolean allowConnections = true;
 		public boolean lamp = false;
+		public boolean bridge = false;
 		
 		public StreetTile(TileTemplate t) {
 			super(t);
@@ -54,6 +55,14 @@ public class Street extends TileTemplate {
 	@Override
 	public Tile createTile() {
 		return new StreetTile(this);
+	}
+	
+	@Override
+	public float getYAt(Tile tile, float sx, float sz, float y0) {
+		if(((StreetTile)tile).bridge && Bridge.isUnder(y0, tile.basey))
+			return tile.level.h.gety(tile.x, tile.z, sx, sz);
+		else
+			return super.getYAt(tile, sx, sz, y0);
 	}
 	
 	@Override
@@ -86,7 +95,7 @@ public class Street extends TileTemplate {
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		street.addInstance(new TileObjectInfo(tile));
-		if(!addAutoHillBridge(tile, tile.basey, renderer))
+		if(!addAutoHillBridge((StreetTile)tile, tile.basey, renderer))
 			renderer.terrain.addWalls(tile);
 		addHandrails(tile);
 		// if(tile.x%2==0 && tile.z%2==0)
@@ -150,7 +159,7 @@ public class Street extends TileTemplate {
 			bridgeSupport.addInstance(new TileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
 	}
 	
-	public boolean addAutoHillBridge(Tile tile, int basey, LevelRenderer renderer) {
+	public boolean addAutoHillBridge(StreetTile tile, int basey, LevelRenderer renderer) {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
@@ -165,6 +174,7 @@ public class Street extends TileTemplate {
 		Tile adjccw = tile.getAdj(tile.d.ccw());
 		if(adjccw==null || adjccw.getGroundY()>=basey)
 			return false;
+		tile.bridge = true;
 		addBridge(tile, basey, miny);
 		renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
 		return true;
@@ -194,7 +204,7 @@ public class Street extends TileTemplate {
 			}
 			for(Dir d : Dir.shuffle(random)) {
 				TileTemplate adjt = tile.getAdjT(d);
-				if(!Street.isAnyStreet(adjt) && !(adjt instanceof Plaza)) {
+				if(adjt!=null && !Street.isAnyPath(adjt)) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
 					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));
@@ -241,7 +251,7 @@ public class Street extends TileTemplate {
 				res = 1;
 				park = adj;
 			}
-			if(Street.isAnyStreet(adj.t) && src!=null)
+			if(Street.isAnyStreet(adj.t) && (adj.d==d.flip() || Math.abs(tile.basey-adj.basey)<=1) && src!=null)
 				return 0;
 		}
 		
@@ -306,6 +316,10 @@ public class Street extends TileTemplate {
 
 	public static boolean isAnyStreet(TileTemplate t) {
 		return t==Street.template || (t instanceof StreetSlope) || t==Bridge.template;
+	}
+	
+	public static boolean isAnyPath(TileTemplate t) {
+		return t==Street.template || t==Street.subTemplate || (t instanceof StreetSlope) || t==Bridge.template;
 	}
 
 }

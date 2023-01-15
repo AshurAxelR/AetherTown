@@ -131,24 +131,34 @@ public class Level {
 			}
 	}
 	
+	public float gety(int x, int z, float sx, float sz, float y0) {
+		if(!isInside(x, z))
+			return 0;
+		Tile tile = map[x][z];
+		if(tile!=null)
+			return tile.t.getYAt(tile, sx, sz, y0);
+		else
+			return h.gety(x, z, sx, sz);
+	}
+
 	public float gety(int x, int z, float sx, float sz) {
 		if(!isInside(x, z))
 			return 0;
 		Tile tile = map[x][z];
 		if(tile!=null)
-			return tile.t.getYAt(tile, sx, sz);
+			return tile.t.getYAt(tile, sx, sz, tile.basey);
 		else
 			return h.gety(x, z, sx, sz);
 	}
-	
-	public float gety(float x, float z) {
+
+	public float gety(float x, float y0, float z) {
 		int tx = (int)((x+Tile.size/2)/Tile.size);
 		int tz = (int)((z+Tile.size/2)/Tile.size);
 		float sx = (x+Tile.size/2 - tx*Tile.size)/Tile.size;
 		float sz = (z+Tile.size/2 - tz*Tile.size)/Tile.size;
-		return gety(tx, tz, sx, sz);
+		return gety(tx, tz, sx, sz, y0);
 	}
-	
+
 	public Tile getAdj(int tx, int tz, Dir d) {
 		int x = tx + d.dx;
 		int z = tz + d.dz;

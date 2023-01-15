@@ -39,7 +39,7 @@ public abstract class TileTemplate implements Generator {
 		return tile.basey;
 	}
 	
-	public float getYAt(Tile tile, float sx, float sz) {
+	public float getYAt(Tile tile, float sx, float sz, float y0) {
 		return Tile.ysize*tile.basey;
 	}
 

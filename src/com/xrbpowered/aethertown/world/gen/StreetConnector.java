@@ -134,7 +134,7 @@ public class StreetConnector {
 		tokens.add(new DistToken(x0, z0, 0));
 		while(!tokens.isEmpty()) {
 			DistToken t = tokens.removeFirst();
-			if(!isAnyStreet(t.x, t.z))
+			if(!isAnyPath(t.x, t.z))
 				continue;
 			if(t.dist>=wmap[t.x][t.z])
 				continue;
@@ -170,15 +170,15 @@ public class StreetConnector {
 		this(level, d, reconnectMargin);
 	}
 
-	private static boolean isAnyStreet(Tile tile) {
-		return tile==null ? false : Street.isAnyStreet(tile.t);
+	private static boolean isAnyPath(Tile tile) {
+		return tile==null ? false : Street.isAnyPath(tile.t);
 	}
 
-	private boolean isAnyStreet(int x, int z) {
+	private boolean isAnyPath(int x, int z) {
 		if(!level.isInside(x, z))
 			return false;
 		else
-			return isAnyStreet(level.map[x][z]);
+			return isAnyPath(level.map[x][z]);
 	}
 
 	private int calcx(int i, int j) {
@@ -197,18 +197,16 @@ public class StreetConnector {
 			for(int xj=xi, zj=zi; j<levelSize; j++, xj+=din.dx, zj+=din.dz) {
 				Tile tile = level.map[xj][zj];
 				if(tile!=null) {
-					if(tile.t==Street.template &&
-							i>=margin && i<levelSize-margin &&
-							((Street.StreetTile) tile).allowConnections) {
+					if(tile.t==Street.template && i>=margin && i<levelSize-margin) {
 						connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
 					}
-					if(isAnyStreet(tile))
+					if(isAnyPath(tile))
 						j -= streetGap;
 					break;
 				}
 				boolean stop = false;
 				for(int k=1; k<=streetGap; k++) {
-					if(isAnyStreet(xj+k*dl.dx, zj+k*dl.dz) || isAnyStreet(xj+k*dr.dx, zj+k*dr.dz)) {
+					if(isAnyPath(xj+k*dl.dx, zj+k*dl.dz) || isAnyPath(xj+k*dr.dx, zj+k*dr.dz)) {
 						stop = true;
 						// TODO sideways connection point?
 						break;

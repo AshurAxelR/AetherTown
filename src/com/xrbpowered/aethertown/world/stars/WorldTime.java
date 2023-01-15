@@ -12,7 +12,7 @@ public class WorldTime {
 
 	private static final float cycleTimeFactor = (float)Math.PI * 2f / (float)(60*60*24);
 	
-	public static float cycleTime = dayOfYear * (float)Math.PI * 2f + (float)Math.PI / 4f;
+	public static float cycleTime = dayOfYear * (float)Math.PI * 2f - (float)Math.PI / 2f;
 	
 	public static void updateTime(float dt) {
 		cycleTime += dt*timeSpeed*cycleTimeFactor;

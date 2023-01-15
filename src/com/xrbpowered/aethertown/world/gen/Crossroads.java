@@ -42,14 +42,14 @@ public class Crossroads extends PlotGenerator implements TokenProvider {
 			else
 				temp = Monument.template;
 		}
-		else
+		else if((i==0 || j==1))
 			temp = Street.template;
+		else
+			temp = Street.subTemplate;
 		
-		Tile atile = temp.forceGenerate(t, random).makeSub(this, i, j);
-		if(atile.t==Street.template) {
-			StreetTile tile = (StreetTile) atile;
-			tile.allowConnections = (i==0 || j==1);
-			tile.lamp = !tile.allowConnections;
+		Tile tile = temp.forceGenerate(t, random).makeSub(this, i, j);
+		if(tile.t==Street.subTemplate) {
+			((StreetTile) tile).lamp = true;
 		}
 	}
 

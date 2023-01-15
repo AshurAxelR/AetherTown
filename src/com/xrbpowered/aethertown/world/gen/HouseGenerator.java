@@ -77,7 +77,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 		Tile tile = level.map[x][z];
 		if(tile==null)
 			return;
-		if(Street.isAnyStreet(tile.t)) {
+		if(Street.isAnyPath(tile.t)) {
 			for(Dir d : Dir.shuffle(random)) {
 				Tile adj = tile.getAdj(d);
 				if(adj!=null && adj.t==HouseT.template && adj.d==d && (adj.sub.parent instanceof HouseGenerator)) {

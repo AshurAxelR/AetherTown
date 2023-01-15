@@ -148,14 +148,8 @@ public class AetherTown extends UIClient {
 					return;
 				
 				if(controllerEnabled) {
-					if(input.isMouseDown(1)) {
-						activeController.update(dt);
-						updateWalkY();
-					}
-					else {
-						activeController.setMouseLook(false);
-						controllerEnabled = false;
-					}
+					activeController.update(dt);
+					updateWalkY();
 				}
 				
 				float dtDay = dt;
@@ -294,7 +288,7 @@ public class AetherTown extends UIClient {
 		
 		pointActor.position.x = camera.position.x;
 		pointActor.position.z = camera.position.z;
-		pointActor.position.y = level.isInside(hoverx, hoverz) ? level.gety(camera.position.x, camera.position.z) : 0;
+		pointActor.position.y = level.isInside(hoverx, hoverz) ? level.gety(camera.position.x, camera.position.y-pawnHeight, camera.position.z) : 0;
 		pointActor.updateTransform();
 		
 		if(activeController==walkController) {
@@ -338,6 +332,21 @@ public class AetherTown extends UIClient {
 		getContainer().repaint();
 	}
 	
+	private void disableController() {
+		if(controllerEnabled) {
+			activeController.setMouseLook(false);
+			controllerEnabled = false;
+		}
+	}
+	
+	@Override
+	public void mouseDown(float x, float y, int button) {
+		if(controllerEnabled && getMouseButton(button)==UIElement.Button.right)
+			disableController();
+		else
+			super.mouseDown(x, y, button);
+	}
+	
 	@Override
 	public void keyPressed(char c, int code) {
 		switch(code) {
@@ -374,6 +383,7 @@ public class AetherTown extends UIClient {
 				System.out.println("Pointer "+(showPointer ? "on" : "off"));
 				break;
 			case KeyEvent.VK_M:
+				disableController();
 				showLevelMap(!uiLevelMap.isVisible());
 				break;
 			default:
@@ -400,7 +410,7 @@ public class AetherTown extends UIClient {
 		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		LevelNames.load();
 
-		long seed = System.currentTimeMillis();
+		long seed = 1673810487944L; // System.currentTimeMillis();
 		generateLevel(seed);
 
 		new AetherTown().run();

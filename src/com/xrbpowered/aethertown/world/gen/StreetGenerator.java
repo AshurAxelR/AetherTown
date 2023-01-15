@@ -35,15 +35,17 @@ public class StreetGenerator implements Generator, TokenProvider {
 	private int margin = streetMargin;
 	public boolean generateSides = true;
 	
-	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.3, 1);
+	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.2, 0.1, 1);
 
 	public static Generator selectSideGenerator(Level level, WRandom w, Random random, int h) {
 		switch(w.next(random)) {
 			case 1:
 				return Park.template;
 			case 2:
-				return (h==0) ? new LargeParkGenerator() : null;
+				return (h==0) ? new LargeParkGenerator(false) : null;
 			case 3:
+				return (h==0) ? new LargeParkGenerator(true) : null;
+			case 4:
 				return HouseGenerator.select(level);
 			default:
 				return null;

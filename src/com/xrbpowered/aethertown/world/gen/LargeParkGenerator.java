@@ -16,6 +16,11 @@ public class LargeParkGenerator extends PlotGenerator {
 	private static final WRandom typeUpw = new WRandom(0, 1, 0.5, 0.5);
 	
 	public int type = 0;
+	private WRandom w;
+	
+	public LargeParkGenerator(boolean pointOfInterest) {
+		w = pointOfInterest ? typeUpw : typew;
+	}
 	
 	@Override
 	protected boolean findSize(Random random) {
@@ -45,7 +50,7 @@ public class LargeParkGenerator extends PlotGenerator {
 	
 	@Override
 	public boolean generate(Token startToken, Random random) {
-		type = typew.next(random);
+		type = w.next(random);
 		return super.generate(startToken, random);
 	}
 

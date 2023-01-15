@@ -33,8 +33,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		return generate(random);
 	}
 	
-	private static final WRandom nextw = new WRandom(0.5, 0.1, 0.3, 1);
-	private static final WRandom nextwLim = new WRandom(1.5, 0.3, 0.2, 0);
+	private static final WRandom nextw = new WRandom(0.5, 0.1, 0, 0.3, 1);
+	private static final WRandom nextwLim = new WRandom(1.5, 0.3, 0, 0.2, 0);
 	
 	@Override
 	protected Generator selectGenerator(Token t, Random random) {

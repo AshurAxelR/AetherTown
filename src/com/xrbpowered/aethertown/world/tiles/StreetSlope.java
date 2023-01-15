@@ -13,6 +13,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -32,11 +33,14 @@ public class StreetSlope extends TileTemplate {
 	
 	@Override
 	public Tile createTile() {
-		return new Street.StreetTile(this);
+		return new StreetTile(this);
 	}
 	
 	@Override
-	public float getYAt(Tile tile, float sx, float sz) {
+	public float getYAt(Tile tile, float sx, float sz, float prevy) {
+		if(((StreetTile)tile).bridge && Bridge.isUnder(prevy, tile.basey-h))
+			return tile.level.h.gety(tile.x, tile.z, sx, sz);
+
 		float y0 = Tile.ysize*tile.basey;
 		float y1 = Tile.ysize*(tile.basey-h);
 		sx *= tile.d.dx;
@@ -119,7 +123,7 @@ public class StreetSlope extends TileTemplate {
 	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
 		if(h>1) {
 			side.addInstance(new TileObjectInfo(tile, 0, -h, 0));
-			if(!Street.template.addAutoHillBridge(tile, tile.basey-h, renderer))
+			if(!Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, renderer))
 				renderer.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
 			Dir dl = tile.d.ccw();
@@ -138,7 +142,7 @@ public class StreetSlope extends TileTemplate {
 		else {
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
-			if(Street.template.addAutoHillBridge(tile, tile.basey-h, renderer)) {
+			if(Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, renderer)) {
 				renderer.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
 				renderer.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
 			}

@@ -15,7 +15,7 @@ public class BridgePresetGenerator extends PlotGenerator implements TokenProvide
 	private static final TileTemplate[][] sett = {
 		{null, null, null, Street.template, null},
 		{Street.template, Street.template, Street.template, Bridge.template, Street.template},
-		{Street.template, StreetSlope.template4, StreetSlope.template4, Street.template, null}
+		{Street.subTemplate, StreetSlope.template4, StreetSlope.template4, Street.template, null}
 	};
 	
 	private static final Dir[][] setd = {
@@ -99,6 +99,11 @@ public class BridgePresetGenerator extends PlotGenerator implements TokenProvide
 	}
 	
 	@Override
+	public boolean ignoreToken(int i, int j) {
+		return sett[ti(i, j)][tj(i, j)]==null;
+	}
+	
+	@Override
 	public Token tokenAt(int i, int j, Dir td) {
 		Token t = super.tokenAt(i, j, td);
 		int ti = ti(i, j);
@@ -106,18 +111,6 @@ public class BridgePresetGenerator extends PlotGenerator implements TokenProvide
 		if(inset(ti, tj))
 			t.offsY(sety[ti(i, j)][tj(i, j)]-basey);
 		return t;
-	}
-	
-	public boolean fits(int left, int right, int fwd) {
-		for(int j=0; j<=fwd; j++)
-			for(int i=-left; i<=right; i++) {
-				if(sett[ti(i, j)][tj(i, j)]==null)
-					continue;
-				Token t = tokenAt(i, j);
-				if(!t.fits() || !t.isFree())
-					return false;
-			}
-		return true;
 	}
 	
 	@Override
@@ -132,13 +125,11 @@ public class BridgePresetGenerator extends PlotGenerator implements TokenProvide
 
 	@Override
 	protected void placeAt(Token t, int i, int j, Random random) {
-		int ti = ti(i, j);
-		int tj = tj(i, j);
-		TileTemplate temp = sett[ti][tj];
+		TileTemplate temp = sett[ti(i, j)][tj(i, j)];
 		if(temp!=null)
 			temp.forceGenerate(t, random).makeSub(this, i, j);
 	}
-
+	
 	@Override
 	public void fillStreet(Random random) {
 	}

@@ -33,6 +33,10 @@ public abstract class PlotGenerator implements Generator {
 			return dr.flip();
 	}
 	
+	public boolean ignoreToken(int i, int j) {
+		return false;
+	}
+	
 	public Token tokenAt(int i, int j, Dir td) {
 		return new Token(startToken.level,
 				startToken.x + j*d.dx + i*dr.dx,
@@ -48,6 +52,8 @@ public abstract class PlotGenerator implements Generator {
 	public boolean fits(int left, int right, int fwd) {
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
+				if(ignoreToken(i, j))
+					continue;
 				Token t = tokenAt(i, j);
 				if(!t.fits() || !t.isFree())
 					return false;
@@ -68,6 +74,8 @@ public abstract class PlotGenerator implements Generator {
 	protected void place(Random random) {
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
+				if(ignoreToken(i, j))
+					continue;
 				placeAt(tokenAt(i, j), i, j, random);
 			}
 		registerPlot();
@@ -88,6 +96,8 @@ public abstract class PlotGenerator implements Generator {
 		Level level = startToken.level;
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
+				if(ignoreToken(i, j))
+					continue;
 				Token t = tokenAt(i, j);
 				level.map[t.x][t.z] = null;
 			}

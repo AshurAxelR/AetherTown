@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.world.tiles;
 
 import java.util.Random;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.world.Tile;
@@ -29,6 +30,13 @@ public class Bridge extends TileTemplate {
 	@Override
 	public Tile createTile() {
 		return new BridgeTile();
+	}
+	
+	public float getYAt(Tile tile, float sx, float sz, float y0) {
+		if(isUnder(y0, tile.basey))
+			return Tile.ysize*(tile.basey-((BridgeTile) tile).h);
+		else
+			return super.getYAt(tile, sx, sz, y0);
 	}
 	
 	protected boolean canGenerate(Token t) {
@@ -74,6 +82,10 @@ public class Bridge extends TileTemplate {
 		else {
 			System.err.println("Not supported yet.");
 		}
+	}
+	
+	public static boolean isUnder(float y0, int basey) {
+		return y0<Tile.ysize*basey-AetherTown.pawnHeight-1.1f;
 	}
 
 }
