@@ -49,7 +49,7 @@ public class HouseRole {
 		new HouseRole("Pub", colorFood),
 		new HouseRole("Italian Restaurant", colorFood),
 		new HouseRole("Pizza Restaurant", colorFood),
-		new HouseRole("Thai Restaurant", colorFood),
+		new HouseRole("Asian Restaurant", colorFood),
 		new HouseRole("Chinese Buffet", colorFood),
 		new HouseRole("Mexican Restaurant", colorFood),
 		new HouseRole("Indian Restaurant", colorFood),

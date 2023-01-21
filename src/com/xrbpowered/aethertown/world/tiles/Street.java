@@ -226,7 +226,7 @@ public class Street extends TileTemplate {
 	}
 	
 	/**
-	 * @return 0: trim not needed, 1: can't trim, 2: trimmed 
+	 * @return 0: trim not needed, 1: can't trim, 2: trimmed
 	 */
 	public static int trimStreet(Tile tile, Random random) {
 		if(tile.x==0 || tile.x==tile.level.levelSize-1 || tile.z==0 || tile.z==tile.level.levelSize-1)
@@ -275,16 +275,16 @@ public class Street extends TileTemplate {
 			return res;
 		}
 		
-		if((tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
-			return 1;
 		if(tile.sub!=null) {
 			Token t = tile.sub.parent.tokenAt(0, 0);
 			Tile root = t.level.map[t.x][t.z];
 			if(root!=null && root.sub.parent==tile.sub.parent)
-				return 1;
+				return 0;
 			else
 				System.err.printf("Orphan %s sub street at [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.x, tile.z);
 		}
+		if((tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
+			return 1;
 		
 		if(src!=null && (src.t instanceof StreetSlope)) {
 			int dy = ((StreetSlope)src.t).h;

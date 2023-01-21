@@ -409,6 +409,9 @@ public class AetherTown extends UIClient {
 	public static void main(String[] args) {
 		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		LevelNames.load();
+		
+		if(args.length>0)
+			WorldTime.setTimeOfDay(Float.parseFloat(args[0]));
 
 		long seed = System.currentTimeMillis();
 		generateLevel(seed);

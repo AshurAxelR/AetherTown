@@ -323,7 +323,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
-	private static final WRandom wcross = new WRandom(0.2, 0.3, 0.5);
+	private static final WRandom wcross = new WRandom(0.2, 0.4, 0.4);
 	
 	@Override
 	public void collectTokens(TokenGenerator out, Random random) {

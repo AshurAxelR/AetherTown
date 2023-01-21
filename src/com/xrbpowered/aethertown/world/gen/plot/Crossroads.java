@@ -25,13 +25,17 @@ public class Crossroads extends StreetPresetGenerator {
 	};
 	
 	private static final ExitPoint[] setout = {
-		new ExitPoint(3, 1, Dir.north, 0, 0),
-		new ExitPoint(1, -1, Dir.east, 0, 0),
-		new ExitPoint(-1, 1, Dir.south, 0, 0),
-		new ExitPoint(1, 3, Dir.west, 0, 0)
+		new ExitPoint(0, 3, 1, Dir.north, 0, 0),
+		new ExitPoint(1, 1, -1, Dir.east, 0, 0),
+		new ExitPoint(2, -1, 1, Dir.south, 0, 0),
+		new ExitPoint(3, 1, 3, Dir.west, 0, 0)
 	};
 	
 	private static final EntryPoint[] setent = { setout[0] };
+	
+	public Crossroads() {
+		super(15);
+	}
 	
 	@Override
 	public int tisize() {
@@ -75,13 +79,5 @@ public class Crossroads extends StreetPresetGenerator {
 	@Override
 	public void fillStreet(Random random) {
 	}
-	
-	/*@Override
-	public void collectTokens(TokenGenerator out, Random random) {
-		out.addToken(tokenAt(0, 3, Dir.north).setGenerator(new StreetGenerator(random, 0)));
-		out.addToken(tokenAt(2, 1, Dir.east).setGenerator(new StreetGenerator(random, 0)));
-		out.addToken(tokenAt(-2, 1, Dir.west).setGenerator(new StreetGenerator(random, 0)));
-		out.addToken(tokenAt(0, -1, Dir.south).setGenerator(new StreetGenerator(random, 0)));
-	}*/
 
 }

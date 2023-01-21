@@ -12,10 +12,18 @@ public class WorldTime {
 
 	private static final float cycleTimeFactor = (float)Math.PI * 2f / (float)(60*60*24);
 	
-	public static float cycleTime = dayOfYear * (float)Math.PI * 2f - (float)Math.PI / 2f;
+	public static float cycleTime = calcCycleTime(0.25f); // dayOfYear * (float)Math.PI * 2f - (float)Math.PI / 2f;
 	
 	public static void updateTime(float dt) {
 		cycleTime += dt*timeSpeed*cycleTimeFactor;
+	}
+	
+	private static float calcCycleTime(float t) {
+		return (float)Math.PI * 2f * (dayOfYear + t - 0.5f);
+	}
+	
+	public static void setTimeOfDay(float t) {
+		cycleTime = calcCycleTime(t); 
 	}
 	
 	public static float getTimeOfDay() {

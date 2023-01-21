@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.world.gen;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
@@ -10,7 +11,9 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.gen.plot.Crossroads;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.StreetPresetGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
@@ -50,15 +53,24 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 	}
 
-	private static boolean addPointOfInterest(Level level, Tile tile, Random random) {
+	public static boolean addPointOfInterest(Token t, Random random) {
+		if(new HouseGenerator().generate(t, random))
+			return true;
+		else if(new LargeParkGenerator(true).generate(t, random))
+			return true;
+		else if(Monument.template.generate(t, random))
+			return true;
+		else
+			return false;
+	}
+
+	public static boolean addPointOfInterest(Tile tile, Random random) {
 		Dir[] dirs = random.nextBoolean() ?
 				new Dir[] {tile.d, tile.d.cw(), tile.d.ccw()} :
 				new Dir[] {tile.d, tile.d.ccw(), tile.d.cw()};
 		for(Dir d : dirs) {
 			Token t = Token.forAdj(tile, d);
-			if(new HouseGenerator().generate(t, random))
-				return true;
-			if(Monument.template.generate(t, random))
+			if(addPointOfInterest(t, random))
 				return true;
 		}
 		return false;
@@ -77,12 +89,22 @@ public class StreetLayoutGenerator extends TokenGenerator {
 								upd = true;
 								break;
 							case 1:
-								upd |= addPointOfInterest(level, tile, random);
+								upd |= addPointOfInterest(tile, random);
 								break;
 							default:
 						}
 					}
 				}
+			
+			LinkedList<StreetPresetGenerator> splots = new LinkedList<>();
+			for(PlotGenerator plot : level.plots) {
+				if(plot instanceof StreetPresetGenerator)
+					splots.add((StreetPresetGenerator) plot);
+			}
+			
+			for(StreetPresetGenerator sp : splots) {
+				upd |= sp.trimStreet(random);
+			}
 		}
 	}
 	
