@@ -3,11 +3,13 @@ package com.xrbpowered.aethertown.world.gen.plot;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Bridge;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
 public class BridgePresetGenerator extends StreetPresetGenerator {
 
@@ -168,6 +170,17 @@ public class BridgePresetGenerator extends StreetPresetGenerator {
 	
 	@Override
 	public void fillStreet(Random random) {
+	}
+	
+	@Override
+	protected Tile placeAt(Token t, int i, int j, Random random) {
+		Tile tile = super.placeAt(t, i, j, random);
+		int ti = ti(i, j);
+		int tj = tj(i, j);
+		if(((ti+tj)%2==1) && (tile.t==Street.subTemplate || tile.t==Street.template)) {
+			((StreetTile) tile).lamp = true;
+		}
+		return tile;
 	}
 	
 	@Override

@@ -49,7 +49,7 @@ public abstract class PlotGenerator implements Generator {
 		return tokenAt(i, j, alignToken(i, j));
 	}
 
-	public boolean fits(int left, int right, int fwd) {
+	public boolean fits() {
 		for(int j=0; j<=fwd; j++)
 			for(int i=-left; i<=right; i++) {
 				if(ignoreToken(i, j))
@@ -59,10 +59,6 @@ public abstract class PlotGenerator implements Generator {
 					return false;
 			}
 		return true;
-	}
-
-	public boolean fits() {
-		return fits(left, right, fwd);
 	}
 
 	protected abstract Tile placeAt(Token t, int i, int j, Random random);

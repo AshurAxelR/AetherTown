@@ -44,7 +44,7 @@ public abstract class StreetPresetGenerator extends PresetPlotGenerator implemen
 	public ExitPoint[] setout() {
 		return (ExitPoint[]) setent();
 	}
-
+	
 	protected Token createExitToken(ExitPoint e) {
 		if(((1<<e.index) & mask)==0)
 			return null;
@@ -53,6 +53,29 @@ public abstract class StreetPresetGenerator extends PresetPlotGenerator implemen
 		Dir td = e.align.flip().apply(d).unapply(entry.align);
 		int dy = e.basey-entry.basey;
 		return tokenAt(i, j, td).offsY(dy);
+	}
+
+	@Override
+	public boolean fits() {
+		if(!super.fits())
+			return false;
+		for(ExitPoint out : setout()) {
+			Token t = createExitToken(out);
+			if(t==null)
+				continue;
+			if(!t.isInside())
+				return false;
+			Tile tile = t.level.map[t.x][t.z];
+			if(tile!=null) {
+				if(tile.t==Street.template || tile.t==Street.subTemplate) {
+					if(tile.basey!=t.y)
+						return false;
+				}
+				else
+					return false;
+			}
+		}
+		return true;
 	}
 
 	@Override

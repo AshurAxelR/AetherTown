@@ -73,11 +73,13 @@ public class Bridge extends TileTemplate {
 		Street.street.addInstance(new TileObjectInfo(tile));
 		Street.template.addBridge(tile, tile.basey, tile.basey-tile.h);
 		Street.template.addHandrails(tile);
-		Street.template.addLamp(tile, renderer, random, 0);
+		// Street.template.addLamp(tile, renderer, random, 0);
 		
 		if(tile.under==Street.template) {
-			Street.street.addInstance(new TileObjectInfo(tile, 0, -tile.h, 0));
 			// FIXME under bridge create geometry via TileTemplate.createGeometry()
+			Street.street.addInstance(new TileObjectInfo(tile, 0, -tile.h, 0));
+			renderer.pointLights.setLight(tile, 0, -tile.h+5.5f, 0, 4.5f);
+			renderer.blockLighting.addLight(tile, tile.basey-tile.h+5, Street.lampLightColor, 0.5f, false);
 		}
 		else {
 			System.err.println("Not supported yet.");

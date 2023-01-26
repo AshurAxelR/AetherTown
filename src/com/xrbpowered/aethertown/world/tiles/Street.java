@@ -182,6 +182,10 @@ public class Street extends TileTemplate {
 	
 	public void addLamp(Tile atile, LevelRenderer renderer, Random random, float dy) {
 		StreetTile tile = (StreetTile) atile;
+		if(!tile.level.isInside(tile.x, tile.z, 5)) {
+			tile.lamp = false;
+			return;
+		}
 		
 		boolean hasLamp = tile.lamp || random.nextInt(4)==0;
 		if(!hasLamp) {
@@ -210,7 +214,7 @@ public class Street extends TileTemplate {
 					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));
 					lampPost.addInstance(new TileObjectInfo(tile, dx, dy, dz));
 					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
-					renderer.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.45f, false);
+					renderer.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
 					tile.lamp = true;
 					break;
 				}
