@@ -1,26 +1,29 @@
 package com.xrbpowered.aethertown.render.sprites;
 
+import java.util.ArrayList;
+
+import com.xrbpowered.aethertown.render.LevelRenderer;
+import com.xrbpowered.aethertown.render.tiles.ObjectInfoUser;
+import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.scene.comp.ComponentRenderer;
-import com.xrbpowered.gl.scene.comp.InstancedMeshList;
 import com.xrbpowered.gl.ui.pane.PaneShader;
 
-public class SpriteComponent extends InstancedMeshList<SpriteInfo> {
+public class SpriteComponent extends TileComponent {
 
-	public static ComponentRenderer<SpriteComponent> renderer;
+	public static ArrayList<TileComponent> list = new ArrayList<>();
 	
 	public SpriteComponent(Texture color) {
-		super(SpriteShader.instanceInfo);
-		StaticMesh quad = createSpriteQuad();
-		setMesh(quad);
-		setTextures(new Texture[] {color});
-		renderer.add(this);
+		super(list, createSpriteQuad(), new Texture[] {color});
+	}
+	
+	public static ComponentRenderer<?> createRenderer(LevelRenderer r, final ObjectInfoUser shader) {
+		return createRenderer(list, r, shader);
 	}
 
-	@Override
-	protected void setInstanceData(float[] data, SpriteInfo obj, int index) {
-		obj.setData(data, getDataOffs(index));
+	public static void releaseRenderer(LevelRenderer r) {
+		releaseRenderer(list, r);
 	}
 	
 	public static StaticMesh createQuad(float r, boolean flipu, boolean flipv) {

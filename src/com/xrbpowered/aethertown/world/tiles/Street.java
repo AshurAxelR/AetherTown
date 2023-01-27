@@ -35,7 +35,7 @@ public class Street extends TileTemplate {
 	
 	private static TileComponent lampPost;
 	private static IllumTileComponent lamp;
-	//private static SpriteComponent sprite;
+	// private static SpriteComponent sprite;
 	private static TileComponent bridge, bridgeSupport;
 	private static TileComponent handrail;
 
@@ -70,7 +70,7 @@ public class Street extends TileTemplate {
 		street = new TileComponent(
 				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
 				new Texture(streetColor));
-		//sprite = new SpriteComponent(new Texture("checker.png"));
+		// sprite = new SpriteComponent(new Texture("checker.png"));
 		lamp = new IllumTileComponent(
 				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture("models/lamp/lamp.png", false, true, false),
@@ -93,14 +93,14 @@ public class Street extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
-		street.addInstance(new TileObjectInfo(tile));
-		if(!addAutoHillBridge((StreetTile)tile, tile.basey, renderer))
-			renderer.terrain.addWalls(tile);
-		addHandrails(tile);
+	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+		street.addInstance(r, new TileObjectInfo(tile));
+		if(!addAutoHillBridge((StreetTile)tile, tile.basey, r))
+			r.terrain.addWalls(tile);
+		addHandrails(r, tile);
 		// if(tile.x%2==0 && tile.z%2==0)
-		// 	sprite.addInstance(new SpriteInfo(tile).size(Tile.size));
-		addLamp(tile, renderer, random, 0);
+		// 		sprite.addInstance(r, new SpriteInfo(tile).size(Tile.size));
+		addLamp(tile, r, random, 0);
 	}
 	
 	public static boolean needsHandrail(Tile tile, Dir d, int dy0, int dy1) {
@@ -119,30 +119,30 @@ public class Street extends TileTemplate {
 		return needsHandrail(tile, d, 0, 0);
 	}
 
-	public static void addHandrailPoles(Tile tile, Dir d, int dy0, int dy1) {
+	public static void addHandrailPoles(LevelRenderer r, Tile tile, Dir d, int dy0, int dy1) {
 		Corner c0 = d.leftCorner();
-		handrailPole.addInstance(new TileObjectInfo(tile, 0.5f*c0.dx, dy0, 0.5f*c0.dz));
+		handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*c0.dx, dy0, 0.5f*c0.dz));
 		Corner c1 = d.rightCorner();
-		handrailPole.addInstance(new TileObjectInfo(tile, 0.5f*c1.dx, dy1, 0.5f*c1.dz));
+		handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*c1.dx, dy1, 0.5f*c1.dz));
 	}
 	
-	public void addHandrail(Tile tile, Dir d) {
+	public void addHandrail(LevelRenderer r, Tile tile, Dir d) {
 		if(needsHandrail(tile, d)) {
-			handrail.addInstance(new TileObjectInfo(tile).rotate(d));
-			addHandrailPoles(tile, d, 0, 0);
+			handrail.addInstance(r, new TileObjectInfo(tile).rotate(d));
+			addHandrailPoles(r, tile, d, 0, 0);
 		}
 	}
 	
-	public void addHandrails(Tile tile) {
+	public void addHandrails(LevelRenderer r, Tile tile) {
 		Dir dsrc = tile.d.flip();
 		for(Dir d : Dir.values()) {
 			if(d!=dsrc)
-				addHandrail(tile, d);
+				addHandrail(r, tile, d);
 			else {
 				Tile src = tile.getAdj(d);
 				if(src!=null && needsHandrail(tile, d, 1, 1)) {
-					handrail.addInstance(new TileObjectInfo(tile).rotate(d));
-					addHandrailPoles(tile, d, 0, 0);
+					handrail.addInstance(r, new TileObjectInfo(tile).rotate(d));
+					addHandrailPoles(r, tile, d, 0, 0);
 				}
 				else {
 					// TODO add entry stairs in place of handrails
@@ -151,15 +151,15 @@ public class Street extends TileTemplate {
 		}
 	}
 	
-	public void addBridge(Tile tile, int basey, int lowy) {
+	public void addBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
 		int dy = basey-tile.basey;
 		int sh = basey-6-lowy;
-		bridge.addInstance(new TileObjectInfo(tile, 0, dy-6, 0));
+		bridge.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0));
 		if(sh>0)
-			bridgeSupport.addInstance(new TileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
+			bridgeSupport.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
 	}
 	
-	public boolean addAutoHillBridge(StreetTile tile, int basey, LevelRenderer renderer) {
+	public boolean addAutoHillBridge(StreetTile tile, int basey, LevelRenderer r) {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
@@ -175,12 +175,12 @@ public class Street extends TileTemplate {
 		if(adjccw==null || adjccw.getGroundY()>=basey)
 			return false;
 		tile.bridge = true;
-		addBridge(tile, basey, miny);
-		renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+		addBridge(r, tile, basey, miny);
+		r.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
 		return true;
 	}
 	
-	public void addLamp(Tile atile, LevelRenderer renderer, Random random, float dy) {
+	public void addLamp(Tile atile, LevelRenderer r, Random random, float dy) {
 		StreetTile tile = (StreetTile) atile;
 		if(!tile.level.isInside(tile.x, tile.z, 5)) {
 			tile.lamp = false;
@@ -211,10 +211,10 @@ public class Street extends TileTemplate {
 				if(adjt!=null && !Street.isAnyPath(adjt) && !(adjt instanceof Plaza)) {
 					float dx = d.dx*0.45f;
 					float dz = d.dz*0.45f;
-					lamp.addInstance(new IllumTileObjectInfo(tile, dx, dy, dz));
-					lampPost.addInstance(new TileObjectInfo(tile, dx, dy, dz));
-					renderer.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
-					renderer.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
+					lamp.addInstance(r, new IllumTileObjectInfo(tile, dx, dy, dz));
+					lampPost.addInstance(r, new TileObjectInfo(tile, dx, dy, dz));
+					r.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
+					r.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
 					tile.lamp = true;
 					break;
 				}

@@ -65,11 +65,11 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
-		renderer.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+		r.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
 		int maxd = getMaxDelta(tile);
 		if(maxd<10)
-			Park.template.addTrees(tile, random);
+			Park.template.addTrees(r, tile, random);
 	}
 	
 	public int getMaxDelta(Tile atile) {

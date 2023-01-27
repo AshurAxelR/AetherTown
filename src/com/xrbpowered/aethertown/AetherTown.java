@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
+import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -56,6 +57,7 @@ public class AetherTown extends UIClient {
 	private boolean controllerEnabled = false;
 	
 	private SkyRenderer sky;
+	private TileRenderer tiles;
 	private LevelRenderer renderer;
 	
 	private StaticMeshActor pointActor;
@@ -117,15 +119,16 @@ public class AetherTown extends UIClient {
 				
 				sky = new SkyRenderer().setCamera(camera);
 				sky.stars.createStars(seed);
-				
+				tiles = new TileRenderer().setCamera(camera);
 				System.out.println("Creating components...");
-				renderer = new LevelRenderer(level, sky.buffer).setCamera(camera);
-				ComponentLibrary.createAllComponents(); // FIXME should not depend on creating level renderer first
+				ComponentLibrary.createAllComponents();
+				
+				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null), tiles.objShader, new Texture(Color.RED));
+
+				renderer = new LevelRenderer(level, sky.buffer, tiles);
 				System.out.println("Building geometry...");
 				renderer.createLevelGeometry();
 				System.out.println("Done.");
-
-				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, renderer.objShader.info, null), renderer.objShader, new Texture(Color.RED));
 
 				updateEnvironment();
 				updateWalkY();
@@ -299,7 +302,7 @@ public class AetherTown extends UIClient {
 	
 	private void updateEnvironment() {
 		sky.updateEnvironment(environment);
-		renderer.updateEnvironment(environment);
+		tiles.updateEnvironment(environment);
 	}
 	
 	private static void printTileDebug(int hoverx, int hoverz, Tile tile) {

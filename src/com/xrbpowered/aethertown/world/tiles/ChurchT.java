@@ -88,36 +88,36 @@ public class ChurchT extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
-		renderer.terrain.addWalls(tile);
+	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+		r.terrain.addWalls(tile);
 		SubInfo sub = tile.sub;
 		if(sub.i==0) {
 			Dir dr = tile.sub.parent.dr;
 			IllumTileObjectInfo info = new IllumTileObjectInfo(tile, 0.5f*dr.dx, 0, 0.5f*dr.dz);
 			TileObjectInfo roofInfo = new TileObjectInfo(tile, 0.5f*dr.dx, 0, 0.5f*dr.dz);
 			if(sub.j==1) {
-				front1.addInstance(info);
-				front2.addInstance(info);
-				front3.addInstance(info);
-				front4.addInstance(info);
-				chapelRoof.addInstance(roofInfo);
-				renderer.pointLights.setLight(tile.getAdj(tile.d.flip()), 0.5f*dr.dx, 10f, 0.5f*dr.dz, 4f);
+				front1.addInstance(r, info);
+				front2.addInstance(r, info);
+				front3.addInstance(r, info);
+				front4.addInstance(r, info);
+				chapelRoof.addInstance(r, roofInfo);
+				r.pointLights.setLight(tile.getAdj(tile.d.flip()), 0.5f*dr.dx, 10f, 0.5f*dr.dz, 4f);
 			}
 			else if(sub.j==sub.parent.fwd-2) {
-				back1.addInstance(info);
-				back2.addInstance(info);
+				back1.addInstance(r, info);
+				back2.addInstance(r, info);
 			}
 			else {
-				mid.addInstance(info);
+				mid.addInstance(r, info);
 			}
-			midRoof.addInstance(roofInfo);
+			midRoof.addInstance(r, roofInfo);
 		}
 		if(sub.j==1)
-			renderer.blockLighting.addLight(tile, tile.basey+8, Street.lampLightColor, 0.4f, false);
+			r.blockLighting.addLight(tile, tile.basey+8, Street.lampLightColor, 0.4f, false);
 		else if(sub.j==sub.parent.fwd-2)
-			renderer.blockLighting.addLight(tile, tile.basey+10, blockLightColor, 0.7f, true);
+			r.blockLighting.addLight(tile, tile.basey+10, blockLightColor, 0.7f, true);
 		else
-			renderer.blockLighting.addLight(tile, tile.basey+8, backLightColor, 0.4f, true);
+			r.blockLighting.addLight(tile, tile.basey+8, backLightColor, 0.4f, true);
 	}
 
 }

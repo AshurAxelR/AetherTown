@@ -80,19 +80,19 @@ public class Park extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
+	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
 		if(isFlex(tile)) {
-			renderer.terrain.addHillTile(grassColor.color(), tile);
+			r.terrain.addHillTile(grassColor.color(), tile);
 		}
 		else {
-			renderer.terrain.addWalls(tile);
-			renderer.terrain.addFlatTile(grassColor.color(), tile);
-			Street.template.addHandrails(tile);
+			r.terrain.addWalls(tile);
+			r.terrain.addFlatTile(grassColor.color(), tile);
+			Street.template.addHandrails(r, tile);
 		}
-		addTrees(tile, random);
+		addTrees(r, tile, random);
 	}
 	
-	public void addTrees(Tile tile, Random random) {
+	public void addTrees(LevelRenderer ren, Tile tile, Random random) {
 		if(tile.basey<=-120)
 			return;
 		float x = tile.x*Tile.size;
@@ -105,9 +105,9 @@ public class Park extends TileTemplate {
 			float ty = (0.3f+random.nextFloat()*0.4f)*Tile.size;
 			float sy = 0.9f+random.nextFloat()*0.4f;
 			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
-			tree.addInstance(new TileObjectInfo(x+tx, y0+ty, z+tz)
+			tree.addInstance(ren, new TileObjectInfo(x+tx, y0+ty, z+tz)
 					.scale(0.8f+random.nextFloat()*0.4f, sy));
-			trunk.addInstance(new TileObjectInfo(x+tx, y0, z+tz).scale(1f, 0.2f*Tile.size+ty));
+			trunk.addInstance(ren, new TileObjectInfo(x+tx, y0, z+tz).scale(1f, 0.2f*Tile.size+ty));
 		}
 		int numBushes = random.nextInt(7) - 3;
 		for(int i=0; i<numBushes; i++) {
@@ -131,7 +131,7 @@ public class Park extends TileTemplate {
 				continue;
 			
 			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
-			bush.addInstance(new TileObjectInfo(x+tx, y0, z+tz).scale(s, sy));
+			bush.addInstance(ren, new TileObjectInfo(x+tx, y0, z+tz).scale(s, sy));
 		}
 	}
 	

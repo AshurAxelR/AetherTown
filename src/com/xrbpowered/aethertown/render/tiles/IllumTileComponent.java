@@ -1,36 +1,33 @@
 package com.xrbpowered.aethertown.render.tiles;
 
+import java.util.ArrayList;
+
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.scene.comp.ComponentRenderer;
-import com.xrbpowered.gl.scene.comp.InstancedMeshList;
 
-public class IllumTileComponent extends InstancedMeshList<IllumTileObjectInfo> {
+public class IllumTileComponent extends TileComponent {
 
-	public static ComponentRenderer<IllumTileComponent> renderer;
-	
+	public static ArrayList<TileComponent> list = new ArrayList<>();
+
 	public IllumTileComponent(StaticMesh mesh, Texture diffuse, Texture illum) {
-		super(IllumTileObjectShader.instanceInfo);
-		setMesh(mesh);
-		setTextures(new Texture[] {diffuse, illum});
-		renderer.add(this);
+		super(list, mesh, new Texture[] {diffuse, illum});
 	}
 
 	@Override
-	protected void bindTextures() {
-		Texture.bindAll(TileObjectShader.numGlobalSamplers, textures);
+	public void addInstance(LevelRenderer r, ObjectInfo obj) {
+		if(obj instanceof IllumTileObjectInfo)
+			super.addInstance(r, (IllumTileObjectInfo) obj);
+		else
+			super.addInstance(r, new IllumTileObjectInfo((TileObjectInfo) obj));
 	}
 	
-	@Override
-	protected void setInstanceData(float[] data, IllumTileObjectInfo obj, int index) {
-		obj.setData(data, getDataOffs(index));
+	public static ComponentRenderer<?> createRenderer(LevelRenderer r, final ObjectInfoUser shader) {
+		return createRenderer(list, r, shader);
 	}
 
-	public int addInstance(TileObjectInfo obj) {
-		if(obj instanceof IllumTileObjectInfo)
-			return addInstance((IllumTileObjectInfo) obj);
-		else
-			return addInstance(new IllumTileObjectInfo(obj));
+	public static void releaseRenderer(LevelRenderer r) {
+		releaseRenderer(list, r);
 	}
-
 }

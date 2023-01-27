@@ -39,13 +39,13 @@ public class Monument extends Plaza {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
-		super.createGeometry(tile, renderer, random);
+	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+		super.createGeometry(tile, r, random);
 		TileObjectInfo info = new TileObjectInfo(tile);
-		pillar.addInstance(info);
-		statue.addInstance(new TileObjectInfo(tile, 0, 10.3f, 0));
-		renderer.pointLights.setLight(tile, -0.35f*tile.d.dx, 9f, -0.35f*tile.d.dz, 5f);
-		renderer.blockLighting.addLight(tile, tile.basey+9, Street.lampLightColor, 0.4f, false);
+		pillar.addInstance(r, info);
+		statue.addInstance(r, new TileObjectInfo(tile, 0, 10.3f, 0));
+		r.pointLights.setLight(tile, -0.35f*tile.d.dx, 9f, -0.35f*tile.d.dz, 5f);
+		r.blockLighting.addLight(tile, tile.basey+9, Street.lampLightColor, 0.4f, false);
 	}
 	
 }

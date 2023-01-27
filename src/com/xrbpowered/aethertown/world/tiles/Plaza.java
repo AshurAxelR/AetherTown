@@ -36,10 +36,10 @@ public class Plaza extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
-		plaza.addInstance(new TileObjectInfo(tile));
-		renderer.terrain.addWalls(tile);
-		Street.template.addHandrails(tile);
+	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+		plaza.addInstance(r, new TileObjectInfo(tile));
+		r.terrain.addWalls(tile);
+		Street.template.addHandrails(r, tile);
 	}
 
 }

@@ -120,47 +120,47 @@ public class StreetSlope extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer renderer, Random random) {
+	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
 		if(h>1) {
-			side.addInstance(new TileObjectInfo(tile, 0, -h, 0));
-			if(!Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, renderer))
-				renderer.terrain.addWalls(tile.x, tile.z, tile.basey-h);
+			side.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
+			if(!Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, r))
+				r.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
 			if(Street.needsHandrail(tile, dl)) {
-				handrailL.addInstance(new TileObjectInfo(tile).rotate(dl));
-				Street.addHandrailPoles(tile, dl, -h, 0);
-				Street.handrailPole.addInstance(new TileObjectInfo(tile, 0.5f*dl.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dl.dz+(0.5f-0.1875f*h)*tile.d.dz));
+				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
+				Street.addHandrailPoles(r, tile, dl, -h, 0);
+				Street.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dl.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dl.dz+(0.5f-0.1875f*h)*tile.d.dz));
 			}
 			if(Street.needsHandrail(tile, dr)) {
-				handrailR.addInstance(new TileObjectInfo(tile).rotate(dr));
-				Street.addHandrailPoles(tile, dr, 0, -h);
-				Street.handrailPole.addInstance(new TileObjectInfo(tile, 0.5f*dr.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dr.dz+(0.5f-0.1875f*h)*tile.d.dz));
+				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
+				Street.addHandrailPoles(r, tile, dr, 0, -h);
+				Street.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dr.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dr.dz+(0.5f-0.1875f*h)*tile.d.dz));
 			}
 		}
 		else {
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
-			if(Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, renderer)) {
-				renderer.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
-				renderer.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
+			if(Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, r)) {
+				r.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
+				r.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
 			}
 			else {
-				renderer.terrain.addWall(tile.x, tile.z, dr, tile.basey, tile.basey-h);
-				renderer.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey);
+				r.terrain.addWall(tile.x, tile.z, dr, tile.basey, tile.basey-h);
+				r.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey);
 			}
 			if(Street.needsHandrail(tile, dl)) {
-				handrailL.addInstance(new TileObjectInfo(tile).rotate(dl));
-				Street.addHandrailPoles(tile, dl, -1, 0);
+				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
+				Street.addHandrailPoles(r, tile, dl, -1, 0);
 			}
 			if(Street.needsHandrail(tile, dr)) {
-				handrailR.addInstance(new TileObjectInfo(tile).rotate(dr));
-				Street.addHandrailPoles(tile, dr, 0, -1);
+				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
+				Street.addHandrailPoles(r, tile, dr, 0, -1);
 			}
-			Street.template.addLamp(tile, renderer, random, -0.5f);
+			Street.template.addLamp(tile, r, random, -0.5f);
 		}
-		street.addInstance(new TileObjectInfo(tile, 0, -h, 0));
+		street.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 	}
 	
 	public static TileTemplate getTemplate(int h) {

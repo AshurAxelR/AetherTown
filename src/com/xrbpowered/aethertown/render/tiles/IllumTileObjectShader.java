@@ -22,4 +22,19 @@ public class IllumTileObjectShader extends TileObjectShader {
 	protected String[] getSamplerNames() {
 		return samplerNames;
 	}
+	
+	@Override
+	public InstanceInfo getInstInfo() {
+		return instanceInfo;
+	}
+	
+	@Override
+	public void setData(ObjectInfo aobj, float[] data, int offs) {
+		super.setData(aobj, data, offs);
+		IllumTileObjectInfo obj = (IllumTileObjectInfo) aobj;
+		data[offs+6] = obj.illumMod.x;
+		data[offs+7] = obj.illumMod.y;
+		data[offs+8] = obj.illumMod.z;
+	}
+	
 }

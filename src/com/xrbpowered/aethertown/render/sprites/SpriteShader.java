@@ -2,12 +2,16 @@ package com.xrbpowered.aethertown.render.sprites;
 
 import org.lwjgl.opengl.GL20;
 
+import com.xrbpowered.aethertown.render.tiles.ObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.ObjectInfoUser;
 import com.xrbpowered.gl.res.shader.CameraShader;
 import com.xrbpowered.gl.res.shader.InstanceInfo;
+import com.xrbpowered.gl.res.shader.Shader;
 import com.xrbpowered.gl.res.shader.VertexInfo;
+import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.scene.CameraActor;
 
-public class SpriteShader extends CameraShader {
+public class SpriteShader extends CameraShader implements ObjectInfoUser {
 
 	public static final VertexInfo vertexInfo = new VertexInfo()
 			.addAttrib("in_Position", 2)
@@ -50,4 +54,27 @@ public class SpriteShader extends CameraShader {
 		GL20.glUniform1f(fovFactorLocation, ff);
 	}
 	
+	@Override
+	public InstanceInfo getInstInfo() {
+		return instanceInfo;
+	}
+	
+	@Override
+	public Shader getShader() {
+		return this;
+	}
+	
+	@Override
+	public void bindTextures(Texture[] textures) {
+		Texture.bindAll(textures);
+	}
+	
+	@Override
+	public void setData(ObjectInfo aobj, float[] data, int offs) {
+		SpriteInfo obj = (SpriteInfo) aobj;
+		data[offs+0] = obj.position.x;
+		data[offs+1] = obj.position.y;
+		data[offs+2] = obj.position.z;
+		data[offs+3] = obj.size;
+	}
 }

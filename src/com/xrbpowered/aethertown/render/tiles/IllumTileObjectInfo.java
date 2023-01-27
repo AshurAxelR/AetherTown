@@ -53,11 +53,4 @@ public class IllumTileObjectInfo extends TileObjectInfo {
 		return this;
 	}
 
-	public void setData(float[] data, int offs) {
-		super.setData(data, offs);
-		data[offs+6] = illumMod.x;
-		data[offs+7] = illumMod.y;
-		data[offs+8] = illumMod.z;
-	}
-
 }

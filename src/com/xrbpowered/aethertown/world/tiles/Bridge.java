@@ -68,18 +68,18 @@ public class Bridge extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile atile, LevelRenderer renderer, Random random) {
+	public void createGeometry(Tile atile, LevelRenderer r, Random random) {
 		BridgeTile tile = (BridgeTile) atile;
-		Street.street.addInstance(new TileObjectInfo(tile));
-		Street.template.addBridge(tile, tile.basey, tile.basey-tile.h);
-		Street.template.addHandrails(tile);
+		Street.street.addInstance(r, new TileObjectInfo(tile));
+		Street.template.addBridge(r, tile, tile.basey, tile.basey-tile.h);
+		Street.template.addHandrails(r, tile);
 		// Street.template.addLamp(tile, renderer, random, 0);
 		
 		if(tile.under==Street.template) {
 			// FIXME under bridge create geometry via TileTemplate.createGeometry()
-			Street.street.addInstance(new TileObjectInfo(tile, 0, -tile.h, 0));
-			renderer.pointLights.setLight(tile, 0, -tile.h+5.5f, 0, 4.5f);
-			renderer.blockLighting.addLight(tile, tile.basey-tile.h+5, Street.lampLightColor, 0.5f, false);
+			Street.street.addInstance(r, new TileObjectInfo(tile, 0, -tile.h, 0));
+			r.pointLights.setLight(tile, 0, -tile.h+5.5f, 0, 4.5f);
+			r.blockLighting.addLight(tile, tile.basey-tile.h+5, Street.lampLightColor, 0.5f, false);
 		}
 		else {
 			System.err.println("Not supported yet.");
