@@ -90,6 +90,19 @@ public abstract class StreetPresetGenerator extends PresetPlotGenerator implemen
 		}
 	}
 	
+	@Override
+	public boolean canConnect(Tile tile, Dir dout) {
+		ExitPoint[] outs = setout();
+		int x = tile.x+dout.dx;
+		int z = tile.z+dout.dz;
+		for(int i=0; i<outs.length; i++) {
+			Token t = createExitToken(outs[i]);
+			if(t!=null && t.x==x && t.z==z)
+				return true;
+		}
+		return false;
+	}
+	
 	protected boolean removeOrPromote(int conn, int mask, Token[] tokens, Random random) {
 		if(conn<=1) {
 			remove();

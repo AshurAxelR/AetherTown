@@ -11,7 +11,6 @@ public abstract class TileTemplate implements Generator {
 	public final Color minimapColor;
 	
 	public TileTemplate(Color minimapColor) {
-		// FIXME registerTemplate(this);
 		this.minimapColor = minimapColor;
 	}
 

@@ -54,7 +54,8 @@ public class LevelMapView extends UIElement {
 		});
 		UIPanView view = (UIPanView) getParent();
 		view.setSize(getBase().getWindow().getClientWidth(), getBase().getWindow().getClientHeight());
-		centerAt(level.getStartX(), level.getStartZ());
+		if(level!=null)
+			centerAt(level.getStartX(), level.getStartZ());
 	}
 	
 	private static void paintInfo(GraphAssist g) {

@@ -90,7 +90,7 @@ public class StarRenderer {
 		pos.w = 1;
 	}
 	
-	public static float[] createPointData(ArrayList<Star> stars) {
+	private static float[] createPointData(ArrayList<Star> stars) {
 		int numStars = stars.size();
 		float[] data = vertexInfo.createData(numStars+1);
 		int offs = 0;
@@ -111,6 +111,8 @@ public class StarRenderer {
 	}
 	
 	public void createStars(long seed) {
+		if(stars!=null)
+			stars.release();
 		Random random = new Random(seed);
 		ArrayList<Star> data = StarData.generate(random);
 		stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);

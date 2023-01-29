@@ -194,26 +194,22 @@ public class StreetConnector {
 		Dir dr = dnext;
 		for(int i=0, xi=startx, zi=startz; i<levelSize; i++, xi+=dnext.dx, zi+=dnext.dz) {
 			int j=0;
-			for(int xj=xi, zj=zi; j<levelSize; j++, xj+=din.dx, zj+=din.dz) {
+			jloop: for(int xj=xi, zj=zi; j<levelSize; j++, xj+=din.dx, zj+=din.dz) {
 				Tile tile = level.map[xj][zj];
 				if(tile!=null) {
-					if(tile.t==Street.template && i>=margin && i<levelSize-margin) {
-						connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
+					if(tile.t==Street.template && i>=margin && i<levelSize-margin &&
+						(tile.sub==null || tile.sub.parent.canConnect(tile, dout))) { 
+							connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
 					}
 					if(isAnyPath(tile))
 						j -= streetGap;
 					break;
 				}
-				boolean stop = false;
 				for(int k=1; k<=streetGap; k++) {
 					if(isAnyPath(xj+k*dl.dx, zj+k*dl.dz) || isAnyPath(xj+k*dr.dx, zj+k*dr.dz)) {
-						stop = true;
-						// TODO sideways connection point?
-						break;
+						break jloop;
 					}
 				}
-				if(stop)
-					break;
 			}
 			j--;
 			wopen[i] = j;

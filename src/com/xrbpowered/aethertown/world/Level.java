@@ -21,7 +21,7 @@ public class Level {
 	public final LevelInfo info;
 	public final int levelSize;
 	
-	private Random random;
+	private Random random; // TODO remove: after decorate() refactoring
 	public Tile[][] map;
 	public HeightMap h;
 	
@@ -81,13 +81,14 @@ public class Level {
 		StreetLayoutGenerator.finishLayout(this, random);
 		
 		HillsGenerator.expand(this, random, 5, 15, -2, 2);
-		HillsGenerator.expand(this, random, 5, 25, -2, 4);
+		 HillsGenerator.expand(this, random, 5, 25, -2, 4);
+		HillsGenerator.expand(this, random, 0, 0, -8, 2);
 		
 		int att = 0;
 		int maxAtt = 10;
 		for(; att<maxAtt; att++) {
 			heightLimiter.revalidate();
-			if(!HillsGenerator.expand(this, random, 0, 0, -8, 2) && att>0) {
+			if(!HillsGenerator.expand(this, random, 0, 0, -2, 2) && att>0) {
 				System.err.println("Failed to get refill tokens on att "+att);
 				break;
 			}
@@ -105,6 +106,8 @@ public class Level {
 		name = LevelNames.next(random, houseCount);
 		HouseAssignment.assignHouses(this, random);
 		heightLimiter = null;
+		
+		// TODO decorate (vs createGeometry)
 	}
 	
 	public void createGeometry(LevelRenderer renderer) {

@@ -58,6 +58,8 @@ public class LevelRenderer {
 		tiles.releaseRenderers(this);
 		pointLights.release();
 		blockLighting.release();
+		for(StaticMeshActor actor : terrainActors)
+			actor.getMesh().release();
 	}
 	
 }

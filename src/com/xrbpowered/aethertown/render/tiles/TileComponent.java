@@ -76,7 +76,7 @@ public class TileComponent {
 	protected static void releaseRenderer(ArrayList<TileComponent> list, LevelRenderer r) {
 		for(TileComponent comp : list) {
 			InstanceList inst = comp.instMap.get(r);
-			inst.release();
+			inst.releaseInstances();
 			comp.instMap.remove(r);
 		}
 	}

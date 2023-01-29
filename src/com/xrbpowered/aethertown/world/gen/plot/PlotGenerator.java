@@ -129,5 +129,9 @@ public abstract class PlotGenerator implements Generator {
 				break;
 		}
 	}
+	
+	public boolean canConnect(Tile tile, Dir dout) {
+		return false;
+	}
 
 }

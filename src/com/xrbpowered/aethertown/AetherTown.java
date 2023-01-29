@@ -58,7 +58,7 @@ public class AetherTown extends UIClient {
 	
 	private SkyRenderer sky;
 	private TileRenderer tiles;
-	private LevelRenderer renderer;
+	private LevelRenderer renderer = null;
 	
 	private StaticMeshActor pointActor;
 
@@ -105,11 +105,6 @@ public class AetherTown extends UIClient {
 				
 				clearColor = environment.bgColor;
 				camera = new CameraActor.Perspective().setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
-				LevelConnection lc = level.info.conns.get(0);
-				camera.position.x = lc.getX()*Tile.size;
-				camera.position.z = lc.getZ()*Tile.size;
-				camera.rotation.y = -(float)Math.PI/2f;
-				camera.updateTransform();
 				
 				walkController = new WalkController(input).setActor(camera);
 				walkController.moveSpeed = 4.8f;
@@ -118,20 +113,13 @@ public class AetherTown extends UIClient {
 				activeController = walkController;
 				
 				sky = new SkyRenderer().setCamera(camera);
-				sky.stars.createStars(seed);
 				tiles = new TileRenderer().setCamera(camera);
 				System.out.println("Creating components...");
 				ComponentLibrary.createAllComponents();
 				
 				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null), tiles.objShader, new Texture(Color.RED));
 
-				renderer = new LevelRenderer(level, sky.buffer, tiles);
-				System.out.println("Building geometry...");
-				renderer.createLevelGeometry();
-				System.out.println("Done.");
-
-				updateEnvironment();
-				updateWalkY();
+				changeLevel(level);
 				super.setupResources();
 			}
 			
@@ -255,7 +243,6 @@ public class AetherTown extends UIClient {
 				}
 			}
 		};
-		LevelMapView.level = level;
 		uiLevelMapView = new LevelMapView(uiLevelMap);
 		uiLevelMap.setVisible(false);
 	}
@@ -303,6 +290,35 @@ public class AetherTown extends UIClient {
 	private void updateEnvironment() {
 		sky.updateEnvironment(environment);
 		tiles.updateEnvironment(environment);
+	}
+	
+	private void changeLevel(Level level) {
+		AetherTown.level = level;
+		LevelMapView.level = level;
+
+		sky.stars.createStars(seed);
+		if(renderer!=null)
+			renderer.release();
+		renderer = new LevelRenderer(level, sky.buffer, tiles);
+		System.out.println("Building geometry...");
+		renderer.createLevelGeometry();
+		System.out.println("Done.");
+
+		updateEnvironment();
+		
+		if(level.info.conns.size()>0) {
+			LevelConnection lc = level.info.conns.get(0);
+			camera.position.x = lc.getX()*Tile.size;
+			camera.position.z = lc.getZ()*Tile.size;
+			camera.rotation.y = -lc.d.flip().ordinal() * (float)Math.PI/2f;
+		}
+		else {
+			camera.position.x = level.getStartX()*Tile.size;
+			camera.position.z = level.getStartZ()*Tile.size;
+			camera.rotation.y = 0;
+		}
+		activeController = walkController;
+		updateWalkY();
 	}
 	
 	private static void printTileDebug(int hoverx, int hoverz, Tile tile) {
@@ -389,6 +405,13 @@ public class AetherTown extends UIClient {
 				disableController();
 				showLevelMap(!uiLevelMap.isVisible());
 				break;
+			case KeyEvent.VK_ENTER: {
+				disableController();
+				long seed = System.currentTimeMillis();
+				Level level = generateLevel(seed);
+				changeLevel(level);
+				break;
+			}
 			default:
 				super.keyPressed(c, code);
 		}
@@ -401,7 +424,7 @@ public class AetherTown extends UIClient {
 		LevelInfo info = new LevelInfo(2, seed);
 		info.addConn(Dir.west, 1);
 		info.addConn(Dir.east, 1);
-		level = new Level(info);
+		Level level = new Level(info);
 		level.generate();
 		
 		System.gc();
@@ -417,7 +440,7 @@ public class AetherTown extends UIClient {
 			WorldTime.setTimeOfDay(Float.parseFloat(args[0]));
 
 		long seed = System.currentTimeMillis();
-		generateLevel(seed);
+		level = generateLevel(seed);
 
 		new AetherTown().run();
 	}
