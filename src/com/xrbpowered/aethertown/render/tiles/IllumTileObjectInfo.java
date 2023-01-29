@@ -44,7 +44,10 @@ public class IllumTileObjectInfo extends TileObjectInfo {
 	}
 	
 	public IllumTileObjectInfo illumMod(Color c) {
-		illumMod.set(c.getRed()/255f, c.getGreen()/255f, c.getBlue()/255f);
+		if(c==null)
+			illumOff();
+		else
+			illumMod.set(c.getRed()/255f, c.getGreen()/255f, c.getBlue()/255f);
 		return this;
 	}
 	

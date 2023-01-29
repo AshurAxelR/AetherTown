@@ -16,6 +16,7 @@ import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -122,20 +123,24 @@ public class LevelMapView extends UIElement {
 		for(int x=0; x<level.levelSize; x++)
 			for(int z=0; z<level.levelSize; z++) {
 				Tile tile = level.map[x][z];
-				Color c = (tile==null) ? null : tile.t.minimapColor;
-				if(tile!=null && tile.sub!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
+				if(tile==null)
+					continue;
+				Color c = new Color(0xfafafa);
+				if(Street.isAnyPath(tile.t))
+					c = Street.streetColor;
+				else if(tile.t==Park.template)
+					c = new Color(0xddeebb);
+				else if(tile.t instanceof Plaza)
+					c = Plaza.plazaColor;
+				else if(tile.sub!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
 					if(tile.sub.parent instanceof HouseGenerator)
 						c = ((HouseGenerator) tile.sub.parent).role.previewColor;
 					else if(tile.sub.parent instanceof ChurchGenerator)
 						c = HouseRole.colorChurch;
 				}
-				if(c==null)
-					continue;
 				
 				g.setColor(c);
 				g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
-				if(tile==null)
-					continue;
 				if(Street.isAnyPath(tile.t)) {
 					g.setColor(colorStreetBorder);
 					for(Dir d : Dir.values()) {

@@ -3,8 +3,6 @@ package com.xrbpowered.aethertown.world.tiles;
 import java.awt.Color;
 import java.util.Random;
 
-import org.joml.Vector3f;
-
 import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
@@ -20,9 +18,9 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
+import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
-import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -37,9 +35,11 @@ public class HouseT extends TileTemplate {
 	
 	public class HouseTile extends Tile {
 		public int groundy;
+		public Color[] illum;
 
 		public HouseTile() {
 			super(HouseT.this);
+			illum = new Color[2]; // FIXME floor count
 		}
 		
 		@Override
@@ -47,10 +47,6 @@ public class HouseT extends TileTemplate {
 			super.place(level, x, y, z, d);
 			groundy = basey;
 		}
-	}
-	
-	public HouseT() {
-		super(roofColor.colors[Seasons.summer]);
 	}
 	
 	@Override
@@ -113,14 +109,26 @@ public class HouseT extends TileTemplate {
 				upperWallColor);
 	}
 
-	private Vector3f randomIllumMod(Random random, boolean houseIllum) {
+	private Color randomIllumMod(Random random, boolean houseIllum) {
 		if(!houseIllum)
 			return null;
 		float r = random.nextFloat()*0.5f+0.5f;
 		float g = r*(random.nextFloat()*0.2f+0.8f);
 		float b = g*(random.nextFloat()*0.2f+0.8f);
-		boolean on = random.nextInt(3)==0;
-		return new Vector3f(r, g, b).mul(on ? 1f : 0.04f);
+		if(random.nextInt(3)>0) {
+			r *= 0.04;
+			g *= 0.04;
+			b *= 0.04;
+		}
+		return new Color(r, g, b);
+	}
+	
+	@Override
+	public void decorateTile(Tile atile, Random random) {
+		HouseTile tile = (HouseTile) atile;
+		HouseGeneratorBase house = (HouseGeneratorBase) tile.sub.parent;
+		for(int i=0; i<tile.illum.length; i++)
+			tile.illum[i] = randomIllumMod(random, house.illum);
 	}
 	
 	private static boolean isObstructed(Tile tile, int[] yloc, int y, Dir d) {
@@ -134,7 +142,8 @@ public class HouseT extends TileTemplate {
 	}
 	
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+	public void createGeometry(Tile atile, LevelRenderer r) {
+		HouseTile tile = (HouseTile) atile;
 		r.terrain.addWalls(tile);
 		
 		int basey = tile.basey;
@@ -147,7 +156,7 @@ public class HouseT extends TileTemplate {
 		int front = house.marginFront;
 		int back = house.fwd-house.marginBack;
 		
-		Vector3f illum = randomIllumMod(random, house.illum);
+		Color illum = tile.illum[0];
 		r.blockLighting.addLight(tile, tile.basey+4, illum, 0.35f, true);
 		if(sub.j==front)
 			(sub.i==0 && sub.j==front ? groundWallDoor : (isObstructed(tile, yloc, basey+2, tile.d.flip()) ? groundWallBlank : groundWall)).addInstance(r, new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum).rotate(tile.d.flip()));
@@ -158,7 +167,7 @@ public class HouseT extends TileTemplate {
 		if(sub.j==back)
 			(isObstructed(tile, yloc, basey+2, tile.d) ? groundWallBlank : groundWall).addInstance(r, new IllumTileObjectInfo(tile, 0, 0, 0).illumMod(illum));
 		
-		illum = randomIllumMod(random, house.illum);
+		illum = tile.illum[1];
 		r.blockLighting.addLight(tile, tile.basey+10, illum, 0.35f, true);
 		if(sub.j==front)
 			(isObstructed(tile, yloc, basey+7, tile.d.flip()) ? upperWallBlank : upperWall).addInstance(r, new IllumTileObjectInfo(tile, 0, 6, 0).illumMod(illum).rotate(tile.d.flip()));

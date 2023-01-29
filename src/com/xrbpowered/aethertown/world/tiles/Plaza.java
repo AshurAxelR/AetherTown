@@ -1,7 +1,6 @@
 package com.xrbpowered.aethertown.world.tiles;
 
 import java.awt.Color;
-import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
@@ -20,14 +19,6 @@ public class Plaza extends TileTemplate {
 	
 	private static TileComponent plaza;
 	
-	public Plaza() {
-		super(plazaColor);
-	}
-
-	public Plaza(Color minimapColor) {
-		super(minimapColor);
-	}
-
 	@Override
 	public void createComponents() {
 		plaza = new TileComponent(
@@ -36,7 +27,7 @@ public class Plaza extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+	public void createGeometry(Tile tile, LevelRenderer r) {
 		plaza.addInstance(r, new TileObjectInfo(tile));
 		r.terrain.addWalls(tile);
 		Street.template.addHandrails(r, tile);

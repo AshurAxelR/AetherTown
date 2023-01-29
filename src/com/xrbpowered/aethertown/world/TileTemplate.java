@@ -1,18 +1,11 @@
 package com.xrbpowered.aethertown.world;
 
-import java.awt.Color;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Corner;
 
 public abstract class TileTemplate implements Generator {
-
-	public final Color minimapColor;
-	
-	public TileTemplate(Color minimapColor) {
-		this.minimapColor = minimapColor;
-	}
 
 	public Tile createTile() {
 		return new Tile(this);
@@ -46,8 +39,11 @@ public abstract class TileTemplate implements Generator {
 		return false;
 	}
 	
+	public void decorateTile(Tile tile, Random random) {
+	}
+	
 	public abstract void createComponents();
-	public abstract void createGeometry(Tile tile, LevelRenderer renderer, Random random);
+	public abstract void createGeometry(Tile tile, LevelRenderer renderer);
 	
 	public void updateHeightLimit(Token t) {
 		HeightLimiter.updateAt(t, HeightLimiter.maxWall, 3);

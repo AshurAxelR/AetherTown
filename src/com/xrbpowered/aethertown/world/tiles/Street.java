@@ -41,15 +41,12 @@ public class Street extends TileTemplate {
 
 	public static class StreetTile extends Tile {
 		public boolean lamp = false;
+		public Dir lampd = null;
 		public boolean bridge = false;
 		
 		public StreetTile(TileTemplate t) {
 			super(t);
 		}
-	}
-	
-	public Street() {
-		super(streetColor);
 	}
 
 	@Override
@@ -93,14 +90,20 @@ public class Street extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+	public void decorateTile(Tile tile, Random random) {
+		addLamp(tile, random);
+	}
+	
+	@Override
+	public void createGeometry(Tile tile, LevelRenderer r) {
 		street.addInstance(r, new TileObjectInfo(tile));
 		if(!addAutoHillBridge((StreetTile)tile, tile.basey, r))
 			r.terrain.addWalls(tile);
+		// FIXME add handrails on decorate() 
 		addHandrails(r, tile);
 		// if(tile.x%2==0 && tile.z%2==0)
 		// 		sprite.addInstance(r, new SpriteInfo(tile).size(Tile.size));
-		addLamp(tile, r, random, 0);
+		createLamp(tile, r, 0);
 	}
 	
 	public static boolean needsHandrail(Tile tile, Dir d, int dy0, int dy1) {
@@ -159,7 +162,7 @@ public class Street extends TileTemplate {
 			bridgeSupport.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
 	}
 	
-	public boolean addAutoHillBridge(StreetTile tile, int basey, LevelRenderer r) {
+	public boolean addAutoHillBridge(StreetTile tile, int basey, LevelRenderer r) { // FIXME addBridge vs createBridge
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
@@ -180,13 +183,12 @@ public class Street extends TileTemplate {
 		return true;
 	}
 	
-	public void addLamp(Tile atile, LevelRenderer r, Random random, float dy) {
+	public void addLamp(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
 		if(!tile.level.isInside(tile.x, tile.z, 5)) {
 			tile.lamp = false;
 			return;
 		}
-		
 		boolean hasLamp = tile.lamp || random.nextInt(4)==0;
 		if(!hasLamp) {
 			for(Dir d : Dir.values()) {
@@ -197,7 +199,6 @@ public class Street extends TileTemplate {
 				}
 			}
 		}
-		
 		if(hasLamp) {
 			for(Dir8 d : Dir8.values()) {
 				Tile adj = tile.getAdj(d.dx, d.dz);
@@ -209,17 +210,25 @@ public class Street extends TileTemplate {
 			for(Dir d : Dir.shuffle(random)) {
 				TileTemplate adjt = tile.getAdjT(d);
 				if(adjt!=null && !Street.isAnyPath(adjt) && !(adjt instanceof Plaza)) {
-					float dx = d.dx*0.45f;
-					float dz = d.dz*0.45f;
-					lamp.addInstance(r, new IllumTileObjectInfo(tile, dx, dy, dz));
-					lampPost.addInstance(r, new TileObjectInfo(tile, dx, dy, dz));
-					r.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
-					r.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
+					tile.lampd = d;
 					tile.lamp = true;
 					break;
 				}
 			}
 		}
+	}
+	
+	public void createLamp(Tile atile, LevelRenderer r, float dy) {
+		StreetTile tile = (StreetTile) atile;
+		Dir d = tile.lampd;
+		if(!tile.lamp || d==null)
+			return;
+		float dx = d.dx*0.45f;
+		float dz = d.dz*0.45f;
+		lamp.addInstance(r, new IllumTileObjectInfo(tile, dx, dy, dz));
+		lampPost.addInstance(r, new TileObjectInfo(tile, dx, dy, dz));
+		r.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
+		r.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
 	}
 	
 	@Override

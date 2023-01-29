@@ -22,10 +22,6 @@ public class Bridge extends TileTemplate {
 			super(template);
 		}
 	}
-	
-	public Bridge() {
-		super(Street.streetColor);
-	}
 
 	@Override
 	public Tile createTile() {
@@ -68,7 +64,7 @@ public class Bridge extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile atile, LevelRenderer r, Random random) {
+	public void createGeometry(Tile atile, LevelRenderer r) {
 		BridgeTile tile = (BridgeTile) atile;
 		Street.street.addInstance(r, new TileObjectInfo(tile));
 		Street.template.addBridge(r, tile, tile.basey, tile.basey-tile.h);

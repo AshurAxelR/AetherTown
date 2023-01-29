@@ -68,7 +68,6 @@ public class AetherTown extends UIClient {
 	
 	private UIOffscreen uiRender;
 	private UINode uiRoot;
-	// private UITexture uiMinimap;
 	private UIPane uiTime, uiCompass, uiLookInfo;
 	private UIPane uiLevelMap;
 	private LevelMapView uiLevelMapView;
@@ -176,26 +175,9 @@ public class AetherTown extends UIClient {
 				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
 				uiCompass.setLocation(getWidth()-uiCompass.getWidth()-20, uiTime.getY());
 				uiLookInfo.setLocation(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
-				// uiMinimap.setLocation(getWidth()-uiMinimap.getWidth()-20, uiTime.getY()-uiMinimap.getHeight()-20);
 				super.layout();
 			}
 		};
-		
-		/*uiMinimap = new UITexture(uiRoot) {
-			@Override
-			public void setupResources() {
-				BufferedImage img = new BufferedImage(level.levelSize*2, level.levelSize*2, BufferedImage.TYPE_INT_ARGB);
-				Graphics2D g = (Graphics2D) img.getGraphics();
-				g.setBackground(bgColor);
-				g.clearRect(0, 0, img.getWidth(), img.getHeight());
-				level.drawMinimap(g, 2);
-				// g.setColor(Color.BLACK);
-				// g.drawRect(0, 0, img.getWidth()-1, img.getHeight()-1);
-				setTexture(new Texture(img, false, false));
-			}
-		};
-		uiMinimap.setSize(level.levelSize*2, level.levelSize*2);
-		uiMinimap.setVisible(false);*/
 		
 		uiTime = new UIPane(uiRoot, false) {
 			@Override

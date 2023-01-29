@@ -8,11 +8,11 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
-import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightMap;
+import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -21,24 +21,20 @@ public class Park extends TileTemplate {
 
 	private static final Seasons grassColor = new Seasons(new Color(0x70a545), new Color(0xf4fcfd));
 
-	private static final float treeRadius = 0.6f*Tile.size;
-	private static final float trunkRadius = 0.065f*Tile.size;
-	private static final float bushRadius = 0.3f*Tile.size;
+	public static final float treeRadius = 0.6f*Tile.size;
+	public static final float trunkRadius = 0.065f*Tile.size;
+	public static final float bushRadius = 0.3f*Tile.size;
 	
 	public static final Park template = new Park();
 	
 	public static TileComponent tree, trunk, bush;
 
-	public class ParkTile extends Tile {
+	public class ParkTile extends TerrainTile {
 		public boolean flex = false;
 		
 		public ParkTile() {
 			super(Park.this);
 		}
-	}
-	
-	public Park() {
-		super(new Color(0xddeebb));
 	}
 	
 	@Override
@@ -80,7 +76,12 @@ public class Park extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+	public void decorateTile(Tile tile, Random random) {
+		TerrainTile.addTrees((ParkTile) tile, random);
+	}
+	
+	@Override
+	public void createGeometry(Tile tile, LevelRenderer r) {
 		if(isFlex(tile)) {
 			r.terrain.addHillTile(grassColor.color(), tile);
 		}
@@ -89,50 +90,7 @@ public class Park extends TileTemplate {
 			r.terrain.addFlatTile(grassColor.color(), tile);
 			Street.template.addHandrails(r, tile);
 		}
-		addTrees(r, tile, random);
-	}
-	
-	public void addTrees(LevelRenderer ren, Tile tile, Random random) {
-		if(tile.basey<=-120)
-			return;
-		float x = tile.x*Tile.size;
-		float z = tile.z*Tile.size;
-		if(random.nextInt(4)==0 && random.nextInt(60)>-tile.basey) {
-			float px = random.nextFloat()*0.5f + 0.25f;
-			float pz = random.nextFloat()*0.5f + 0.25f;
-			float tx = Tile.size*(px-0.5f);
-			float tz = Tile.size*(pz-0.5f);
-			float ty = (0.3f+random.nextFloat()*0.4f)*Tile.size;
-			float sy = 0.9f+random.nextFloat()*0.4f;
-			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
-			tree.addInstance(ren, new TileObjectInfo(x+tx, y0+ty, z+tz)
-					.scale(0.8f+random.nextFloat()*0.4f, sy));
-			trunk.addInstance(ren, new TileObjectInfo(x+tx, y0, z+tz).scale(1f, 0.2f*Tile.size+ty));
-		}
-		int numBushes = random.nextInt(7) - 3;
-		for(int i=0; i<numBushes; i++) {
-			if(random.nextInt(120)<-tile.basey)
-				continue;
-			float px = random.nextFloat();
-			float pz = random.nextFloat();
-			float tx = Tile.size*(px - 0.5f);
-			float tz = Tile.size*(pz - 0.5f);
-			float sy = 0.6f+random.nextFloat();
-			float s = sy+random.nextFloat()*0.4f;
-			float r = bushRadius*s;
-			
-			if(tx<-Tile.size/2f+r && tile.getAdjT(-1, 0)!=tile.t)
-				continue;
-			if(tx>Tile.size/2f-r && tile.getAdjT(+1, 0)!=tile.t)
-				continue;
-			if(tz<-Tile.size/2f+r && tile.getAdjT(0, -1)!=tile.t)
-				continue;
-			if(tz>Tile.size/2f-r && tile.getAdjT(0, +1)!=tile.t)
-				continue;
-			
-			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
-			bush.addInstance(ren, new TileObjectInfo(x+tx, y0, z+tz).scale(s, sy));
-		}
+		((ParkTile) tile).createTrees(r);
 	}
 	
 	@Override

@@ -1,7 +1,6 @@
 package com.xrbpowered.aethertown.world.tiles;
 
 import java.awt.Color;
-import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
@@ -20,10 +19,6 @@ public class Monument extends Plaza {
 	
 	public static TileComponent pillar, statue;
 
-	public Monument() {
-		super(statueColor);
-	}
-
 	protected boolean canGenerate(Token t) {
 		return t.level.isInside(t.x, t.z) && t.isFree() && t.level.overlapsHeight(t.x, t.y, t.z, 4);
 	}
@@ -39,8 +34,8 @@ public class Monument extends Plaza {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
-		super.createGeometry(tile, r, random);
+	public void createGeometry(Tile tile, LevelRenderer r) {
+		super.createGeometry(tile, r);
 		TileObjectInfo info = new TileObjectInfo(tile);
 		pillar.addInstance(r, info);
 		statue.addInstance(r, new TileObjectInfo(tile, 0, 10.3f, 0));

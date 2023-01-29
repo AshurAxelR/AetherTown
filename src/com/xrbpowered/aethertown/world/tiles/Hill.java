@@ -1,6 +1,5 @@
 package com.xrbpowered.aethertown.world.tiles;
 
-import java.awt.Color;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
@@ -10,6 +9,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.HeightMap;
+import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
@@ -18,16 +18,12 @@ public class Hill extends TileTemplate {
 
 	public static final Hill template = new Hill();
 	
-	public class HillTile extends Tile {
+	public class HillTile extends TerrainTile {
 		public Integer maxDelta = null;
 		
 		public HillTile() {
 			super(Hill.this);
 		}
-	}
-	
-	public Hill() {
-		super(new Color(0xfafafa));
 	}
 	
 	@Override
@@ -65,11 +61,16 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+	public void decorateTile(Tile tile, Random random) {
+		TerrainTile.addTrees((HillTile) tile, random);
+	}
+	
+	@Override
+	public void createGeometry(Tile tile, LevelRenderer r) {
 		r.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
 		int maxd = getMaxDelta(tile);
 		if(maxd<10)
-			Park.template.addTrees(r, tile, random);
+			((HillTile) tile).createTrees(r);
 	}
 	
 	public int getMaxDelta(Tile atile) {

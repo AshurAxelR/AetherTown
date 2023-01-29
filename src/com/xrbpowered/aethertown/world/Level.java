@@ -1,7 +1,5 @@
 package com.xrbpowered.aethertown.world;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -18,10 +16,11 @@ import com.xrbpowered.aethertown.world.region.LevelNames;
 
 public class Level {
 
+	private static final int maxRefillAttempts = 10;
+	
 	public final LevelInfo info;
 	public final int levelSize;
 	
-	private Random random; // TODO remove: after decorate() refactoring
 	public Tile[][] map;
 	public HeightMap h;
 	
@@ -37,8 +36,6 @@ public class Level {
 	public Level(LevelInfo info) {
 		this.info = info;
 		this.levelSize = info.getLevelSize();
-		this.map = new Tile[levelSize][levelSize];
-		this.h = new HeightMap(this);
 	}
 	
 	public int getStartX() {
@@ -49,6 +46,21 @@ public class Level {
 		return levelSize/2;
 	}
 
+	private void resetGenerator() {
+		map = new Tile[levelSize][levelSize];
+		h = new HeightMap(this);
+		houses = null;
+		churches = new ArrayList<>();
+		houseCount = 0;
+		heightLimiter = new HeightLimiter(this);
+		plots = new ArrayList<>();
+	}
+	
+	private void releaseGenerator() {
+		heightLimiter = null;
+		plots = null;
+	}
+	
 	private boolean finalizeTiles(Random random) {
 		boolean upd = true;
 		boolean refill = false;
@@ -68,15 +80,12 @@ public class Level {
 	}
 
 	public void generate() {
-		generate(new Random(info.seed));
+		generate(new Random(info.seed)); // TODO loop over try/catch
 	}
 
-	protected void generate(Random random) {
-		this.random = random;
-		heightLimiter = new HeightLimiter(this);
-		plots = new ArrayList<>();
-		houseCount = 0;
-		churches = new ArrayList<>();
+	private void generate(Random random) {
+		resetGenerator();
+		
 		new StreetLayoutGenerator(60).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
 		StreetLayoutGenerator.finishLayout(this, random);
 		
@@ -85,8 +94,7 @@ public class Level {
 		HillsGenerator.expand(this, random, 0, 0, -8, 2);
 		
 		int att = 0;
-		int maxAtt = 10;
-		for(; att<maxAtt; att++) {
+		for(;; att++) {
 			heightLimiter.revalidate();
 			if(!HillsGenerator.expand(this, random, 0, 0, -2, 2) && att>0) {
 				System.err.println("Failed to get refill tokens on att "+att);
@@ -94,43 +102,50 @@ public class Level {
 			}
 			if(finalizeTiles(random))
 				break;
+			if(att>=maxRefillAttempts-1) {
+				System.err.println("Refill attempts limit reached");
+				break;
+			}
 			StreetLayoutGenerator.trimStreets(this, random); // in case of removed plots
 		}
 		System.out.printf("Completed %d refill cycles\n", att+1);
-		if(att>=maxAtt)
-			System.err.println("Refill attempts limit reached");
+		if(!checkNulls())
+			System.err.println("Level incomplete"); // FIXME throw exception
 		
-		plots = null;
 		houses = HouseGenerator.listHouses(this, random);
 		houseCount = houses.size();
 		name = LevelNames.next(random, houseCount);
 		HouseAssignment.assignHouses(this, random);
-		heightLimiter = null;
 		
-		// TODO decorate (vs createGeometry)
+		decorate(random);
+		
+		releaseGenerator();
+	}
+
+	private boolean checkNulls() {
+		for(int x=0; x<levelSize; x++)
+			for(int z=0; z<levelSize; z++) {
+				if(map[x][z]==null) {
+					System.err.printf("null tile at [%d, %d]\n", x, z);
+					return false;
+				}
+			}
+		return true;
 	}
 	
+	private void decorate(Random random) {
+		for(int x=0; x<levelSize; x++)
+			for(int z=0; z<levelSize; z++) {
+				Tile tile = map[x][z];
+				tile.t.decorateTile(tile, random);
+			}
+	}
+
 	public void createGeometry(LevelRenderer renderer) {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
 				Tile tile = map[x][z];
-				if(tile!=null)
-					tile.t.createGeometry(tile, renderer, random);
-				else {
-					System.err.printf("null tile at [%d, %d]\n", x, z);
-				}
-			}
-	}
-	
-	public void drawMinimap(Graphics2D g, int tileSize) {
-		for(int x=0; x<levelSize; x++)
-			for(int z=0; z<levelSize; z++) {
-				Tile tile = map[x][z];
-				Color c = (tile==null) ? null : tile.t.minimapColor;
-				if(c!=null) {
-					g.setColor(c);
-					g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
-				}
+				tile.t.createGeometry(tile, renderer);
 			}
 	}
 	

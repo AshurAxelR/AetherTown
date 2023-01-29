@@ -83,6 +83,8 @@ public class BlockLighting extends FloatDataTexture {
 	}
 
 	public void addLight(Tile tile, int y0, Color color, float v0, boolean skipFirst) {
+		if(color==null)
+			return;
 		float red = color.getRed()/255f;
 		float green = color.getGreen()/255f;
 		float blue = color.getBlue()/255f;
@@ -90,8 +92,9 @@ public class BlockLighting extends FloatDataTexture {
 	}
 
 	public void addLight(Tile tile, int y0, Vector3f color, float v0, boolean skipFirst) {
-		if(color!=null)
-			addLight(tile, y0, color.x, color.y, color.z, v0, skipFirst);
+		if(color==null)
+			return;
+		addLight(tile, y0, color.x, color.y, color.z, v0, skipFirst);
 	}
 
 	public FloatDataTexture finish() {

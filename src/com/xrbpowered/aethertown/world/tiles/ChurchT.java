@@ -1,12 +1,10 @@
 package com.xrbpowered.aethertown.world.tiles;
 
 import java.awt.Color;
-import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
-import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -15,8 +13,8 @@ import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
-import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -29,10 +27,6 @@ public class ChurchT extends TileTemplate {
 	
 	private static IllumTileComponent mid, front1, front2, front3, front4, back1, back2;
 	private static TileComponent midRoof, chapelRoof;
-	
-	public ChurchT() {
-		super(HouseT.roofColor.colors[Seasons.summer]);
-	}
 	
 	@Override
 	public String getTileInfo(Tile tile) {
@@ -88,7 +82,7 @@ public class ChurchT extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+	public void createGeometry(Tile tile, LevelRenderer r) {
 		r.terrain.addWalls(tile);
 		SubInfo sub = tile.sub;
 		if(sub.i==0) {

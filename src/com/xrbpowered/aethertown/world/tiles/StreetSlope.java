@@ -27,7 +27,6 @@ public class StreetSlope extends TileTemplate {
 	private TileComponent street, side, handrailL, handrailR;
 	
 	public StreetSlope(int h) {
-		super(Street.streetColor);
 		this.h = h;
 	}
 	
@@ -120,20 +119,28 @@ public class StreetSlope extends TileTemplate {
 	}
 
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r, Random random) {
+	public void decorateTile(Tile tile, Random random) {
+		if(h==1) {
+			Street.template.addLamp(tile, random);
+		}
+	}
+	
+	@Override
+	public void createGeometry(Tile atile, LevelRenderer r) {
+		StreetTile tile = (StreetTile) atile;
 		if(h>1) {
 			side.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
-			if(!Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, r))
+			if(!Street.template.addAutoHillBridge(tile, tile.basey-h, r))
 				r.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
-			if(Street.needsHandrail(tile, dl)) {
+			if(Street.needsHandrail(tile, dl, -h, 0)) {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
 				Street.addHandrailPoles(r, tile, dl, -h, 0);
 				Street.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dl.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dl.dz+(0.5f-0.1875f*h)*tile.d.dz));
 			}
-			if(Street.needsHandrail(tile, dr)) {
+			if(Street.needsHandrail(tile, dr, 0, -h)) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
 				Street.addHandrailPoles(r, tile, dr, 0, -h);
 				Street.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dr.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dr.dz+(0.5f-0.1875f*h)*tile.d.dz));
@@ -142,7 +149,7 @@ public class StreetSlope extends TileTemplate {
 		else {
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
-			if(Street.template.addAutoHillBridge((StreetTile)tile, tile.basey-h, r)) {
+			if(Street.template.addAutoHillBridge(tile, tile.basey-h, r)) {
 				r.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
 			}
@@ -150,15 +157,15 @@ public class StreetSlope extends TileTemplate {
 				r.terrain.addWall(tile.x, tile.z, dr, tile.basey, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey);
 			}
-			if(Street.needsHandrail(tile, dl)) {
+			if(Street.needsHandrail(tile, dl, 0, 0)) {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
 				Street.addHandrailPoles(r, tile, dl, -1, 0);
 			}
-			if(Street.needsHandrail(tile, dr)) {
+			if(Street.needsHandrail(tile, dr, 0, 0)) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
 				Street.addHandrailPoles(r, tile, dr, 0, -1);
 			}
-			Street.template.addLamp(tile, r, random, -0.5f);
+			Street.template.createLamp(atile, r, -0.5f);
 		}
 		street.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 	}
