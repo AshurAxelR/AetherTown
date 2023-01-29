@@ -119,10 +119,11 @@ public class StreetSlope extends TileTemplate {
 	}
 
 	@Override
-	public void decorateTile(Tile tile, Random random) {
-		if(h==1) {
+	public void decorateTile(Tile atile, Random random) {
+		StreetTile tile = (StreetTile) atile;
+		Street.template.autoAddHillBridge(tile, tile.basey-h);
+		if(h==1)
 			Street.template.addLamp(tile, random);
-		}
 	}
 	
 	@Override
@@ -130,7 +131,9 @@ public class StreetSlope extends TileTemplate {
 		StreetTile tile = (StreetTile) atile;
 		if(h>1) {
 			side.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
-			if(!Street.template.addAutoHillBridge(tile, tile.basey-h, r))
+			if(tile.bridge)
+				Street.template.createHillBridge(r, tile, tile.basey-h);
+			else
 				r.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
 			Dir dl = tile.d.ccw();
@@ -149,7 +152,8 @@ public class StreetSlope extends TileTemplate {
 		else {
 			Dir dl = tile.d.ccw();
 			Dir dr = tile.d.cw();
-			if(Street.template.addAutoHillBridge(tile, tile.basey-h, r)) {
+			if(tile.bridge) {
+				Street.template.createHillBridge(r, tile, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
 			}
@@ -159,11 +163,11 @@ public class StreetSlope extends TileTemplate {
 			}
 			if(Street.needsHandrail(tile, dl, 0, 0)) {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
-				Street.addHandrailPoles(r, tile, dl, -1, 0);
+				Street.addHandrailPoles(r, tile, dl, -h, 0);
 			}
 			if(Street.needsHandrail(tile, dr, 0, 0)) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
-				Street.addHandrailPoles(r, tile, dr, 0, -1);
+				Street.addHandrailPoles(r, tile, dr, 0, -h);
 			}
 			Street.template.createLamp(atile, r, -0.5f);
 		}

@@ -17,6 +17,7 @@ import com.xrbpowered.aethertown.world.region.LevelNames;
 public class Level {
 
 	private static final int maxRefillAttempts = 10;
+	private static final int maxGeneratorAttempts = 3;
 	
 	public final LevelInfo info;
 	public final int levelSize;
@@ -80,7 +81,22 @@ public class Level {
 	}
 
 	public void generate() {
-		generate(new Random(info.seed)); // TODO loop over try/catch
+		System.out.printf("Generating... %dL\n", info.seed);
+		Random random = new Random(info.seed);
+		for(int att = 0; att<maxGeneratorAttempts; att++) {
+			if(att>0)
+				System.out.printf("Retrying...\nAttempt #%d\n", att+1);
+			try {
+				generate(random);
+				System.gc();
+				System.out.println("Done.");
+				return;
+			}
+			catch (GeneratorException e) {
+				e.printStackTrace();
+			}
+		}
+		throw new RuntimeException("Generator attempts limit reached");
 	}
 
 	private void generate(Random random) {
@@ -90,8 +106,8 @@ public class Level {
 		StreetLayoutGenerator.finishLayout(this, random);
 		
 		HillsGenerator.expand(this, random, 5, 15, -2, 2);
-		 HillsGenerator.expand(this, random, 5, 25, -2, 4);
-		HillsGenerator.expand(this, random, 0, 0, -8, 2);
+		HillsGenerator.expand(this, random, 5, 25, -2, 4);
+		HillsGenerator.expand(this, random, 1, 0, -8, 2);
 		
 		int att = 0;
 		for(;; att++) {
@@ -110,7 +126,7 @@ public class Level {
 		}
 		System.out.printf("Completed %d refill cycles\n", att+1);
 		if(!checkNulls())
-			System.err.println("Level incomplete"); // FIXME throw exception
+			throw new GeneratorException("Level incomplete");
 		
 		houses = HouseGenerator.listHouses(this, random);
 		houseCount = houses.size();

@@ -6,6 +6,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Generator;
+import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
@@ -119,7 +120,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		
 		for(LevelConnection lc : level.info.conns) {
 			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random))
-				System.err.printf("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
+				throw new GeneratorException("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
 		}
 	}
 	

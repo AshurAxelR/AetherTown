@@ -401,16 +401,11 @@ public class AetherTown extends UIClient {
 	
 	public static Level generateLevel(long seed) {
 		AetherTown.seed = seed;
-		System.out.printf("Generating... %dL\n", seed);
-		
 		LevelInfo info = new LevelInfo(2, seed);
 		info.addConn(Dir.west, 1);
 		info.addConn(Dir.east, 1);
 		Level level = new Level(info);
 		level.generate();
-		
-		System.gc();
-		System.out.println("Done.");
 		return level;
 	}
 	

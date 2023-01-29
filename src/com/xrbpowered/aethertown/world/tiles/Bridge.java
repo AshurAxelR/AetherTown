@@ -5,6 +5,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
@@ -67,7 +68,7 @@ public class Bridge extends TileTemplate {
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		BridgeTile tile = (BridgeTile) atile;
 		Street.street.addInstance(r, new TileObjectInfo(tile));
-		Street.template.addBridge(r, tile, tile.basey, tile.basey-tile.h);
+		Street.template.createBridge(r, tile, tile.basey, tile.basey-tile.h);
 		Street.template.addHandrails(r, tile);
 		// Street.template.addLamp(tile, renderer, random, 0);
 		
@@ -78,7 +79,7 @@ public class Bridge extends TileTemplate {
 			r.blockLighting.addLight(tile, tile.basey-tile.h+5, Street.lampLightColor, 0.5f, false);
 		}
 		else {
-			System.err.println("Not supported yet.");
+			throw new GeneratorException("Not supported yet.");
 		}
 	}
 	

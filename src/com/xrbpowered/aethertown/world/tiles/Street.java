@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
@@ -92,12 +93,15 @@ public class Street extends TileTemplate {
 	@Override
 	public void decorateTile(Tile tile, Random random) {
 		addLamp(tile, random);
+		autoAddHillBridge((StreetTile)tile, tile.basey);
 	}
 	
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer r) {
 		street.addInstance(r, new TileObjectInfo(tile));
-		if(!addAutoHillBridge((StreetTile)tile, tile.basey, r))
+		if(((StreetTile) tile).bridge)
+			createHillBridge(r, tile, tile.basey);
+		else
 			r.terrain.addWalls(tile);
 		// FIXME add handrails on decorate() 
 		addHandrails(r, tile);
@@ -112,8 +116,12 @@ public class Street extends TileTemplate {
 		Tile adj = tile.getAdj(d);
 		if(adj==null)
 			return false;
-		if(adj.t==Hill.template && tile.basey>=adj.basey+4)
-			return true;
+		if(adj.t==Hill.template || (adj instanceof StreetTile && ((StreetTile) adj).bridge && adj.d!=d && adj.d!=d.flip())) {
+			int[] yloc = tile.level.h.yloc(adj.x, adj.z);
+			int miny = MathUtils.min(yloc);
+			if(tile.basey>=miny+4)
+				return true;
+		}
 		return tile.t.getFenceY(tile, c0)>adj.t.getFenceY(adj, c0.flipOver(d))+dy0 ||
 				tile.t.getFenceY(tile, c1)>adj.t.getFenceY(adj, c1.flipOver(d))+dy1;
 	}
@@ -154,33 +162,37 @@ public class Street extends TileTemplate {
 		}
 	}
 	
-	public void addBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
+	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
 		int dy = basey-tile.basey;
 		int sh = basey-6-lowy;
 		bridge.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0));
 		if(sh>0)
 			bridgeSupport.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
 	}
-	
-	public boolean addAutoHillBridge(StreetTile tile, int basey, LevelRenderer r) { // FIXME addBridge vs createBridge
+
+	public void createHillBridge(LevelRenderer r, Tile tile, int basey) {
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		int miny = MathUtils.min(yloc);
+		createBridge(r, tile, basey, miny);
+		r.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+	}
+
+	public void autoAddHillBridge(StreetTile tile, int basey) {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
 		if(maxy>basey-3 || basey-miny>=24)
-			return false;
+			return;
 		TileTemplate adjt = tile.getAdjT(tile.d);
-		if(adjt==null || !(Street.isAnyStreet(adjt) || (adjt instanceof Plaza)))
-			return false;
+		if(adjt==null || !(Street.isAnyPath(adjt) || (adjt instanceof Plaza)))
+			return;
 		Tile adjcw = tile.getAdj(tile.d.cw());
 		if(adjcw==null || adjcw.getGroundY()>=basey)
-			return false;
+			return;
 		Tile adjccw = tile.getAdj(tile.d.ccw());
 		if(adjccw==null || adjccw.getGroundY()>=basey)
-			return false;
+			return;
 		tile.bridge = true;
-		addBridge(r, tile, basey, miny);
-		r.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
-		return true;
 	}
 	
 	public void addLamp(Tile atile, Random random) {
@@ -294,7 +306,7 @@ public class Street extends TileTemplate {
 			if(root!=null && root.sub.parent==tile.sub.parent)
 				return 0;
 			else
-				System.err.printf("Orphan %s sub street at [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.x, tile.z);
+				throw new GeneratorException("Orphan %s sub street at [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.x, tile.z);
 		}
 		if((tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
 			return 1;

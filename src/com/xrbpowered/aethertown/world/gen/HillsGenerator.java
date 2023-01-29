@@ -76,7 +76,7 @@ public class HillsGenerator extends TokenGenerator {
 					Tile adj = level.getAdj(x, z, d);
 					if(adj!=null) {
 						adjDir = d;
-						expand = adj.t.canExpandFill(adj) || random.nextInt(5)==0;
+						expand = adj.t.canExpandFill(adj) || random.nextInt(10)==0;
 						y = adj.basey;
 						if(expand)
 							break;
