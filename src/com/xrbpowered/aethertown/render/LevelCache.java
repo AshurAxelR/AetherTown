@@ -1,0 +1,83 @@
+package com.xrbpowered.aethertown.render;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import com.xrbpowered.aethertown.render.env.SkyBuffer;
+import com.xrbpowered.aethertown.render.tiles.TileRenderer;
+import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
+import com.xrbpowered.gl.res.buffer.RenderTarget;
+
+public class LevelCache {
+
+	private class CacheEntry {
+		public Level level = null;
+		public LevelRenderer renderer = null;
+	}
+	
+	private HashMap<LevelInfo, CacheEntry> infoMap = new HashMap<>();
+	private ArrayList<CacheEntry> list = new ArrayList<>();
+	private CacheEntry active = null;
+	
+	public Level activeLevel() {
+		return active.level;
+	}
+	
+	public LevelRenderer activeLevelRenderer() {
+		return active.renderer;
+	}
+	
+	public void add(LevelInfo info) {
+		if(!infoMap.containsKey(info)) {
+			Level level = new Level(info);
+			level.generate();
+			CacheEntry c = new CacheEntry();
+			c.level = level;
+			infoMap.put(info, c);
+			list.add(c);
+		}
+	}
+	
+	public void addAll(List<LevelInfo> list) {
+		for(LevelInfo info : list)
+			add(info);
+	}
+	
+	public Level getLevel(LevelInfo info) {
+		return infoMap.get(info).level;
+	}
+	
+	public Level setActive(LevelInfo info) {
+		active = infoMap.get(info);
+		return active.level;
+	}
+
+	public void createRenderers(SkyBuffer sky, TileRenderer tiles) {
+		for(CacheEntry c : list) {
+			c.renderer = new LevelRenderer(c.level, sky, tiles);
+			System.out.println("Building geometry...");
+			c.renderer.createLevelGeometry();
+			System.out.println("Done.");
+		}
+	}
+	
+	public void updateLevelOffsets() {
+		int x0 = active.level.info.x0;
+		int z0 = active.level.info.z0;
+		for(CacheEntry c : list) {
+			int dx = c.level.info.x0 - x0;
+			int dz = c.level.info.z0 - z0;
+			c.renderer.levelOffset.set(dx*LevelInfo.baseSize*Tile.size, dz*LevelInfo.baseSize*Tile.size);
+		}
+	}
+	
+	public void renderAll(RenderTarget target) {
+		for(CacheEntry c : list) {
+			c.renderer.render(target);
+		}
+	}
+	
+}

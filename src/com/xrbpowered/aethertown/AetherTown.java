@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 import com.xrbpowered.aethertools.LevelMapView;
-import com.xrbpowered.aethertown.render.LevelRenderer;
+import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
@@ -16,8 +16,10 @@ import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
-import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
+import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.region.LevelSettlementType;
+import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -48,7 +50,9 @@ public class AetherTown extends UIClient {
 	// private static int activeEnvironment = 0;
 	private DaytimeEnvironment environment = new DaytimeEnvironment(); // ShaderEnvironment.environments[activeEnvironment];
 
-	public static long seed;
+	//public static long seed;
+	private static Region region;
+	private static LevelCache levelCache;
 	private static Level level;
 
 	private CameraActor camera;
@@ -58,7 +62,7 @@ public class AetherTown extends UIClient {
 	
 	private SkyRenderer sky;
 	private TileRenderer tiles;
-	private LevelRenderer renderer = null;
+	// private LevelRenderer renderer = null;
 	
 	private StaticMeshActor pointActor;
 
@@ -118,7 +122,7 @@ public class AetherTown extends UIClient {
 				
 				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null), tiles.objShader, new Texture(Color.RED));
 
-				changeLevel(level);
+				changeRegion();
 				super.setupResources();
 			}
 			
@@ -158,8 +162,10 @@ public class AetherTown extends UIClient {
 			@Override
 			protected void renderBuffer(RenderTarget target) {
 				super.renderBuffer(target);
-				sky.render(target, renderer);
-				renderer.render(target);
+				//sky.render(target, renderer);
+				//renderer.render(target);
+				sky.render(target, levelCache.activeLevelRenderer());
+				levelCache.renderAll(target);
 				
 				if(showPointer)
 					pointActor.draw();
@@ -274,17 +280,18 @@ public class AetherTown extends UIClient {
 		tiles.updateEnvironment(environment);
 	}
 	
-	private void changeLevel(Level level) {
-		AetherTown.level = level;
+	private void changeRegion() {
 		LevelMapView.level = level;
 
-		sky.stars.createStars(seed);
-		if(renderer!=null)
+		sky.stars.createStars(region.seed);
+		/*if(renderer!=null)
 			renderer.release();
 		renderer = new LevelRenderer(level, sky.buffer, tiles);
 		System.out.println("Building geometry...");
 		renderer.createLevelGeometry();
-		System.out.println("Done.");
+		System.out.println("Done.");*/
+		levelCache.createRenderers(sky.buffer, tiles);
+		levelCache.updateLevelOffsets();
 
 		updateEnvironment();
 		
@@ -388,10 +395,10 @@ public class AetherTown extends UIClient {
 				showLevelMap(!uiLevelMap.isVisible());
 				break;
 			case KeyEvent.VK_ENTER: {
-				disableController();
+				/*disableController();
 				long seed = System.currentTimeMillis();
 				Level level = generateLevel(seed);
-				changeLevel(level);
+				changeLevel(level);*/
 				break;
 			}
 			default:
@@ -399,9 +406,18 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
+	public static void generateRegion(long seed) {
+		System.out.printf("Region seed: %dL\n", seed);
+		region = new Region(seed);
+		region.generate();
+		levelCache = new LevelCache();
+		levelCache.addAll(region.displayLevels);
+		level = levelCache.setActive(region.startLevel);
+	}
+	
 	public static Level generateLevel(long seed) {
-		AetherTown.seed = seed;
 		LevelInfo info = new LevelInfo(2, seed);
+		info.setSettlement(LevelSettlementType.smallTown);
 		info.addConn(Dir.west, 1);
 		info.addConn(Dir.east, 1);
 		Level level = new Level(info);
@@ -417,7 +433,8 @@ public class AetherTown extends UIClient {
 			WorldTime.setTimeOfDay(Float.parseFloat(args[0]));
 
 		long seed = System.currentTimeMillis();
-		level = generateLevel(seed);
+		// level = generateLevel(seed);
+		generateRegion(seed);
 
 		new AetherTown().run();
 	}

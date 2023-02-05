@@ -56,7 +56,7 @@ public class Bridge extends TileTemplate {
 			tile.h = t.y-under.basey;
 		}
 		tile.place(t);
-		// updateHeightLimit(t); FIXME
+		// updateHeightLimit(t);
 		return tile;
 	}
 	

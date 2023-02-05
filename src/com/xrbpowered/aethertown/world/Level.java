@@ -39,6 +39,11 @@ public class Level {
 		this.levelSize = info.getLevelSize();
 	}
 	
+	@Override
+	public int hashCode() {
+		return info.hashCode();
+	}
+	
 	public int getStartX() {
 		return levelSize/2;
 	}
@@ -102,7 +107,11 @@ public class Level {
 	private void generate(Random random) {
 		resetGenerator();
 		
-		new StreetLayoutGenerator(60).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
+		if(info.settlement.maxHouses>0 || !info.conns.isEmpty()) {
+			new StreetLayoutGenerator(info.settlement.maxHouses).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
+			if(houseCount<info.settlement.minHouses)
+				throw new GeneratorException("Settlement is too small");
+		}
 		StreetLayoutGenerator.finishLayout(this, random);
 		
 		HillsGenerator.expand(this, random, 5, 15, -2, 2);
@@ -130,7 +139,7 @@ public class Level {
 		
 		houses = HouseGenerator.listHouses(this, random);
 		houseCount = houses.size();
-		name = LevelNames.next(random, houseCount);
+		name = LevelNames.next(random, info.settlement);
 		HouseAssignment.assignHouses(this, random);
 		
 		decorate(random);

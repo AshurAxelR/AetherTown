@@ -37,6 +37,7 @@ public class ObjectShader extends ActorShader {
 		int pId = getProgramId();
 		GL20.glUseProgram(pId);
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level.level.levelSize);
+		uniform(GL20.glGetUniformLocation(pId, "levelOffset"), level.levelOffset);
 		level.sky.bindTexture(0);
 		level.pointLights.bind(1);
 	}

@@ -35,7 +35,7 @@ in vec4 pass_Position;
 in vec3 pass_Normal;
 in vec2 pass_TexCoord;
 
-in vec4 pass_WorldPosition;
+in vec4 pass_LevelPosition;
 in vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
 in vec3 pass_illumMod;
@@ -47,7 +47,7 @@ float calcPointLight(vec2 index, vec3 normal) {
 	vec4 lightPos = texture(dataPointLights, index/levelSize);
 	float radius = lightPos.w;
 	lightPos.w = 1;
-	vec3 lightVec = (lightPos - pass_WorldPosition).xyz;
+	vec3 lightVec = (lightPos - pass_LevelPosition).xyz;
 	
 	float dist = length(lightVec);
 	float falloff = clamp((radius-dist)/(radius+dist), 0, 1);
@@ -56,7 +56,7 @@ float calcPointLight(vec2 index, vec3 normal) {
 }
 
 vec4 calcPointLights(vec3 normal) {
-	vec2 center = vec2(floor(pass_WorldPosition.x/4+(0.5+EPSILON)), floor(pass_WorldPosition.z/4+(0.5+EPSILON)));
+	vec2 center = vec2(floor(pass_LevelPosition.x/4+(0.5+EPSILON)), floor(pass_LevelPosition.z/4+(0.5+EPSILON)));
 	float light = 0;
 	for(int dx=-POINT_LIGHT_R; dx<=POINT_LIGHT_R; dx++)
 		for(int dz=-POINT_LIGHT_R; dz<=POINT_LIGHT_R; dz++) {
@@ -88,7 +88,7 @@ void main(void) {
 	vec4 blockLight = vec4(0);
 	if(illum<illumTrigger) {
 		diffuseLight += calcPointLights(normal);
-		blockLight = texture(dataBlockLighting, (pass_WorldPosition.xz/4+0.5+0.5*normal.xz)/levelSize)*(1-illum/illumTrigger);
+		blockLight = texture(dataBlockLighting, (pass_LevelPosition.xz/4+0.5+0.5*normal.xz)/levelSize)*(1-illum/illumTrigger);
 		diffuseLight += 0.4*blockLight;
 	}
 	
@@ -105,7 +105,7 @@ void main(void) {
 	vec4 fogColor = texture(texSky, pass_SkyCoord);
 	float lowNear = clamp((viewDist - MIN_FOG_DIST) / (cloudNear - MIN_FOG_DIST), 0, 1);
 	vec4 highColor = mix(out_Color, fogColor, clamp((viewDist - fogNear) / (fogFar - fogNear), 0, 1));
-	highColor = mix(highColor, fogColor+0.075*blockLight, clamp((pass_WorldPosition.y - cloudTop) / (cloudBottom - cloudTop), 0, 1) * lowNear);
+	highColor = mix(highColor, fogColor+0.075*blockLight, clamp((pass_LevelPosition.y - cloudTop) / (cloudBottom - cloudTop), 0, 1) * lowNear);
 	vec4 lowColor = mix(out_Color, fogColor, lowNear);
 	out_Color = mix(highColor, lowColor, clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1));
 	

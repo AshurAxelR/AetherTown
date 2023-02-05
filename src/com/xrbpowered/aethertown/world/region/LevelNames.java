@@ -15,12 +15,10 @@ public abstract class LevelNames {
 	private static String[] saints;
 	private static WRandom wsaints;
 	
-	public static final String[] rankNames = {"Inn", "Outpost", "Village", "Town", "City"};
-	
-	public static String next(Random random, int numHouses) {
+	public static String next(Random random, LevelSettlementType settlement) {
 		String noun = nouns[random.nextInt(nouns.length)];
 		String adj = adjectives[random.nextInt(adjectives.length)];
-		return String.format("%s %s %s", adj, noun, rankNames[HouseAssignment.levelRank(numHouses)]);
+		return String.format("%s %s %s", adj, noun, settlement.title);
 	}
 
 	public static String nextSaint(Random random) {

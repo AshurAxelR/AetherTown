@@ -50,6 +50,8 @@ public class LevelInfo {
 	public final int size;
 	public final long seed;
 	
+	public LevelSettlementType settlement = LevelSettlementType.none;
+	
 	public ArrayList<LevelConnection> conns = new ArrayList<>();
 	
 	public LevelInfo(int size, long seed) {
@@ -62,6 +64,11 @@ public class LevelInfo {
 		this.z0 = z;
 		this.size = size;
 		this.seed = seed;
+	}
+	
+	public LevelInfo setSettlement(LevelSettlementType settlement) {
+		this.settlement = settlement;
+		return this;
 	}
 
 	public boolean isFree() {
@@ -100,10 +107,14 @@ public class LevelInfo {
 	public int getLevelSize() {
 		return size*baseSize;
 	}
-	
+
 	@Override
 	public int hashCode() {
-		return x0*Region.sizez+z0;
-	}
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + x0;
+		result = prime * result + z0;
+		return result;
+	}	
 	
 }

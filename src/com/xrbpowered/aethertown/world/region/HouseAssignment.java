@@ -37,19 +37,6 @@ public abstract class HouseAssignment {
 		for(int i=0; i<level.houseCount; i++)
 			assignHouse(i, assignNext(i, random));
 	}
-	
-	public static int levelRank(int numHouses) {
-		if(numHouses<5)
-			return 0;
-		else if(numHouses<15)
-			return 1;
-		else if(numHouses<40)
-			return 2;
-		else if(numHouses<100)
-			return 3;
-		else
-			return 4;
-	}
 
 	private static class Village extends HouseAssignment {
 		private Shuffle shInit = new Shuffle(6);

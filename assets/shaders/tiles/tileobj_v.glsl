@@ -2,6 +2,7 @@
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
+uniform vec2 levelOffset = vec2(0, 0);
 
 in vec3 in_Position;
 in vec3 in_Normal;
@@ -18,7 +19,7 @@ in vec3 ins_illumMod;
 out vec4 pass_Position;
 out vec3 pass_Normal;
 out vec2 pass_TexCoord;
-out vec4 pass_WorldPosition;
+out vec4 pass_LevelPosition;
 out vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
 out vec3 pass_illumMod;
@@ -49,8 +50,8 @@ mat4 scaleMatrix(float xz, float y) {
 
 void main(void) {
 	mat4 modelMatrix = translationMatrix(ins_Position) * rotationYMatrix(ins_Rotation) * scaleMatrix(ins_ScaleXZ, ins_ScaleY);
-	pass_WorldPosition = modelMatrix * vec4(in_Position, 1);
-	pass_Position = viewMatrix * pass_WorldPosition;
+	pass_LevelPosition = modelMatrix * vec4(in_Position, 1);
+	pass_Position = viewMatrix * (pass_LevelPosition + vec4(levelOffset.x, 0, levelOffset.y, 0));
 	gl_Position = projectionMatrix * pass_Position;
 	pass_SkyCoord = 0.5+0.5*gl_Position.xy/gl_Position.w;
 	

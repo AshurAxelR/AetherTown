@@ -109,6 +109,13 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 	}
 	
+	private static void connectOut(Level level, Random random) {
+		for(LevelConnection lc : level.info.conns) {
+			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random))
+				throw new GeneratorException("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
+		}
+	}
+	
 	private static void reconnectStreets(Level level, Random random) {
 		boolean upd = true;
 		while(upd) {
@@ -117,14 +124,10 @@ public class StreetLayoutGenerator extends TokenGenerator {
 				upd |= new StreetConnector(level, d).connectAll(random);
 			}
 		}
-		
-		for(LevelConnection lc : level.info.conns) {
-			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random))
-				throw new GeneratorException("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
-		}
 	}
 	
 	public static void finishLayout(Level level, Random random) {
+		connectOut(level, random);
 		trimStreets(level, random);
 		for(PlotGenerator plot : level.plots)
 			plot.fillStreet(random);

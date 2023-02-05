@@ -63,12 +63,6 @@ public class RegionPaths {
 		return level;
 	}
 	
-	private void connect(int x, int z, Dir d) {
-		region.map[x][z].addConn(x, z, d);
-		LevelInfo level = region.map[x+d.dx][z+d.dz];
-		level.addConn(x+d.dx, z+d.dz, d.flip());
-	}
-	
 	private static final WRandom wnextDir = new WRandom(1, 0.5, 0.5, 1);
 	
 	private Dir nextDir(Dir d) {
@@ -112,7 +106,7 @@ public class RegionPaths {
 			int s = wsize.next(random)+1;
 			LevelInfo level = checkSize(t, s);
 			if(level==null) {
-				connect(t.x, t.z, t.enter.flip());
+				region.connectLevels(t.x, t.z, t.enter.flip());
 				if(tokenCount<1)
 					addToken(nextToken(region.map[t.x][t.z], Dir.east, t.pop+1));
 				continue;
@@ -120,7 +114,7 @@ public class RegionPaths {
 			
 			level.place();
 			if(t.enter!=null)
-				connect(t.x, t.z, t.enter.flip());
+				region.connectLevels(t.x, t.z, t.enter.flip());
 			
 			if(t.x<Region.sizex-Region.sizez/2) {
 				addToken(nextToken(level, nextDir(t.enter), t.pop+1));
