@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.gen;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -12,6 +13,8 @@ import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class HillsGenerator extends TokenGenerator {
 
+	private static final int edgeBlend = 8;
+	
 	public int mindy = -4;
 	public int maxdy = 4;
 	
@@ -41,6 +44,11 @@ public class HillsGenerator extends TokenGenerator {
 			}
 			else
 				return false;
+		}
+
+		int edge = t.edgeDist();
+		if(edge<edgeBlend) {
+			t.y = Math.round(MathUtils.lerp(t.level.heightGuide.gety(t.x, t.z), t.y, edge/(float)edgeBlend));
 		}
 		
 		int miny = t.level.heightLimiter.miny[t.x][t.z];

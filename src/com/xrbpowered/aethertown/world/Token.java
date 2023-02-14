@@ -53,6 +53,10 @@ public class Token {
 		return level.map[x][z]==null;
 	}
 
+	public int edgeDist() {
+		return Level.edgeDist(level.levelSize, x, z);
+	}
+	
 	public Tile tile() {
 		return level.map[x][z];
 	}

@@ -19,4 +19,17 @@ public enum LevelSettlementType {
 		this.maxHouses = maxHouses;
 	}
 	
+	public LevelSettlementType demote() {
+		if(this==none)
+			return this;
+		else
+			return values()[ordinal()-1];
+	}
+	
+	public int getStreetMargin(int levelSize) {
+		int size = (int)Math.ceil(Math.sqrt(maxHouses*40)/4.0)*4;
+		if(size<24) size = 24;
+		return (levelSize-size)/2;
+	}
+	
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.HeightGuideChunk;
 
 public class Region {
 
@@ -18,6 +19,24 @@ public class Region {
 	
 	public Region(long seed) {
 		this.seed = seed;
+	}
+	
+	public LevelInfo getLevel(int x, int z) {
+		if(!isInside(x, z) || map[x][z]==null)
+			return LevelInfo.createNullLevel(this, x, z);
+		else
+			return map[x][z];
+	}
+	
+	public LevelTerrainType getTerrain(int x, int z) {
+		if(!isInside(x, z) || map[x][z]==null)
+			return LevelTerrainType.nullTerrain;
+		else
+			return map[x][z].terrain;
+	}
+	
+	public HeightGuideChunk draftHG(int x, int z) {
+		return new HeightGuideChunk(this, x, z).generate(true);
 	}
 	
 	public void generate() {
@@ -39,8 +58,8 @@ public class Region {
 		level = new LevelInfo(this, x+2, z, 2, random.nextLong()).setSettlement(LevelSettlementType.village);
 		level.place();
 		displayLevels.add(level);
-		connectLevels(x+1, z, Dir.east);
 		connectLevels(x, z, Dir.west);
+		connectLevels(x+1, z, Dir.east);
 	}
 
 	public void connectLevels(int x, int z, Dir d) {

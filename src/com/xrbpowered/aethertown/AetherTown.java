@@ -15,10 +15,8 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
-import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelNames;
-import com.xrbpowered.aethertown.world.region.LevelSettlementType;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
@@ -162,8 +160,6 @@ public class AetherTown extends UIClient {
 			@Override
 			protected void renderBuffer(RenderTarget target) {
 				super.renderBuffer(target);
-				//sky.render(target, renderer);
-				//renderer.render(target);
 				sky.render(target, levelCache.activeLevelRenderer());
 				levelCache.renderAll(target);
 				
@@ -284,12 +280,6 @@ public class AetherTown extends UIClient {
 		LevelMapView.level = level;
 
 		sky.stars.createStars(region.seed);
-		/*if(renderer!=null)
-			renderer.release();
-		renderer = new LevelRenderer(level, sky.buffer, tiles);
-		System.out.println("Building geometry...");
-		renderer.createLevelGeometry();
-		System.out.println("Done.");*/
 		levelCache.createRenderers(sky.buffer, tiles);
 		levelCache.updateLevelOffsets();
 
@@ -297,8 +287,8 @@ public class AetherTown extends UIClient {
 		
 		if(level.info.conns.size()>0) {
 			LevelConnection lc = level.info.conns.get(0);
-			camera.position.x = lc.getX()*Tile.size;
-			camera.position.z = lc.getZ()*Tile.size;
+			camera.position.x = lc.getLevelX()*Tile.size;
+			camera.position.z = lc.getLevelZ()*Tile.size;
 			camera.rotation.y = -lc.d.flip().ordinal() * (float)Math.PI/2f;
 		}
 		else {
@@ -312,6 +302,8 @@ public class AetherTown extends UIClient {
 	
 	private static void printTileDebug(int hoverx, int hoverz, Tile tile) {
 		System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
+		if(level.heightGuide!=null)
+			System.out.printf("\theightGuide: %d\n", level.heightGuide.gety(hoverx, hoverz));
 		if(level.heightLimiter!=null)
 			System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
 		if(tile!=null) {
@@ -413,16 +405,6 @@ public class AetherTown extends UIClient {
 		levelCache = new LevelCache();
 		levelCache.addAll(region.displayLevels);
 		level = levelCache.setActive(region.startLevel);
-	}
-	
-	public static Level generateLevel(long seed) {
-		LevelInfo info = new LevelInfo(2, seed);
-		info.setSettlement(LevelSettlementType.smallTown);
-		info.addConn(Dir.west, 1);
-		info.addConn(Dir.east, 1);
-		Level level = new Level(info);
-		level.generate();
-		return level;
 	}
 	
 	public static void main(String[] args) {

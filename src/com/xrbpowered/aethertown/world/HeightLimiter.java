@@ -4,11 +4,12 @@ import com.xrbpowered.aethertown.utils.Dir;
 
 public class HeightLimiter {
 
-	private static final int hardLimit = 100;
+	public static final int maxCliff = 18; //24;
+	public static final int maxWall = 12; //8;
+	public static final int maxEdge = 8;
+
 	private static final int maxUpdate = 120;
-	public static int maxCliff = 18; //24;
-	public static int maxWall = 12; //8;
-	
+
 	public final Level level;
 	public final int levelSize;
 	
@@ -29,8 +30,9 @@ public class HeightLimiter {
 	public void reset() {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
-				miny[x][z] = -hardLimit;
-				maxy[x][z] = hardLimit;
+				int dy = Level.edgeDist(levelSize, x, z)*maxEdge;
+				miny[x][z] = Math.max(level.info.terrain.miny, level.heightGuide.gety(x, z)-dy);
+				maxy[x][z] = Math.min(level.info.terrain.maxy, level.heightGuide.gety(x, z)+dy);
 			}
 	}
 	

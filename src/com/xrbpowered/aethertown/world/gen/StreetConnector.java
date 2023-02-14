@@ -108,6 +108,7 @@ public class StreetConnector {
 		
 		public boolean check(Random random) {
 			street = new StreetGenerator().setMargin(margin).setGenerateSides(false);
+			street.ignoreHeightLimiter = true; // FIXME remove ignoreHeightLimiter
 			startToken = new Token(level, x, yS, z, d);
 			return street.checkFit(startToken, random, len, yD);
 		}
@@ -439,7 +440,7 @@ public class StreetConnector {
 	}
 	
 	public boolean connectOut(LevelConnection lc, Random random) {
-		ConnPoint connOut = new ConnPoint(lc.getLevelI(), 0, lc.basey);
+		ConnPoint connOut = new ConnPoint(lc.getLevelI(), 0, lc.getY());
 		scanOpen();
 		boolean res = false;
 		while(!res) {
@@ -447,7 +448,8 @@ public class StreetConnector {
 			int minDist = level.levelSize*3;
 			for(int p=1; p<connPoints.size()-1; p++) {
 				ConnPoint conn = connPoints.get(p);
-				int mdist = conn.mdisty(connOut);
+				// int mdist = conn.mdisty(connOut); // FIXME use mdisty
+				int mdist = conn.mdist(connOut);
 				if(Math.abs(conn.i - connOut.i)<2)
 					continue;
 				if(mdist<minDist) {

@@ -23,7 +23,8 @@ import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 public class StreetGenerator implements Generator, TokenProvider {
 
 	public static final int streetGap = 1;
-	private static final int streetMargin = 40;
+
+	public static int defaultStreetMargin = 20;
 
 	private int dy, absdy;
 	private Integer targetHeight = null;
@@ -36,8 +37,9 @@ public class StreetGenerator implements Generator, TokenProvider {
 	private int len;
 	public int[] dylist = null;
 	
-	private int margin = streetMargin;
+	private int margin = defaultStreetMargin;
 	public boolean generateSides = true;
+	public boolean ignoreHeightLimiter = false;
 	
 	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.2, 0.1, 1);
 
@@ -75,11 +77,13 @@ public class StreetGenerator implements Generator, TokenProvider {
 	private static final WRandom dyoptw = new WRandom(0.1, 0.4, 0.4, 0.3, 0.3, 0.2, 0.2);
 	
 	public StreetGenerator() {
+		margin = defaultStreetMargin;
 		dy = 0;
 		absdy = 0;
 	}
 	
 	public StreetGenerator(Random random, int prevdy) {
+		margin = defaultStreetMargin;
 		dy = dyopt[dyoptw.next(random)];
 		absdy = Math.abs(dy);
 		if(dy*prevdy<0)
@@ -212,9 +216,9 @@ public class StreetGenerator implements Generator, TokenProvider {
 		int contSlope = 0;
 		Token t = startToken;
 		for(int i=0; i<=len; i++) {
-			if(targetHeight==null && (!t.fitsHeight() || !level.fitsHeight(t.x, t.y+this.dy, t.z)))
+			if(!ignoreHeightLimiter && targetHeight==null && (!t.fitsHeight() || !level.fitsHeight(t.x, t.y+this.dy, t.z)))
 				return null;
-			if(targetHeight!=null && !level.overlapsHeight(t.x, t.y, t.z, HeightLimiter.maxWall))
+			if(!ignoreHeightLimiter && targetHeight!=null && !level.overlapsHeight(t.x, t.y, t.z, HeightLimiter.maxWall))
 				return null;
 			int dy = 0;
 			if(i<len) {

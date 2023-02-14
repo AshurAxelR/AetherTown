@@ -93,7 +93,7 @@ public class Hill extends TileTemplate {
 			res = true;
 		}
 		tile.maxDelta = MathUtils.maxDelta(yloc);
-		if(tile.maxDelta>1)
+		if(tile.maxDelta>1 || !tile.level.isInside(tile.x, tile.z, 2))
 			return res;
 
 		Dir adjDir = null;

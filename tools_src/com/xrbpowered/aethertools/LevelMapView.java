@@ -3,7 +3,6 @@ package com.xrbpowered.aethertools;
 import java.awt.Color;
 import java.awt.Rectangle;
 
-import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
@@ -12,21 +11,16 @@ import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.HouseRole;
-import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
-import com.xrbpowered.gl.res.asset.AssetManager;
-import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
 import com.xrbpowered.zoomui.base.UIPanView;
-import com.xrbpowered.zoomui.swing.SwingFrame;
-import com.xrbpowered.zoomui.swing.SwingWindowFactory;
 
 public class LevelMapView extends UIElement {
 
@@ -186,18 +180,6 @@ public class LevelMapView extends UIElement {
 		hoverx = (int)(x/tileSize);
 		hoverz = (int)(y/tileSize);
 		repaint();
-	}
-
-	public static void main(String[] args) {
-		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
-		LevelNames.load();
-		Fonts.load();
-
-		level = AetherTown.generateLevel(System.currentTimeMillis());
-		
-		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown level map", 1920, 1080);
-		new LevelMapView(frame.getContainer());
-		frame.show();
 	}
 
 }

@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.region;
 import java.util.ArrayList;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.RandomSeed;
 
 public class LevelInfo {
 
@@ -12,13 +13,34 @@ public class LevelInfo {
 		public Dir d;
 		public int i;
 		public int offs = 0;
-		public int basey = 0;
 		
 		public LevelConnection(Dir d, int i) {
 			this.d = d;
 			this.i = i;
 		}
 		
+		public LevelInfo getAdj() {
+			return region.map[getRegionX()+d.dx][getRegionZ()+d.dz];
+		}
+		
+		public int getRegionX() {
+			if(d.dx==0)
+				return x0+i;
+			else if(d.dx>0)
+				return x0+size-1;
+			else
+				return x0;
+		}
+
+		public int getRegionZ() {
+			if(d.dz==0)
+				return z0+i;
+			else if(d.dz>0)
+				return z0+size-1;
+			else
+				return z0;
+		}
+
 		public int getLevelI() {
 			int li = baseSize*i + baseSize/2 + offs;
 			if(d==Dir.south || d==Dir.west)
@@ -26,7 +48,7 @@ public class LevelInfo {
 			return li;
 		}
 		
-		public int getX() {
+		public int getLevelX() {
 			if(d.dx==0)
 				return baseSize*i + baseSize/2 + offs;
 			else if(d.dx<0)
@@ -35,13 +57,17 @@ public class LevelInfo {
 				return getLevelSize()-1;
 		}
 		
-		public int getZ() {
+		public int getLevelZ() {
 			if(d.dz==0)
 				return baseSize*i + baseSize/2 + offs;
 			else if(d.dz<0)
 				return 0;
 			else
 				return getLevelSize()-1;
+		}
+		
+		public int getY() {
+			return (terrain.conny+getAdj().terrain.conny)/2;
 		}
 	}
 	
@@ -50,13 +76,10 @@ public class LevelInfo {
 	public final int size;
 	public final long seed;
 	
+	public LevelTerrainType terrain = LevelTerrainType.hill;
 	public LevelSettlementType settlement = LevelSettlementType.none;
 	
 	public ArrayList<LevelConnection> conns = new ArrayList<>();
-	
-	public LevelInfo(int size, long seed) {
-		this(null, 0, 0, size, seed);
-	}
 	
 	public LevelInfo(Region region, int x, int z, int size, long seed) {
 		this.region = region;
@@ -66,7 +89,15 @@ public class LevelInfo {
 		this.seed = seed;
 	}
 	
+	public LevelInfo setTerrain(LevelTerrainType terrain) {
+		this.terrain = terrain;
+		return this;
+	}
+	
 	public LevelInfo setSettlement(LevelSettlementType settlement) {
+		int levelSize = getLevelSize();
+		while(settlement.getStreetMargin(levelSize)<8)
+			settlement = settlement.demote();
 		this.settlement = settlement;
 		return this;
 	}
@@ -116,5 +147,10 @@ public class LevelInfo {
 		result = prime * result + z0;
 		return result;
 	}	
+	
+	public static LevelInfo createNullLevel(Region region, int x, int z) {
+		long seed = RandomSeed.seedXY(region.seed+6799, x, z);
+		return new LevelInfo(region, x, z, 1, seed).setTerrain(LevelTerrainType.nullTerrain);
+	}
 	
 }

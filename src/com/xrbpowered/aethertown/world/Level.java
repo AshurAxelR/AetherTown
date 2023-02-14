@@ -6,6 +6,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
+import com.xrbpowered.aethertown.world.gen.StreetGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
@@ -31,6 +32,7 @@ public class Level {
 	public String name;
 
 	// available only during generation
+	public HeightGuide heightGuide = null;
 	public HeightLimiter heightLimiter = null;
 	public ArrayList<PlotGenerator> plots = null;
 
@@ -58,12 +60,15 @@ public class Level {
 		houses = null;
 		churches = new ArrayList<>();
 		houseCount = 0;
+		heightGuide = new HeightGuide(info).generate();
 		heightLimiter = new HeightLimiter(this);
 		plots = new ArrayList<>();
+		StreetGenerator.defaultStreetMargin = info.settlement.getStreetMargin(levelSize);
 	}
 	
 	private void releaseGenerator() {
 		heightLimiter = null;
+		// heightGuide = null;
 		plots = null;
 	}
 	
@@ -107,16 +112,21 @@ public class Level {
 	private void generate(Random random) {
 		resetGenerator();
 		
+		Token startToken = new Token(this, getStartX(), info.terrain.starty, getStartZ(), Dir.north);
 		if(info.settlement.maxHouses>0 || !info.conns.isEmpty()) {
-			new StreetLayoutGenerator(info.settlement.maxHouses).generate(new Token(this, getStartX(), 20, getStartZ(), Dir.north), random);
+			new StreetLayoutGenerator(info.settlement.maxHouses).generate(startToken, random);
 			if(houseCount<info.settlement.minHouses)
 				throw new GeneratorException("Settlement is too small");
+			StreetLayoutGenerator.finishLayout(this, random);
 		}
-		StreetLayoutGenerator.finishLayout(this, random);
+		else {
+			new HillsGenerator(20).generate(startToken, random);
+		}
 		
 		HillsGenerator.expand(this, random, 5, 15, -2, 2);
 		HillsGenerator.expand(this, random, 5, 25, -2, 4);
 		HillsGenerator.expand(this, random, 1, 0, -8, 2);
+		// HillsGenerator.expand(this, random, 1, 0, -4, 2);
 		
 		int att = 0;
 		for(;; att++) {
@@ -237,11 +247,23 @@ public class Level {
 	}
 
 	public boolean isInside(int x, int z) {
-		return x>=0 && x<levelSize && z>=0 && z<levelSize;
+		return isInside(levelSize, x, z, 0);
 	}
 	
 	public boolean isInside(int x, int z, int margin) {
-		return x>=margin && x<levelSize-margin && z>=margin && z<levelSize-margin;
+		return isInside(levelSize, x, z, margin);
 	}
 	
+	public static boolean isInside(int levelSize, int x, int z, int margin) {
+		return x>=margin && x<levelSize-margin && z>=margin && z<levelSize-margin;
+	}
+
+	public static int edgeDist(int levelSize, int x) {
+		return x<levelSize/2 ? x : levelSize-1-x;
+	}
+
+	public static int edgeDist(int levelSize, int x, int z) {
+		return Math.min(edgeDist(levelSize, x), edgeDist(levelSize, z));
+	}
+
 }
