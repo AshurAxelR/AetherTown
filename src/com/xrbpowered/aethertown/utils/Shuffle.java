@@ -29,4 +29,18 @@ public class Shuffle {
 		return n;
 	}
 
+	public static class List<T> extends Shuffle {
+		public final T[] items;
+		
+		@SafeVarargs
+		public List(T... items) {
+			super(items.length);
+			this.items = items;
+		}
+		
+		public T nextItem(Random random) {
+			return items[super.next(random)];
+		}
+	}
+	
 }

@@ -2,10 +2,16 @@ package com.xrbpowered.aethertown.world;
 
 import static com.xrbpowered.aethertown.world.region.LevelInfo.baseSize;
 
+import java.util.Random;
+
+import com.xrbpowered.aethertown.utils.RandomSeed;
+import com.xrbpowered.aethertown.world.region.LevelTerrainType;
 import com.xrbpowered.aethertown.world.region.Region;
 
 public class HeightGuideChunk {
 
+	private static final float plasmaAmp = 60f;
+	
 	public final Region region;
 	public final int rx, rz;
 	public final HeightGuide parent;
@@ -30,41 +36,33 @@ public class HeightGuideChunk {
 		this.cz = cz;
 	}
 	
-	/*private int delta(Random random, float amp) {
-		return Math.round(random.nextFloat()*amp*2f-amp);
+	private int delta(Random random, float amp) {
+		return Math.round(random.nextFloat()*amp-amp/2f);
 	}
 	
 	private void plasma(int x0, int z0, int size, float amp, Random random) {
+		// FIXME replace plasma with perlin
 		int x1 = x0+size;
 		int z1 = z0+size;
 		int mx = x0+size/2;
 		int mz = z0+size/2;
 		
-		if(z0>0) y[mx][z0] = (y[x0][z0]+y[x1][z0])/2 + delta(random, amp); // +amp
-		if(x0>0) y[x0][mz] = (y[x0][z0]+y[x0][z1])/2 + delta(random, amp); // +amp
-		y[mx][z1] = (y[x0][z1]+y[x1][z1])/2 + delta(random, amp); // +amp
-		y[x1][mz] = (y[x1][z0]+y[x1][z1])/2 + delta(random, amp); // +amp
-		y[mx][mz] = (y[mx][z0]+y[mx][z1]+y[x0][mz]+y[x1][mz])/4 + delta(random, amp); // +amp
+		if(z0>0) y[mx][z0] = (y[x0][z0]+y[x1][z0])/2; // + delta(random, amp);
+		if(x0>0) y[x0][mz] = (y[x0][z0]+y[x0][z1])/2; // + delta(random, amp);
+		y[mx][z1] = (y[x0][z1]+y[x1][z1])/2; // + delta(random, amp);
+		y[x1][mz] = (y[x1][z0]+y[x1][z1])/2; // + delta(random, amp);
+		y[mx][mz] = (y[mx][z0]+y[mx][z1]+y[x0][mz]+y[x1][mz])/4 + delta(random, amp);
 		
 		if(size>2) {
-			plasma(x0, z0, size/2, amp*0.75f, random);
-			plasma(mx, z0, size/2, amp*0.75f, random);
-			plasma(x0, mz, size/2, amp*0.75f, random);
-			plasma(mx, mz, size/2, amp*0.75f, random);
+			plasma(x0, z0, size/2, amp*0.5f, random);
+			plasma(mx, z0, size/2, amp*0.5f, random);
+			plasma(x0, mz, size/2, amp*0.5f, random);
+			plasma(mx, mz, size/2, amp*0.5f, random);
 		}
 	}
 	
 	public HeightGuideChunk generate(boolean draft) {
 		Random random = new Random(RandomSeed.seedXY(region.seed+91271L, rx, rz));
-		
-		if(!draft) {
-			HeightGuideChunk west = (parent==null || cx==0) ? region.draftHG(rx-1, rz) : parent.chunks[cx-1][cz];
-			for(int z=0; z<baseSize; z++)
-				y[0][z] = west.y[baseSize][z];
-			HeightGuideChunk north = (parent==null || cz==0) ? region.draftHG(rx, rz-1) : parent.chunks[cx][cz-1];
-			for(int x=0; x<baseSize; x++)
-				y[x][0] = north.y[x][baseSize];
-		}
 		
 		LevelTerrainType[][] t = new LevelTerrainType[3][3];
 		for(int dx=-1; dx<=1; dx++)
@@ -72,19 +70,30 @@ public class HeightGuideChunk {
 				t[dx+1][dz+1] = region.getTerrain(rx+dx, rz+dz);
 			}
 		
-		y[0][baseSize] = (t[0][1].edgey+t[0][2].edgey+t[1][1].edgey+t[1][2].edgey)/4;
-		y[baseSize][0] = (t[1][0].edgey+t[1][1].edgey+t[2][0].edgey+t[2][1].edgey)/4;
+		if(!draft) {
+			HeightGuideChunk west = (parent==null || cx==0) ? region.draftHG(rx-1, rz) : parent.chunks[cx-1][cz];
+			for(int z=0; z<=baseSize; z++)
+				y[0][z] = west.y[baseSize][z];
+			HeightGuideChunk north = (parent==null || cz==0) ? region.draftHG(rx, rz-1) : parent.chunks[cx][cz-1];
+			for(int x=0; x<=baseSize; x++)
+				y[x][0] = north.y[x][baseSize];
+		}
+		else {
+			y[0][baseSize] = (t[0][1].edgey+t[0][2].edgey+t[1][1].edgey+t[1][2].edgey)/4;
+			y[baseSize][0] = (t[1][0].edgey+t[1][1].edgey+t[2][0].edgey+t[2][1].edgey)/4;
+		}
+		
 		y[baseSize][baseSize] = (t[1][1].edgey+t[1][2].edgey+t[2][1].edgey+t[2][2].edgey)/4;
-		plasma(0, 0, baseSize, 20f, random); // TODO avg amp
+		plasma(0, 0, baseSize, plasmaAmp, random);
 		return this;
-	}*/
+	}
 	
-	public HeightGuideChunk generate(boolean draft) {
+	/*public HeightGuideChunk generate(boolean draft) {
 		for(int x=0; x<=baseSize; x++)
 			for(int z=0; z<=baseSize; z++) {
 				y[x][z] = -100;
 			}
 		return this;
-	}
+	}*/
 
 }

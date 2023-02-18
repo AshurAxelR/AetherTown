@@ -43,9 +43,9 @@ public abstract class HouseAssignment {
 		private WRandom wDown = new WRandom(3, 2, 1, 0.2, 0.2, 1);
 		private boolean hasMuseum = false;
 		private int countConv = 0;
-		private WRandom wConv = new WRandom(3, 1);
+		private WRandom wConv = new WRandom(2.75, 0.25, 1);
 		private int countComm = 0;
-		private WRandom wComm = new WRandom(1, 1.5, 0.3, 0.3, 1, 0.2, 0.2);
+		private WRandom wComm = new WRandom(0.3, 0.5, 1.5, 0.2, 0.3, 1, 0.2, 0.5);
 		private int countPostOffice = 0;
 		
 		public Village(Level level) {
@@ -89,24 +89,26 @@ public abstract class HouseAssignment {
 				}
 			}
 			else {
-				if(countConv<countRes/4) {
+				if(countConv<countRes/5) {
 					countConv++;
 					switch(wConv.next(random)) {
 						case 0: return HouseRole.localShop;
-						case 1: return HouseRole.randomFastFood(random);
+						case 1: return HouseRole.supermarket;
+						case 2: return HouseRole.randomFastFood(random);
 						default: throw new RuntimeException();
 					}
 				}
-				if(countComm<countRes/7) {
+				if(countComm<countRes/6) {
 					countComm++;
 					switch(wComm.next(random)) {
 						case 0: return HouseRole.supermarket;
-						case 1: return HouseRole.randomRestaurant(random);
-						case 2: return HouseRole.hotel;
-						case 3: return HouseRole.inn;
-						case 4: return HouseRole.randomShop(random);
-						case 5: return HouseRole.library;
-						case 6: return HouseRole.office;
+						case 1: return HouseRole.randomFastFood(random);
+						case 2: return HouseRole.randomRestaurant(random);
+						case 3: return HouseRole.hotel;
+						case 4: return HouseRole.inn;
+						case 5: return HouseRole.randomShop(random);
+						case 6: return HouseRole.library;
+						case 7: return HouseRole.office;
 						default: throw new RuntimeException();
 					}
 				}

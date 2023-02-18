@@ -78,17 +78,8 @@ public class HeightMap {
 					}
 				}
 			}
-			else { // FIXME still doesn't help. border gap
-				int hx = x+c.tx;
-				if(hx<0) hx = 0;
-				if(hx>=level.levelSize) hx = level.levelSize-1;
-				int hz = z+c.tz;
-				if(hz<0) hz = 0;
-				if(hz>=level.levelSize) hz = level.levelSize-1;
-				int y = level.heightGuide.gety(hx, hz);
-				minf = y;
-				max = y;
-				maxFix = 3;
+			else {
+				// FIXME border gap
 			}
 		}
 		if(first)
@@ -102,6 +93,7 @@ public class HeightMap {
 	}
 	
 	private static int blur(int y, int y1, int y2) {
+		// FIXME don't blur into edge
 		int min = Math.min(y1, y2);
 		int max = Math.max(y1, y2);
 		if(y>min-8 && y>max)
@@ -145,17 +137,6 @@ public class HeightMap {
 					this.y[x][z] = blur(this.y[x][z], this.y[x][z-1], this.y[x+1][z], this.y[x][z+1], this.y[x-1][z]);
 				}
 		}
-		// FIXME border mismatch
-		/*for(int x=0; x<levelSize; x++) {
-			this.y[x][0] = level.heightGuide.gety(x, 0);
-			this.y[x][levelSize-1] = level.heightGuide.gety(x, levelSize-1);
-			this.y[x][levelSize] = level.heightGuide.gety(x, levelSize-1);
-		}
-		for(int z=0; z<levelSize; z++) {
-			this.y[0][z] = level.heightGuide.gety(0, z);
-			this.y[levelSize-1][z] = level.heightGuide.gety(levelSize-1, z);
-			this.y[levelSize][z] = level.heightGuide.gety(levelSize-1, z);
-		}*/
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
 				this.diag[x][z] = calcDiag(y[x][z], y[x][z+1], y[x+1][z], y[x+1][z+1]);

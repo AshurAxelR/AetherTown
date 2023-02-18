@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.render;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import com.xrbpowered.aethertown.render.env.SkyBuffer;
@@ -53,6 +54,26 @@ public class LevelCache {
 	public Level setActive(LevelInfo info) {
 		active = infoMap.get(info);
 		return active.level;
+	}
+	
+	public Iterable<Level> list() {
+		return new Iterable<Level>() {
+			final Iterator<CacheEntry> i = list.iterator();
+			@Override
+			public Iterator<Level> iterator() {
+				return new Iterator<Level>() {
+					@Override
+					public boolean hasNext() {
+						return i.hasNext();
+					}
+					@Override
+					public Level next() {
+						CacheEntry e = i.next();
+						return e.level;
+					}
+				};
+			}
+		};
 	}
 
 	public void createRenderers(SkyBuffer sky, TileRenderer tiles) {

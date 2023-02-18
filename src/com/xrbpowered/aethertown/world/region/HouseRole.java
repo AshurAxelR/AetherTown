@@ -3,6 +3,8 @@ package com.xrbpowered.aethertown.world.region;
 import java.awt.Color;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.utils.Shuffle;
+
 public class HouseRole {
 
 	public static final Color colorResidential = new Color(0x007700);
@@ -13,7 +15,7 @@ public class HouseRole {
 	public static final Color colorFood = new Color(0x7777dd);
 	public static final Color colorShopSmall = new Color(0x0077dd);
 	public static final Color colorShop = new Color(0x0000dd);
-	public static final Color colorShopLarge = new Color(0x000077);
+	public static final Color colorShopLarge = new Color(0x005599);
 	public static final Color colorChurch = new Color(0xffdd77);
 	public static final Color colorCulture = new Color(0xdd77bb);
 	public static final Color colorOffice = new Color(0x77aaaa);
@@ -28,7 +30,7 @@ public class HouseRole {
 	public static final HouseRole inn = new HouseRole("Inn", colorHotel);
 	
 	public static final HouseRole localShop = new HouseRole("Local Store", colorShopSmall);
-	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShop);
+	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge);
 	public static final HouseRole clothesShop = new HouseRole("Clothes Shop", colorShop);
 	
 	// public static final HouseRole mall = new HouseRole("Mall", colorShopLarge);
@@ -45,7 +47,7 @@ public class HouseRole {
 		this.previewColor = color;
 	}
 	
-	private static final HouseRole[] restaurantList = {
+	private static final Shuffle.List<HouseRole> restaurantShuffle = new Shuffle.List<>(
 		new HouseRole("Pub", colorFood),
 		new HouseRole("Italian Restaurant", colorFood),
 		new HouseRole("Pizza Restaurant", colorFood),
@@ -56,41 +58,40 @@ public class HouseRole {
 		new HouseRole("Western-European Restaurant", colorFood),
 		new HouseRole("Eastern-European Restaurant", colorFood),
 		new HouseRole("Spanish Tapas", colorFood),
-		new HouseRole("Turkish Restaurant", colorFood),
-	};
+		new HouseRole("Mediterranean Restaurant", colorFood)
+	);
 
 	public static HouseRole randomRestaurant(Random random) {
-		return restaurantList[random.nextInt(restaurantList.length)];
+		return restaurantShuffle.nextItem(random);
 	}
 
-	private static final HouseRole[] fastFoodList = {
-		new HouseRole("Sandwich Bar", colorFoodSmall),
-		new HouseRole("Burrito Bar", colorFoodSmall),
-		new HouseRole("Burger Bar", colorFoodSmall),
-		new HouseRole("Pizza Bar", colorFoodSmall),
-		new HouseRole("Coffee Shop", colorFoodSmall),
-		new HouseRole("Chinese Takeaway", colorFoodSmall),
-		new HouseRole("Fish and Chips", colorFoodSmall),
-		new HouseRole("Chicken Grill Bar", colorFoodSmall),
-	};
+	private static final Shuffle.List<HouseRole> fastFoodShuffle = new Shuffle.List<>(
+			new HouseRole("Sandwich Bar", colorFoodSmall),
+			new HouseRole("Burrito Bar", colorFoodSmall),
+			new HouseRole("Burger Bar", colorFoodSmall),
+			new HouseRole("Pizza Bar", colorFoodSmall),
+			new HouseRole("Coffee Shop", colorFoodSmall),
+			new HouseRole("Chinese Takeaway", colorFoodSmall),
+			new HouseRole("Fish and Chips", colorFoodSmall),
+			new HouseRole("Chicken Grill Bar", colorFoodSmall)
+	);
 
 	public static HouseRole randomFastFood(Random random) {
-		return fastFoodList[random.nextInt(fastFoodList.length)];
+		return fastFoodShuffle.nextItem(random);
 	}
 
-	private static final HouseRole[] shopList = {
-		supermarket,
-		clothesShop,
-		new HouseRole("Book Store", colorShop),
-		new HouseRole("DIY and Homeware", colorShop),
-		new HouseRole("Tech Store", colorShop),
-		new HouseRole("Hobby Shop", colorShop),
-		new HouseRole("Music Shop", colorShop),
-		new HouseRole("Art Shop", colorShop),
-	};
+	private static final Shuffle.List<HouseRole> shopShuffle = new Shuffle.List<>(
+			supermarket,
+			clothesShop,
+			new HouseRole("DIY and Homeware", colorShop),
+			new HouseRole("Tech Store", colorShop),
+			new HouseRole("Hobby Shop", colorShop),
+			new HouseRole("Music Shop", colorShop),
+			new HouseRole("Art Shop", colorShop)
+	);
 	
 	public static HouseRole randomShop(Random random) {
-		return shopList[random.nextInt(shopList.length)];
+		return shopShuffle.nextItem(random);
 	}
 	
 }

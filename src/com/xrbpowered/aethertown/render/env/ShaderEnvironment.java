@@ -7,6 +7,7 @@ import java.awt.Color;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL20;
 
+import com.xrbpowered.aethertown.utils.ColorBlend;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.shader.Shader;
@@ -113,14 +114,14 @@ public class ShaderEnvironment {
 	}
 
 	public void blend(ShaderEnvironment s0, ShaderEnvironment s1, float s) {
-		lightColor = blend(s0.lightColor, s1.lightColor, s);
-		midColor = blend(s0.midColor, s1.midColor, s);
-		shadowColor = blend(s0.shadowColor, s1.shadowColor, s);
+		lightColor = ColorBlend.blend(s0.lightColor, s1.lightColor, s);
+		midColor = ColorBlend.blend(s0.midColor, s1.midColor, s);
+		shadowColor = ColorBlend.blend(s0.shadowColor, s1.shadowColor, s);
 
-		cloudColor = blend(s0.cloudColor, s1.cloudColor, s);
-		bgColor = blend(s0.bgColor, s1.bgColor, s);
-		zenithColor = blend(s0.zenithColor, s1.zenithColor, s);
-		lightSkyColor = blend(s0.lightSkyColor, s1.lightSkyColor, s);
+		cloudColor = ColorBlend.blend(s0.cloudColor, s1.cloudColor, s);
+		bgColor = ColorBlend.blend(s0.bgColor, s1.bgColor, s);
+		zenithColor = ColorBlend.blend(s0.zenithColor, s1.zenithColor, s);
+		lightSkyColor = ColorBlend.blend(s0.lightSkyColor, s1.lightSkyColor, s);
 		
 		fogNear = MathUtils.lerp(s0.fogNear, s1.fogNear, s);
 		fogFar = MathUtils.lerp(s0.fogFar, s1.fogFar, s);
@@ -129,13 +130,6 @@ public class ShaderEnvironment {
 		lightWashTop = MathUtils.lerp(s0.lightWashTop, s1.lightWashTop, s);
 		lightWashBottom = MathUtils.lerp(s0.lightWashBottom, s1.lightWashBottom, s);
 		lightSkyWash = MathUtils.lerp(s0.lightSkyWash, s1.lightSkyWash, s);
-	}
-	
-	private static Color blend(Color c0, Color c1, float s) {
-		float r = MathUtils.clamp(MathUtils.lerp(c0.getRed(), c1.getRed(), s)/255f);
-		float g = MathUtils.clamp(MathUtils.lerp(c0.getGreen(), c1.getGreen(), s)/255f);
-		float b = MathUtils.clamp(MathUtils.lerp(c0.getBlue(), c1.getBlue(), s)/255f);
-		return new Color(r, g, b);
 	}
 	
 	public static ShaderEnvironment clearDay = new ShaderEnvironment();

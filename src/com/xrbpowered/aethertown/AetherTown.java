@@ -41,16 +41,14 @@ import com.xrbpowered.zoomui.UIElement;
 public class AetherTown extends UIClient {
 
 	private static final boolean testFps = false;
-	public static final float pawnHeight = 1.6f;
+	public static final float pawnHeight = 1.55f;
 
 	public static final Color bgColor = new Color(0x22000000, true);
 	
-	// private static int activeEnvironment = 0;
-	private DaytimeEnvironment environment = new DaytimeEnvironment(); // ShaderEnvironment.environments[activeEnvironment];
+	private DaytimeEnvironment environment = new DaytimeEnvironment();
 
-	//public static long seed;
-	private static Region region;
-	private static LevelCache levelCache;
+	public static Region region;
+	public static LevelCache levelCache;
 	private static Level level;
 
 	private CameraActor camera;
@@ -60,7 +58,6 @@ public class AetherTown extends UIClient {
 	
 	private SkyRenderer sky;
 	private TileRenderer tiles;
-	// private LevelRenderer renderer = null;
 	
 	private StaticMeshActor pointActor;
 

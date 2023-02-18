@@ -13,7 +13,7 @@ import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class HillsGenerator extends TokenGenerator {
 
-	private static final int edgeBlend = 8;
+	private static final int edgeBlend = 4;
 	
 	public int mindy = -4;
 	public int maxdy = 4;

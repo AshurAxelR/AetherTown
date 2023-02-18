@@ -198,7 +198,7 @@ public class StreetConnector {
 			jloop: for(int xj=xi, zj=zi; j<levelSize; j++, xj+=din.dx, zj+=din.dz) {
 				Tile tile = level.map[xj][zj];
 				if(tile!=null) {
-					if(tile.t==Street.template && i>=margin && i<levelSize-margin &&
+					if(tile.t==Street.template && i>=margin && i<levelSize-margin && j<level.levelSize/2 &&
 						(tile.sub==null || tile.sub.parent.canConnect(tile, dout))) { 
 							connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
 					}
@@ -448,8 +448,7 @@ public class StreetConnector {
 			int minDist = level.levelSize*3;
 			for(int p=1; p<connPoints.size()-1; p++) {
 				ConnPoint conn = connPoints.get(p);
-				// int mdist = conn.mdisty(connOut); // FIXME use mdisty
-				int mdist = conn.mdist(connOut);
+				int mdist = conn.mdisty(connOut);
 				if(Math.abs(conn.i - connOut.i)<2)
 					continue;
 				if(mdist<minDist) {

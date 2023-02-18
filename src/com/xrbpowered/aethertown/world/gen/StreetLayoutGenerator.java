@@ -116,9 +116,9 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 	}
 	
-	private static void reconnectStreets(Level level, Random random) {
+	private static void reconnectStreets(Level level, Random random, boolean loop) {
 		boolean upd = true;
-		while(upd) {
+		while(upd && loop) {
 			upd = false;
 			for(Dir d : Dir.shuffle(random)) {
 				upd |= new StreetConnector(level, d).connectAll(random);
@@ -127,11 +127,12 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	}
 	
 	public static void finishLayout(Level level, Random random) {
+		reconnectStreets(level, random, false);
 		connectOut(level, random);
 		trimStreets(level, random);
 		for(PlotGenerator plot : level.plots)
 			plot.fillStreet(random);
-		reconnectStreets(level, random);
+		reconnectStreets(level, random, true);
 		level.heightLimiter.revalidate();
 	}
 }

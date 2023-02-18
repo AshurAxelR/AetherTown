@@ -103,7 +103,7 @@ public class Level {
 				return;
 			}
 			catch (GeneratorException e) {
-				e.printStackTrace();
+				System.err.printf("Generation failed: %s\n", e.getMessage());
 			}
 		}
 		throw new RuntimeException("Generator attempts limit reached");
@@ -124,7 +124,8 @@ public class Level {
 		}
 		
 		HillsGenerator.expand(this, random, 5, 15, -2, 2);
-		HillsGenerator.expand(this, random, 5, 25, -2, 4);
+		HillsGenerator.expand(this, random, 5, 15, -2, 4);
+		// HillsGenerator.expand(this, random, 5, 25, -2, 4);
 		HillsGenerator.expand(this, random, 1, 0, -8, 2);
 		// HillsGenerator.expand(this, random, 1, 0, -4, 2);
 		

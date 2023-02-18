@@ -31,7 +31,7 @@ public class HeightLimiter {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
 				int dy = Level.edgeDist(levelSize, x, z)*maxEdge;
-				miny[x][z] = Math.max(level.info.terrain.miny, level.heightGuide.gety(x, z)-dy);
+				miny[x][z] = level.heightGuide.gety(x, z); // Math.max(level.info.terrain.miny, level.heightGuide.gety(x, z)-dy);
 				maxy[x][z] = Math.min(level.info.terrain.maxy, level.heightGuide.gety(x, z)+dy);
 			}
 	}
