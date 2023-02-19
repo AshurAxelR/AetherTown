@@ -39,6 +39,7 @@ public class HeightMapView extends UIElement {
 			new float[] {-100, -50, -20, 40, 70, 100}
 		);
 	
+	private static boolean showGuide = false;
 	private int offsX, offsZ;
 	
 	public HeightMapView(UIContainer parent) {
@@ -99,8 +100,11 @@ public class HeightMapView extends UIElement {
 				Tile tile = level.map[x][z];
 				if(tile==null)
 					continue;
-				Color c = heightColor.get(tile.basey);
-				// Color c = heightColor.get(level.heightGuide.gety(x, z));
+				Color c;
+				if(showGuide)
+					c = heightColor.get(level.heightGuide.gety(x, z));
+				else
+					c = heightColor.get(tile.basey);
 				if(!(tile.t==Hill.template || tile.t==Park.template)) {
 					float b = 0.3f*c.getRed()/255f + 0.59f*c.getGreen()/255f + 0.11f*c.getBlue()/255f;
 					c = new Color(b, b, b);

@@ -76,7 +76,7 @@ public class LevelInfo {
 	public final int size;
 	public final long seed;
 	
-	public LevelTerrainType terrain = LevelTerrainType.hill;
+	public LevelTerrainModel terrain = LevelTerrainModel.hill;
 	public LevelSettlementType settlement = LevelSettlementType.none;
 	
 	public ArrayList<LevelConnection> conns = new ArrayList<>();
@@ -89,7 +89,7 @@ public class LevelInfo {
 		this.seed = seed;
 	}
 	
-	public LevelInfo setTerrain(LevelTerrainType terrain) {
+	public LevelInfo setTerrain(LevelTerrainModel terrain) {
 		this.terrain = terrain;
 		return this;
 	}
@@ -150,7 +150,7 @@ public class LevelInfo {
 	
 	public static LevelInfo createNullLevel(Region region, int x, int z) {
 		long seed = RandomSeed.seedXY(region.seed+6799, x, z);
-		return new LevelInfo(region, x, z, 1, seed).setTerrain(LevelTerrainType.nullTerrain);
+		return new LevelInfo(region, x, z, 1, seed).setTerrain(LevelTerrainModel.nullTerrain);
 	}
 	
 }

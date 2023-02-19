@@ -120,14 +120,10 @@ public class Level {
 			StreetLayoutGenerator.finishLayout(this, random);
 		}
 		else {
-			new HillsGenerator(20).generate(startToken, random);
+			info.terrain.startTerrain(startToken, random);
 		}
-		
-		HillsGenerator.expand(this, random, 5, 15, -2, 2);
-		HillsGenerator.expand(this, random, 5, 15, -2, 4);
-		// HillsGenerator.expand(this, random, 5, 25, -2, 4);
-		HillsGenerator.expand(this, random, 1, 0, -8, 2);
-		// HillsGenerator.expand(this, random, 1, 0, -4, 2);
+
+		info.terrain.fillTerrain(this, random);
 		
 		int att = 0;
 		for(;; att++) {

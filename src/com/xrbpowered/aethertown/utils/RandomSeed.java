@@ -14,11 +14,22 @@ public class RandomSeed {
 		seed = hashSeed(seed, x);
 		return seed;
 	}
+	
 	public static long seedXY(long seed, long x, long y) {
 		seed = hashSeed(seed, x);
 		seed = hashSeed(seed, y);
 		seed = hashSeed(seed, x);
 		seed = hashSeed(seed, y);
+		return seed;
+	}
+
+	public static long seedXYZ(long seed, long x, long y, long z) {
+		seed = hashSeed(seed, x);
+		seed = hashSeed(seed, y);
+		seed = hashSeed(seed, z);
+		seed = hashSeed(seed, x);
+		seed = hashSeed(seed, y);
+		seed = hashSeed(seed, z);
 		return seed;
 	}
 

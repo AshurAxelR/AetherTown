@@ -17,7 +17,11 @@ public class HillsGenerator extends TokenGenerator {
 	
 	public int mindy = -4;
 	public int maxdy = 4;
-	
+
+	public HillsGenerator() {
+		super(0);
+	}
+
 	public HillsGenerator(int limit) {
 		super(limit);
 	}
@@ -96,7 +100,7 @@ public class HillsGenerator extends TokenGenerator {
 	}
 
 	public static boolean expand(Level level, Random random, int skip, int limit, int mindy, int maxdy) {
-		HillsGenerator hillsGen = new HillsGenerator(0).setAmp(mindy, maxdy);
+		HillsGenerator hillsGen = new HillsGenerator().setAmp(mindy, maxdy);
 		expandTokens(level, hillsGen, random, skip);
 		if(hillsGen.tokenCount()>0) {
 			hillsGen.limit = hillsGen.tokenCount()*limit;
