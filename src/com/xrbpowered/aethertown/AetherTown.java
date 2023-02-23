@@ -160,8 +160,10 @@ public class AetherTown extends UIClient {
 				sky.render(target, levelCache.activeLevelRenderer());
 				levelCache.renderAll(target);
 				
-				if(showPointer)
+				if(showPointer) {
+					tiles.objShader.setLevel(levelCache.activeLevelRenderer());
 					pointActor.draw();
+				}
 			}
 		};
 		
@@ -231,8 +233,12 @@ public class AetherTown extends UIClient {
 	private int compass = -1;
 	
 	private void updateWalkY() {
-		hoverx = (int)((camera.position.x+Tile.size/2)/Tile.size);
-		hoverz = (int)((camera.position.z+Tile.size/2)/Tile.size);
+		boolean inside = Level.hoverInside(level.levelSize, camera.position.x, camera.position.z);
+		if(!inside)
+			changeLevel();
+
+		hoverx = Level.hover(camera.position.x);
+		hoverz = Level.hover(camera.position.z);
 		
 		String info = "";
 		if(activeController==walkController) {
@@ -273,7 +279,21 @@ public class AetherTown extends UIClient {
 		tiles.updateEnvironment(environment);
 	}
 	
+	private void changeLevel() {
+		Level l = levelCache.findHover(camera.position.x, camera.position.z);
+		if(l==null || l==level)
+			return;
+		LevelCache.adjustCameraPosition(level.info, l.info, camera.position);
+		camera.updateTransform();
+		level = levelCache.setActive(l.info);
+		LevelMapView.level = level;
+		levelCache.updateLevelOffsets();
+		
+		System.out.printf("Level switched to [%d, %d]\n", level.info.x0, level.info.z0);
+	}
+	
 	private void changeRegion() {
+		level = levelCache.setActive(region.startLevel);
 		LevelMapView.level = level;
 
 		sky.stars.createStars(region.seed);
@@ -401,7 +421,6 @@ public class AetherTown extends UIClient {
 		region.generate();
 		levelCache = new LevelCache();
 		levelCache.addAll(region.displayLevels);
-		level = levelCache.setActive(region.startLevel);
 	}
 	
 	public static void main(String[] args) {

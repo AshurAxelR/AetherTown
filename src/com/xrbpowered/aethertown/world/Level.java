@@ -251,6 +251,15 @@ public class Level {
 		return isInside(levelSize, x, z, margin);
 	}
 	
+	public static boolean hoverInside(int levelSize, float x, float z) {
+		return (x+Tile.size/2)>=0f && (x+Tile.size/2)<=levelSize*Tile.size &&
+				(z+Tile.size/2)>=0f && (z+Tile.size/2)<=levelSize*Tile.size;
+	}
+	
+	public static int hover(float cam) {
+		return (int)((cam+Tile.size/2)/Tile.size);
+	}
+	
 	public static boolean isInside(int levelSize, int x, int z, int margin) {
 		return x>=margin && x<levelSize-margin && z>=margin && z<levelSize-margin;
 	}

@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
+import org.joml.Vector3f;
+
 import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
@@ -75,6 +77,14 @@ public class LevelCache {
 			}
 		};
 	}
+	
+	public Level findHover(float x, float z) {
+		for (CacheEntry c : list) {
+			if (Level.hoverInside(c.level.levelSize, x - c.renderer.levelOffset.x, z - c.renderer.levelOffset.y))
+				return c.level;
+		}
+		return null;
+	}
 
 	public void createRenderers(SkyBuffer sky, TileRenderer tiles) {
 		for(CacheEntry c : list) {
@@ -83,6 +93,13 @@ public class LevelCache {
 			c.renderer.createLevelGeometry();
 			System.out.println("Done.");
 		}
+	}
+	
+	public static void adjustCameraPosition(LevelInfo prev, LevelInfo next, Vector3f pos) {
+		float dx = (prev.x0 - next.x0)*LevelInfo.baseSize*Tile.size;
+		float dz = (prev.z0 - next.z0)*LevelInfo.baseSize*Tile.size;
+		pos.x += dx;
+		pos.z += dz;
 	}
 	
 	public void updateLevelOffsets() {
