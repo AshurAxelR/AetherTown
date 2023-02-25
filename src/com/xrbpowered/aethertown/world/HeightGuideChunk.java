@@ -52,8 +52,6 @@ public class HeightGuideChunk {
 		int mx = x0+size/2;
 		int mz = z0+size/2;
 		
-		//if(z0>0) y[mx][z0] = (y[x0][z0]+y[x1][z0])/2 + delta(random, amp);
-		//if(x0>0) y[x0][mz] = (y[x0][z0]+y[x0][z1])/2 + delta(random, amp);
 		y[mx][z1] = (y[x0][z1]+y[x1][z1])/2 + delta(random, amp);
 		y[x1][mz] = (y[x1][z0]+y[x1][z1])/2 + delta(random, amp);
 		y[mx][mz] = (y[mx][z0]+y[mx][z1]+y[x0][mz]+y[x1][mz])/4; // + delta(random, amp);
@@ -106,6 +104,16 @@ public class HeightGuideChunk {
 		plasma(m, 0, m, plasmaAmp, random);
 		plasma(0, m, m, plasmaAmp, random);
 		plasma(m, m, m, plasmaAmp, random);
+		
+		// for the purpose of HeightMap.calcy
+		for(int z=0; z<=baseSize; z++) {
+			if(y[baseSize-1][z]>y[baseSize][z])
+				y[baseSize-1][z] = y[baseSize][z];
+		}
+		for(int x=0; x<=baseSize; x++) {
+			if(y[x][baseSize-1]>y[x][baseSize])
+				y[x][baseSize-1] = y[x][baseSize];
+		}
 		return this;
 	}
 

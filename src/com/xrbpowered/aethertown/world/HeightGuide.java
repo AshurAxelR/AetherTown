@@ -16,7 +16,10 @@ public class HeightGuide {
 	}
 	
 	public int gety(int x, int z) {
-		return chunks[x/baseSize][z/baseSize].y[x%baseSize][z%baseSize];
+		int levelSize = info.getLevelSize();
+		int cx = (x==levelSize) ? info.size-1 : x/baseSize; 
+		int cz = (z==levelSize) ? info.size-1 : z/baseSize; 
+		return chunks[cx][cz].y[x-cx*baseSize][z-cz*baseSize];
 	}
 	
 	public HeightGuide generate() {

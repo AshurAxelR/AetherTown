@@ -1,9 +1,9 @@
 package com.xrbpowered.aethertown.world;
 
+import static com.xrbpowered.aethertown.utils.MathUtils.lerp;
+
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.MathUtils;
-
-import static com.xrbpowered.aethertown.utils.MathUtils.lerp;
 
 public class HeightMap {
 
@@ -60,26 +60,37 @@ public class HeightMap {
 		int minf = 0;
 		int maxFix = 0;
 		for(Corner c : Corner.values()) {
-			if(level.isInside(x+c.tx, z+c.tz)) {
-				Tile t = level.map[x+c.tx][z+c.tz];
+			int fix, y;
+			int cx = x+c.tx;
+			int cz = z+c.tz;
+			
+			if(level.isInside(cx, cz)) {
+				Tile t = level.map[cx][cz];
 				if(t==null)
 					continue;
-				int fix = t.t.getFixedYStrength();
-				if(fix>0) {
-					if(fix>maxFix || (t.basey<minf && fix==maxFix)) {
-						minf = t.getGroundY();
-						maxFix = fix;
-					}
-				}
-				else {
-					if(first || t.basey>max) {
-						max = t.getGroundY();
-						first = false;
-					}
+				fix = t.t.getFixedYStrength();
+				y = t.getGroundY();
+			}
+			else {
+				if(cx<0) cx = 0;
+				if(cx>level.levelSize) cx = level.levelSize;
+				if(cz<0) cz = 0;
+				if(cz>level.levelSize) cz = level.levelSize;
+				fix = 0;
+				y = level.heightGuide.gety(cx, cz);
+			}
+			
+			if(fix>0) {
+				if(fix>maxFix || (y<minf && fix==maxFix)) {
+					minf = y;
+					maxFix = fix;
 				}
 			}
 			else {
-				// FIXME border gap
+				if(first || y>max) {
+					max = y;
+					first = false;
+				}
 			}
 		}
 		if(first)
@@ -93,7 +104,6 @@ public class HeightMap {
 	}
 	
 	private static int blur(int y, int y1, int y2) {
-		// FIXME don't blur into edge
 		int min = Math.min(y1, y2);
 		int max = Math.max(y1, y2);
 		if(y>min-8 && y>max)
