@@ -8,7 +8,7 @@ public class WorldTime {
 	@SuppressWarnings("unused")
 	public static final int season = (dayOfYear>0.7f && dayOfYear<0.85f) ? Seasons.winter : Seasons.summer;
 
-	public static final float timeSpeed = 60f;
+	public static final float timeSpeed = 20f;
 
 	private static final float cycleTimeFactor = (float)Math.PI * 2f / (float)(60*60*24);
 	

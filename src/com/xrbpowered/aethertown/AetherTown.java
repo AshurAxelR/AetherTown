@@ -28,6 +28,7 @@ import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.shader.Shader;
 import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.scene.CameraActor;
+import com.xrbpowered.gl.scene.CameraActor.Perspective;
 import com.xrbpowered.gl.scene.Controller;
 import com.xrbpowered.gl.scene.StaticMeshActor;
 import com.xrbpowered.gl.scene.WalkController;
@@ -158,7 +159,7 @@ public class AetherTown extends UIClient {
 			protected void renderBuffer(RenderTarget target) {
 				super.renderBuffer(target);
 				sky.render(target, levelCache.activeLevelRenderer());
-				levelCache.renderAll(target);
+				levelCache.renderAll(target, (Perspective)camera);
 				
 				if(showPointer) {
 					tiles.objShader.setLevel(levelCache.activeLevelRenderer());
@@ -287,7 +288,6 @@ public class AetherTown extends UIClient {
 		camera.updateTransform();
 		level = levelCache.setActive(l.info);
 		LevelMapView.level = level;
-		levelCache.updateLevelOffsets();
 		
 		System.out.printf("Level switched to [%d, %d]\n", level.info.x0, level.info.z0);
 	}
@@ -298,7 +298,6 @@ public class AetherTown extends UIClient {
 
 		sky.stars.createStars(region.seed);
 		levelCache.createRenderers(sky.buffer, tiles);
-		levelCache.updateLevelOffsets();
 
 		updateEnvironment();
 		
@@ -318,6 +317,7 @@ public class AetherTown extends UIClient {
 	}
 	
 	private static void printTileDebug(int hoverx, int hoverz, Tile tile) {
+		System.out.printf("Rendering %d levels\n", levelCache.renderedLevels);
 		System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
 		if(level.heightGuide!=null)
 			System.out.printf("\theightGuide: %d\n", level.heightGuide.gety(hoverx, hoverz));
@@ -420,7 +420,8 @@ public class AetherTown extends UIClient {
 		region = new Region(seed);
 		region.generate();
 		levelCache = new LevelCache();
-		levelCache.addAll(region.displayLevels);
+		// levelCache.addAll(region.displayLevels);
+		levelCache.addAllAdj(region.startLevel);
 	}
 	
 	public static void main(String[] args) {
@@ -431,7 +432,6 @@ public class AetherTown extends UIClient {
 			WorldTime.setTimeOfDay(Float.parseFloat(args[0]));
 
 		long seed = System.currentTimeMillis();
-		// level = generateLevel(seed);
 		generateRegion(seed);
 
 		new AetherTown().run();

@@ -26,7 +26,7 @@ public class ShaderEnvironment {
 	public Color lightSkyColor = new Color(0xf2f7ff);
 	
 	public float fogNear = 15f*Tile.size;
-	public float fogFar = 70f*Tile.size;
+	public float fogFar = 63f*Tile.size;
 	
 	public boolean renderStars = false;
 	public float lightWashTop = 1f;

@@ -105,6 +105,8 @@ public abstract class StreetPresetGenerator extends PresetPlotGenerator implemen
 	
 	protected boolean removeOrPromote(int conn, int mask, Token[] tokens, Random random) {
 		if(conn<=1) {
+			if(conn==1 && startToken.x==startToken.level.getStartX() && startToken.z==startToken.level.getStartZ())
+				return false;
 			remove();
 			return true;
 		}

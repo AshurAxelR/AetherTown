@@ -8,6 +8,7 @@ import org.lwjgl.opengl.GL11;
 import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.scene.StaticMeshActor;
@@ -33,6 +34,13 @@ public class LevelRenderer {
 		this.sky = sky;
 		this.tiles = tiles;
 		this.renderers = tiles.createRenderers(this);
+	}
+	
+	public float levelDist(float x, float z) {
+		float r = level.levelSize*Tile.size*0.5f;
+		float dx = levelOffset.x + r - x;
+		float dz = levelOffset.y + r - z;
+		return (float)Math.sqrt(dx*dx+dz*dz) - r*(float)Math.sqrt(2);
 	}
 
 	public void createLevelGeometry() {

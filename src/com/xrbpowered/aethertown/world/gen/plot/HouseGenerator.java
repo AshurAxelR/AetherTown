@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
+import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -97,11 +98,30 @@ public class HouseGenerator extends HouseGeneratorBase {
 		}
 	}
 	
+	private static int findUnlistedHouses(Level level) {
+		int err = 0;
+		for(int x=0; x<level.levelSize; x++)
+			for(int z=0; z<level.levelSize; z++) {
+				Tile tile = level.map[x][z];
+				if(tile!=null && tile.t==HouseT.template) {
+					HouseGenerator house = (HouseGenerator)tile.sub.parent;
+					if(house.index<0)
+						err++;
+				}
+			}
+		return err;
+	}
+	
 	public static ArrayList<HouseGenerator> listHouses(Level level, Random random) {
 		ArrayList<HouseGenerator> houses = new ArrayList<>();
 		boolean[][] visited = new boolean[level.levelSize][level.levelSize];
 		listHousesRec(level, random, level.getStartX(), level.getStartZ(), visited, houses);
 		System.out.printf("%d houses\n", houses.size());
+		
+		int err = findUnlistedHouses(level);
+		if(err>0)
+			throw new GeneratorException(String.format("%d unlisted house tiles", err));
+		
 		return houses;
 	}
 	

@@ -9,7 +9,7 @@ import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 
 public class Region {
 
-	public static final int sizex = 1024;
+	public static final int sizex = 512;
 	public static final int sizez = 128;
 	
 	public final long seed;
@@ -69,8 +69,14 @@ public class Region {
 		level = new LevelInfo(this, x+2, z, 2, random.nextLong()).setSettlement(LevelSettlementType.village);
 		level.place();
 		displayLevels.add(level);
+		level = new LevelInfo(this, x, z-1, 1, random.nextLong()).setTerrain(LevelTerrainModel.low);
+		level.place();
+		displayLevels.add(level);
 		connectLevels(x, z, Dir.west);
+		connectLevels(x, z, Dir.north);
 		connectLevels(x+1, z, Dir.east);
+		displayLevels.add(getLevel(x-1, z-1));
+		displayLevels.add(getLevel(x+1, z-1));
 	}
 
 	public void connectLevels(int x, int z, Dir d) {

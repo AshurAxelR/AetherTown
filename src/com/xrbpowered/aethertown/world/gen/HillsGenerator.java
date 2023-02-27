@@ -27,6 +27,8 @@ public class HillsGenerator extends TokenGenerator {
 	}
 	
 	public HillsGenerator setAmp(int mindy, int maxdy) {
+		if(maxdy<mindy)
+			throw new IllegalArgumentException();
 		this.mindy = mindy;
 		this.maxdy = maxdy;
 		return this;
