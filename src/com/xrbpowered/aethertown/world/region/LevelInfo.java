@@ -146,7 +146,14 @@ public class LevelInfo {
 		result = prime * result + x0;
 		result = prime * result + z0;
 		return result;
-	}	
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		LevelInfo info = (LevelInfo) obj;
+		return this.region==info.region && // TODO region.equals()
+				this.x0==info.x0 && this.z0==info.z0 && this.size==info.size;
+	}
 	
 	public static LevelInfo createNullLevel(Region region, int x, int z) {
 		long seed = RandomSeed.seedXY(region.seed+6799, x, z);

@@ -286,10 +286,13 @@ public class AetherTown extends UIClient {
 			return;
 		LevelCache.adjustCameraPosition(level.info, l.info, camera.position);
 		camera.updateTransform();
+		levelCache.addAllAdj(l.info);
 		level = levelCache.setActive(l.info);
+		levelCache.createRenderers(sky.buffer, tiles);
 		LevelMapView.level = level;
 		
 		System.out.printf("Level switched to [%d, %d]\n", level.info.x0, level.info.z0);
+		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
 	}
 	
 	private void changeRegion() {

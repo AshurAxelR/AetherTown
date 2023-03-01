@@ -113,6 +113,8 @@ public class RegionPaths {
 			}
 			
 			level.place();
+			if(region.startLevel==null)
+				region.startLevel = level;
 			if(t.enter!=null)
 				region.connectLevels(t.x, t.z, t.enter.flip());
 			

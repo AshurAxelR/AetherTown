@@ -1,6 +1,5 @@
 package com.xrbpowered.aethertown.world.region;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
@@ -16,7 +15,6 @@ public class Region {
 	public LevelInfo[][] map = null;
 	
 	public LevelInfo startLevel = null;
-	public ArrayList<LevelInfo> displayLevels = new ArrayList<>(); // temporary
 	
 	public Region(long seed) {
 		this.seed = seed;
@@ -53,10 +51,10 @@ public class Region {
 	public void generate() {
 		map = new LevelInfo[sizex][sizez];
 		Random random = new Random(seed);
-		// new RegionPaths(this, random).generatePaths();
+		new RegionPaths(this, random).generatePaths();
 		
 		// temporary:
-		int x = sizez/2;
+		/*int x = sizez/2;
 		int z = sizez/2;
 		LevelInfo level;
 		level = new LevelInfo(this, x, z, 2, random.nextLong()).setSettlement(LevelSettlementType.smallTown);
@@ -76,7 +74,7 @@ public class Region {
 		connectLevels(x, z, Dir.north);
 		connectLevels(x+1, z, Dir.east);
 		displayLevels.add(getLevel(x-1, z-1));
-		displayLevels.add(getLevel(x+1, z-1));
+		displayLevels.add(getLevel(x+1, z-1));*/
 	}
 
 	public void connectLevels(int x, int z, Dir d) {

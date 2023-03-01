@@ -17,15 +17,19 @@ import com.xrbpowered.gl.scene.CameraActor;
 
 public class LevelCache {
 
+	public static final int storageLimit = 64;
+	
 	private class CacheEntry {
 		public Level level = null;
 		public LevelRenderer renderer = null;
+		public long lastRenderTime = -1L;
 	}
 	
 	private HashMap<LevelInfo, CacheEntry> infoMap = new HashMap<>();
 	private ArrayList<CacheEntry> list = new ArrayList<>();
 	private CacheEntry active = null;
 	
+	private int storage = 0;
 	public int renderedLevels = 0;
 	
 	public Level activeLevel() {
@@ -44,6 +48,10 @@ public class LevelCache {
 			c.level = level;
 			infoMap.put(info, c);
 			list.add(c);
+			
+			storage += info.size*info.size;
+			while(storage > storageLimit)
+				expel(getLRU());
 		}
 	}
 	
@@ -57,6 +65,30 @@ public class LevelCache {
 			for(int z=info.z0-1; z<info.z0+info.size+1; z++) {
 				add(info.region.getLevel(x, z));
 			}
+	}
+
+	public LevelInfo getLRU() {
+		CacheEntry lru = null;
+		for(CacheEntry c : list) {
+			if(c.lastRenderTime<0L)
+				continue;
+			if(lru==null || c.lastRenderTime<lru.lastRenderTime)
+				lru = c;
+		}
+		return lru.level.info;
+	}
+	
+	public void expel(LevelInfo info) {
+		CacheEntry c = infoMap.get(info);
+		if(c!=null) {
+			infoMap.remove(info);
+			list.remove(c);
+			storage -= info.size*info.size;
+		}
+	}
+
+	public int getStoredBlocks() {
+		return storage;
 	}
 	
 	public Level getLevel(LevelInfo info) {
@@ -128,11 +160,16 @@ public class LevelCache {
 	}
 
 	public void renderAll(RenderTarget target, CameraActor.Perspective camera) {
+		long time = System.currentTimeMillis();
 		renderedLevels = 0;
 		for(CacheEntry c : list) {
-			if(c.renderer.levelDist(camera.position.x, camera.position.z) > camera.getFar())
+			if(c.renderer.levelDist(camera.position.x, camera.position.z) > camera.getFar()) {
+				if(c.lastRenderTime<0L)
+					c.lastRenderTime = 0L;
 				continue;
+			}
 			c.renderer.render(target);
+			c.lastRenderTime = time;
 			renderedLevels++;
 		}
 	}

@@ -117,7 +117,8 @@ public class RegionMapView extends UIElement {
 		LevelNames.load();
 		Fonts.load();
 
-		region = new Region(System.currentTimeMillis());
+		long seed = System.currentTimeMillis();
+		region = new Region(seed);
 		region.generate();
 		
 		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown region map", 1920, 1080);
