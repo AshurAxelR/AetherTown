@@ -15,7 +15,6 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
-import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
@@ -304,17 +303,10 @@ public class AetherTown extends UIClient {
 
 		updateEnvironment();
 		
-		if(level.info.conns.size()>0) {
-			LevelConnection lc = level.info.conns.get(0);
-			camera.position.x = lc.getLevelX()*Tile.size;
-			camera.position.z = lc.getLevelZ()*Tile.size;
-			camera.rotation.y = -lc.d.flip().ordinal() * (float)Math.PI/2f;
-		}
-		else {
-			camera.position.x = level.getStartX()*Tile.size;
-			camera.position.z = level.getStartZ()*Tile.size;
-			camera.rotation.y = 0;
-		}
+		camera.position.x = level.getStartX()*Tile.size;
+		camera.position.z = level.getStartZ()*Tile.size;
+		camera.rotation.y = 0;
+
 		activeController = walkController;
 		updateWalkY();
 	}

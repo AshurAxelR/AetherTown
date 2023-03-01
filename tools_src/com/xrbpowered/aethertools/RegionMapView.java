@@ -5,9 +5,9 @@ import java.awt.Rectangle;
 
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
+import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.Region;
-import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -22,9 +22,13 @@ public class RegionMapView extends UIElement {
 	public static final int tileSize = 12;
 	
 	public static final Color colorBg = new Color(0xf5f5f5);
-	public static final Color colorLevel = new Color(0xffffff);
+	public static final Color colorTextBg = new Color(0xbbffffff, true);
+	public static final Color colorText = new Color(0x777777);
+	
+	public static final Color colorLevel = new Color(0xddeebb);
 	public static final Color colorLevelBorder = new Color(0xdddddd);
 	public static final Color colorPaths = new Color(0x777777);
+	public static final Color colorTown = new Color(0x000000);
 	
 	public static Region region;
 	
@@ -50,10 +54,19 @@ public class RegionMapView extends UIElement {
 	private static void paintInfo(GraphAssist g) {
 		if(!Region.isInside(hoverx, hoverz))
 			return;
+		g.fillRect(10, 10, 350, 55, colorTextBg);
+		int x = 20;
+		int y = 35;
+		int h = 18;
+		g.setFont(Fonts.small);
+		g.setColor(colorText);
+		g.drawString(String.format("[%d, %d]", hoverx, hoverz), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		LevelInfo level = region.map[hoverx][hoverz];
-		if(level==null)
-			return;
-		// print info
+		if(level!=null) {
+			g.setFont(Fonts.smallBold);
+			g.setColor(Color.BLACK);
+			g.drawString(level.name, x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
+		}
 	}
 	
 	public void centerAt(int x, int z) {
@@ -100,6 +113,12 @@ public class RegionMapView extends UIElement {
 					g.line(mx, mz, cx, cz);
 				}
 				g.popAntialiasing();
+				
+				int s = level.settlement.ordinal();
+				if(s>0) {
+					g.setColor(colorTown);
+					g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
+				}
 			}
 
 		g.popAntialiasing();
@@ -118,6 +137,7 @@ public class RegionMapView extends UIElement {
 		Fonts.load();
 
 		long seed = System.currentTimeMillis();
+		System.out.printf("Region seed: %dL\n", seed);
 		region = new Region(seed);
 		region.generate();
 		

@@ -38,7 +38,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 	
 	@Override
 	public String getInfo() {
-		return String.format("%d, %s: %s", index+1, startToken.level.name, role.title);
+		return String.format("%d, %s: %s", index+1, startToken.level.info.name, role.title);
 	}
 	
 	@Override

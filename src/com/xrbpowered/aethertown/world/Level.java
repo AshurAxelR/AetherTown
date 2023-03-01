@@ -13,7 +13,6 @@ import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.HouseAssignment;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
-import com.xrbpowered.aethertown.world.region.LevelNames;
 
 public class Level {
 
@@ -29,7 +28,6 @@ public class Level {
 	public ArrayList<ChurchGenerator> churches = null;
 	public ArrayList<HouseGenerator> houses = null;
 	public int houseCount = 0;
-	public String name;
 
 	// available only during generation
 	public HeightGuide heightGuide = null;
@@ -146,7 +144,6 @@ public class Level {
 		
 		houses = HouseGenerator.listHouses(this, random);
 		houseCount = houses.size();
-		name = LevelNames.next(random, info.settlement);
 		HouseAssignment.assignHouses(this, random);
 		
 		decorate(random);

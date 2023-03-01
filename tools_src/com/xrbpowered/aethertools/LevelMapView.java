@@ -62,7 +62,7 @@ public class LevelMapView extends UIElement {
 		int h = 18;
 		g.setFont(Fonts.small);
 		g.setColor(colorText);
-		g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, level.name), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
+		g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, level.info.name), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		Tile tile = level.map[hoverx][hoverz];
 		if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
 			String info = null;

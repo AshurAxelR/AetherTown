@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.world.region;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.RandomSeed;
@@ -75,6 +76,7 @@ public class LevelInfo {
 	public final int x0, z0;
 	public final int size;
 	public final long seed;
+	public String name;
 	
 	public LevelTerrainModel terrain = LevelTerrainModel.hill;
 	public LevelSettlementType settlement = LevelSettlementType.none;
@@ -87,6 +89,11 @@ public class LevelInfo {
 		this.z0 = z;
 		this.size = size;
 		this.seed = seed;
+		updateName();
+	}
+	
+	private void updateName() {
+		this.name = LevelNames.next(new Random(seed+6173L), settlement);
 	}
 	
 	public LevelInfo setTerrain(LevelTerrainModel terrain) {
@@ -99,6 +106,7 @@ public class LevelInfo {
 		while(settlement.getStreetMargin(levelSize)<8)
 			settlement = settlement.demote();
 		this.settlement = settlement;
+		updateName();
 		return this;
 	}
 

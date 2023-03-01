@@ -65,20 +65,26 @@ public class RegionPaths {
 	
 	private static final WRandom wnextDir = new WRandom(1, 0.5, 0.5, 1);
 	
-	private Dir nextDir(Dir d) {
+	private static boolean zprob(double rnd, int z, int sign) {
+		double sz = sign*(z-Region.sizez/2)*2/(double)Region.sizez;
+		double tan = 0.001*Math.tan(sz*Math.PI/2.0);
+		return rnd-0.5 < tan;
+	}
+	
+	private Dir nextDir(Dir d, int z) {
 		switch (wnextDir.next(random)) {
 			case 0:
 				return d==null ? Dir.east : d;
 			case 1:
-				return d!=Dir.south ? Dir.north : Dir.east;
+				return d!=Dir.south && zprob(random.nextFloat(), z, 1) ? Dir.north : Dir.west;
 			case 2:
-				return d!=Dir.north ? Dir.south : Dir.east;
+				return d!=Dir.north && zprob(random.nextFloat(), z, -1) ? Dir.south : Dir.west;
 			default:
 				return Dir.east;
 		}
 	}
 	
-	private PathToken nextToken(LevelInfo level, Dir d, int pop) {
+	private PathToken nextToken(LevelInfo level, Dir d, int pop, int att) {
 		int dx = d.dx;
 		int dz = d.dz;
 		if(dx>0)
@@ -90,8 +96,11 @@ public class RegionPaths {
 		else if(dz==0)
 			dz = random.nextInt(level.size);
 		PathToken nt = new PathToken(level.x0+dx, level.z0+dz, d, pop);
-		if(!Region.isInside(nt.x, nt.z))
-			return nextToken(level, d, pop);
+		if(!Region.isInside(nt.x, nt.z)) {
+			if(att>30)
+				throw new StackOverflowError();
+			return nextToken(level, d, pop, att+1);
+		}
 		else
 			return nt;
 	}
@@ -108,18 +117,20 @@ public class RegionPaths {
 			if(level==null) {
 				region.connectLevels(t.x, t.z, t.enter.flip());
 				if(tokenCount<1)
-					addToken(nextToken(region.map[t.x][t.z], Dir.east, t.pop+1));
+					addToken(nextToken(region.map[t.x][t.z], Dir.east, t.pop+1, 0));
 				continue;
 			}
 			
 			level.place();
 			if(region.startLevel==null)
 				region.startLevel = level;
+			else
+				level.setSettlement(LevelSettlementType.random(level.size, random));
 			if(t.enter!=null)
 				region.connectLevels(t.x, t.z, t.enter.flip());
 			
 			if(t.x<Region.sizex-Region.sizez/2) {
-				addToken(nextToken(level, nextDir(t.enter), t.pop+1));
+				addToken(nextToken(level, nextDir(t.enter, t.z), t.pop+1, 0));
 				//if(random.nextInt(tokenCount*10+2)==0)
 				//	addToken(nextToken(level, nextDir(t.enter), t.pop+1));
 			}
