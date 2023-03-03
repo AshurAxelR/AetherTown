@@ -3,11 +3,14 @@ package com.xrbpowered.aethertown.world.region;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightGuideChunk;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 
 public class Region {
 
+	private static final int maxGeneratorAttempts = 3;
+	
 	public static final int sizex = 512;
 	public static final int sizez = 128;
 	
@@ -48,33 +51,30 @@ public class Region {
 		return false;
 	}
 	
-	public void generate() {
+	private void resetGenerator() {
 		map = new LevelInfo[sizex][sizez];
+		startLevel = null;
+	}
+	
+	public void generate() {
 		Random random = new Random(seed);
+		for(int att = 0; att<maxGeneratorAttempts; att++) {
+			if(att>0)
+				System.out.printf("Retrying...\nAttempt #%d\n", att+1);
+			try {
+				generate(random);
+				return;
+			}
+			catch (GeneratorException e) {
+				System.err.printf("Generation failed: %s\n", e.getMessage());
+			}
+		}
+		throw new RuntimeException("Generator attempts limit reached");
+	}
+
+	private void generate(Random random) {
+		resetGenerator();
 		new RegionPaths(this, random).generatePaths();
-		
-		// temporary:
-		/*int x = sizez/2;
-		int z = sizez/2;
-		LevelInfo level;
-		level = new LevelInfo(this, x, z, 2, random.nextLong()).setSettlement(LevelSettlementType.smallTown);
-		level.place();
-		startLevel = level;
-		displayLevels.add(level);
-		level = new LevelInfo(this, x-2, z, 2, random.nextLong()).setSettlement(LevelSettlementType.village);
-		level.place();
-		displayLevels.add(level);
-		level = new LevelInfo(this, x+2, z, 2, random.nextLong()).setSettlement(LevelSettlementType.village);
-		level.place();
-		displayLevels.add(level);
-		level = new LevelInfo(this, x, z-1, 1, random.nextLong()).setTerrain(LevelTerrainModel.low);
-		level.place();
-		displayLevels.add(level);
-		connectLevels(x, z, Dir.west);
-		connectLevels(x, z, Dir.north);
-		connectLevels(x+1, z, Dir.east);
-		displayLevels.add(getLevel(x-1, z-1));
-		displayLevels.add(getLevel(x+1, z-1));*/
 	}
 
 	public void connectLevels(int x, int z, Dir d) {

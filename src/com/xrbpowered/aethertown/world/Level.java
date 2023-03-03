@@ -17,7 +17,7 @@ import com.xrbpowered.aethertown.world.region.LevelInfo;
 public class Level {
 
 	private static final int maxRefillAttempts = 10;
-	private static final int maxGeneratorAttempts = 30;
+	private static final int maxGeneratorAttempts = 10;
 	
 	public final LevelInfo info;
 	public final int levelSize;

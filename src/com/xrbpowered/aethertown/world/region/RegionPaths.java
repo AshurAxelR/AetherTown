@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
+import com.xrbpowered.aethertown.world.GeneratorException;
 
 public class RegionPaths {
 
@@ -63,7 +64,7 @@ public class RegionPaths {
 		return level;
 	}
 	
-	private static final WRandom wnextDir = new WRandom(1, 0.5, 0.5, 1);
+	private static final WRandom wnextDir = new WRandom(1, 0.5, 0.5, 0.5, 0.5);
 	
 	private static boolean zprob(double rnd, int z, int sign) {
 		double sz = sign*(z-Region.sizez/2)*2/(double)Region.sizez;
@@ -79,6 +80,10 @@ public class RegionPaths {
 				return d!=Dir.south && zprob(random.nextFloat(), z, 1) ? Dir.north : Dir.west;
 			case 2:
 				return d!=Dir.north && zprob(random.nextFloat(), z, -1) ? Dir.south : Dir.west;
+			case 3:
+				return d==Dir.west ? Dir.north : Dir.east;
+			case 4:
+				return d==Dir.west ? Dir.south : Dir.east;
 			default:
 				return Dir.east;
 		}
@@ -97,8 +102,8 @@ public class RegionPaths {
 			dz = random.nextInt(level.size);
 		PathToken nt = new PathToken(level.x0+dx, level.z0+dz, d, pop);
 		if(!Region.isInside(nt.x, nt.z)) {
-			if(att>30)
-				throw new StackOverflowError();
+			if(att>10)
+				throw new GeneratorException("Path out of region bounds");
 			return nextToken(level, d, pop, att+1);
 		}
 		else
@@ -125,7 +130,7 @@ public class RegionPaths {
 			if(region.startLevel==null)
 				region.startLevel = level;
 			else
-				level.setSettlement(LevelSettlementType.random(level.size, random));
+			 	level.setSettlement(LevelSettlementType.random(level.size, random));
 			if(t.enter!=null)
 				region.connectLevels(t.x, t.z, t.enter.flip());
 			

@@ -55,7 +55,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	}
 
 	public static boolean addPointOfInterest(Token t, Random random) {
-		if(new HouseGenerator().generate(t, random))
+		if(t.level.info.settlement.maxHouses>0 && new HouseGenerator().generate(t, random))
 			return true;
 		else if(new LargeParkGenerator(true).generate(t, random))
 			return true;
@@ -117,6 +117,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	}
 	
 	private static void reconnectStreets(Level level, Random random, boolean loop) {
+		if(level.info.settlement.maxHouses==0)
+			return;
 		boolean upd = true;
 		while(upd && loop) {
 			upd = false;

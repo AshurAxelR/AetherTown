@@ -103,7 +103,7 @@ public class LevelInfo {
 	
 	public LevelInfo setSettlement(LevelSettlementType settlement) {
 		int levelSize = getLevelSize();
-		while(settlement.getStreetMargin(levelSize)<8)
+		while(settlement.getStreetMargin(levelSize)<14)
 			settlement = settlement.demote();
 		this.settlement = settlement;
 		updateName();

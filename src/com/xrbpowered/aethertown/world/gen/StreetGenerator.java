@@ -52,7 +52,10 @@ public class StreetGenerator implements Generator, TokenProvider {
 			case 3:
 				return (h==0) ? new LargeParkGenerator(true) : null;
 			case 4:
-				return HouseGenerator.select(level);
+				if(level.info.settlement.maxHouses>0)
+					return HouseGenerator.select(level);
+				else
+					return null;
 			default:
 				return null;
 		}

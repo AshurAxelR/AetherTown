@@ -32,13 +32,13 @@ public enum LevelSettlementType {
 	
 	public int getStreetMargin(int levelSize) {
 		int size = (int)Math.ceil(Math.sqrt(maxHouses*40)/4.0)*4;
-		if(size<24) size = 24;
+		if(size<20) size = 20;
 		return (levelSize-size)/2;
 	}
 	
 	private static final WRandom[] w = {
-		new WRandom(0.5, 0.2, 0.2, 0.1, 0, 0),
-		new WRandom(0.1, 0.15, 0.2, 0.3, 0.2, 0.05),
+		new WRandom(0.6, 0.2, 0.15, 0.05, 0, 0),
+		new WRandom(0.2, 0.1, 0.15, 0.3, 0.2, 0.05),
 		new WRandom(0, 0, 0, 0.1, 0.3, 0.6),
 	};
 	public static LevelSettlementType random(int levelSize, Random random) {
