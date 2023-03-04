@@ -45,6 +45,8 @@ public class AetherTown extends UIClient {
 	public static final Color bgColor = new Color(0x22000000, true);
 	public static final float pawnHeight = 1.55f;
 	
+	private static final boolean useDebugAssets = false; 
+	
 	public static class ClientConfig extends AbstractConfig {
 		public boolean fullscreen = false;
 		public int windowedWidth = 1920;
@@ -475,7 +477,10 @@ public class AetherTown extends UIClient {
 	}
 	
 	public static void main(String[] args) {
-		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
+		AssetManager.defaultAssets = new FileAssetManager("assets", AssetManager.defaultAssets);
+		if(useDebugAssets)
+			AssetManager.defaultAssets = new FileAssetManager("assets_src", AssetManager.defaultAssets);
+		
 		LevelNames.load();
 		settings.load();
 

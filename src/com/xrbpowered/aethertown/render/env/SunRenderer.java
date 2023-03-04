@@ -9,7 +9,6 @@ import org.lwjgl.opengl.GL20;
 import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
 import com.xrbpowered.aethertown.render.sprites.SpriteShader;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
-import com.xrbpowered.gl.res.texture.Texture;
 
 public class SunRenderer {
 
@@ -54,14 +53,12 @@ public class SunRenderer {
 
 	private SunShader shader;
 	private StaticMesh quad;
-	private Texture color;
 	
 	public final Vector4f position = new Vector4f();
 
 	public SunRenderer() {
 		quad = SpriteComponent.createSpriteQuad();
 		shader = new SunShader();
-		color = new Texture("checker.png");
 	}
 
 	public SunShader getShader() {
@@ -72,7 +69,6 @@ public class SunRenderer {
 		if(position.y<-0.3f)
 			return;
 		shader.use();
-		color.bind(0);
 		quad.draw();
 		shader.unuse();
 	}

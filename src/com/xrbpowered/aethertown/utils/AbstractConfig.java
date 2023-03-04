@@ -163,36 +163,4 @@ public abstract class AbstractConfig {
 			return obj.toString();
 	}
 	
-	public static class Config extends AbstractConfig {
-		public int windowedWidth = 1280;
-		public int windowedHeight = 720;
-		public long regionSeed = -1L;
-
-		public Config() {
-			super("client.cfg");
-		}
-
-		@Override
-		public Config load(String path) {
-			super.load(path);
-			return this;
-		}
-
-		@Override
-		public Config load() {
-			super.load();
-			return this;
-		}
-	}
-	
-	public static void main(String[] args) {
-		Config cfg = new Config().load();
-		System.out.printf("windowedWidth: %d\n", cfg.windowedWidth);
-		System.out.printf("windowedHeight: %d\n", cfg.windowedHeight);
-		System.out.printf("regionSeed: %d\n", cfg.regionSeed);
-		cfg.windowedWidth = 1600;
-		cfg.windowedHeight = 800;
-		cfg.save();
-	}
-	
 }
