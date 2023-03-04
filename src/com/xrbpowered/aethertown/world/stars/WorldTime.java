@@ -45,5 +45,14 @@ public class WorldTime {
 	public static String getFormattedTime() {
 		return getFormattedTime(getTimeOfDay());
 	}
+	
+	public static float parseTime(String value) {
+		String[] s = value.split(":", 3);
+		if(s.length<2)
+			throw new NumberFormatException();
+		int h = Integer.parseInt(s[0]);
+		int m = Integer.parseInt(s[1]);
+		return h/24f + m/(24f*60f);
+	}
 
 }

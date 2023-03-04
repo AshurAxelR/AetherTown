@@ -7,6 +7,7 @@ import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
@@ -25,7 +26,7 @@ public class RegionMapView extends UIElement {
 	public static final Color colorTextBg = new Color(0xbbffffff, true);
 	public static final Color colorText = new Color(0x777777);
 	
-	public static final Color colorLevel = new Color(0xddeebb);
+	public static final Color[] colorLevel = { new Color(0xecf4db), new Color(0xddeebb) };
 	public static final Color colorLevelBorder = new Color(0xdddddd);
 	public static final Color colorPaths = new Color(0x777777);
 	public static final Color colorTown = new Color(0x000000);
@@ -86,6 +87,15 @@ public class RegionMapView extends UIElement {
 		return true;
 	}
 	
+	private static Color getLevelColor(LevelTerrainModel terrain) {
+		if(terrain==LevelTerrainModel.low)
+			return colorLevel[0];
+		else if(terrain==LevelTerrainModel.hill)
+			return colorLevel[1];
+		else
+			return Color.WHITE;
+	}
+	
 	@Override
 	public void paint(GraphAssist g) {
 		g.pushAntialiasing(false);
@@ -98,7 +108,7 @@ public class RegionMapView extends UIElement {
 				if(level.x0!=x || level.z0!=z)
 					continue;
 				
-				g.setColor(colorLevel);
+				g.setColor(getLevelColor(level.terrain));
 				g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
 				g.setColor(colorLevelBorder);
 				g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);

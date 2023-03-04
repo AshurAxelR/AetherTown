@@ -117,7 +117,7 @@ public class RegionPaths {
 		while(!tokens.isEmpty()) {
 			PathToken t = tokens.removeFirst();
 			tokenCount--;
-			int s = wsize.next(random)+1;
+			int s = (region.startLevel==null) ? 1 : wsize.next(random)+1;
 			LevelInfo level = checkSize(t, s);
 			if(level==null) {
 				region.connectLevels(t.x, t.z, t.enter.flip());
@@ -127,15 +127,22 @@ public class RegionPaths {
 			}
 			
 			level.place();
-			if(region.startLevel==null)
+			Dir d;
+			if(region.startLevel==null) {
 				region.startLevel = level;
-			else
+				level.setTerrain(LevelTerrainModel.low);
+				d = Dir.east;
+			}
+			else {
 			 	level.setSettlement(LevelSettlementType.random(level.size, random));
+			 	level.setTerrain(LevelTerrainModel.random(level, random));
+			 	d = nextDir(t.enter, t.z);
+			}
 			if(t.enter!=null)
 				region.connectLevels(t.x, t.z, t.enter.flip());
 			
 			if(t.x<Region.sizex-Region.sizez/2) {
-				addToken(nextToken(level, nextDir(t.enter, t.z), t.pop+1, 0));
+				addToken(nextToken(level, d, t.pop+1, 0));
 				//if(random.nextInt(tokenCount*10+2)==0)
 				//	addToken(nextToken(level, nextDir(t.enter), t.pop+1));
 			}

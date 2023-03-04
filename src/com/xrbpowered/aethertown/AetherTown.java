@@ -10,9 +10,11 @@ import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.ui.Fonts;
+import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
+import com.xrbpowered.aethertown.utils.ParseParams;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelNames;
@@ -40,10 +42,29 @@ import com.xrbpowered.zoomui.UIElement;
 
 public class AetherTown extends UIClient {
 
-	private static final boolean testFps = false;
-	public static final float pawnHeight = 1.55f;
-
 	public static final Color bgColor = new Color(0x22000000, true);
+	public static final float pawnHeight = 1.55f;
+	
+	public static class ClientConfig extends AbstractConfig {
+		public boolean fullscreen = false;
+		public int windowedWidth = 1920;
+		public int windowedHeight = 1080;
+		public float uiScaling = 1;
+		public int renderScaling = 1;
+		public int fov = 75;
+		public boolean vsync = true;
+		public int noVsyncSleep = 2;
+		public boolean showFps = false;
+		public float mouseSensitivity = 0.002f;
+		
+		public boolean nosave = false;
+		
+		public ClientConfig() {
+			super("./client.cfg");
+		}
+	}
+	
+	public static ClientConfig settings = new ClientConfig();
 	
 	private DaytimeEnvironment environment = new DaytimeEnvironment();
 
@@ -71,18 +92,17 @@ public class AetherTown extends UIClient {
 	private UIPane uiLevelMap;
 	private LevelMapView uiLevelMapView;
 
-	public AetherTown() {
-		super("Aether Town", 1f);
-		windowedWidth = 1920;
-		windowedHeight = 1080;
-		if(testFps) {
-			vsync = false;
-			noVsyncSleep = 2;
-		}
+	public AetherTown(final SaveState save) {
+		super("Aether Town", settings.uiScaling);
+		fullscreen = settings.fullscreen;
+		windowedWidth = settings.windowedWidth;
+		windowedHeight = settings.windowedHeight;
+		vsync = settings.vsync;
+		noVsyncSleep = settings.noVsyncSleep;
 		
 		Fonts.load();
 		
-		uiRender = new UIOffscreen(getContainer()) {
+		uiRender = new UIOffscreen(getContainer(), settings.renderScaling) {
 			@Override
 			public void setSize(float width, float height) {
 				super.setSize(width, height);
@@ -102,12 +122,14 @@ public class AetherTown extends UIClient {
 				Shader.xunifyDefs = true;
 				
 				clearColor = environment.bgColor;
-				camera = new CameraActor.Perspective().setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
+				camera = new CameraActor.Perspective().setFov(settings.fov).setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
 				
 				walkController = new WalkController(input).setActor(camera);
 				walkController.moveSpeed = 4.8f;
+				walkController.mouseSensitivity = settings.mouseSensitivity;
 				flyController = new Controller(input).setActor(camera);
 				flyController.moveSpeed = 24f;
+				flyController.mouseSensitivity = settings.mouseSensitivity;
 				activeController = walkController;
 				
 				sky = new SkyRenderer().setCamera(camera);
@@ -117,7 +139,7 @@ public class AetherTown extends UIClient {
 				
 				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null), tiles.objShader, new Texture(Color.RED));
 
-				changeRegion();
+				changeRegion(save);
 				super.setupResources();
 			}
 			
@@ -167,7 +189,7 @@ public class AetherTown extends UIClient {
 			}
 		};
 		
-		if(testFps)
+		if(settings.showFps)
 			new UIFpsOverlay(this);
 		
 		uiRoot = new UINode(getContainer()) {
@@ -294,21 +316,46 @@ public class AetherTown extends UIClient {
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
 	}
 	
-	private void changeRegion() {
-		level = levelCache.setActive(region.startLevel);
+	private void changeRegion(SaveState save) {
+		level = levelCache.setActive(save.getLevel(region));
 		LevelMapView.level = level;
 
 		sky.stars.createStars(region.seed);
 		levelCache.createRenderers(sky.buffer, tiles);
 
+		WorldTime.setTimeOfDay(save.time);
 		updateEnvironment();
 		
-		camera.position.x = level.getStartX()*Tile.size;
-		camera.position.z = level.getStartZ()*Tile.size;
-		camera.rotation.y = 0;
+		if(save.defaultStart) {
+			camera.position.x = level.getStartX()*Tile.size;
+			camera.position.z = level.getStartZ()*Tile.size;
+			camera.rotation.x = 0;
+			camera.rotation.y = 0;
+		}
+		else {
+			camera.position.x = save.cameraPosX;
+			camera.position.z = save.cameraPosZ;
+			camera.rotation.x = save.cameraLookX;
+			camera.rotation.y = save.cameraLookY;
+		}
 
+		camera.position.y = 100f;
 		activeController = walkController;
 		updateWalkY();
+	}
+	
+	public void saveState() {
+		SaveState save = new SaveState();
+		save.regionSeed = region.seed;
+		save.defaultStart = false;
+		save.levelx = level.info.x0;
+		save.levelz = level.info.z0;
+		save.time = WorldTime.getTimeOfDay();
+		save.cameraPosX = camera.position.x;
+		save.cameraPosZ = camera.position.z;
+		save.cameraLookX = camera.rotation.x;
+		save.cameraLookY = camera.rotation.y;
+		save.save();
 	}
 	
 	private static void printTileDebug(int hoverx, int hoverz, Tile tile) {
@@ -410,25 +457,38 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
-	public static void generateRegion(long seed) {
+	@Override
+	public void destroyWindow() {
+		if(!settings.nosave)
+			saveState();
+		super.destroyWindow();
+	}
+	
+	public static void generateRegion(SaveState save) {
+		long seed = save.getRegionSeed();
 		System.out.printf("Region seed: %dL\n", seed);
 		region = new Region(seed);
 		region.generate();
+		
 		levelCache = new LevelCache();
-		// levelCache.addAll(region.displayLevels);
-		levelCache.addAllAdj(region.startLevel);
+		levelCache.addAllAdj(save.getLevel(region));
 	}
 	
 	public static void main(String[] args) {
 		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		LevelNames.load();
+		settings.load();
+
+		ParseParams params = new ParseParams();
+		params.addFlagParam("-nosave", x -> { settings.nosave = x; }, "ignore save file");
+		params.parseParams(args);
+
+		SaveState save = new SaveState();
+		if(!settings.nosave)
+			save.load();
 		
-		if(args.length>0)
-			WorldTime.setTimeOfDay(Float.parseFloat(args[0]));
-
-		long seed = System.currentTimeMillis();
-		generateRegion(seed);
-
-		new AetherTown().run();
+		// save.regionSeed = 1677924431066L;
+		generateRegion(save);
+		new AetherTown(save).run();
 	}
 }

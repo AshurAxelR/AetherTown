@@ -4,12 +4,14 @@ import java.awt.Color;
 import java.awt.Rectangle;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.SaveState;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.ColorBlend;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.region.LevelSettlementType;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -133,12 +135,20 @@ public class HeightMapView extends UIElement {
 	}
 
 	public static void main(String[] args) {
+		for(LevelSettlementType settlement : LevelSettlementType.values()) {
+			System.out.printf("(%d) %s margin: ", settlement.ordinal(), settlement.title);
+			for(int s=1; s<=3; s++)
+				System.out.printf("size(%d)=%d; ", s, settlement.getStreetMargin(s*LevelInfo.baseSize, true));
+			System.out.println();
+		}
+		
 		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		LevelNames.load();
 		Fonts.load();
 
-		long seed = System.currentTimeMillis();
-		AetherTown.generateRegion(seed);
+		SaveState save = new SaveState();
+		// save.regionSeed = 0L;
+		AetherTown.generateRegion(save);
 		AetherTown.levelCache.setActive(AetherTown.region.startLevel);
 		
 		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown height map", 1920, 1080);
