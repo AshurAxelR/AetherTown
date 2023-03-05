@@ -26,7 +26,7 @@ public class RegionMapView extends UIElement {
 	public static final Color colorTextBg = new Color(0xbbffffff, true);
 	public static final Color colorText = new Color(0x777777);
 	
-	public static final Color[] colorLevel = { new Color(0xecf4db), new Color(0xddeebb) };
+	public static final Color[] colorLevel = { new Color(0xecf4db), new Color(0xddeebb), new Color(0xccdd88) };
 	public static final Color colorLevelBorder = new Color(0xdddddd);
 	public static final Color colorPaths = new Color(0x777777);
 	public static final Color colorTown = new Color(0x000000);
@@ -92,6 +92,8 @@ public class RegionMapView extends UIElement {
 			return colorLevel[0];
 		else if(terrain==LevelTerrainModel.hill)
 			return colorLevel[1];
+		else if(terrain==LevelTerrainModel.peak)
+			return colorLevel[2];
 		else
 			return Color.WHITE;
 	}

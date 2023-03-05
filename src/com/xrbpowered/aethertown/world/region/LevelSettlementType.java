@@ -11,8 +11,10 @@ public enum LevelSettlementType {
 	outpost("Outpost", 4, 10),
 	village("Village", 10, 30),
 	smallTown("Town", 30, 50),
-	largeTown("Town", 30, 80);
-	// city
+	largeTown("Town", 30, 80),
+	smallCity("City", 90, 120),
+	mediumCity("City", 90, 160),
+	largeCity("City", 90, 200);
 	
 	public final String title;
 	public final int minHouses, maxHouses;
@@ -41,9 +43,9 @@ public enum LevelSettlementType {
 	}
 
 	private static final WRandom[] w = {
-		new WRandom(0.6, 0.2, 0.15, 0.05, 0, 0),
+		new WRandom(0.6, 0.2, 0.15, 0.05),
 		new WRandom(0.2, 0.1, 0.15, 0.3, 0.2, 0.05),
-		new WRandom(0, 0, 0, 0.1, 0.3, 0.6),
+		new WRandom(0, 0, 0, 0.05, 0.25, 0.55, 0.2, 0.05),
 	};
 	public static LevelSettlementType random(int levelSize, Random random) {
 		return values()[w[levelSize-1].next(random)];

@@ -43,8 +43,8 @@ in vec3 pass_illumMod;
 
 out vec4 out_Color;
 
-float calcPointLight(vec2 index, vec3 normal) {
-	vec4 lightPos = texture(dataPointLights, index/levelSize);
+float calcPointLight(ivec2 index, vec3 normal) {
+	vec4 lightPos = texelFetch(dataPointLights, index, 0);
 	float radius = lightPos.w;
 	lightPos.w = 1;
 	vec3 lightVec = (lightPos - pass_LevelPosition).xyz;
@@ -56,11 +56,11 @@ float calcPointLight(vec2 index, vec3 normal) {
 }
 
 vec4 calcPointLights(vec3 normal) {
-	vec2 center = vec2(floor(pass_LevelPosition.x/4+(0.5+EPSILON)), floor(pass_LevelPosition.z/4+(0.5+EPSILON)));
+	ivec2 center = ivec2(floor(pass_LevelPosition.x/4+(0.5+EPSILON)), floor(pass_LevelPosition.z/4+(0.5+EPSILON)));
 	float light = 0;
 	for(int dx=-POINT_LIGHT_R; dx<=POINT_LIGHT_R; dx++)
 		for(int dz=-POINT_LIGHT_R; dz<=POINT_LIGHT_R; dz++) {
-			light += calcPointLight(center+vec2(dx, dz), normal);
+			light += calcPointLight(center+ivec2(dx, dz), normal);
 		}
 	return pointLightColor*light;
 }

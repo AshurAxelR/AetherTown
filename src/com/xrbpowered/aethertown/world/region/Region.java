@@ -1,8 +1,10 @@
 package com.xrbpowered.aethertown.world.region;
 
+import java.util.LinkedList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightGuideChunk;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
@@ -72,9 +74,38 @@ public class Region {
 		throw new RuntimeException("Generator attempts limit reached");
 	}
 
+	private boolean expand(Random random, int minAdj) {
+		LinkedList<LevelInfo> add = new LinkedList<>();
+		for(int x=1; x<sizex-1; x++)
+			for(int z=1; z<sizez-1; z++) {
+				if(map[x][z]!=null)
+					continue;
+				int countAdj = 0;
+				for(Dir8 d : Dir8.values()) {
+					if(map[x+d.dx][z+d.dz]!=null)
+						countAdj++;
+				}
+				if(countAdj>=minAdj && countAdj-minAdj+1>=random.nextInt(6)) {
+					LevelInfo level = new LevelInfo(this, x, z, 1, random.nextLong());
+					level.setTerrain(LevelTerrainModel.random(level, random));
+					// TODO expand level: up size
+					add.add(level);
+				}
+			}
+		
+		for(LevelInfo level : add) {
+			level.place();
+		}
+		return !add.isEmpty();
+	}
+	
 	private void generate(Random random) {
 		resetGenerator();
 		new RegionPaths(this, random).generatePaths();
+		for(int minAdj=2;; minAdj+=2) {
+			if(!expand(random, minAdj))
+				break;
+		}
 	}
 
 	public void connectLevels(int x, int z, Dir d) {

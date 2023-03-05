@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 import com.xrbpowered.aethertools.LevelMapView;
+import com.xrbpowered.aethertools.RegionMapView;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
@@ -93,6 +94,8 @@ public class AetherTown extends UIClient {
 	private UIPane uiTime, uiCompass, uiLookInfo;
 	private UIPane uiLevelMap;
 	private LevelMapView uiLevelMapView;
+	private UIPane uiRegionMap;
+	private RegionMapView uiRegionMapView;
 
 	public AetherTown(final SaveState save) {
 		super("Aether Town", settings.uiScaling);
@@ -252,6 +255,19 @@ public class AetherTown extends UIClient {
 		};
 		uiLevelMapView = new LevelMapView(uiLevelMap);
 		uiLevelMap.setVisible(false);
+		
+		uiRegionMap = new UIPane(getContainer(), true) {
+			@Override
+			public void layout() {
+				for(UIElement c : children) {
+					c.setLocation(0, 0);
+					c.setSize(getWidth(), getHeight());
+					c.layout();
+				}
+			}
+		};
+		uiRegionMapView = new RegionMapView(uiRegionMap);
+		uiRegionMap.setVisible(false);
 	}
 	
 	private int compass = -1;
@@ -320,6 +336,7 @@ public class AetherTown extends UIClient {
 	
 	private void changeRegion(SaveState save) {
 		level = levelCache.setActive(save.getLevel(region));
+		RegionMapView.region = region;
 		LevelMapView.level = level;
 
 		sky.stars.createStars(region.seed);
@@ -385,6 +402,14 @@ public class AetherTown extends UIClient {
 		System.out.println();
 	}
 	
+	private void showRegionMap(boolean show) {
+		uiRegionMap.setVisible(show);
+		if(show)
+			uiRegionMapView.centerAt(level.info.x0, level.info.z0);
+		uiRender.setVisible(!show);
+		getContainer().repaint();
+	}
+	
 	private void showLevelMap(boolean show) {
 		uiLevelMap.setVisible(show);
 		if(show)
@@ -410,12 +435,39 @@ public class AetherTown extends UIClient {
 	
 	@Override
 	public void keyPressed(char c, int code) {
+		if(uiRegionMap.isVisible()) {
+			switch(code) {
+				case KeyEvent.VK_ESCAPE:
+				case KeyEvent.VK_N:
+					showRegionMap(false);
+					break;
+				case KeyEvent.VK_M:
+					showRegionMap(false);
+					showLevelMap(true);
+				default:
+					super.keyPressed(c, code);
+			}
+			return;
+		}
+
+		if(uiLevelMap.isVisible()) {
+			switch(code) {
+				case KeyEvent.VK_ESCAPE:
+				case KeyEvent.VK_M:
+					showLevelMap(false);
+					break;
+				case KeyEvent.VK_N:
+					showLevelMap(false);
+					showRegionMap(true);
+				default:
+					super.keyPressed(c, code);
+			}
+			return;
+		}
+		
 		switch(code) {
 			case KeyEvent.VK_ESCAPE:
-				if(uiLevelMap.isVisible())
-					showLevelMap(false);
-				else
-					requestExit();
+				requestExit();
 				break;
 			case KeyEvent.VK_TAB:
 				if(controllerEnabled)
@@ -443,17 +495,14 @@ public class AetherTown extends UIClient {
 				showPointer = !showPointer;
 				System.out.println("Pointer "+(showPointer ? "on" : "off"));
 				break;
+			case KeyEvent.VK_N:
+				disableController();
+				showRegionMap(true);
+				break;
 			case KeyEvent.VK_M:
 				disableController();
-				showLevelMap(!uiLevelMap.isVisible());
+				showLevelMap(true);
 				break;
-			case KeyEvent.VK_ENTER: {
-				/*disableController();
-				long seed = System.currentTimeMillis();
-				Level level = generateLevel(seed);
-				changeLevel(level);*/
-				break;
-			}
 			default:
 				super.keyPressed(c, code);
 		}
