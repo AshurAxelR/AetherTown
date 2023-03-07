@@ -81,7 +81,7 @@ public class Region {
 				if(map[x][z]!=null)
 					continue;
 				int countAdj = 0;
-				for(Dir8 d : Dir8.values()) {
+				for(Dir8 d : Dir8.values()) { // possibly Dir 4 after all?
 					if(map[x+d.dx][z+d.dz]!=null)
 						countAdj++;
 				}
@@ -99,9 +99,27 @@ public class Region {
 		return !add.isEmpty();
 	}
 	
+	private void checkPeaks() {
+		// hack: fixing low-to-peak by lowering size 1 peaks
+		for(int x=1; x<sizex-1; x++)
+			for(int z=1; z<sizez-1; z++) {
+				LevelInfo level = map[x][z];
+				if(level==null || level.size>1 || level.terrain!=LevelTerrainModel.peak)
+					continue;
+				for(LevelConnection conn : level.conns) {
+					LevelInfo adj = map[x+conn.d.dx][z+conn.d.dz];
+					if(adj.terrain==LevelTerrainModel.low)
+						level.setTerrain(LevelTerrainModel.hill);
+				}
+			}
+	}
+	
 	private void generate(Random random) {
 		resetGenerator();
 		new RegionPaths(this, random).generatePaths();
+		
+		checkPeaks();
+		
 		for(int minAdj=2;; minAdj+=2) {
 			if(!expand(random, minAdj))
 				break;

@@ -328,7 +328,10 @@ public class AetherTown extends UIClient {
 		levelCache.addAllAdj(l.info);
 		level = levelCache.setActive(l.info);
 		levelCache.createRenderers(sky.buffer, tiles);
+		
 		LevelMapView.level = level;
+		RegionMapView.active = level.info;
+		level.info.visited = true;
 		
 		System.out.printf("Level switched to [%d, %d]\n", level.info.x0, level.info.z0);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
@@ -337,7 +340,10 @@ public class AetherTown extends UIClient {
 	private void changeRegion(SaveState save) {
 		level = levelCache.setActive(save.getLevel(region));
 		RegionMapView.region = region;
+		
 		LevelMapView.level = level;
+		RegionMapView.active = level.info;
+		level.info.visited = true;
 
 		sky.stars.createStars(region.seed);
 		levelCache.createRenderers(sky.buffer, tiles);
@@ -374,6 +380,7 @@ public class AetherTown extends UIClient {
 		save.cameraPosZ = camera.position.z;
 		save.cameraLookX = camera.rotation.x;
 		save.cameraLookY = camera.rotation.y;
+		save.listVisited(region);
 		save.save();
 	}
 	
@@ -444,6 +451,13 @@ public class AetherTown extends UIClient {
 				case KeyEvent.VK_M:
 					showRegionMap(false);
 					showLevelMap(true);
+					break;
+				case KeyEvent.VK_A:
+					if((input.getKeyMods()&UIElement.modCtrlMask)!=0) {
+						RegionMapView.showVisited = !RegionMapView.showVisited;
+						getContainer().repaint();
+					}
+					break;
 				default:
 					super.keyPressed(c, code);
 			}
@@ -520,6 +534,7 @@ public class AetherTown extends UIClient {
 		System.out.printf("Region seed: %dL\n", seed);
 		region = new Region(seed);
 		region.generate();
+		save.assignVisited(region);
 		
 		levelCache = new LevelCache();
 		levelCache.addAllAdj(save.getLevel(region));

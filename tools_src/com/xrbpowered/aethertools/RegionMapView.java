@@ -25,6 +25,8 @@ public class RegionMapView extends UIElement {
 	public static final Color colorBg = new Color(0xf5f5f5);
 	public static final Color colorTextBg = new Color(0xbbffffff, true);
 	public static final Color colorText = new Color(0x777777);
+	public static final Color colorNotVisited = new Color(0xfafafa);
+	public static final Color colorActive = new Color(0xdd0000);
 	
 	public static final Color[] colorLevel = { new Color(0xecf4db), new Color(0xddeebb), new Color(0xccdd88) };
 	public static final Color colorLevelBorder = new Color(0xdddddd);
@@ -32,6 +34,8 @@ public class RegionMapView extends UIElement {
 	public static final Color colorTown = new Color(0x000000);
 	
 	public static Region region;
+	public static LevelInfo active = null;
+	public static boolean showVisited = true;
 	
 	private static int hoverx, hoverz;
 	
@@ -64,9 +68,11 @@ public class RegionMapView extends UIElement {
 		g.drawString(String.format("[%d, %d]", hoverx, hoverz), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		LevelInfo level = region.map[hoverx][hoverz];
 		if(level!=null) {
-			g.setFont(Fonts.smallBold);
+			boolean visited = !showVisited || level.visited;
+			if(visited)
+				g.setFont(Fonts.smallBold);
 			g.setColor(Color.BLACK);
-			g.drawString(level.name, x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
+			g.drawString(visited ? level.name : "(not visited)", x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		}
 	}
 	
@@ -110,29 +116,44 @@ public class RegionMapView extends UIElement {
 				if(level.x0!=x || level.z0!=z)
 					continue;
 				
-				g.setColor(getLevelColor(level.terrain));
-				g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
-				g.setColor(colorLevelBorder);
-				g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
-				
-				g.pushAntialiasing(true);
-				g.setColor(colorPaths);
-				int mx = x*tileSize+level.size*tileSize/2;
-				int mz = z*tileSize+level.size*tileSize/2;
-				for(LevelConnection c : level.conns) {
-					int cx = (c.d.dx==0) ? x*tileSize+c.i*tileSize+tileSize/2 : mx + c.d.dx*level.size*tileSize/2;
-					int cz = (c.d.dz==0) ? z*tileSize+c.i*tileSize+tileSize/2 : mz + c.d.dz*level.size*tileSize/2;
-					g.line(mx, mz, cx, cz);
+				if(!showVisited || level.visited) {
+					g.setColor(getLevelColor(level.terrain));
+					g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
+					g.setColor(colorLevelBorder);
+					g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
+					g.pushAntialiasing(true);
+					g.setColor(colorPaths);
+					int mx = x*tileSize+level.size*tileSize/2;
+					int mz = z*tileSize+level.size*tileSize/2;
+					for(LevelConnection c : level.conns) {
+						int cx = (c.d.dx==0) ? x*tileSize+c.i*tileSize+tileSize/2 : mx + c.d.dx*level.size*tileSize/2;
+						int cz = (c.d.dz==0) ? z*tileSize+c.i*tileSize+tileSize/2 : mz + c.d.dz*level.size*tileSize/2;
+						g.line(mx, mz, cx, cz);
+					}
+					g.popAntialiasing();
+					
+					int s = level.settlement.ordinal();
+					if(s>0) {
+						g.setColor(colorTown);
+						g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
+					}
 				}
-				g.popAntialiasing();
-				
-				int s = level.settlement.ordinal();
-				if(s>0) {
-					g.setColor(colorTown);
-					g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
+				else {
+					g.setColor(colorNotVisited);
+					g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
 				}
 			}
 
+		if(active!=null) {
+			g.pushAntialiasing(true);
+			g.pushPureStroke(true);
+			g.setColor(colorActive);
+			g.setStroke(3f);
+			g.graph.drawOval(active.x0*tileSize-3, active.z0*tileSize-3, active.size*tileSize+6, active.size*tileSize+6);
+			g.popAntialiasing();
+			g.resetStroke();
+			g.popPureStroke();
+		}
 		g.popAntialiasing();
 	}
 	
@@ -153,6 +174,8 @@ public class RegionMapView extends UIElement {
 		region = new Region(seed);
 		region.generate();
 		
+		active = region.startLevel;
+		showVisited = false;
 		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown region map", 1920, 1080);
 		new RegionMapView(frame.getContainer());
 		frame.show();

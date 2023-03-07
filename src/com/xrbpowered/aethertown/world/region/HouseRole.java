@@ -94,4 +94,10 @@ public class HouseRole {
 		return shopShuffle.nextItem(random);
 	}
 	
+	public static void resetShuffle() {
+		restaurantShuffle.reset();
+		fastFoodShuffle.reset();
+		shopShuffle.reset();
+	}
+	
 }

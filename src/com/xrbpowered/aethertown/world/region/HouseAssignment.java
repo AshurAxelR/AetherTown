@@ -122,6 +122,7 @@ public abstract class HouseAssignment {
 	}
 	
 	public static void assignHouses(Level level, Random random) {
+		HouseRole.resetShuffle();
 		new Village(level).assign(random);
 	}
 	

@@ -83,6 +83,8 @@ public class LevelInfo {
 	
 	public ArrayList<LevelConnection> conns = new ArrayList<>();
 	
+	public boolean visited = false;
+	
 	public LevelInfo(Region region, int x, int z, int size, long seed) {
 		this.region = region;
 		this.x0 = x;

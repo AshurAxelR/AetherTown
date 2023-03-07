@@ -12,10 +12,11 @@ public class Shuffle {
 	
 	public Shuffle(int size) {
 		this.size = size;
-		refill();
+		reset();
 	}
 	
-	private void refill() {
+	public void reset() {
+		indices.clear();
 		for(int i=0; i<size; i++)
 			indices.add(i);
 		rem = size;
@@ -23,7 +24,7 @@ public class Shuffle {
 	
 	public int next(Random random) {
 		if(rem==0)
-			refill();
+			reset();
 		int n = indices.remove(random.nextInt(rem));
 		rem--;
 		return n;

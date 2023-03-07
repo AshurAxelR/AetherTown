@@ -89,7 +89,7 @@ public class Level {
 	}
 
 	public void generate() {
-		System.out.printf("Generating... %dL\n", info.seed);
+		System.out.printf("Generating... [%d, %d] %dL\n", info.x0, info.z0, info.seed);
 		Random random = new Random(info.seed);
 		for(int att = 0; att<maxGeneratorAttempts; att++) {
 			if(att>0)
