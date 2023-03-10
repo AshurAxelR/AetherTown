@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.world.stars;
 
+import static com.xrbpowered.aethertown.AetherTown.settings;
+
 import com.xrbpowered.aethertown.render.env.Seasons;
 
 public class WorldTime {
@@ -8,18 +10,21 @@ public class WorldTime {
 	@SuppressWarnings("unused")
 	public static final int season = (dayOfYear>0.7f && dayOfYear<0.85f) ? Seasons.winter : Seasons.summer;
 
-	public static final float timeSpeed = 20f;
-
 	private static final float cycleTimeFactor = (float)Math.PI * 2f / (float)(60*60*24);
 	
+	public static int day1 = 0;
 	public static float cycleTime = calcCycleTime(0.25f);
 	
 	public static void updateTime(float dt) {
-		cycleTime += dt*timeSpeed*cycleTimeFactor;
+		cycleTime += dt*settings.timeSpeed*cycleTimeFactor;
 	}
 	
 	private static float calcCycleTime(float t) {
 		return (float)Math.PI * 2f * (dayOfYear + t - 0.5f);
+	}
+	
+	private static float fromCycleTime() {
+		return (cycleTime / (float)Math.PI / 2f) - WorldTime.dayOfYear + 0.5f;
 	}
 	
 	public static void setTimeOfDay(float t) {
@@ -27,12 +32,12 @@ public class WorldTime {
 	}
 	
 	public static float getTimeOfDay() {
-		float t = (cycleTime / (float)Math.PI / 2f) - WorldTime.dayOfYear + 0.5f;
-		if(t<0)
-			t += Math.floor(t)+1;
-		else
-			t -= Math.floor(t);
-		return t;
+		float t = fromCycleTime();
+		return t - (float)Math.floor(t);
+	}
+	
+	public static int getDay() {
+		return (int)Math.floor(fromCycleTime()) + day1;
 	}
 	
 	public static String getFormattedTime(float t) {

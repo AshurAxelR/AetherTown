@@ -16,6 +16,7 @@ public class SaveState extends AbstractConfig {
 	public int levelx = Region.sizez/2;
 	public int levelz = Region.sizez/2;
 	
+	public int day = 0;
 	public float time = 0.25f;
 	
 	public float cameraPosX = 0f;

@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import com.xrbpowered.aethertools.LevelMapView;
 import com.xrbpowered.aethertools.RegionMapView;
 import com.xrbpowered.aethertown.render.LevelCache;
+import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
@@ -59,6 +60,9 @@ public class AetherTown extends UIClient {
 		public int noVsyncSleep = 2;
 		public boolean showFps = false;
 		public float mouseSensitivity = 0.002f;
+		public float timeSpeed = 20f;
+		public float timeSpeedUp = 100f;
+		public float screenshotScale = 1f;
 		
 		public boolean nosave = false;
 		
@@ -73,7 +77,7 @@ public class AetherTown extends UIClient {
 
 	public static Region region;
 	public static LevelCache levelCache;
-	private static Level level;
+	public static Level level;
 
 	private CameraActor camera;
 	private Controller flyController, walkController;
@@ -170,9 +174,9 @@ public class AetherTown extends UIClient {
 				
 				float dtDay = dt;
 				if(input.isKeyDown(KeyEvent.VK_OPEN_BRACKET))
-					dtDay = -100*dt;
+					dtDay = -settings.timeSpeedUp*dt;
 				else if(input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET))
-					dtDay = 100*dt;
+					dtDay = settings.timeSpeedUp*dt;
 				sky.updateTime(dtDay);
 				uiTime.repaint();
 				environment.recalc(sky.sun.position);
@@ -213,11 +217,12 @@ public class AetherTown extends UIClient {
 				clear(g, bgColor);
 				g.setColor(Color.WHITE);
 				g.setFont(Fonts.large);
-				String s = WorldTime.getFormattedTime();
-				g.drawString(s, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
+				g.drawString(WorldTime.getFormattedTime(), 50, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
+				g.setFont(Fonts.small);
+				g.drawString(String.format("DAY %d", WorldTime.getDay()+1), 100, getHeight()/2, GraphAssist.LEFT, GraphAssist.CENTER);
 			}
 		};
-		uiTime.setSize(100, 32);
+		uiTime.setSize(180, 32);
 		
 		uiCompass = new UIPane(uiRoot, false) {
 			@Override
@@ -348,6 +353,7 @@ public class AetherTown extends UIClient {
 		sky.stars.createStars(region.seed);
 		levelCache.createRenderers(sky.buffer, tiles);
 
+		WorldTime.day1 = save.day;
 		WorldTime.setTimeOfDay(save.time);
 		updateEnvironment();
 		
@@ -375,6 +381,7 @@ public class AetherTown extends UIClient {
 		save.defaultStart = false;
 		save.levelx = level.info.x0;
 		save.levelz = level.info.z0;
+		save.day = WorldTime.getDay();
 		save.time = WorldTime.getTimeOfDay();
 		save.cameraPosX = camera.position.x;
 		save.cameraPosZ = camera.position.z;
@@ -509,6 +516,9 @@ public class AetherTown extends UIClient {
 				showPointer = !showPointer;
 				System.out.println("Pointer "+(showPointer ? "on" : "off"));
 				break;
+			case KeyEvent.VK_F10:
+				Screenshot.screenshot.make(uiRender.pane.getBuffer());
+				break;
 			case KeyEvent.VK_N:
 				disableController();
 				showRegionMap(true);
@@ -547,6 +557,7 @@ public class AetherTown extends UIClient {
 		
 		LevelNames.load();
 		settings.load();
+		// settings.save();
 
 		ParseParams params = new ParseParams();
 		params.addFlagParam("-nosave", x -> { settings.nosave = x; }, "ignore save file");
