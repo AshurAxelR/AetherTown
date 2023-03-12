@@ -99,16 +99,19 @@ public class Hill extends TileTemplate {
 		Dir adjDir = null;
 		int y = 0;
 		int countUp = 0;
+		TileTemplate gen = Park.template;
 		for(Dir d : Dir.shuffle(random)) {
 			Tile adj = tile.getAdj(d);
 			if(adj==null)
 				continue;
-			if(adj.t==Park.template || adj.t==Street.template) {
+			if(adj.t==Park.template || adj.t==Street.template || (adj.t instanceof Plaza)) {
 				if(Math.abs(adj.basey-tile.basey)<=1) {
 					if(adjDir==null || adj.t==Street.template) {
 						adjDir = d;
 						y = adj.basey;
 					}
+					if(adj.t==Street.template && random.nextInt(5)==0)
+						gen = Bench.templatePark;
 				}
 			}
 			if(adj!=null && adj.basey>tile.basey-2) {
@@ -116,7 +119,7 @@ public class Hill extends TileTemplate {
 			}
 		}
 		if(adjDir!=null && countUp>1) {
-			Park.template.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()), random);
+			gen.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()), random);
 			return true;
 		}
 		else

@@ -19,7 +19,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
 
-	private static final Seasons grassColor = new Seasons(new Color(0x70a545), new Color(0xf4fcfd));
+	public static final Seasons grassColor = new Seasons(new Color(0x70a545), new Color(0xf4fcfd));
 
 	public static final float treeRadius = 0.6f*Tile.size;
 	public static final float trunkRadius = 0.065f*Tile.size;

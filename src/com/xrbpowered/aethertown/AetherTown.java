@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
+import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
@@ -19,6 +20,7 @@ import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.ParseParams;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
@@ -75,6 +77,7 @@ public class AetherTown extends UIClient {
 	
 	private DaytimeEnvironment environment = new DaytimeEnvironment();
 
+	public static AetherTown aether;
 	public static Region region;
 	public static LevelCache levelCache;
 	public static Level level;
@@ -96,6 +99,8 @@ public class AetherTown extends UIClient {
 	private UIOffscreen uiRender;
 	private UINode uiRoot;
 	private UIPane uiTime, uiCompass, uiLookInfo;
+	private BookmarkPane uiBookmarks;
+	
 	private UIPane uiLevelMap;
 	private LevelMapView uiLevelMapView;
 	private UIPane uiRegionMap;
@@ -103,13 +108,13 @@ public class AetherTown extends UIClient {
 
 	public AetherTown(final SaveState save) {
 		super("Aether Town", settings.uiScaling);
+		aether = this;
+		
 		fullscreen = settings.fullscreen;
 		windowedWidth = settings.windowedWidth;
 		windowedHeight = settings.windowedHeight;
 		vsync = settings.vsync;
 		noVsyncSleep = settings.noVsyncSleep;
-		
-		Fonts.load();
 		
 		uiRender = new UIOffscreen(getContainer(), settings.renderScaling) {
 			@Override
@@ -127,6 +132,9 @@ public class AetherTown extends UIClient {
 			@Override
 			public void setupResources() {
 				System.out.println("Loading resources...");
+
+				Fonts.load();
+				
 				Shader.resolveIncludes = true;
 				Shader.xunifyDefs = true;
 				
@@ -207,6 +215,7 @@ public class AetherTown extends UIClient {
 				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
 				uiCompass.setLocation(getWidth()-uiCompass.getWidth()-20, uiTime.getY());
 				uiLookInfo.setLocation(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
+				uiBookmarks.setLocation(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
 				super.layout();
 			}
 		};
@@ -248,6 +257,10 @@ public class AetherTown extends UIClient {
 		uiLookInfo.setSize(400, 32);
 		uiLookInfo.setVisible(false);
 		
+		uiBookmarks = new BookmarkPane(uiRoot);
+		uiBookmarks.restoreBookmarks(save, region);
+		uiBookmarks.setVisible(false);
+		
 		uiLevelMap = new UIPane(getContainer(), true) {
 			@Override
 			public void layout() {
@@ -280,7 +293,7 @@ public class AetherTown extends UIClient {
 	private void updateWalkY() {
 		boolean inside = Level.hoverInside(level.levelSize, camera.position.x, camera.position.z);
 		if(!inside)
-			changeLevel();
+			checkLevelChange();
 
 		hoverx = Level.hover(camera.position.x);
 		hoverz = Level.hover(camera.position.z);
@@ -324,14 +337,21 @@ public class AetherTown extends UIClient {
 		tiles.updateEnvironment(environment);
 	}
 	
-	private void changeLevel() {
-		Level l = levelCache.findHover(camera.position.x, camera.position.z);
-		if(l==null || l==level)
-			return;
-		LevelCache.adjustCameraPosition(level.info, l.info, camera.position);
-		camera.updateTransform();
-		levelCache.addAllAdj(l.info);
-		level = levelCache.setActive(l.info);
+	public void teleportTo(LevelInfo info) {
+		activateLevel(info);
+		camera.position.x = level.getStartX()*Tile.size;
+		camera.position.z = level.getStartZ()*Tile.size;
+		camera.rotation.x = 0;
+		camera.rotation.y = 0;
+		
+		camera.position.y = 100f;
+		activeController = walkController;
+		updateWalkY();
+	}
+	
+	private void activateLevel(LevelInfo info) {
+		levelCache.addAllAdj(info);
+		level = levelCache.setActive(info);
 		levelCache.createRenderers(sky.buffer, tiles);
 		
 		LevelMapView.level = level;
@@ -340,6 +360,18 @@ public class AetherTown extends UIClient {
 		
 		System.out.printf("Level switched to [%d, %d]\n", level.info.x0, level.info.z0);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
+		
+		if(uiBookmarks.isVisible())
+			uiBookmarks.updateSelection();
+	}
+	
+	private void checkLevelChange() {
+		Level l = levelCache.findHover(camera.position.x, camera.position.z);
+		if(l==null || l==level)
+			return;
+		LevelCache.adjustCameraPosition(level.info, l.info, camera.position);
+		camera.updateTransform();
+		activateLevel(l.info);
 	}
 	
 	private void changeRegion(SaveState save) {
@@ -388,6 +420,7 @@ public class AetherTown extends UIClient {
 		save.cameraLookX = camera.rotation.x;
 		save.cameraLookY = camera.rotation.y;
 		save.listVisited(region);
+		uiBookmarks.saveBookmarks(save);
 		save.save();
 	}
 	
@@ -518,6 +551,11 @@ public class AetherTown extends UIClient {
 				break;
 			case KeyEvent.VK_F10:
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
+				break;
+			case KeyEvent.VK_B:
+				uiBookmarks.setVisible(!uiBookmarks.isVisible());
+				uiBookmarks.selectNone();
+				getContainer().repaint();
 				break;
 			case KeyEvent.VK_N:
 				disableController();

@@ -271,7 +271,7 @@ public class Street extends TileTemplate {
 			if(adj.d==d) {
 				if(adj.t==Hill.template)
 					continue;
-				if(adj.t!=Park.template)
+				if(adj.t!=Park.template && adj.t!=Bench.templatePark)
 					return 0;
 				res = 1;
 				park = adj;
@@ -283,7 +283,7 @@ public class Street extends TileTemplate {
 		if(res==1) {
 			if(park!=null) {
 				if(park.sub==null) {
-					Monument.template.forceGenerate(Token.forTile(park), random);
+					Bench.templatePlaza.forceGenerate(Token.forTile(park), random);
 					return 0;
 				}
 				else if(park.sub.parent instanceof LargeParkGenerator) {

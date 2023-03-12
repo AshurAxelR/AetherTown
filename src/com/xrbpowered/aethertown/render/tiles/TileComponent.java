@@ -20,6 +20,7 @@ public class TileComponent {
 			this.shader = shader;
 			setMesh(TileComponent.this.mesh);
 			setTextures(TileComponent.this.textures);
+			setCulling(TileComponent.this.culling);
 		}
 
 		@Override
@@ -37,6 +38,7 @@ public class TileComponent {
 	
 	public StaticMesh mesh;
 	public Texture[] textures;
+	public boolean culling = true;
 
 	private HashMap<LevelRenderer, InstanceList> instMap = new HashMap<>(); 
 
@@ -50,6 +52,11 @@ public class TileComponent {
 		list.add(this);
 	}
 
+	public TileComponent setCulling(boolean culling) {
+		this.culling = culling;
+		return this;
+	}
+	
 	public void addInstance(LevelRenderer r, ObjectInfo info) {
 		instMap.get(r).addInstance(info);
 	}

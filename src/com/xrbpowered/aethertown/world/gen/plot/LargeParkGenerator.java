@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
@@ -13,10 +14,14 @@ import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class LargeParkGenerator extends PlotGenerator {
 
+	public enum ParkType {
+		largePark, monumentPark, monumentPlaza, largePlaza
+	}
+	
 	private static final WRandom typew = new WRandom(3.5, 1, 0.5, 1);
 	private static final WRandom typeUpw = new WRandom(0, 1, 0.5, 0.5);
 	
-	public int type = 0;
+	public ParkType type = ParkType.largePark;
 	private WRandom w;
 	
 	public LargeParkGenerator(boolean pointOfInterest) {
@@ -33,17 +38,19 @@ public class LargeParkGenerator extends PlotGenerator {
 	protected Tile placeAt(Token t, int i, int j, Random random) {
 		TileTemplate temp;
 		if(i==0 && j<2) {
-			if(type==0)
+			if(type==ParkType.largePark)
 				temp = Park.template;
 			else if(j==0)
 				temp = Street.template;
-			else if(type==3)
+			else if(type==ParkType.largePlaza)
 				temp = Park.template;
 			else
 				temp = Monument.template;
 		}
-		else if(type<2)
+		else if(type==ParkType.largePark || type==ParkType.monumentPark)
 			temp = Park.template;
+		else if(type==ParkType.largePlaza && (j==1 || i==0))
+			temp = Bench.templatePlaza;
 		else
 			temp = Plaza.template;
 		return temp.forceGenerate(t, random).makeSub(this, i, j);
@@ -51,7 +58,7 @@ public class LargeParkGenerator extends PlotGenerator {
 	
 	@Override
 	public boolean generate(Token startToken, Random random) {
-		type = w.next(random);
+		type = ParkType.values()[w.next(random)];
 		return super.generate(startToken, random);
 	}
 
@@ -60,9 +67,9 @@ public class LargeParkGenerator extends PlotGenerator {
 	}
 	
 	public void promote(Random random) {
-		if(type==0) {
+		if(type==ParkType.largePark) {
 			remove();
-			type = typeUpw.next(random);
+			type = ParkType.values()[typeUpw.next(random)];
 			place(random);
 		}
 	}

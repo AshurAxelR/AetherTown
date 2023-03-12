@@ -24,6 +24,7 @@ public class SaveState extends AbstractConfig {
 	public float cameraLookX = 0f;
 	public float cameraLookY = 0f;
 
+	public LinkedList<Vector2i> bookmarks = new LinkedList<Vector2i>();
 	public LinkedList<Vector2i> visited = new LinkedList<Vector2i>();
 	
 	public SaveState() {
@@ -47,33 +48,54 @@ public class SaveState extends AbstractConfig {
 				level.visited = true;
 		}
 	}
+	
+	private static Object parsePointList(String value, LinkedList<Vector2i> list, boolean allowNulls) {
+		list.clear();
+		if(value.isEmpty())
+			return list;
+		String[] vs = value.split(";");
+		for(String v : vs) {
+			if(allowNulls && v.isEmpty()) {
+				list.add(null);
+				continue;
+			}
+			String[] xz = v.split(",");
+			if(xz.length!=2)
+				return null;
+			try {
+				int x = Integer.parseInt(xz[0]);
+				int z = Integer.parseInt(xz[1]);
+				if(!Region.isInside(x, z))
+					return null;
+				list.add(new Vector2i(x, z));
+			}
+			catch (NumberFormatException e) {
+				return null;
+			}
+		}
+		return list;
+	}
+
+	private static String formatPointList(LinkedList<Vector2i> list) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		for(Vector2i v : list) {
+			if(!first) sb.append(";");
+			first = false;
+			if(v!=null)
+				sb.append(String.format("%d,%d", v.x, v.y));
+		}
+		return sb.toString();
+	}
 
 	@Override
 	protected Object parseValue(String name, String value, Class<?> type) {
 		if(name.equals("time"))
 			return WorldTime.parseTime(value);
-		else if(name.equals("visited")) {
-			visited.clear();
-			if(value.isEmpty())
-				return visited;
-			String[] vs = value.split(";");
-			for(String v : vs) {
-				String[] xz = v.split(",");
-				if(xz.length!=2)
-					return null;
-				try {
-					int x = Integer.parseInt(xz[0]);
-					int z = Integer.parseInt(xz[1]);
-					if(!Region.isInside(x, z))
-						return null;
-					visited.add(new Vector2i(x, z));
-				}
-				catch (NumberFormatException e) {
-					return null;
-				}
-			}
-			return visited;
-		}
+		else if(name.equals("bookmarks"))
+			return parsePointList(value, bookmarks, true);
+		else if(name.equals("visited"))
+			return parsePointList(value, visited, false);
 		else
 			return super.parseValue(name, value, type);
 	}
@@ -82,16 +104,10 @@ public class SaveState extends AbstractConfig {
 	protected String formatValue(String name, Object obj) {
 		if(name.equals("time"))
 			return WorldTime.getFormattedTime((Float) obj);
-		else if(name.equals("visited")) {
-			StringBuilder sb = new StringBuilder();
-			boolean first = true;
-			for(Vector2i v : visited) {
-				if(!first) sb.append(";");
-				first = false;
-				sb.append(String.format("%d,%d", v.x, v.y));
-			}
-			return sb.toString();
-		}
+		else if(name.equals("bookmarks"))
+			return formatPointList(bookmarks);
+		else if(name.equals("visited"))
+			return formatPointList(visited);
 		else
 			return super.formatValue(name, obj);
 	}

@@ -29,7 +29,11 @@ public class IllumTileObjectInfo extends TileObjectInfo {
 	public IllumTileObjectInfo(Tile tile, float dx, float dy, float dz) {
 		super(tile, dx, dy, dz);
 	}
-	
+
+	public IllumTileObjectInfo(Tile tile, float dout, float dy) {
+		super(tile, dout, dy);
+	}
+
 	public IllumTileObjectInfo illumMod(float r, float g, float b) {
 		illumMod.set(r, g, b);
 		return this;

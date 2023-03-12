@@ -16,7 +16,7 @@ import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.StreetPresetGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
-import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class StreetLayoutGenerator extends TokenGenerator {
@@ -40,8 +40,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		return generate(random);
 	}
 	
-	private static final WRandom nextw = new WRandom(0.5, 0.1, 0, 0.3, 1);
-	private static final WRandom nextwLim = new WRandom(1.5, 0.3, 0, 0.2, 0);
+	private static final WRandom nextw = new WRandom(0.2, 0.1, 0, 0.3, 1, 0.3);
+	private static final WRandom nextwLim = new WRandom(1, 0.3, 0, 0.2, 0, 0.5);
 	
 	@Override
 	protected Generator selectGenerator(Token t, Random random) {
@@ -59,7 +59,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 			return true;
 		else if(new LargeParkGenerator(true).generate(t, random))
 			return true;
-		else if(Monument.template.generate(t, random))
+		else if(Bench.templatePlaza.generate(t, random))
 			return true;
 		else
 			return false;

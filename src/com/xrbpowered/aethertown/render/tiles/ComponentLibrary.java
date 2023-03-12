@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.render.tiles;
 
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
@@ -13,6 +14,7 @@ import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 public class ComponentLibrary {
 
 	private static final TileTemplate[] allTemplates = {
+		Bench.templatePlaza,
 		ChurchT.template,
 		Hill.template,
 		HouseT.template,

@@ -36,6 +36,11 @@ public class TileObjectInfo extends ObjectInfo {
 		rotate(tile.d);
 	}
 
+	public TileObjectInfo(Tile tile, float dout, float dy) {
+		super(tile, tile.d.dx*dout, dy, tile.d.dz*dout);
+		rotate(tile.d);
+	}
+
 	public TileObjectInfo scale(float xz, float y) {
 		this.scaleXZ = xz;
 		this.scaleY = y;

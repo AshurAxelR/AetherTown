@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.world.gen.plot.BridgePresetGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.Crossroads;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
+import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
@@ -41,7 +42,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 	public boolean generateSides = true;
 	public boolean ignoreHeightLimiter = false;
 	
-	private static final WRandom sidew = new WRandom(1.5, 0.2, 0.2, 0.1, 1);
+	private static final WRandom sidew = new WRandom(1.2, 0.2, 0.2, 0.1, 1, 0.3);
 
 	public static Generator selectSideGenerator(Level level, WRandom w, Random random, int h) {
 		switch(w.next(random)) {
@@ -56,6 +57,8 @@ public class StreetGenerator implements Generator, TokenProvider {
 					return HouseGenerator.select(level);
 				else
 					return null;
+			case 5:
+				return (h==0) ? Bench.templatePark : null;
 			default:
 				return null;
 		}
