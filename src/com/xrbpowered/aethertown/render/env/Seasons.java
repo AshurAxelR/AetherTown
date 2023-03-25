@@ -18,7 +18,7 @@ public class Seasons {
 	}
 	
 	public Color color() {
-		return colors[WorldTime.season];
+		return colors[WorldTime.season()];
 	}
 	
 	public Texture texture() {

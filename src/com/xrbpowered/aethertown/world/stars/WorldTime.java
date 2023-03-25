@@ -6,10 +6,6 @@ import com.xrbpowered.aethertown.render.env.Seasons;
 
 public class WorldTime {
 
-	public static final float dayOfYear = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
-	@SuppressWarnings("unused")
-	public static final int season = (dayOfYear>0.7f && dayOfYear<0.85f) ? Seasons.winter : Seasons.summer;
-
 	private static final float cycleTimeFactor = (float)Math.PI * 2f / (float)(60*60*24);
 	
 	public static int day1 = 0;
@@ -20,11 +16,11 @@ public class WorldTime {
 	}
 	
 	private static float calcCycleTime(float t) {
-		return (float)Math.PI * 2f * (dayOfYear + t - 0.5f);
+		return (float)Math.PI * 2f * (settings.dayOfYear + t - 0.5f);
 	}
 	
 	private static float fromCycleTime() {
-		return (cycleTime / (float)Math.PI / 2f) - WorldTime.dayOfYear + 0.5f;
+		return (cycleTime / (float)Math.PI / 2f) - settings.dayOfYear + 0.5f;
 	}
 	
 	public static void setTimeOfDay(float t) {
@@ -58,6 +54,10 @@ public class WorldTime {
 		int h = Integer.parseInt(s[0]);
 		int m = Integer.parseInt(s[1]);
 		return h/24f + m/(24f*60f);
+	}
+	
+	public static int season() {
+		return (settings.dayOfYear>0.7f && settings.dayOfYear<0.85f) ? Seasons.winter : Seasons.summer;
 	}
 
 }

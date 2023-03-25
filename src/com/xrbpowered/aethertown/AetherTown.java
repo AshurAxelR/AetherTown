@@ -62,8 +62,11 @@ public class AetherTown extends UIClient {
 		public int noVsyncSleep = 2;
 		public boolean showFps = false;
 		public float mouseSensitivity = 0.002f;
+		
+		public float dayOfYear = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
 		public float timeSpeed = 20f;
 		public float timeSpeedUp = 100f;
+		
 		public float screenshotScale = 1f;
 		
 		public boolean nosave = false;
@@ -382,7 +385,7 @@ public class AetherTown extends UIClient {
 		RegionMapView.active = level.info;
 		level.info.visited = true;
 
-		sky.stars.createStars(region.seed);
+		sky.stars.createStars(region.seed, settings.dayOfYear);
 		levelCache.createRenderers(sky.buffer, tiles);
 
 		WorldTime.day1 = save.day;

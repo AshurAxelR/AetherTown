@@ -110,11 +110,11 @@ public class StarRenderer {
 		return data;
 	}
 	
-	public void createStars(long seed) {
+	public void createStars(long seed, float dayOfYear) {
 		if(stars!=null)
 			stars.release();
 		Random random = new Random(seed);
-		ArrayList<Star> data = StarData.generate(random);
+		ArrayList<Star> data = StarData.generate(random, dayOfYear);
 		stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
 	}
 	
