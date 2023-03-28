@@ -23,7 +23,7 @@ public class BookmarkPane extends UIPane {
 	public static final Color bgColorSelected = Color.WHITE;
 	public static final Color textColorSelected = Color.BLACK;
 
-	private LevelInfo[] bookmarks = new LevelInfo[numBookmarks];
+	public LevelInfo[] bookmarks = new LevelInfo[numBookmarks];
 	
 	private ClickButton buttonAdd, buttonDelete, buttonTravel;
 	private int selected = -1;

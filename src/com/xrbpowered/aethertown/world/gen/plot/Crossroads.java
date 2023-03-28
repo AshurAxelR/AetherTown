@@ -79,5 +79,9 @@ public class Crossroads extends StreetPresetGenerator {
 	@Override
 	public void fillStreet(Random random) {
 	}
+	
+	public static Token centerAt(Token t) {
+		return new Token(t.level, t.x-t.d.dx, t.y, t.z-t.d.dz, t.d);
+	}
 
 }

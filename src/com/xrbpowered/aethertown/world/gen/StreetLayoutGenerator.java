@@ -23,19 +23,19 @@ public class StreetLayoutGenerator extends TokenGenerator {
 
 	public final int houseLimit;
 	
+	public Token startToken;
+	
 	public StreetLayoutGenerator(int limit) {
 		super(0);
 		houseLimit = limit;
 	}
-
+	
 	@Override
 	public boolean generate(Token startToken, Random random) {
 		clearTokens();
-		/*Template.street.generate(startToken, random);
-		for(Dir d : Dir.values())
-			addToken(startToken.next(d, 0).setGenerator(new StreetGenerator(random, 0)));*/
+		this.startToken = Crossroads.centerAt(startToken);
 		Crossroads start = new Crossroads();
-		start.generate(startToken, random);
+		start.generate(this.startToken, random);
 		start.collectTokens(this, random);
 		return generate(random);
 	}

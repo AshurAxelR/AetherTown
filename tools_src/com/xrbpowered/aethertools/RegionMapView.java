@@ -2,7 +2,9 @@ package com.xrbpowered.aethertools;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.util.HashSet;
 
+import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
@@ -38,6 +40,8 @@ public class RegionMapView extends UIElement {
 	public static boolean showVisited = true;
 	
 	private static int hoverx, hoverz;
+	
+	public BookmarkPane bookmarks = null;
 	
 	public RegionMapView(UIContainer parent) {
 		super(new UIPanView(parent) {
@@ -108,6 +112,10 @@ public class RegionMapView extends UIElement {
 	public void paint(GraphAssist g) {
 		g.pushAntialiasing(false);
 		
+		HashSet<LevelInfo> bookmarks = new HashSet<>();
+		for(LevelInfo level : this.bookmarks.bookmarks)
+			bookmarks.add(level);
+		
 		for(int x=0; x<Region.sizex; x++)
 			for(int z=0; z<Region.sizez; z++) {
 				LevelInfo level = region.map[x][z];
@@ -134,8 +142,12 @@ public class RegionMapView extends UIElement {
 					
 					int s = level.settlement.ordinal();
 					if(s>0) {
-						g.setColor(colorTown);
+						g.setColor(bookmarks.contains(level) ? colorActive : colorTown);
 						g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
+					}
+					else if(bookmarks.contains(level)) {
+						g.setColor(colorActive);
+						g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
 					}
 				}
 				else {

@@ -288,6 +288,7 @@ public class AetherTown extends UIClient {
 			}
 		};
 		uiRegionMapView = new RegionMapView(uiRegionMap);
+		uiRegionMapView.bookmarks = uiBookmarks;
 		uiRegionMap.setVisible(false);
 	}
 	

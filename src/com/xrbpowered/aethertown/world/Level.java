@@ -34,9 +34,13 @@ public class Level {
 	public HeightLimiter heightLimiter = null;
 	public ArrayList<PlotGenerator> plots = null;
 
+	private int startx, startz;
+	
 	public Level(LevelInfo info) {
 		this.info = info;
 		this.levelSize = info.getLevelSize();
+		this.startx = levelSize/2;
+		this.startz = levelSize/2;
 	}
 	
 	@Override
@@ -45,11 +49,11 @@ public class Level {
 	}
 	
 	public int getStartX() {
-		return levelSize/2;
+		return startx;
 	}
 
 	public int getStartZ() {
-		return levelSize/2;
+		return startz;
 	}
 
 	private void resetGenerator() {
@@ -66,7 +70,7 @@ public class Level {
 	
 	private void releaseGenerator() {
 		heightLimiter = null;
-		// heightGuide = null;
+		heightGuide = null;
 		plots = null;
 	}
 	
@@ -112,7 +116,11 @@ public class Level {
 		
 		Token startToken = new Token(this, getStartX(), info.terrain.starty, getStartZ(), Dir.north);
 		if(info.settlement.maxHouses>0 || !info.conns.isEmpty()) {
-			new StreetLayoutGenerator(info.settlement.maxHouses).generate(startToken, random);
+			StreetLayoutGenerator gen = new StreetLayoutGenerator(info.settlement.maxHouses);
+			gen.generate(startToken, random);
+			startx = gen.startToken.x;
+			startz = gen.startToken.z;
+			
 			if(houseCount<info.settlement.minHouses)
 				throw new GeneratorException("Settlement is too small");
 			StreetLayoutGenerator.finishLayout(this, random);
