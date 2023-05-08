@@ -38,6 +38,63 @@ public abstract class HouseAssignment {
 			assignHouse(i, assignNext(i, random));
 	}
 
+	private static class Inn extends HouseAssignment {
+		private WRandom wAdd = new WRandom(1.2, 0.5, 0.4, 0.3, 0.1, 0.5, 0.1, 0.2);
+		private boolean hasGiftShop = false;
+		private boolean hasSupermarket = false;
+		private boolean hasMuseum = false;
+		private boolean hasPostOffice = false;
+		private boolean hasLibrary = false;
+		
+		public Inn(Level level) {
+			super(level);
+		}
+		
+		@Override
+		public HouseRole assignNext(int index, Random random) {
+			if(index==0)
+				return HouseRole.inn;
+			else {
+				switch(wAdd.next(random)) {
+					case 0: {
+						if(hasGiftShop)
+							return assignNext(index, random);
+						hasGiftShop = true;
+						return HouseRole.giftShop; 
+					}
+					case 1: {
+						if(hasSupermarket)
+							return assignNext(index, random);
+						hasSupermarket = true;
+						return HouseRole.supermarket;
+					}
+					case 2: return HouseRole.randomRestaurant(random);
+					case 3: return HouseRole.randomFastFood(random);
+					case 4: return HouseRole.randomShop(random);
+					case 5: {
+						if(hasMuseum)
+							return assignNext(index, random);
+						hasMuseum = true;
+						return HouseRole.museum;
+					}
+					case 6: {
+						if(hasPostOffice)
+							return assignNext(index, random);
+						hasPostOffice = true;
+						return HouseRole.postOffice;
+					}
+					case 7: {
+						if(hasLibrary)
+							return assignNext(index, random);
+						hasLibrary = true;
+						return HouseRole.library;
+					}
+					default: throw new RuntimeException();
+				}
+			}
+		}
+	}
+
 	private static class Village extends HouseAssignment {
 		private Shuffle shInit = new Shuffle(6);
 		private WRandom wDown = new WRandom(3, 2, 1, 0.2, 0.2, 1);
@@ -123,7 +180,16 @@ public abstract class HouseAssignment {
 	
 	public static void assignHouses(Level level, Random random) {
 		HouseRole.resetShuffle();
-		new Village(level).assign(random);
+		HouseAssignment ha;
+		switch(level.info.settlement) {
+			case inn:
+				ha = new Inn(level);
+				break;
+			case village:
+			default:
+				ha = new Village(level);
+		}
+		ha.assign(random);
 	}
 	
 }

@@ -85,18 +85,20 @@ public class HillsGenerator extends TokenGenerator {
 					continue;
 				Dir adjDir = null;
 				boolean expand = false;
+				boolean noSkip = false;
 				int y = 0;
 				for(Dir d : Dir.shuffle(random)) {
 					Tile adj = level.getAdj(x, z, d);
 					if(adj!=null) {
 						adjDir = d;
 						expand = adj.t.canExpandFill(adj) || random.nextInt(8)==0;
+						noSkip |= adj.t.noSkipExpandFill(adj);
 						y = adj.basey;
 						if(expand)
 							break;
 					}
 				}
-				if(adjDir!=null && (skip==0 || expand) && random.nextInt(skip+1)==0)
+				if(adjDir!=null && (skip==0 || expand) && (noSkip || random.nextInt(skip+1)==0))
 					gen.addToken(new Token(level, x, y, z, adjDir));
 			}
 	}

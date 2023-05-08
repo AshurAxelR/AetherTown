@@ -16,6 +16,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.GeneratorException;
+import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
@@ -44,6 +45,7 @@ public class Street extends TileTemplate {
 		public boolean lamp = false;
 		public Dir lampd = null;
 		public boolean bridge = false;
+		public boolean forceExpand = false;
 		
 		public StreetTile(TileTemplate t) {
 			super(t);
@@ -61,6 +63,23 @@ public class Street extends TileTemplate {
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
 		else
 			return super.getYAt(tile, sx, sz, y0);
+	}
+	
+	@Override
+	public void updateHeightLimit(Token t) {
+		HeightLimiter.updateAt(t, HeightLimiter.maxBridge, HeightLimiter.maxWall, 3);
+	}
+	
+	@Override
+	public boolean canExpandFill(Tile tile) {
+		TileTemplate adjtL = tile.getAdjT(tile.d.cw());
+		TileTemplate adjtR = tile.getAdjT(tile.d.ccw());
+		return (adjtR!=null && isAnyStreet(adjtR) || adjtL!=null && isAnyStreet(adjtL));
+	}
+	
+	@Override
+	public boolean noSkipExpandFill(Tile tile) {
+		return ((StreetTile) tile).forceExpand;
 	}
 	
 	@Override
@@ -241,13 +260,6 @@ public class Street extends TileTemplate {
 		lampPost.addInstance(r, new TileObjectInfo(tile, dx, dy, dz));
 		r.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
 		r.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
-	}
-	
-	@Override
-	public boolean canExpandFill(Tile tile) {
-		TileTemplate adjtL = tile.getAdjT(tile.d.cw());
-		TileTemplate adjtR = tile.getAdjT(tile.d.ccw());
-		return (adjtR!=null && isAnyStreet(adjtR) || adjtL!=null && isAnyStreet(adjtL));
 	}
 	
 	/**

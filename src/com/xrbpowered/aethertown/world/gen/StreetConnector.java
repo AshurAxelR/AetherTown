@@ -13,6 +13,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Street;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
 public class StreetConnector {
 
@@ -115,6 +116,13 @@ public class StreetConnector {
 		
 		public void generate(Random random) {
 			street.finish(random);
+			Token end = street.getEndToken();
+			if(end!=null) {
+				Tile t = end.tile();
+				if(t!=null && t.t==Street.template) {
+					((StreetTile) t).forceExpand = true;
+				}
+			}
 		}
 	}
 	

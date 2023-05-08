@@ -32,6 +32,7 @@ public class HouseRole {
 	public static final HouseRole localShop = new HouseRole("Local Store", colorShopSmall);
 	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge);
 	public static final HouseRole clothesShop = new HouseRole("Clothes Shop", colorShop);
+	public static final HouseRole giftShop = new HouseRole("Gift Shop", colorShop);
 	
 	// public static final HouseRole mall = new HouseRole("Mall", colorShopLarge);
 	public static final HouseRole museum = new HouseRole("Museum", colorCulture);
@@ -81,8 +82,8 @@ public class HouseRole {
 	}
 
 	private static final Shuffle.List<HouseRole> shopShuffle = new Shuffle.List<>(
-			supermarket,
 			clothesShop,
+			giftShop,
 			new HouseRole("DIY and Homeware", colorShop),
 			new HouseRole("Tech Store", colorShop),
 			new HouseRole("Hobby Shop", colorShop),

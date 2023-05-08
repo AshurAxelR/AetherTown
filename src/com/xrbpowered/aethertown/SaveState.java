@@ -17,7 +17,7 @@ public class SaveState extends AbstractConfig {
 	public int levelz = Region.sizez/2;
 	
 	public int day = 0;
-	public float time = 0.25f;
+	public float time = AetherTown.settings.startTime;
 	
 	public float cameraPosX = 0f;
 	public float cameraPosZ = 0f;

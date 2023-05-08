@@ -114,6 +114,10 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return perfectMatch;
 	}
 	
+	public Token getEndToken() {
+		return endToken;
+	}
+	
 	private boolean fitLength(Random random, Integer targetLength) {
 		int maxLen = (absdy>1) ? 2+random.nextInt(4) : 3+random.nextInt(5);
 		int minLen = (absdy>1) ? streetGap : 3;

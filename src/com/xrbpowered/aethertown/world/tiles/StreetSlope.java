@@ -11,8 +11,10 @@ import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -67,6 +69,14 @@ public class StreetSlope extends TileTemplate {
 			return (c==Corner.ne || c==Corner.nw) ? tile.basey-h : tile.basey;
 		else
 			return (c==Corner.ne || c==Corner.nw) ? tile.basey : tile.basey-h;
+	}
+	
+	@Override
+	public void updateHeightLimit(Token t) {
+		if(h==1)
+			HeightLimiter.updateAt(t, HeightLimiter.maxBridge, HeightLimiter.maxWall, 3);
+		else
+			super.updateHeightLimit(t);
 	}
 
 	@Override

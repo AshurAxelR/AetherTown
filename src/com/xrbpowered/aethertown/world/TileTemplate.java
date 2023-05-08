@@ -73,5 +73,9 @@ public abstract class TileTemplate implements Generator {
 	public boolean canExpandFill(Tile tile) {
 		return true;
 	}
+	
+	public boolean noSkipExpandFill(Tile tile) {
+		return false;
+	}
 
 }

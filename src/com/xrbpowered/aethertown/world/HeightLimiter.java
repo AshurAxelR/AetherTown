@@ -6,6 +6,7 @@ public class HeightLimiter {
 
 	public static final int maxCliff = 18; //24;
 	public static final int maxWall = 12; //8;
+	public static final int maxBridge = 18; //8;
 	public static final int maxEdge = 8;
 
 	private static final int maxUpdate = 120;

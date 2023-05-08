@@ -63,6 +63,7 @@ public class AetherTown extends UIClient {
 		public boolean showFps = false;
 		public float mouseSensitivity = 0.002f;
 		
+		public float startTime = 0.25f;
 		public float dayOfYear = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
 		public float timeSpeed = 20f;
 		public float timeSpeedUp = 100f;
