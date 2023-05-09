@@ -122,7 +122,8 @@ public class Level {
 			startz = gen.startToken.z;
 			
 			if(houseCount<info.settlement.minHouses)
-				throw new GeneratorException("Settlement is too small");
+				throw new GeneratorException("Settlement is too small: %d vs %d min for %s",
+						houseCount, info.settlement.minHouses, info.settlement.title);
 			StreetLayoutGenerator.finishLayout(this, random);
 		}
 		else {

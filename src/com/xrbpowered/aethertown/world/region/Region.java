@@ -100,16 +100,29 @@ public class Region {
 	}
 	
 	private void checkPeaks() {
-		// hack: fixing low-to-peak by lowering size 1 peaks
+		// FIXME hack: fixing low-to-peak by lowering size 1 peaks
 		for(int x=1; x<sizex-1; x++)
 			for(int z=1; z<sizez-1; z++) {
 				LevelInfo level = map[x][z];
-				if(level==null || level.size>1 || level.terrain!=LevelTerrainModel.peak)
+				if(level==null || level.size>1)
 					continue;
-				for(LevelConnection conn : level.conns) {
-					LevelInfo adj = map[x+conn.d.dx][z+conn.d.dz];
-					if(adj.terrain==LevelTerrainModel.low)
-						level.setTerrain(LevelTerrainModel.hill);
+				if(level.terrain==LevelTerrainModel.peak) {
+					for(LevelConnection conn : level.conns) {
+						LevelInfo adj = map[x+conn.d.dx][z+conn.d.dz];
+						if(adj.terrain==LevelTerrainModel.low) {
+							level.setTerrain(LevelTerrainModel.hill);
+							break;
+						}
+					}
+				}
+				else if(level.terrain==LevelTerrainModel.low && level.settlement.minHouses>0) {
+					for(Dir d : Dir.values()) {
+						LevelInfo adj = map[x+d.dx][z+d.dz];
+						if(adj!=null && adj.terrain==LevelTerrainModel.peak) {
+							level.setTerrain(LevelTerrainModel.hill);
+							break;
+						}
+					}
 				}
 			}
 	}

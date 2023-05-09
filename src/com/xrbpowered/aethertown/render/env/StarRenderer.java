@@ -26,7 +26,7 @@ public class StarRenderer {
 			.addAttrib("in_Magnitude", 1)
 			.addAttrib("in_Color", 3);
 
-	public static final float latitude = (float)Math.toRadians(30); // 0 - north pole, 180 - south pole
+	public static final float latitude = (float)Math.toRadians(60); // 0 - north pole, 180 - south pole
 
 	public class StarShader extends CameraShader {
 		private int modelMatrixLocation;
