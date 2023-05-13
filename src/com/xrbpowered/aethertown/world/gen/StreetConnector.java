@@ -205,7 +205,7 @@ public class StreetConnector {
 		return startz + i*dnext.dz + j*din.dz;
 	}
 
-	private void scanOpen() {
+	private void scanOpen(int margin) {
 		connPoints.clear();
 		Dir dl = dnext.flip();
 		Dir dr = dnext;
@@ -468,7 +468,7 @@ public class StreetConnector {
 	}
 	
 	public boolean connectAll(Random random) {
-		scanOpen();
+		scanOpen(margin);
 		boolean upd = false;
 		int iblock = 0;
 		int[][] wdistMap = new int[levelSize][levelSize];
@@ -504,7 +504,7 @@ public class StreetConnector {
 	
 	public boolean connectOut(LevelConnection lc, Random random, boolean multi) {
 		ConnPoint connOut = new ConnPoint(lc.getLevelI(), 0, lc.getY());
-		scanOpen();
+		scanOpen(zMargin);
 		boolean res = false;
 		while(!res) {
 			ConnPoint connS = null;

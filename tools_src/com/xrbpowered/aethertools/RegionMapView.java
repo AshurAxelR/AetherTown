@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.region.LevelSettlementType;
 import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -22,7 +23,7 @@ import com.xrbpowered.zoomui.swing.SwingWindowFactory;
 
 public class RegionMapView extends UIElement {
 
-	public static final int tileSize = 12;
+	public static final int tileSize = 20;
 	
 	public static final Color colorBg = new Color(0xf5f5f5);
 	public static final Color colorTextBg = new Color(0xbbffffff, true);
@@ -69,8 +70,11 @@ public class RegionMapView extends UIElement {
 		int h = 18;
 		g.setFont(Fonts.small);
 		g.setColor(colorText);
-		g.drawString(String.format("[%d, %d]", hoverx, hoverz), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		LevelInfo level = region.map[hoverx][hoverz];
+		String terrain = "-";
+		if(level!=null)
+			terrain = level.terrain.name;
+		g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, terrain), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		if(level!=null) {
 			boolean visited = !showVisited || level.visited;
 			if(visited)
@@ -100,7 +104,7 @@ public class RegionMapView extends UIElement {
 	private static Color getLevelColor(LevelTerrainModel terrain) {
 		if(terrain==LevelTerrainModel.low)
 			return colorLevel[0];
-		else if(terrain==LevelTerrainModel.hill)
+		else if(terrain==LevelTerrainModel.hill || terrain==LevelTerrainModel.flat)
 			return colorLevel[1];
 		else if(terrain==LevelTerrainModel.peak)
 			return colorLevel[2];
@@ -108,13 +112,19 @@ public class RegionMapView extends UIElement {
 			return Color.WHITE;
 	}
 	
+	private static int getSettlementRectSize(LevelSettlementType settlement) {
+		return settlement.ordinal()+1;
+	}
+	
 	@Override
 	public void paint(GraphAssist g) {
 		g.pushAntialiasing(false);
 		
 		HashSet<LevelInfo> bookmarks = new HashSet<>();
-		for(LevelInfo level : this.bookmarks.bookmarks)
-			bookmarks.add(level);
+		if(this.bookmarks!=null) {
+			for(LevelInfo level : this.bookmarks.bookmarks)
+				bookmarks.add(level);
+		}
 		
 		for(int x=0; x<Region.sizex; x++)
 			for(int z=0; z<Region.sizez; z++) {
@@ -140,8 +150,8 @@ public class RegionMapView extends UIElement {
 					}
 					g.popAntialiasing();
 					
-					int s = level.settlement.ordinal();
-					if(s>0) {
+					if(level.settlement!=LevelSettlementType.none) {
+						int s = getSettlementRectSize(level.settlement);
 						g.setColor(bookmarks.contains(level) ? colorActive : colorTown);
 						g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
 					}

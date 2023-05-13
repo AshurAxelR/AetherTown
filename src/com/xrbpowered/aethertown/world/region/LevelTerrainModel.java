@@ -9,9 +9,10 @@ import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 
 public class LevelTerrainModel {
 
-	public static final LevelTerrainModel bottom = new LevelTerrainModel(-100, -90, -90, -80);
-	public static final LevelTerrainModel low = new LevelTerrainModel(-100, -50, -30, 0);
-	public static final LevelTerrainModel hill = new LevelTerrainModel(-80, -20, 20, 80) {
+	public static final LevelTerrainModel bottom = new LevelTerrainModel("bottom", -100, -90, -90, -80);
+	public static final LevelTerrainModel low = new LevelTerrainModel("low", -100, -50, -30, 0);
+	public static final LevelTerrainModel flat = new LevelTerrainModel("flat", -40, 0, 20, 40);
+	public static final LevelTerrainModel hill = new LevelTerrainModel("hill", -80, -20, 20, 80) {
 		@Override
 		public void fillTerrain(Level level, Random random) {
 			HillsGenerator.expand(level, random, 5, 15, -2, 2);
@@ -19,7 +20,7 @@ public class LevelTerrainModel {
 			HillsGenerator.expand(level, random, 1, 0, -8, 2);
 		}
 	};
-	public static final LevelTerrainModel peak = new LevelTerrainModel(-60, 10, 60, 100) {
+	public static final LevelTerrainModel peak = new LevelTerrainModel("peak", -60, 10, 60, 100) {
 		@Override
 		public void fillTerrain(Level level, Random random) {
 			HillsGenerator.expand(level, random, 5, 10, -10, -2);
@@ -30,11 +31,13 @@ public class LevelTerrainModel {
 
 	public static LevelTerrainModel nullTerrain = bottom;
 	
+	public final String name;
 	public final int maxy;
 	public final int starty, conny;
 	public final int edgey;
 	
-	private LevelTerrainModel(int edgey, int conny, int starty, int maxy) {
+	private LevelTerrainModel(String name, int edgey, int conny, int starty, int maxy) {
+		this.name = name;
 		this.maxy = maxy;
 		this.starty = starty;
 		this.conny = conny;
@@ -50,13 +53,13 @@ public class LevelTerrainModel {
 		HillsGenerator.expand(level, random, 1, 0, -6, 2);
 	}
 	
-	private static final WRandom w = new WRandom(0.25, 0.6, 0.15);
-	private static final WRandom wpark = new WRandom(0.5, 0.45, 0.05);
-	private static final WRandom wexpand = new WRandom(0.05, 0.7, 0.25);
-	private static final LevelTerrainModel[] list = {low, hill, peak};
+	private static final WRandom w = new WRandom(0, 0.1, 0.55, 0.35);
+	private static final WRandom wpark = new WRandom(0.4, 0.15, 0.35, 0.1);
+	private static final WRandom wexpand = new WRandom(0.1, 0.2, 0.4, 0.3);
+	private static final LevelTerrainModel[] list = {low, flat, hill, peak};
 	public static LevelTerrainModel random(LevelInfo level, Random random) {
-		if(level.settlement.getStreetMargin(level.getLevelSize(), true)<24)
-			return low;
+		if(level.settlement.getStreetMargin(level.getLevelSize(), true)<18)
+			return flat;
 		else if(level.settlement==LevelSettlementType.none && level.conns.isEmpty())
 			return list[wexpand.next(random)];
 		else if(level.settlement==LevelSettlementType.none || level.settlement==LevelSettlementType.inn)

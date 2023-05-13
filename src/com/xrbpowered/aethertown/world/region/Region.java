@@ -109,7 +109,7 @@ public class Region {
 				if(level.terrain==LevelTerrainModel.peak) {
 					for(LevelConnection conn : level.conns) {
 						LevelInfo adj = map[x+conn.d.dx][z+conn.d.dz];
-						if(adj.terrain==LevelTerrainModel.low) {
+						if(adj.terrain==LevelTerrainModel.low || adj.terrain==LevelTerrainModel.bottom) {
 							level.setTerrain(LevelTerrainModel.hill);
 							break;
 						}

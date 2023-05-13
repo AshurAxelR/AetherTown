@@ -40,9 +40,10 @@ public class LevelCache {
 		return active.renderer;
 	}
 	
-	public void add(LevelInfo info) {
+	public LevelInfo add(LevelInfo info) {
+		Level level;
 		if(!infoMap.containsKey(info)) {
-			Level level = new Level(info);
+			level = new Level(info);
 			level.generate();
 			CacheEntry c = new CacheEntry();
 			c.level = level;
@@ -53,6 +54,10 @@ public class LevelCache {
 			while(storage > storageLimit)
 				expel(getLRU());
 		}
+		else {
+			level = infoMap.get(info).level;
+		}
+		return level.info;
 	}
 	
 	public void addAll(List<LevelInfo> list) {
@@ -60,10 +65,12 @@ public class LevelCache {
 			add(info);
 	}
 	
-	public void addAllAdj(LevelInfo info) {
+	public void addAllAdj(LevelInfo info, boolean markVisited) {
 		for(int x=info.x0-1; x<info.x0+info.size+1; x++)
 			for(int z=info.z0-1; z<info.z0+info.size+1; z++) {
-				add(info.region.getLevel(x, z));
+				LevelInfo level = add(info.region.getLevel(x, z));
+				if(markVisited)
+					level.visited = true;
 			}
 	}
 

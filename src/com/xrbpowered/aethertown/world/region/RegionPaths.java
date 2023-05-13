@@ -127,6 +127,9 @@ public class RegionPaths {
 			}
 			
 			level.place();
+			if(t.enter!=null)
+				region.connectLevels(t.x, t.z, t.enter.flip());
+
 			Dir d;
 			if(region.startLevel==null) {
 				region.startLevel = level;
@@ -138,8 +141,6 @@ public class RegionPaths {
 			 	level.setTerrain(LevelTerrainModel.random(level, random));
 			 	d = nextDir(t.enter, t.z);
 			}
-			if(t.enter!=null)
-				region.connectLevels(t.x, t.z, t.enter.flip());
 			
 			if(t.x<Region.sizex-Region.sizez/2) {
 				addToken(nextToken(level, d, t.pop+1, 0));

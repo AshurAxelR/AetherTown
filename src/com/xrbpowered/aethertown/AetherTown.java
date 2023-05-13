@@ -62,6 +62,8 @@ public class AetherTown extends UIClient {
 		public int noVsyncSleep = 2;
 		public boolean showFps = false;
 		public float mouseSensitivity = 0.002f;
+		public float walkSpeed = 4.8f; // meters per second. Human: 1.35
+		public float flySpeed = 24f;
 		
 		public float startTime = 0.25f;
 		public float dayOfYear = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
@@ -70,6 +72,7 @@ public class AetherTown extends UIClient {
 		
 		public float screenshotScale = 1f;
 		
+		public long regionSeed = -1L;
 		public boolean nosave = false;
 		
 		public ClientConfig() {
@@ -146,10 +149,10 @@ public class AetherTown extends UIClient {
 				camera = new CameraActor.Perspective().setFov(settings.fov).setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
 				
 				walkController = new WalkController(input).setActor(camera);
-				walkController.moveSpeed = 4.8f;
+				walkController.moveSpeed = settings.walkSpeed;
 				walkController.mouseSensitivity = settings.mouseSensitivity;
 				flyController = new Controller(input).setActor(camera);
-				flyController.moveSpeed = 24f;
+				flyController.moveSpeed = settings.flySpeed;
 				flyController.mouseSensitivity = settings.mouseSensitivity;
 				activeController = walkController;
 				
@@ -355,7 +358,7 @@ public class AetherTown extends UIClient {
 	}
 	
 	private void activateLevel(LevelInfo info) {
-		levelCache.addAllAdj(info);
+		levelCache.addAllAdj(info, true);
 		level = levelCache.setActive(info);
 		levelCache.createRenderers(sky.buffer, tiles);
 		
@@ -590,7 +593,7 @@ public class AetherTown extends UIClient {
 		save.assignVisited(region);
 		
 		levelCache = new LevelCache();
-		levelCache.addAllAdj(save.getLevel(region));
+		levelCache.addAllAdj(save.getLevel(region), true);
 	}
 	
 	public static void main(String[] args) {

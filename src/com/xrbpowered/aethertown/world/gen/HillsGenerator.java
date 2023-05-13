@@ -46,7 +46,7 @@ public class HillsGenerator extends TokenGenerator {
 			if(tile.t==Street.template &&  t.y<tile.basey+4 && tile.getAdj(t.d)==null) {
 				t.x = t.x + t.d.dx;
 				t.z = t.z + t.d.dz;
-				return checkToken(t);
+				return t.isInside() ? checkToken(t) : false;
 			}
 			else
 				return false;

@@ -11,7 +11,7 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class SaveState extends AbstractConfig {
 
-	public long regionSeed = -1L;
+	public long regionSeed = AetherTown.settings.regionSeed;
 	public boolean defaultStart = true;
 	public int levelx = Region.sizez/2;
 	public int levelz = Region.sizez/2;

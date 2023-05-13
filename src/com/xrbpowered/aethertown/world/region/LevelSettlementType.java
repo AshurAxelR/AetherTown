@@ -43,8 +43,8 @@ public enum LevelSettlementType {
 	}
 
 	private static final WRandom[] w = {
-		new WRandom(0.6, 0.2, 0.15, 0.05),
-		new WRandom(0.2, 0.1, 0.15, 0.3, 0.2, 0.05),
+		new WRandom(0.7, 0.25, 0.05),
+		new WRandom(0.3, 0.3, 0.2, 0.15, 0.05),
 		new WRandom(0, 0, 0, 0.05, 0.25, 0.55, 0.2, 0.05),
 	};
 	public static LevelSettlementType random(int levelSize, Random random) {

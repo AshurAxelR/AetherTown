@@ -28,12 +28,14 @@ public class ShaderEnvironment {
 	public float fogNear = 15f*Tile.size;
 	public float fogFar = 63f*Tile.size;
 	
+	public float cloudTop = 0f;
+	public float cloudBottom = -30f;
+	public float cloudNear = 20f;
+	
 	public boolean renderStars = false;
 	public float lightWashTop = 1f;
 	public float lightWashBottom = 1f;
 	public float lightSkyWash = 1f;
-	
-	// FIXME cloudTop, cloudButtom? via LevelRenderer?
 	
 	public ShaderEnvironment() {
 	}
@@ -79,6 +81,10 @@ public class ShaderEnvironment {
 		
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "fogNear"), fogNear);
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "fogFar"), fogFar);
+		
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "cloudTop"), cloudTop);
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "cloudBottom"), cloudBottom);
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "cloudNear"), cloudNear);
 		
 		uniform(GL20.glGetUniformLocation(pId, "lightDirection"), lightDirection);
 		uniform(GL20.glGetUniformLocation(pId, "lightColor"), lightColor);
