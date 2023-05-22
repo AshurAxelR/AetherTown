@@ -3,16 +3,15 @@ package com.xrbpowered.aethertown.render.tiles;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.xrbpowered.aethertown.render.LevelComponentRenderer;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
-import com.xrbpowered.gl.res.shader.Shader;
 import com.xrbpowered.gl.res.texture.Texture;
-import com.xrbpowered.gl.scene.comp.ComponentRenderer;
 import com.xrbpowered.gl.scene.comp.InstancedMeshList;
 
 public class TileComponent {
 
-	private class InstanceList extends InstancedMeshList<ObjectInfo> {
+	public class InstanceList extends InstancedMeshList<ObjectInfo> {
 		public final ObjectInfoUser shader;
 		
 		public InstanceList(ObjectInfoUser shader) {
@@ -65,13 +64,8 @@ public class TileComponent {
 		return new InstanceList(shader);
 	}
 
-	protected static ComponentRenderer<?> createRenderer(ArrayList<TileComponent> list, LevelRenderer r, final ObjectInfoUser shader) {
-		ComponentRenderer<InstanceList> renderer = new ComponentRenderer<InstanceList>() {
-			@Override
-			protected Shader getShader() {
-				return shader.getShader();
-			}
-		};
+	protected static LevelComponentRenderer createRenderer(ArrayList<TileComponent> list, LevelRenderer r, int renderPass, final ObjectInfoUser shader) {
+		LevelComponentRenderer renderer = new LevelComponentRenderer(renderPass, shader);
 		for(TileComponent comp : list) {
 			InstanceList inst = comp.createInstList(shader);
 			comp.instMap.put(r, inst);
@@ -88,8 +82,8 @@ public class TileComponent {
 		}
 	}
 
-	public static ComponentRenderer<?> createRenderer(LevelRenderer r, final ObjectInfoUser shader) {
-		return createRenderer(list, r, shader);
+	public static LevelComponentRenderer createRenderer(LevelRenderer r, final ObjectInfoUser shader) {
+		return createRenderer(list, r, LevelRenderer.solidRenderPass, shader);
 	}
 
 	public static void releaseRenderer(LevelRenderer r) {

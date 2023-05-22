@@ -7,6 +7,8 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.TexColor;
+import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
+import com.xrbpowered.aethertown.render.sprites.SpriteInfo;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -37,7 +39,7 @@ public class Street extends TileTemplate {
 	
 	private static TileComponent lampPost;
 	private static IllumTileComponent lamp;
-	// private static SpriteComponent sprite;
+	private static SpriteComponent coronaSprite;
 	private static TileComponent bridge, bridgeSupport;
 	private static TileComponent handrail;
 
@@ -87,11 +89,11 @@ public class Street extends TileTemplate {
 		street = new TileComponent(
 				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
 				new Texture(streetColor));
-		// sprite = new SpriteComponent(new Texture("checker.png"));
 		lamp = new IllumTileComponent(
 				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture("models/lamp/lamp.png", false, true, false),
 				new Texture("models/lamp/lamp_illum.png", false, true, false));
+		coronaSprite = new SpriteComponent(new Texture("models/lamp/corona.png"));
 		lampPost = new TileComponent(
 				ObjMeshLoader.loadObj("models/lamp/lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(0x353433));
@@ -124,8 +126,6 @@ public class Street extends TileTemplate {
 			r.terrain.addWalls(tile);
 		// FIXME add handrails on decorate() 
 		addHandrails(r, tile);
-		// if(tile.x%2==0 && tile.z%2==0)
-		// 		sprite.addInstance(r, new SpriteInfo(tile).size(Tile.size));
 		createLamp(tile, r, 0);
 	}
 	
@@ -258,6 +258,7 @@ public class Street extends TileTemplate {
 		float dz = d.dz*0.45f;
 		lamp.addInstance(r, new IllumTileObjectInfo(tile, dx, dy, dz));
 		lampPost.addInstance(r, new TileObjectInfo(tile, dx, dy, dz));
+		coronaSprite.addInstance(r, new SpriteInfo(tile, dx, dy+5.75f, dz).size(Tile.size*0.75f));
 		r.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
 		r.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
 	}

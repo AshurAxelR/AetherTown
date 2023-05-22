@@ -2,12 +2,12 @@ package com.xrbpowered.aethertown.render.sprites;
 
 import java.util.ArrayList;
 
+import com.xrbpowered.aethertown.render.LevelComponentRenderer;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.ObjectInfoUser;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
-import com.xrbpowered.gl.scene.comp.ComponentRenderer;
 import com.xrbpowered.gl.ui.pane.PaneShader;
 
 public class SpriteComponent extends TileComponent {
@@ -18,8 +18,8 @@ public class SpriteComponent extends TileComponent {
 		super(list, createSpriteQuad(), new Texture[] {color});
 	}
 	
-	public static ComponentRenderer<?> createRenderer(LevelRenderer r, final ObjectInfoUser shader) {
-		return createRenderer(list, r, shader);
+	public static LevelComponentRenderer createRenderer(LevelRenderer r, final ObjectInfoUser shader) {
+		return createRenderer(list, r, LevelRenderer.spriteRenderPass, shader);
 	}
 
 	public static void releaseRenderer(LevelRenderer r) {

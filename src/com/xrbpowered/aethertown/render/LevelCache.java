@@ -166,19 +166,25 @@ public class LevelCache {
 		c.renderer.levelOffset.set(dx*LevelInfo.baseSize*Tile.size, dz*LevelInfo.baseSize*Tile.size);
 	}
 
+	private ArrayList<LevelRenderer> renderQueue = new ArrayList<>();
+	
 	public void renderAll(RenderTarget target, CameraActor.Perspective camera) {
 		long time = System.currentTimeMillis();
 		renderedLevels = 0;
+		renderQueue.clear();
 		for(CacheEntry c : list) {
 			if(c.renderer.levelDist(camera.position.x, camera.position.z) > camera.getFar()) {
 				if(c.lastRenderTime<0L)
 					c.lastRenderTime = 0L;
 				continue;
 			}
-			c.renderer.render(target);
 			c.lastRenderTime = time;
 			renderedLevels++;
+			renderQueue.add(c.renderer);
 		}
+		for(int renderPass : LevelRenderer.renderPassList)
+			for(LevelRenderer renderer : renderQueue)
+				renderer.render(target, renderPass);
 	}
 	
 }

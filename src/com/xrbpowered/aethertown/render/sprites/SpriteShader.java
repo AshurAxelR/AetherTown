@@ -1,7 +1,11 @@
 package com.xrbpowered.aethertown.render.sprites;
 
+import static org.lwjgl.opengl.GL11.*;
+
+import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.ObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.ObjectInfoUser;
 import com.xrbpowered.gl.res.shader.CameraShader;
@@ -49,9 +53,21 @@ public class SpriteShader extends CameraShader implements ObjectInfoUser {
 	@Override
 	public void updateUniforms() {
 		super.updateUniforms();
+		
+		glDepthMask(false);
+		glEnable(GL11.GL_BLEND);
+		glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
+
 		GL20.glUniform1f(invAspectRatioLocation, 1f/camera.getAspectRatio());
 		float ff = 1f/(float)Math.tan(Math.toRadians(((CameraActor.Perspective)camera).getFov()) / 2.0);
 		GL20.glUniform1f(fovFactorLocation, ff);
+	}
+	
+	@Override
+	public void unuse() {
+		glDepthMask(true);
+		glDisable(GL11.GL_BLEND);
+		super.unuse();
 	}
 	
 	@Override
@@ -76,5 +92,11 @@ public class SpriteShader extends CameraShader implements ObjectInfoUser {
 		data[offs+1] = obj.position.y;
 		data[offs+2] = obj.position.z;
 		data[offs+3] = obj.size;
+	}
+	
+	public void setLevel(LevelRenderer level) {
+		int pId = getProgramId();
+		GL20.glUseProgram(pId);
+		uniform(GL20.glGetUniformLocation(pId, "levelOffset"), level.levelOffset);
 	}
 }

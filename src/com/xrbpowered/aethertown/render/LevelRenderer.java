@@ -12,14 +12,17 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.scene.StaticMeshActor;
-import com.xrbpowered.gl.scene.comp.ComponentRenderer;
 
 public class LevelRenderer {
 
+	public static final int solidRenderPass = 0;
+	public static final int spriteRenderPass = 1;
+	public static final int[] renderPassList = {solidRenderPass, spriteRenderPass};
+	
 	public final Level level;
 	public final SkyBuffer sky;
 	public final TileRenderer tiles;
-	public final ComponentRenderer<?>[] renderers;
+	public final LevelComponentRenderer[] renderers;
 	
 	public final Vector2f levelOffset = new Vector2f();
 	
@@ -57,13 +60,16 @@ public class LevelRenderer {
 		blockLighting.finish();
 	}
 	
-	public void render(RenderTarget target) {
-		GL11.glDisable(GL11.GL_CULL_FACE);
+	public void render(RenderTarget target, int renderPass) {
 		tiles.setLevel(this);
-		tiles.drawInstances(this);
-		tiles.objShader.setLevel(this);
-		for(StaticMeshActor actor : terrainActors)
-			actor.draw();
+		tiles.drawInstances(this, renderPass);
+
+		if(renderPass==solidRenderPass) {
+			GL11.glEnable(GL11.GL_CULL_FACE);
+			tiles.objShader.setLevel(this);
+			for(StaticMeshActor actor : terrainActors)
+				actor.draw();
+		}
 	}
 	
 	public void release() {
