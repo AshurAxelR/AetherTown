@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.world;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 
 public class Tile {
@@ -20,6 +21,8 @@ public class Tile {
 	public int basey = 0;
 	public Dir d;
 	public SubInfo sub = null;
+	
+	private FenceType[] fences = new FenceType[] {FenceType.none, FenceType.none, FenceType.none, FenceType.none};
 	
 	protected Tile(TileTemplate t) {
 		this.t = t;
@@ -50,6 +53,18 @@ public class Tile {
 		return t.getGroundY(this);
 	}
 	
+	public boolean hasFence(Dir d) {
+		return fences[d.ordinal()]!=FenceType.none;
+	}
+	
+	public FenceType getFence(Dir d) {
+		return fences[d.ordinal()];
+	}
+
+	public void setFence(Dir d, FenceType fence) {
+		fences[d.ordinal()] = fence;
+	}
+
 	public Tile getAdj(int dx, int dz) {
 		int x = this.x + dx;
 		int z = this.z + dz;

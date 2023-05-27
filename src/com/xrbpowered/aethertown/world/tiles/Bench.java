@@ -4,6 +4,7 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -38,7 +39,7 @@ public class Bench extends Plaza {
 		else {
 			r.terrain.addWalls(tile);
 			r.terrain.addFlatTile(Park.grassColor.color(), tile);
-			Street.template.addHandrails(r, tile);
+			FenceGenerator.createFences(r, tile);
 			dout = -0.25f;
 		}
 		bench.addInstance(r, new TileObjectInfo(tile, dout, 0));

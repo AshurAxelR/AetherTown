@@ -5,6 +5,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
@@ -56,7 +57,6 @@ public class Bridge extends TileTemplate {
 			tile.h = t.y-under.basey;
 		}
 		tile.place(t);
-		// updateHeightLimit(t);
 		return tile;
 	}
 	
@@ -65,12 +65,16 @@ public class Bridge extends TileTemplate {
 	}
 
 	@Override
+	public void decorateTile(Tile tile, Random random) {
+		FenceGenerator.addHandrails(tile);
+	}
+	
+	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		BridgeTile tile = (BridgeTile) atile;
 		Street.street.addInstance(r, new TileObjectInfo(tile));
 		Street.template.createBridge(r, tile, tile.basey, tile.basey-tile.h);
-		Street.template.addHandrails(r, tile);
-		// Street.template.addLamp(tile, renderer, random, 0);
+		FenceGenerator.createFences(r, tile);
 		
 		if(tile.under==Street.template) {
 			// FIXME under bridge create geometry via TileTemplate.createGeometry()

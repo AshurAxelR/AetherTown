@@ -11,8 +11,10 @@ import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -124,11 +126,21 @@ public class StreetSlope extends TileTemplate {
 		Street.template.autoAddHillBridge(tile, tile.basey-h);
 		if(h==1)
 			Street.template.addLamp(tile, random);
+		
+		Dir dl = tile.d.ccw();
+		Dir dr = tile.d.cw();
+		int hh = h>1 ? h : 0;
+		if(FenceGenerator.needsHandrail(tile, dl, -hh, 0))
+			tile.setFence(dl, FenceType.handrail);
+		if(FenceGenerator.needsHandrail(tile, dr, 0, -hh))
+			tile.setFence(dr, FenceType.handrail);
 	}
 	
 	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		StreetTile tile = (StreetTile) atile;
+		Dir dl = tile.d.ccw();
+		Dir dr = tile.d.cw();
 		if(h>1) {
 			side.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 			if(tile.bridge)
@@ -136,22 +148,18 @@ public class StreetSlope extends TileTemplate {
 			else
 				r.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
-			Dir dl = tile.d.ccw();
-			Dir dr = tile.d.cw();
-			if(Street.needsHandrail(tile, dl, -h, 0)) {
+			if(tile.getFence(dl)==FenceType.handrail) {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
-				Street.addHandrailPoles(r, tile, dl, -h, 0);
-				Street.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dl.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dl.dz+(0.5f-0.1875f*h)*tile.d.dz));
+				FenceGenerator.createHandrailPoles(r, tile, dl, -h, 0);
+				FenceGenerator.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dl.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dl.dz+(0.5f-0.1875f*h)*tile.d.dz));
 			}
-			if(Street.needsHandrail(tile, dr, 0, -h)) {
+			if(tile.getFence(dr)==FenceType.handrail) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
-				Street.addHandrailPoles(r, tile, dr, 0, -h);
-				Street.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dr.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dr.dz+(0.5f-0.1875f*h)*tile.d.dz));
+				FenceGenerator.createHandrailPoles(r, tile, dr, 0, -h);
+				FenceGenerator.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dr.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dr.dz+(0.5f-0.1875f*h)*tile.d.dz));
 			}
 		}
 		else {
-			Dir dl = tile.d.ccw();
-			Dir dr = tile.d.cw();
 			if(tile.bridge) {
 				Street.template.createHillBridge(r, tile, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
@@ -161,13 +169,13 @@ public class StreetSlope extends TileTemplate {
 				r.terrain.addWall(tile.x, tile.z, dr, tile.basey, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey);
 			}
-			if(Street.needsHandrail(tile, dl, 0, 0)) {
+			if(tile.getFence(dl)==FenceType.handrail) {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
-				Street.addHandrailPoles(r, tile, dl, -h, 0);
+				FenceGenerator.createHandrailPoles(r, tile, dl, -h, 0);
 			}
-			if(Street.needsHandrail(tile, dr, 0, 0)) {
+			if(tile.getFence(dr)==FenceType.handrail) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
-				Street.addHandrailPoles(r, tile, dr, 0, -h);
+				FenceGenerator.createHandrailPoles(r, tile, dr, 0, -h);
 			}
 			Street.template.createLamp(atile, r, -0.5f);
 		}

@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
@@ -78,6 +79,9 @@ public class Park extends TileTemplate {
 	@Override
 	public void decorateTile(Tile tile, Random random) {
 		TerrainTile.addTrees((ParkTile) tile, random);
+		if(!isFlex(tile))
+			FenceGenerator.addHandrails(tile);
+		// TODO fill handrail gaps (for hills too)
 	}
 	
 	@Override
@@ -88,9 +92,9 @@ public class Park extends TileTemplate {
 		else {
 			r.terrain.addWalls(tile);
 			r.terrain.addFlatTile(grassColor.color(), tile);
-			Street.template.addHandrails(r, tile);
 		}
 		((ParkTile) tile).createTrees(r);
+		FenceGenerator.createFences(r, tile);
 	}
 	
 	@Override

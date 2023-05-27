@@ -13,10 +13,10 @@ import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
-import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Tile;
@@ -35,13 +35,12 @@ public class Street extends TileTemplate {
 	public static final Street template = new Street();
 	public static final Street subTemplate = new Street();
 	
-	public static TileComponent street, handrailPole;
+	public static TileComponent street;
 	
 	private static TileComponent lampPost;
 	private static IllumTileComponent lamp;
 	private static SpriteComponent coronaSprite;
 	private static TileComponent bridge, bridgeSupport;
-	private static TileComponent handrail;
 
 	public static class StreetTile extends Tile {
 		public boolean lamp = false;
@@ -103,18 +102,14 @@ public class Street extends TileTemplate {
 		bridgeSupport = new TileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(TerrainBuilder.wallColor));
-		handrail = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/handrail.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture("models/fences/handrail.png", false, true, false));
-		handrailPole = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/handrail_pole.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(0xd5ceba));
+		FenceGenerator.createComponents();
 	}
 
 	@Override
 	public void decorateTile(Tile tile, Random random) {
 		addLamp(tile, random);
 		autoAddHillBridge((StreetTile)tile, tile.basey);
+		FenceGenerator.addHandrails(tile);
 	}
 	
 	@Override
@@ -124,61 +119,8 @@ public class Street extends TileTemplate {
 			createHillBridge(r, tile, tile.basey);
 		else
 			r.terrain.addWalls(tile);
-		// FIXME add handrails on decorate() 
-		addHandrails(r, tile);
+		FenceGenerator.createFences(r, tile);
 		createLamp(tile, r, 0);
-	}
-	
-	public static boolean needsHandrail(Tile tile, Dir d, int dy0, int dy1) {
-		Corner c0 = d.leftCorner();
-		Corner c1 = d.rightCorner();
-		Tile adj = tile.getAdj(d);
-		if(adj==null)
-			return false;
-		if(adj.t==Hill.template || (adj instanceof StreetTile && ((StreetTile) adj).bridge && adj.d!=d && adj.d!=d.flip())) {
-			int[] yloc = tile.level.h.yloc(adj.x, adj.z);
-			int miny = MathUtils.min(yloc);
-			if(tile.basey>=miny+4)
-				return true;
-		}
-		return tile.t.getFenceY(tile, c0)>adj.t.getFenceY(adj, c0.flipOver(d))+dy0 ||
-				tile.t.getFenceY(tile, c1)>adj.t.getFenceY(adj, c1.flipOver(d))+dy1;
-	}
-
-	public static boolean needsHandrail(Tile tile, Dir d) {
-		return needsHandrail(tile, d, 0, 0);
-	}
-
-	public static void addHandrailPoles(LevelRenderer r, Tile tile, Dir d, int dy0, int dy1) {
-		Corner c0 = d.leftCorner();
-		handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*c0.dx, dy0, 0.5f*c0.dz));
-		Corner c1 = d.rightCorner();
-		handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*c1.dx, dy1, 0.5f*c1.dz));
-	}
-	
-	public void addHandrail(LevelRenderer r, Tile tile, Dir d) {
-		if(needsHandrail(tile, d)) {
-			handrail.addInstance(r, new TileObjectInfo(tile).rotate(d));
-			addHandrailPoles(r, tile, d, 0, 0);
-		}
-	}
-	
-	public void addHandrails(LevelRenderer r, Tile tile) {
-		Dir dsrc = tile.d.flip();
-		for(Dir d : Dir.values()) {
-			if(d!=dsrc)
-				addHandrail(r, tile, d);
-			else {
-				Tile src = tile.getAdj(d);
-				if(src!=null && needsHandrail(tile, d, 1, 1)) {
-					handrail.addInstance(r, new TileObjectInfo(tile).rotate(d));
-					addHandrailPoles(r, tile, d, 0, 0);
-				}
-				else {
-					// TODO add entry stairs in place of handrails
-				}
-			}
-		}
 	}
 	
 	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
