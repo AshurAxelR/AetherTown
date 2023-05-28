@@ -98,9 +98,11 @@ public class Screenshot {
 			int y = height - 55;
 			String s = String.format("DAY %d, %s", WorldTime.getDay()+1, WorldTime.getFormattedTime());
 			g.drawString(s, width-40, y, GraphAssist.RIGHT, GraphAssist.CENTER); y += h;
-			LevelInfo level = AetherTown.level.info;
-			s = String.format("%s [%d, %d]", level.name, level.x0, level.z0);
-			g.drawString(s, width-40, y, GraphAssist.RIGHT, GraphAssist.CENTER);
+			if(AetherTown.level!=null) {
+				LevelInfo level = AetherTown.level.info;
+				s = String.format("%s [%d, %d]", level.name, level.x0, level.z0);
+				g.drawString(s, width-40, y, GraphAssist.RIGHT, GraphAssist.CENTER);
+			}
 		}
 	};
 

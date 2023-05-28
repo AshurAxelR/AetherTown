@@ -149,7 +149,7 @@ public class HeightMapView extends UIElement {
 		SaveState save = new SaveState();
 		// save.regionSeed = 0L;
 		AetherTown.generateRegion(save);
-		AetherTown.levelCache.setActive(AetherTown.region.startLevel);
+		AetherTown.levelCache.setActive(AetherTown.region.startLevel, true);
 		
 		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown height map", 1920, 1080);
 		new HeightMapView(frame.getContainer());

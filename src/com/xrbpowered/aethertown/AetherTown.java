@@ -87,7 +87,8 @@ public class AetherTown extends UIClient {
 	public static AetherTown aether;
 	public static Region region;
 	public static LevelCache levelCache;
-	public static Level level;
+	public static Level level = null;
+	public static LevelInfo levelInfo = null;
 
 	private CameraActor camera;
 	private Controller flyController, walkController;
@@ -203,6 +204,8 @@ public class AetherTown extends UIClient {
 			@Override
 			protected void renderBuffer(RenderTarget target) {
 				super.renderBuffer(target);
+				if(levelCache.isMissingRenderers())
+					levelCache.createRenderers(sky.buffer, tiles);
 				sky.render(target, levelCache.activeLevelRenderer());
 				levelCache.renderAll(target, (Perspective)camera);
 				
@@ -359,14 +362,15 @@ public class AetherTown extends UIClient {
 	
 	private void activateLevel(LevelInfo info) {
 		levelCache.addAllAdj(info, true);
-		level = levelCache.setActive(info);
-		levelCache.createRenderers(sky.buffer, tiles);
+		level = levelCache.setActive(info, true);
+		levelInfo = info;
+		// levelCache.createRenderers(sky.buffer, tiles);
 		
 		LevelMapView.level = level;
-		RegionMapView.active = level.info;
-		level.info.visited = true;
+		RegionMapView.active = info;
+		info.visited = true;
 		
-		System.out.printf("Level switched to [%d, %d]\n", level.info.x0, level.info.z0);
+		System.out.printf("Level switched to [%d, %d]\n", info.x0, info.z0);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
 		
 		if(uiBookmarks.isVisible())
@@ -383,15 +387,18 @@ public class AetherTown extends UIClient {
 	}
 	
 	private void changeRegion(SaveState save) {
-		level = levelCache.setActive(save.getLevel(region));
+		// FIXME may not work with multiple regions in levelCache
+		LevelInfo info = save.getLevel(region);
+		level = levelCache.setActive(info, true);
+		levelInfo = info;
 		RegionMapView.region = region;
 		
 		LevelMapView.level = level;
-		RegionMapView.active = level.info;
-		level.info.visited = true;
+		RegionMapView.active = info;
+		info.visited = true;
 
 		sky.stars.createStars(region.seed, settings.dayOfYear);
-		levelCache.createRenderers(sky.buffer, tiles);
+		// levelCache.createRenderers(sky.buffer, tiles);
 
 		WorldTime.day1 = save.day;
 		WorldTime.setTimeOfDay(save.time);
@@ -419,8 +426,8 @@ public class AetherTown extends UIClient {
 		SaveState save = new SaveState();
 		save.regionSeed = region.seed;
 		save.defaultStart = false;
-		save.levelx = level.info.x0;
-		save.levelz = level.info.z0;
+		save.levelx = levelInfo.x0;
+		save.levelz = levelInfo.z0;
 		save.day = WorldTime.getDay();
 		save.time = WorldTime.getTimeOfDay();
 		save.cameraPosX = camera.position.x;
@@ -545,7 +552,7 @@ public class AetherTown extends UIClient {
 					activeController.setMouseLook(true);
 				break;
 			case KeyEvent.VK_F1: {
-					if(level.isInside(hoverx, hoverz)) {
+					if(level!=null && level.isInside(hoverx, hoverz)) {
 						printTileDebug(hoverx, hoverz, level.map[hoverx][hoverz]);
 					}
 					else {
@@ -561,17 +568,23 @@ public class AetherTown extends UIClient {
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
 				break;
 			case KeyEvent.VK_B:
-				uiBookmarks.setVisible(!uiBookmarks.isVisible());
-				uiBookmarks.selectNone();
-				getContainer().repaint();
+				if(level!=null) {
+					uiBookmarks.setVisible(!uiBookmarks.isVisible());
+					uiBookmarks.selectNone();
+					getContainer().repaint();
+				}
 				break;
 			case KeyEvent.VK_N:
-				disableController();
-				showRegionMap(true);
+				if(level!=null) {
+					disableController();
+					showRegionMap(true);
+				}
 				break;
 			case KeyEvent.VK_M:
-				disableController();
-				showLevelMap(true);
+				if(level!=null) {
+					disableController();
+					showLevelMap(true);
+				}
 				break;
 			default:
 				super.keyPressed(c, code);

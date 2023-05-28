@@ -19,11 +19,19 @@ public class LevelCache {
 
 	public static final int storageLimit = 64;
 	
-	private class CacheEntry {
+	public class CacheEntry {
+		public final LevelInfo info;
+		
 		public Level level = null;
 		public LevelRenderer renderer = null;
 		public long lastRenderTime = -1L;
+		
+		public CacheEntry(LevelInfo info) {
+			this.info = info;
+		}
 	}
+	
+	public final GeneratorQueue generatorQueue;
 	
 	private HashMap<LevelInfo, CacheEntry> infoMap = new HashMap<>();
 	private ArrayList<CacheEntry> list = new ArrayList<>();
@@ -32,8 +40,19 @@ public class LevelCache {
 	private int storage = 0;
 	public int renderedLevels = 0;
 	
+	private boolean missingRenderers = false;
+	
+	public LevelCache() {
+		generatorQueue = new GeneratorQueue();
+		generatorQueue.start();
+	}
+	
 	public Level activeLevel() {
 		return active.level;
+	}
+	
+	public boolean isMissingRenderers() {
+		return missingRenderers;
 	}
 	
 	public LevelRenderer activeLevelRenderer() {
@@ -41,23 +60,22 @@ public class LevelCache {
 	}
 	
 	public LevelInfo add(LevelInfo info) {
-		Level level;
 		if(!infoMap.containsKey(info)) {
-			level = new Level(info);
-			level.generate();
-			CacheEntry c = new CacheEntry();
-			c.level = level;
+			CacheEntry c = new CacheEntry(info);
+			generatorQueue.queueLevel(c);
 			infoMap.put(info, c);
 			list.add(c);
+			missingRenderers = true;
 			
 			storage += info.size*info.size;
 			while(storage > storageLimit)
 				expel(getLRU());
+			
+			return info;
 		}
 		else {
-			level = infoMap.get(info).level;
+			return infoMap.get(info).info;
 		}
-		return level.info;
 	}
 	
 	public void addAll(List<LevelInfo> list) {
@@ -66,8 +84,15 @@ public class LevelCache {
 	}
 	
 	public void addAllAdj(LevelInfo info, boolean markVisited) {
+		// prioritise origin:
+		add(info);
+		if(markVisited)
+			info.visited = true;
+		
 		for(int x=info.x0-1; x<info.x0+info.size+1; x++)
 			for(int z=info.z0-1; z<info.z0+info.size+1; z++) {
+				if(x==info.x0 && z==info.z0)
+					continue;
 				LevelInfo level = add(info.region.getLevel(x, z));
 				if(markVisited)
 					level.visited = true;
@@ -82,7 +107,7 @@ public class LevelCache {
 			if(lru==null || c.lastRenderTime<lru.lastRenderTime)
 				lru = c;
 		}
-		return lru.level.info;
+		return lru.info;
 	}
 	
 	public void expel(LevelInfo info) {
@@ -102,10 +127,23 @@ public class LevelCache {
 		return infoMap.get(info).level;
 	}
 	
-	public Level setActive(LevelInfo info) {
+	public Level setActive(LevelInfo info, boolean waitGenerator) {
 		active = infoMap.get(info);
 		for(CacheEntry c : list)
 			updateLevelOffset(c);
+		
+		if(waitGenerator && active.level==null) {
+			System.err.println("... Level cache waiting for the generator thread");
+			try {
+				while(active.level==null)
+					Thread.sleep(10);
+			}
+			catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.err.println("... Level cache ready");
+		}
+		
 		return active.level;
 	}
 	
@@ -140,9 +178,14 @@ public class LevelCache {
 	}
 
 	public void createRenderers(SkyBuffer sky, TileRenderer tiles) {
+		missingRenderers = false;
 		for(CacheEntry c : list) {
-			if(c.renderer!=null || c.level==null)
+			if(c.renderer!=null)
 				continue;
+			if(c.level==null) {
+				missingRenderers = true;
+				continue;
+			}
 			c.renderer = new LevelRenderer(c.level, sky, tiles);
 			System.out.println("Building geometry...");
 			c.renderer.createLevelGeometry();
@@ -161,8 +204,8 @@ public class LevelCache {
 	private void updateLevelOffset(CacheEntry c) {
 		if(c.renderer==null)
 			return;
-		int dx = c.level.info.x0 - active.level.info.x0;
-		int dz = c.level.info.z0 - active.level.info.z0;
+		int dx = c.info.x0 - active.info.x0;
+		int dz = c.info.z0 - active.info.z0;
 		c.renderer.levelOffset.set(dx*LevelInfo.baseSize*Tile.size, dz*LevelInfo.baseSize*Tile.size);
 	}
 
@@ -173,6 +216,8 @@ public class LevelCache {
 		renderedLevels = 0;
 		renderQueue.clear();
 		for(CacheEntry c : list) {
+			if(c.renderer==null)
+				continue;
 			if(c.renderer.levelDist(camera.position.x, camera.position.z) > camera.getFar()) {
 				if(c.lastRenderTime<0L)
 					c.lastRenderTime = 0L;

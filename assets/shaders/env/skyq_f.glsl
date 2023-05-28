@@ -36,7 +36,7 @@ void main(void) {
 
 	vec4 blockLight = vec4(0);
 	float illum = lightColor.x+lightColor.y+lightColor.z;
-	if(illum<illumTrigger) {
+	if(illum<illumTrigger && levelSize>0) {
 		blockLight = texture(dataBlockLighting, (cameraPosition.xz/4+0.5)/levelSize)*(1-illum/illumTrigger);
 	}
 	vec4 fogColor = cloudColor + 0.15*blockLight;
