@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
@@ -82,10 +83,10 @@ public class StreetSlope extends TileTemplate {
 		if(h==4) {
 			street = new TileComponent(
 					ObjMeshLoader.loadObj("models/stairs/stairs4.obj", 0, 1f, ObjectShader.vertexInfo, null),
-					new Texture(Street.streetColor));
+					TexColor.get(Street.streetColor));
 			side = new TileComponent(
 					ObjMeshLoader.loadObj("models/stairs/stairs4side.obj", 0, 1f, ObjectShader.vertexInfo, null),
-					new Texture(TerrainBuilder.wallColor));
+					TexColor.get(TerrainBuilder.wallColor));
 			handrailL = new TileComponent(
 					ObjMeshLoader.loadObj("models/fences/handrail_s4l.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					handrailTex);
@@ -96,10 +97,10 @@ public class StreetSlope extends TileTemplate {
 		else if(h==2) {
 			street = new TileComponent(
 					ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null),
-					new Texture(Street.streetColor));
+					TexColor.get(Street.streetColor));
 			side = new TileComponent(
 					ObjMeshLoader.loadObj("models/stairs/stairs2side.obj", 0, 1f, ObjectShader.vertexInfo, null),
-					new Texture(TerrainBuilder.wallColor));
+					TexColor.get(TerrainBuilder.wallColor));
 			handrailL = new TileComponent(
 					ObjMeshLoader.loadObj("models/fences/handrail_s2l.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					handrailTex);
@@ -110,7 +111,7 @@ public class StreetSlope extends TileTemplate {
 		else {
 			street = new TileComponent(
 					BasicGeometry.slope(Tile.size, Tile.ysize*h, ObjectShader.vertexInfo, null),
-					new Texture(Street.streetColor));
+					TexColor.get(Street.streetColor));
 			handrailL = new TileComponent(
 					ObjMeshLoader.loadObj("models/fences/handrail_s1l.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					handrailTex);
@@ -130,9 +131,9 @@ public class StreetSlope extends TileTemplate {
 		Dir dl = tile.d.ccw();
 		Dir dr = tile.d.cw();
 		int hh = h>1 ? h : 0;
-		if(FenceGenerator.needsHandrail(tile, dl, -hh, 0))
+		if(FenceGenerator.needsHandrail(tile, dl, -hh, 0)==FenceType.handrail)
 			tile.setFence(dl, FenceType.handrail);
-		if(FenceGenerator.needsHandrail(tile, dr, 0, -hh))
+		if(FenceGenerator.needsHandrail(tile, dr, 0, -hh)==FenceType.handrail)
 			tile.setFence(dr, FenceType.handrail);
 	}
 	
