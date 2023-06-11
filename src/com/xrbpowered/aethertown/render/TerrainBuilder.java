@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
 import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -85,7 +86,10 @@ public class TerrainBuilder {
 	}
 	
 	public void addWalls(Tile tile) {
-		addWalls(tile.x, tile.z, tile.basey);
+		for(Dir d : Dir.values()) {
+			if(tile.getFence(d)!=FenceType.stepsOut)
+				addWall(tile.x, tile.z, d, tile.basey, tile.basey);
+		}
 	}
 
 	/*public Texture createTexture() {

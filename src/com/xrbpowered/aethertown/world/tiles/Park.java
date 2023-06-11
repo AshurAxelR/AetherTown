@@ -48,11 +48,11 @@ public class Park extends TileTemplate {
 	}
 	
 	@Override
-	public float getYAt(Tile tile, float sx, float sz, float y0) {
+	public float getYIn(Tile tile, float sx, float sz, float y0) {
 		if(isFlex(tile))
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
 		else
-			return super.getYAt(tile, sx, sz, y0);
+			return super.getYIn(tile, sx, sz, y0);
 	}
 	
 	@Override

@@ -30,11 +30,11 @@ public class Bridge extends TileTemplate {
 		return new BridgeTile();
 	}
 	
-	public float getYAt(Tile tile, float sx, float sz, float y0) {
+	public float getYIn(Tile tile, float sx, float sz, float y0) {
 		if(isUnder(y0, tile.basey))
 			return Tile.ysize*(tile.basey-((BridgeTile) tile).h);
 		else
-			return super.getYAt(tile, sx, sz, y0);
+			return super.getYIn(tile, sx, sz, y0);
 	}
 	
 	protected boolean canGenerate(Token t) {

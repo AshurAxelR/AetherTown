@@ -26,6 +26,8 @@ public class StreetSlope extends TileTemplate {
 	public static final StreetSlope template2 = new StreetSlope(2);
 	public static final StreetSlope template4 = new StreetSlope(4);
 
+	private static TileComponent stepsL, stepsR;
+	
 	public final int h;
 	private TileComponent street, side, handrailL, handrailR;
 	
@@ -39,17 +41,13 @@ public class StreetSlope extends TileTemplate {
 	}
 	
 	@Override
-	public float getYAt(Tile tile, float sx, float sz, float prevy) {
+	public float getYIn(Tile tile, float sx, float sz, float prevy) {
 		if(((StreetTile)tile).bridge && Bridge.isUnder(prevy, tile.basey-h))
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
 
 		float y0 = Tile.ysize*tile.basey;
 		float y1 = Tile.ysize*(tile.basey-h);
-		sx *= tile.d.dx;
-		if(sx<0) sx += 1;
-		sz *= tile.d.dz;
-		if(sz<0) sz += 1;
-		float s = sx+sz;
+		float s = sForXZ(sx, sz, tile.d);
 		if(h==4) {
 			s = MathUtils.clamp((s-0.25f)/0.75f);
 			return MathUtils.lerp(y0, y1, s);
@@ -118,9 +116,23 @@ public class StreetSlope extends TileTemplate {
 			handrailR = new TileComponent(
 					ObjMeshLoader.loadObj("models/fences/handrail_s1r.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					handrailTex);
+			stepsL = new TileComponent(
+					ObjMeshLoader.loadObj("models/fences/steps_out_s1l.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					TexColor.get(Street.streetColor));
+			stepsR = new TileComponent(
+					ObjMeshLoader.loadObj("models/fences/steps_out_s1r.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					TexColor.get(Street.streetColor));
 		}
 	}
 
+	private static void setFence(StreetTile tile, Tile upTile, Dir d, int h0, int h1) {
+		FenceType fence = FenceGenerator.needsHandrail(tile, d, h0, h1);
+		// FIXME doesn't work in decoration cycle as it depends on the iteration order
+		if(fence==FenceType.stepsOut && upTile.getFence(d)!=FenceType.stepsOut)
+			fence = FenceType.none;
+		tile.setFence(d, fence);
+	}
+	
 	@Override
 	public void decorateTile(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
@@ -131,10 +143,11 @@ public class StreetSlope extends TileTemplate {
 		Dir dl = tile.d.ccw();
 		Dir dr = tile.d.cw();
 		int hh = h>1 ? h : 0;
-		if(FenceGenerator.needsHandrail(tile, dl, -hh, 0)==FenceType.handrail)
-			tile.setFence(dl, FenceType.handrail);
-		if(FenceGenerator.needsHandrail(tile, dr, 0, -hh)==FenceType.handrail)
-			tile.setFence(dr, FenceType.handrail);
+		Tile upTile = tile.getAdj(tile.d.flip());
+		setFence(tile, upTile, dl, -hh, 0);
+		setFence(tile, upTile, dr, 0, -hh);
+		// tile.setFence(dl, FenceGenerator.needsHandrail(tile, dl, -hh, 0));
+		// tile.setFence(dr, FenceGenerator.needsHandrail(tile, dr, 0, -hh));
 	}
 	
 	@Override
@@ -174,9 +187,15 @@ public class StreetSlope extends TileTemplate {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
 				FenceGenerator.createHandrailPoles(r, tile, dl, -h, 0);
 			}
+			else if(tile.getFence(dl)==FenceType.stepsOut) {
+				stepsL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
+			}
 			if(tile.getFence(dr)==FenceType.handrail) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
 				FenceGenerator.createHandrailPoles(r, tile, dr, 0, -h);
+			}
+			else if(tile.getFence(dr)==FenceType.stepsOut) {
+				stepsR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
 			}
 			Street.template.createLamp(atile, r, -0.5f);
 		}

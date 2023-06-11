@@ -59,11 +59,11 @@ public class Street extends TileTemplate {
 	}
 	
 	@Override
-	public float getYAt(Tile tile, float sx, float sz, float y0) {
+	public float getYIn(Tile tile, float sx, float sz, float y0) {
 		if(((StreetTile)tile).bridge && Bridge.isUnder(y0, tile.basey))
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
 		else
-			return super.getYAt(tile, sx, sz, y0);
+			return super.getYIn(tile, sx, sz, y0);
 	}
 	
 	@Override

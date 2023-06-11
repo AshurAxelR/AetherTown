@@ -32,7 +32,7 @@ public class Hill extends TileTemplate {
 	}
 	
 	@Override
-	public float getYAt(Tile tile, float sx, float sz, float y0) {
+	public float getYIn(Tile tile, float sx, float sz, float y0) {
 		return tile.level.h.gety(tile.x, tile.z, sx, sz);
 	}
 	

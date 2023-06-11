@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
@@ -36,6 +37,7 @@ public class HouseT extends TileTemplate {
 	public class HouseTile extends Tile {
 		public int groundy;
 		public Color[] illum;
+		public boolean steps = false;
 
 		public HouseTile() {
 			super(HouseT.this);
@@ -77,6 +79,14 @@ public class HouseT extends TileTemplate {
 	@Override
 	public int getLightBlockY(Tile tile) {
 		return tile.basey+15;
+	}
+	
+	@Override
+	public float getYOut(Tile tile, Dir d, float sout, float sx, float sz, float prevy) {
+		if(((HouseTile) tile).steps && d==tile.d.flip())
+			return FenceGenerator.getFenceYOut(tile.basey, sout);
+		else
+			return Float.NEGATIVE_INFINITY;
 	}
 	
 	@Override
@@ -129,6 +139,8 @@ public class HouseT extends TileTemplate {
 		HouseGeneratorBase house = (HouseGeneratorBase) tile.sub.parent;
 		for(int i=0; i<tile.illum.length; i++)
 			tile.illum[i] = randomIllumMod(random, house.illum);
+		if(tile.sub.i==0 && tile.sub.j==0 && tile.getAdj(tile.d.flip()).t==StreetSlope.template1)
+			tile.steps = true;
 	}
 	
 	private static boolean isObstructed(Tile tile, int[] yloc, int y, Dir d) {
@@ -145,6 +157,8 @@ public class HouseT extends TileTemplate {
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		HouseTile tile = (HouseTile) atile;
 		r.terrain.addWalls(tile);
+		if(tile.steps)
+			FenceGenerator.steps.addInstance(r, new TileObjectInfo(tile).rotate(tile.d.flip()));
 		
 		int basey = tile.basey;
 		SubInfo sub = tile.sub;

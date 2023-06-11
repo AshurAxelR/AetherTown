@@ -19,12 +19,11 @@ public abstract class FenceGenerator {
 	public static enum FenceType {
 		none,
 		handrail,
-		stairsOut
+		stepsOut
 	}
 	
-	public static TileComponent handrailPole;
-	private static TileComponent handrail;
-	private static TileComponent stairs;
+	public static TileComponent handrailPole, steps;
+	private static TileComponent handrail, stepsCorner;
 
 	public static void createComponents() {
 		handrail = new TileComponent(
@@ -33,8 +32,11 @@ public abstract class FenceGenerator {
 		handrailPole = new TileComponent(
 				ObjMeshLoader.loadObj("models/fences/handrail_pole.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(0xd5ceba));
-		stairs = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/stairs_out.obj", 0, 1f, ObjectShader.vertexInfo, null),
+		steps = new TileComponent(
+				ObjMeshLoader.loadObj("models/fences/steps_out.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(Street.streetColor));
+		stepsCorner = new TileComponent(
+				ObjMeshLoader.loadObj("models/fences/steps_out_c.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(Street.streetColor));
 	}
 	
@@ -56,7 +58,7 @@ public abstract class FenceGenerator {
 			return FenceType.handrail;
 		if(h0>0 || h1>0) {
 			if(adj.basey>=tile.basey-1)
-				return FenceType.stairsOut;
+				return FenceType.stepsOut;
 			else
 				return FenceType.handrail;
 		}
@@ -68,20 +70,8 @@ public abstract class FenceGenerator {
 	}
 
 	public static void addHandrails(Tile tile) {
-		Dir dsrc = tile.d.flip();
 		for(Dir d : Dir.values()) {
-			if(d!=dsrc) {
-				tile.setFence(d, needsHandrail(tile, d));
-			}
-			else {
-				Tile src = tile.getAdj(d);
-				if(src!=null && needsHandrail(tile, d, 1, 1)==FenceType.handrail) {
-					tile.setFence(d, FenceType.handrail);
-				}
-				else {
-					// TODO add entry stairs in place of handrails
-				}
-			}
+			tile.setFence(d, needsHandrail(tile, d));
 		}
 	}
 
@@ -103,12 +93,26 @@ public abstract class FenceGenerator {
 				case handrail:
 					createHandrail(r, tile, d);
 					break;
-				case stairsOut:
-					stairs.addInstance(r, new TileObjectInfo(tile).rotate(d));
+				case stepsOut:
+					steps.addInstance(r, new TileObjectInfo(tile).rotate(d));
+					if(tile.getFence(d.cw())==FenceType.stepsOut)
+						stepsCorner.addInstance(r, new TileObjectInfo(tile).rotate(d));
 					break;
 				default:
 					break;
 			}
+		}
+	}
+	
+	public static float getFenceYOut(int basey, float sout) {
+		float w = 0.75f/Tile.size;
+		if(sout<w) {
+			float y0 = Tile.ysize*basey;
+			float y1 = Tile.ysize*(basey-1);
+			return MathUtils.lerp(y0, y1, sout/w);
+		}
+		else {
+			return Float.NEGATIVE_INFINITY;
 		}
 	}
 	

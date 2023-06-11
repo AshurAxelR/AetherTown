@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Corner;
+import com.xrbpowered.aethertown.utils.Dir;
 
 public abstract class TileTemplate implements Generator {
 
@@ -31,8 +32,41 @@ public abstract class TileTemplate implements Generator {
 		return tile.basey;
 	}
 	
-	public float getYAt(Tile tile, float sx, float sz, float y0) {
+	public float getYOut(Tile tile, Dir d, float sout, float sx, float sz, float prevy) {
+		switch(tile.getFence(d)) {
+			case stepsOut:
+				return FenceGenerator.getFenceYOut(tile.basey, sout);
+			default:
+				return Float.NEGATIVE_INFINITY;
+		}
+	}
+	
+	public static float sForXZ(float sx, float sz, Dir d) {
+		sx *= d.dx;
+		if(sx<0) sx += 1;
+		sz *= d.dz;
+		if(sz<0) sz += 1;
+		return sx+sz;
+	}
+	
+	protected float getYFromAdj(Tile tile, float sx, float sz, float prevy) {
+		float max = Float.NEGATIVE_INFINITY;
+		for(Dir d : Dir.values()) {
+			Tile adj = tile.getAdj(d.flip());
+			if(adj!=null) {
+				float sout = sForXZ(sx, sz, d);
+				max = Math.max(max, adj.t.getYOut(adj, d, sout, sx-d.dx, sz-d.dz, prevy));
+			}
+		}
+		return max;
+	}
+
+	public float getYIn(Tile tile, float sx, float sz, float prevy) {
 		return Tile.ysize*tile.basey;
+	}
+
+	public final float getYAt(Tile tile, float sx, float sz, float prevy) {
+		return Math.max(getYIn(tile, sx, sz, prevy), getYFromAdj(tile, sx, sz, prevy));
 	}
 
 	public boolean finalizeTile(Tile tile, Random random) {
