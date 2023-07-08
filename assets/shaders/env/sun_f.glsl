@@ -24,6 +24,8 @@ void main(void) {
 		d -= hdot*10;
 	
 	if(d>=1) discard;
-	out_Color = max(pow4(lightColor, 2.75) * 2.75, vec4(1, 0.2, 0, 1));
-	out_Color.a = min(1, 10*(1-d)/(100*d+1));
+	float a = min(2, 10*(1-d)/(100*d+1));
+	// out_Color = pow4(lightColor, 2.75) * 2.75;
+	float len = pow(length(lightColor.xyz), 0.35);
+	out_Color = vec4(lightColor.xyz*1.2/len + pow(max(0, (a-1)), 1.5), sqrt(a));
 }

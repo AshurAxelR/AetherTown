@@ -38,7 +38,6 @@ import com.xrbpowered.gl.scene.Controller;
 import com.xrbpowered.gl.scene.StaticMeshActor;
 import com.xrbpowered.gl.scene.WalkController;
 import com.xrbpowered.gl.ui.UINode;
-import com.xrbpowered.gl.ui.common.UIFpsOverlay;
 import com.xrbpowered.gl.ui.pane.UIOffscreen;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -106,7 +105,7 @@ public class AetherTown extends UIClient {
 	
 	private UIOffscreen uiRender;
 	private UINode uiRoot;
-	private UIPane uiTime, uiCompass, uiLookInfo;
+	private UIPane uiTime, uiCompass, uiLookInfo, uiDebugInfo;
 	private BookmarkPane uiBookmarks;
 	
 	private UIPane uiLevelMap;
@@ -216,9 +215,6 @@ public class AetherTown extends UIClient {
 			}
 		};
 		
-		if(settings.showFps)
-			new UIFpsOverlay(this);
-		
 		uiRoot = new UINode(getContainer()) {
 			@Override
 			public void layout() {
@@ -229,6 +225,26 @@ public class AetherTown extends UIClient {
 				super.layout();
 			}
 		};
+		if(settings.showFps) {
+			uiDebugInfo = new UIPane(uiRoot, false) {
+				@Override
+				protected void paintSelf(GraphAssist g) {
+					clear(g, bgColor);
+					g.setColor(Color.WHITE);
+					g.setFont(Fonts.small);
+					float y = 10;
+					y = g.drawString(String.format("%.1f fps", getFps()), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+					float a = 90f - (float)Math.toDegrees(Math.acos(sky.sun.position.dot(0, 1, 0, 0)));
+					y = g.drawString(String.format("Sun angle: %.1f\u00b0", a), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+				}
+				@Override
+				public void updateTime(float dt) {
+					repaint();
+				}
+			};
+			uiDebugInfo.setSize(180, 50);
+			uiDebugInfo.setLocation(20, 20);
+		}
 		
 		uiTime = new UIPane(uiRoot, false) {
 			@Override
