@@ -93,6 +93,7 @@ public class AetherTown extends UIClient {
 	private Controller flyController, walkController;
 	private Controller activeController = null;
 	private boolean controllerEnabled = false;
+	private boolean autoWalk = false;
 	
 	private SkyRenderer sky;
 	private TileRenderer tiles;
@@ -148,7 +149,19 @@ public class AetherTown extends UIClient {
 				clearColor = environment.bgColor;
 				camera = new CameraActor.Perspective().setFov(settings.fov).setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
 				
-				walkController = new WalkController(input).setActor(camera);
+				walkController = new WalkController(input) {
+					@Override
+					protected void updateMove(org.joml.Vector3f move) {
+						super.updateMove(move);
+						if(autoWalk) {
+							if(move.length()>0)
+								autoWalk = false;
+							else
+								move.set(0, 0, 1);
+						}
+					}
+				};
+				walkController.setActor(camera);
 				walkController.moveSpeed = settings.walkSpeed;
 				walkController.mouseSensitivity = settings.mouseSensitivity;
 				flyController = new Controller(input).setActor(camera);
@@ -499,6 +512,7 @@ public class AetherTown extends UIClient {
 	private void disableController() {
 		if(controllerEnabled) {
 			activeController.setMouseLook(false);
+			autoWalk = false;
 			controllerEnabled = false;
 		}
 	}
@@ -507,6 +521,8 @@ public class AetherTown extends UIClient {
 	public void mouseDown(float x, float y, int button) {
 		if(controllerEnabled && getMouseButton(button)==UIElement.Button.right)
 			disableController();
+		else if(controllerEnabled && activeController==walkController && button==3)
+			autoWalk = !autoWalk;
 		else
 			super.mouseDown(x, y, button);
 	}
@@ -555,6 +571,7 @@ public class AetherTown extends UIClient {
 				requestExit();
 				break;
 			case KeyEvent.VK_TAB:
+				autoWalk = false;
 				if(controllerEnabled)
 					activeController.setMouseLook(false);
 				if(activeController==flyController) {

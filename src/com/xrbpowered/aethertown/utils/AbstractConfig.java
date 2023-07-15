@@ -52,7 +52,7 @@ public abstract class AbstractConfig {
 				e.printStackTrace();
 			}
 		}
-		System.out.printf("%s loaded.", path);
+		System.out.printf("%s loaded.\n", path);
 		return this;
 	}
 	
@@ -78,7 +78,7 @@ public abstract class AbstractConfig {
 			}
 		}
 		if(saveValues(values, path))
-			System.out.printf("%s saved.", path);
+			System.out.printf("%s saved.\n", path);
 	}
 	
 	public static HashMap<String, String> loadValues(String path) {
