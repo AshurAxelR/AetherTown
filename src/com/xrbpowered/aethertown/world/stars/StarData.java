@@ -72,7 +72,12 @@ public class StarData {
 
 	public static Star sun = null;
 	
-	public static ArrayList<Star> generate(Random random, float dayOfYear) {
+	public static void updateSun(float timeOfYear) {
+		sun.ra = timeOfYear*Math.PI*2f;
+		sun.de = axialTilt*Math.sin(sun.ra);
+	}
+	
+	public static ArrayList<Star> generate(Random random) {
 		ArrayList<Star> stars = new ArrayList<>();
 		for(int i=0; i<numStars; i++) {
 			Star star = new Star();
@@ -85,8 +90,6 @@ public class StarData {
 		}
 
 		sun = new Star(); // sun
-		sun.ra = dayOfYear*Math.PI*2f;
-		sun.de = axialTilt*Math.sin(sun.ra);
 		sun.mag = -10;
 		sun.temp = 5500;
 

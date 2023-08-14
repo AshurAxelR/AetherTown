@@ -8,6 +8,7 @@ import com.xrbpowered.aethertools.RegionMapView;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
+import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
@@ -65,7 +66,8 @@ public class AetherTown extends UIClient {
 		public float flySpeed = 24f;
 		
 		public float startTime = 0.25f;
-		public float dayOfYear = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
+		public int startDay = 0;
+		public int season = Seasons.winter; // FIXME remove
 		public float timeSpeed = 20f;
 		public float timeSpeedUp = 100f;
 		
@@ -200,6 +202,11 @@ public class AetherTown extends UIClient {
 					updateWalkY();
 				}
 				
+				if(input.isKeyDown(KeyEvent.VK_MINUS))
+					WorldTime.shiftTimeOfYear(-dt);
+				else if(input.isKeyDown(KeyEvent.VK_EQUALS))
+					WorldTime.shiftTimeOfYear(dt);
+				
 				float dtDay = dt;
 				if(input.isKeyDown(KeyEvent.VK_OPEN_BRACKET))
 					dtDay = -settings.timeSpeedUp*dt;
@@ -267,10 +274,10 @@ public class AetherTown extends UIClient {
 				g.setFont(Fonts.large);
 				g.drawString(WorldTime.getFormattedTime(), 50, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 				g.setFont(Fonts.small);
-				g.drawString(String.format("DAY %d", WorldTime.getDay()+1), 100, getHeight()/2, GraphAssist.LEFT, GraphAssist.CENTER);
+				g.drawString(String.format("DAY %d, %s", WorldTime.getDay()+1, WorldTime.getFormattedDate()), 100, getHeight()/2, GraphAssist.LEFT, GraphAssist.CENTER);
 			}
 		};
-		uiTime.setSize(180, 32);
+		uiTime.setSize(200, 32);
 		
 		uiCompass = new UIPane(uiRoot, false) {
 			@Override
@@ -426,10 +433,11 @@ public class AetherTown extends UIClient {
 		RegionMapView.active = info;
 		info.visited = true;
 
-		sky.stars.createStars(region.seed, settings.dayOfYear);
+		sky.stars.createStars(region.seed);
 		// levelCache.createRenderers(sky.buffer, tiles);
 
 		WorldTime.day1 = save.day;
+		WorldTime.setDayOfYear(save.startDay + save.day);
 		WorldTime.setTimeOfDay(save.time);
 		updateEnvironment();
 		

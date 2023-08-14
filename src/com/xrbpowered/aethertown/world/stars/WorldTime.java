@@ -2,29 +2,54 @@ package com.xrbpowered.aethertown.world.stars;
 
 import static com.xrbpowered.aethertown.AetherTown.settings;
 
-import com.xrbpowered.aethertown.render.env.Seasons;
-
 public class WorldTime {
+	
+	public static final int daysInYear = 12*7;
+	public static final int equinoxDay = 19;
 
-	private static final float cycleTimeFactor = (float)Math.PI * 2f / (float)(60*60*24);
+	public static final String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+	
+	private static final float dayFactor = 1f / (float)(60*60*24);
+	private static final float cycleTimeFactor = (float)Math.PI * 2f * dayFactor;
 	
 	public static int day1 = 0;
 	public static float cycleTime = calcCycleTime(0.25f);
+	public static float timeOfYear = 0.25f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
 	
 	public static void updateTime(float dt) {
 		cycleTime += dt*settings.timeSpeed*cycleTimeFactor;
+		timeOfYear += dt*settings.timeSpeed * dayFactor / daysInYear;
+		clampTimeOfYear();
+	}
+	
+	private static void clampTimeOfYear() {
+		if(timeOfYear<0f)
+			timeOfYear += 1f;
+		if(timeOfYear>1f)
+			timeOfYear -= 1f;
+	}
+	
+	public static void shiftTimeOfYear(float dt) {
+		timeOfYear += dt*0.05f;
+		clampTimeOfYear();
+		cycleTime += dt*0.05f * (float)Math.PI*2f;
 	}
 	
 	private static float calcCycleTime(float t) {
-		return (float)Math.PI * 2f * (settings.dayOfYear + t - 0.5f);
+		return (float)Math.PI * 2f * (timeOfYear + t - 0.5f);
 	}
 	
 	private static float fromCycleTime() {
-		return (cycleTime / (float)Math.PI / 2f) - settings.dayOfYear + 0.5f;
+		return (cycleTime / (float)Math.PI / 2f) - timeOfYear + 0.5f;
 	}
 	
 	public static void setTimeOfDay(float t) {
+		// FIXME date break
 		cycleTime = calcCycleTime(t); 
+	}
+	
+	public static void setDayOfYear(int day) {
+		timeOfYear = ((day - equinoxDay + daysInYear) % daysInYear) / (float) daysInYear;
 	}
 	
 	public static float getTimeOfDay() {
@@ -34,6 +59,10 @@ public class WorldTime {
 	
 	public static int getDay() {
 		return (int)Math.floor(fromCycleTime()) + day1;
+	}
+	
+	public static int getDayOfYear() {
+		return ((int)(timeOfYear*daysInYear) + equinoxDay) % daysInYear;
 	}
 	
 	public static String getFormattedTime(float t) {
@@ -47,6 +76,16 @@ public class WorldTime {
 		return getFormattedTime(getTimeOfDay());
 	}
 	
+	public static String getFormattedDate(int day) {
+		int m = day/7;
+		int d = day%7;
+		return String.format("%s %d", monthNames[m], d+1);
+	}
+
+	public static String getFormattedDate() {
+		return getFormattedDate(getDayOfYear());
+	}
+
 	public static float parseTime(String value) {
 		String[] s = value.split(":", 3);
 		if(s.length<2)
@@ -57,7 +96,8 @@ public class WorldTime {
 	}
 	
 	public static int season() {
-		return (settings.dayOfYear>0.7f && settings.dayOfYear<0.85f) ? Seasons.winter : Seasons.summer;
+		// FIXME re-create season textures
+		return settings.season; // (timeOfYear>0.7f && timeOfYear<0.85f) ? Seasons.winter : Seasons.summer;
 	}
 
 }

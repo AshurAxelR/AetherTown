@@ -74,6 +74,7 @@ public class StarRenderer {
 	
 	public void update(Vector4f sun) {
 		transform.rotationXYZ(-latitude, -WorldTime.cycleTime, 0);
+		StarData.updateSun(WorldTime.timeOfYear);
 		starPos(StarData.sun.ra, StarData.sun.de, sun);
 		transform.transform(sun);
 	}
@@ -110,11 +111,11 @@ public class StarRenderer {
 		return data;
 	}
 	
-	public void createStars(long seed, float dayOfYear) {
+	public void createStars(long seed) {
 		if(stars!=null)
 			stars.release();
 		Random random = new Random(seed);
-		ArrayList<Star> data = StarData.generate(random, dayOfYear);
+		ArrayList<Star> data = StarData.generate(random);
 		stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
 	}
 	
