@@ -1,68 +1,47 @@
 package com.xrbpowered.aethertown.world.stars;
 
 import static com.xrbpowered.aethertown.AetherTown.settings;
+import static com.xrbpowered.aethertown.utils.MathUtils.frac;
 
 public class WorldTime {
 	
+	public static final String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+
 	public static final int daysInYear = 12*7;
 	public static final int equinoxDay = 19;
+	public static float yearPhase = 0f;
 
-	public static final String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+	private static final float timeFactor = 1f / (float)(60*60*24);
 	
-	private static final float dayFactor = 1f / (float)(60*60*24);
-	private static final float cycleTimeFactor = (float)Math.PI * 2f * dayFactor;
-	
-	public static int day1 = 0;
-	public static float cycleTime = calcCycleTime(0.25f);
-	public static float timeOfYear = 0.25f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
+	public static float time = 0f;
 	
 	public static void updateTime(float dt) {
-		cycleTime += dt*settings.timeSpeed*cycleTimeFactor;
-		timeOfYear += dt*settings.timeSpeed * dayFactor / daysInYear;
-		clampTimeOfYear();
-	}
-	
-	private static void clampTimeOfYear() {
-		if(timeOfYear<0f)
-			timeOfYear += 1f;
-		if(timeOfYear>1f)
-			timeOfYear -= 1f;
+		time += dt*settings.timeSpeed*timeFactor;
 	}
 	
 	public static void shiftTimeOfYear(float dt) {
-		timeOfYear += dt*0.05f;
-		clampTimeOfYear();
-		cycleTime += dt*0.05f * (float)Math.PI*2f;
+		yearPhase += dt*0.05f;
 	}
-	
-	private static float calcCycleTime(float t) {
-		return (float)Math.PI * 2f * (timeOfYear + t - 0.5f);
-	}
-	
-	private static float fromCycleTime() {
-		return (cycleTime / (float)Math.PI / 2f) - timeOfYear + 0.5f;
-	}
-	
-	public static void setTimeOfDay(float t) {
-		// FIXME date break
-		cycleTime = calcCycleTime(t); 
-	}
-	
-	public static void setDayOfYear(int day) {
-		timeOfYear = ((day - equinoxDay + daysInYear) % daysInYear) / (float) daysInYear;
-	}
-	
+
 	public static float getTimeOfDay() {
-		float t = fromCycleTime();
-		return t - (float)Math.floor(t);
+		return frac(time);
+	}
+	
+	public static float getTimeOfYear() {
+		return frac(time/daysInYear + yearPhase);
+	}
+	
+	public static void setTime(float startSeason, int day, float t) {
+		yearPhase = startSeason;
+		time = day + t;
 	}
 	
 	public static int getDay() {
-		return (int)Math.floor(fromCycleTime()) + day1;
+		return (int)Math.floor(time);
 	}
 	
 	public static int getDayOfYear() {
-		return ((int)(timeOfYear*daysInYear) + equinoxDay) % daysInYear;
+		return ((int)(getTimeOfYear()*daysInYear) + equinoxDay) % daysInYear;
 	}
 	
 	public static String getFormattedTime(float t) {

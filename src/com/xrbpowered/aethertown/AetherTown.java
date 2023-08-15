@@ -66,7 +66,7 @@ public class AetherTown extends UIClient {
 		public float flySpeed = 24f;
 		
 		public float startTime = 0.25f;
-		public int startDay = 0;
+		public float startSeason = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
 		public int season = Seasons.winter; // FIXME remove
 		public float timeSpeed = 20f;
 		public float timeSpeedUp = 100f;
@@ -436,9 +436,7 @@ public class AetherTown extends UIClient {
 		sky.stars.createStars(region.seed);
 		// levelCache.createRenderers(sky.buffer, tiles);
 
-		WorldTime.day1 = save.day;
-		WorldTime.setDayOfYear(save.startDay + save.day);
-		WorldTime.setTimeOfDay(save.time);
+		WorldTime.setTime(save.startSeason, save.day, save.time);
 		updateEnvironment();
 		
 		if(save.defaultStart) {

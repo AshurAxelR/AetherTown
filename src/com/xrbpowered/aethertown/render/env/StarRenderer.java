@@ -73,8 +73,9 @@ public class StarRenderer {
 	}
 	
 	public void update(Vector4f sun) {
-		transform.rotationXYZ(-latitude, -WorldTime.cycleTime, 0);
-		StarData.updateSun(WorldTime.timeOfYear);
+		float y = WorldTime.getTimeOfYear();
+		transform.rotationXYZ(-latitude, -(WorldTime.time-0.5f+y)*(float)Math.PI*2f, 0);
+		StarData.updateSun(y);
 		starPos(StarData.sun.ra, StarData.sun.de, sun);
 		transform.transform(sun);
 	}

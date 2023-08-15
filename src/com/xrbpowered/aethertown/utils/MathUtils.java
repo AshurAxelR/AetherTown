@@ -71,5 +71,13 @@ public class MathUtils {
 	public static int maxDelta(int... x) {
 		return max(x) - min(x);
 	}
+	
+	public static float frac(float x) {
+		return x - (float)Math.floor(x);
+	}
+
+	public static double frac(double x) {
+		return x - Math.floor(x);
+	}
 
 }
