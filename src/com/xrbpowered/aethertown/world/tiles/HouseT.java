@@ -7,7 +7,6 @@ import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
-import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -27,8 +26,6 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class HouseT extends TileTemplate {
 
-	public static final Seasons roofColor = new Seasons(new Color(0x57554a), new Color(0xe0eef1));
-	
 	public static final HouseT template = new HouseT();
 	
 	private static IllumTileComponent groundWall, groundWallDoor, groundWallBlank, upperWall, upperWallBlank;
@@ -109,7 +106,7 @@ public class HouseT extends TileTemplate {
 				TexColor.get(Color.BLACK));
 		roof = new TileComponent(
 				BasicGeometry.slope(Tile.size, 8*Tile.ysize, ObjectShader.vertexInfo, null),
-				roofColor.texture());
+				ChurchT.roofTexture);
 		Texture upperWallColor = new Texture(new Color(0xd5ceba));
 		roofEndLeft = new TileComponent(
 				BasicGeometry.slopeSideLeft(Tile.size, 8*Tile.ysize, ObjectShader.vertexInfo, null),

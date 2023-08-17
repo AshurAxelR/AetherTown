@@ -3,12 +3,12 @@ package com.xrbpowered.aethertown.render;
 import static com.xrbpowered.aethertown.render.TerrainBuilder.chunkSize;
 
 import java.awt.Color;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.xrbpowered.aethertown.render.env.TerrainTexture;
 import com.xrbpowered.aethertown.render.tiles.TileObjectShader;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -34,6 +34,23 @@ public class TerrainChunkBuilder {
 	private static final boolean enableSmooth = false;
 	private static final boolean enableDebugNormals = false;
 	
+	public static class TerrainMeshActor extends StaticMeshActor {
+		@Override
+		protected void bindTextures() {
+			Texture.bindAll(TileObjectShader.numGlobalSamplers, textures);
+		}
+		
+		public void release() {
+			if(mesh!=null)
+				mesh.release();
+			mesh = null;
+			if(textures!=null)
+				for(Texture t : textures)
+					t.release();
+			textures = null;
+		}
+	}
+	
 	public final Level level;
 	public final int cx, cz;
 	
@@ -41,14 +58,14 @@ public class TerrainChunkBuilder {
 	private Vertex[][] grassVertexMap;
 	private Vector3f[][] debugNormals;
 	
-	public BufferedImage color;
+	public TerrainTexture color;
 	
 	public TerrainChunkBuilder(Level level, int cx, int cz) {
 		this.level = level;
 		this.cx = cx;
 		this.cz = cz;
 		
-		color = new BufferedImage(chunkSize, chunkSize, BufferedImage.TYPE_INT_RGB);
+		color = new TerrainTexture(chunkSize, chunkSize);
 		grassBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
 		cliffBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
 		wallBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
@@ -149,7 +166,7 @@ public class TerrainChunkBuilder {
 		addHillTriangle(MathUtils.maxDelta(p0.y, p1.y, p2.y), p0, p1, p2);
 	}
 
-	public void addHillTile(Color c, int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
+	public void addHillTile(TerrainMaterial c, int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
 		Vector3i p00 = new Vector3i(x, y00, z);
 		Vector3i p01 = new Vector3i(x, y01, z+1);
 		Vector3i p10 = new Vector3i(x+1, y10, z);
@@ -162,7 +179,7 @@ public class TerrainChunkBuilder {
 			addHillTriangle(p00, p01, p10);
 			addHillTriangle(p01, p11, p10);
 		}
-		color.setRGB(x - cx*chunkSize, z - cz*chunkSize, c.getRGB());
+		color.set(x - cx*chunkSize, z - cz*chunkSize, c);
 	}
 
 	private void addTriangleVertical(AdvancedMeshBuilder b, Vector3i p0, Vector3i p1, Vector3i p2, Dir d) {
@@ -246,24 +263,19 @@ public class TerrainChunkBuilder {
 		return debug.create();
 	}
 
-	public static StaticMeshActor makeActor(final StaticMesh mesh, final ActorShader shader, final Texture diffuse) {
-		StaticMeshActor actor =  new StaticMeshActor() {
-			@Override
-			protected void bindTextures() {
-				Texture.bindAll(TileObjectShader.numGlobalSamplers, textures);
-			}
-		};
+	public static TerrainMeshActor makeActor(final StaticMesh mesh, final ActorShader shader, final Texture diffuse) {
+		TerrainMeshActor actor =  new TerrainMeshActor();
 		actor.setMesh(mesh);
 		actor.setShader(shader);
 		actor.setTextures(new Texture[] {diffuse});
 		return actor;
 	}
 	
-	public void createActors(ActorShader shader, ArrayList<StaticMeshActor> actors) {
+	public void createActors(ActorShader shader, ArrayList<TerrainMeshActor> actors) {
 		if(enableDebugNormals)
 			actors.add(makeActor(createDebugMesh(Tile.size/2), shader, new Texture(Color.RED)));
 
-		actors.add(makeActor(grassBuilder.create(), shader, new Texture(color, true, false)));
+		actors.add(makeActor(grassBuilder.create(), shader, color.create()));
 		actors.add(makeActor(cliffBuilder.create(), shader, new Texture(TerrainBuilder.cliffColor)));
 		actors.add(makeActor(wallBuilder.create(), shader, new Texture(TerrainBuilder.wallColor)));
 	}

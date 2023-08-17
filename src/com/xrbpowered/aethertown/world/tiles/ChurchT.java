@@ -5,6 +5,7 @@ import java.awt.Color;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
+import com.xrbpowered.aethertown.render.env.SeasonalTexture;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -27,7 +28,9 @@ public class ChurchT extends TileTemplate {
 	
 	private static IllumTileComponent mid, front1, front2, front3, front4, back1, back2;
 	private static TileComponent midRoof, chapelRoof;
-	
+
+	public static Texture roofTexture;
+
 	@Override
 	public String getTileInfo(Tile tile) {
 		return ((HouseGeneratorBase) tile.sub.parent).getInfo();
@@ -45,6 +48,8 @@ public class ChurchT extends TileTemplate {
 	
 	@Override
 	public void createComponents() {
+		roofTexture = new SeasonalTexture(new int[] {10, 80}, new Color[] {new Color(0x57554a), new Color(0xe0eef1)});
+		
 		mid = new IllumTileComponent(
 				ObjMeshLoader.loadObj("models/church/church_mid.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture("models/church/church_mid.png", false, true, false),
@@ -75,10 +80,10 @@ public class ChurchT extends TileTemplate {
 				new Texture("models/church/church_back_2_illum.png", false, true, false));
 		midRoof = new TileComponent(
 				ObjMeshLoader.loadObj("models/church/church_mid_roof.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				HouseT.roofColor.texture());
+				roofTexture);
 		chapelRoof = new TileComponent(
 				ObjMeshLoader.loadObj("models/church/church_chapel_roof.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				HouseT.roofColor.texture());
+				roofTexture);
 	}
 
 	@Override

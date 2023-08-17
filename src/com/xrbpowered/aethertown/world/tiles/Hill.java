@@ -3,7 +3,7 @@ package com.xrbpowered.aethertown.world.tiles;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
-import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
@@ -67,7 +67,7 @@ public class Hill extends TileTemplate {
 	
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer r) {
-		r.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+		r.terrain.addHillTile(TerrainMaterial.hillGrass, tile);
 		int maxd = getMaxDelta(tile);
 		if(maxd<10)
 			((HillTile) tile).createTrees(r);

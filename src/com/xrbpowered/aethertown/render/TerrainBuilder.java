@@ -3,20 +3,18 @@ package com.xrbpowered.aethertown.render;
 import java.awt.Color;
 import java.util.ArrayList;
 
-import com.xrbpowered.aethertown.render.env.Seasons;
+import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
 import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.shader.ActorShader;
-import com.xrbpowered.gl.scene.StaticMeshActor;
 
 public class TerrainBuilder {
 
 	public static final int chunkSize = 64; 
 	
-	public static final Seasons grassColor = new Seasons(new Color(0x7da547), new Color(0xf4fcfd));
 	public static final Color cliffColor = new Color(0x7d7f6e);
 	public static final Color wallColor = new Color(0x85857a);
 
@@ -36,13 +34,13 @@ public class TerrainBuilder {
 			}
 	}
 	
-	public void addHillTile(Color c, int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
+	public void addHillTile(TerrainMaterial c, int x, int z, int y00, int y01, int y10, int y11, boolean diag) {
 		int cx = x/chunkSize;
 		int cz = z/chunkSize;
 		chunks[cx][cz].addHillTile(c, x, z, y00, y01, y10, y11, diag);
 	}
 	
-	public void addHillTile(Color c, int x, int z) {
+	public void addHillTile(TerrainMaterial c, int x, int z) {
 		HeightMap h = level.h;
 		addHillTile(c, x, z,
 			h.y[x][z],
@@ -53,17 +51,17 @@ public class TerrainBuilder {
 		);
 	}
 
-	public void addHillTile(Color c, Tile tile) {
+	public void addHillTile(TerrainMaterial c, Tile tile) {
 		addHillTile(c, tile.x, tile.z);
 	}
 
-	public void addFlatTile(Color c, int x, int y, int z) {
+	public void addFlatTile(TerrainMaterial c, int x, int y, int z) {
 		addHillTile(c, x, z,
 			y, y, y, y, true
 		);
 	}
 
-	public void addFlatTile(Color c, Tile tile) {
+	public void addFlatTile(TerrainMaterial c, Tile tile) {
 		addFlatTile(c, tile.x, tile.basey, tile.z);
 	}
 
@@ -92,12 +90,8 @@ public class TerrainBuilder {
 		}
 	}
 
-	/*public Texture createTexture() {
-		return new Texture(color, false, false);
-	}*/
-	
-	public ArrayList<StaticMeshActor> createActors(ActorShader shader) {
-		ArrayList<StaticMeshActor> actors = new ArrayList<>();
+	public ArrayList<TerrainMeshActor> createActors(ActorShader shader) {
+		ArrayList<TerrainMeshActor> actors = new ArrayList<>();
 		for(int cx=0; cx<csize; cx++)
 			for(int cz=0; cz<csize; cz++) {
 				chunks[cx][cz].createActors(shader, actors);

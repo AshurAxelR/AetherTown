@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import org.joml.Vector2f;
 import org.lwjgl.opengl.GL11;
 
+import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
 import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
-import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.scene.StaticMeshActor;
 
 public class LevelRenderer {
@@ -30,7 +30,7 @@ public class LevelRenderer {
 	public PointLightArray pointLights = null;
 	public BlockLighting blockLighting = null;
 	
-	private ArrayList<StaticMeshActor> terrainActors = null;
+	private ArrayList<TerrainMeshActor> terrainActors = null;
 
 	public LevelRenderer(Level level, SkyBuffer sky, TileRenderer tiles) {
 		this.level = level;
@@ -47,7 +47,7 @@ public class LevelRenderer {
 	}
 
 	public void createLevelGeometry() {
-		pointLights = new PointLightArray(level.levelSize); // FIXME point light problem for larger levels
+		pointLights = new PointLightArray(level.levelSize);
 		blockLighting = new BlockLighting(level);
 		tiles.startCreateInstances(this);
 		terrain = new TerrainBuilder(level);
@@ -76,10 +76,8 @@ public class LevelRenderer {
 		tiles.releaseRenderers(this);
 		pointLights.release();
 		blockLighting.release();
-		for(StaticMeshActor actor : terrainActors) {
-			StaticMesh mesh = actor.getMesh();
-			if(mesh!=null)
-				mesh.release();
+		for(TerrainMeshActor actor : terrainActors) {
+			actor.release();
 		}
 	}
 	

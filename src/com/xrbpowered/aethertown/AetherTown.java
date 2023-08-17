@@ -8,7 +8,6 @@ import com.xrbpowered.aethertools.RegionMapView;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
-import com.xrbpowered.aethertown.render.env.Seasons;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
@@ -67,7 +66,6 @@ public class AetherTown extends UIClient {
 		
 		public float startTime = 0.25f;
 		public float startSeason = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
-		public int season = Seasons.winter; // FIXME remove
 		public float timeSpeed = 20f;
 		public float timeSpeedUp = 100f;
 		
@@ -277,7 +275,7 @@ public class AetherTown extends UIClient {
 				g.drawString(String.format("DAY %d, %s", WorldTime.getDay()+1, WorldTime.getFormattedDate()), 100, getHeight()/2, GraphAssist.LEFT, GraphAssist.CENTER);
 			}
 		};
-		uiTime.setSize(200, 32);
+		uiTime.setSize(220, 32);
 		
 		uiCompass = new UIPane(uiRoot, false) {
 			@Override
@@ -463,6 +461,7 @@ public class AetherTown extends UIClient {
 		save.defaultStart = false;
 		save.levelx = levelInfo.x0;
 		save.levelz = levelInfo.z0;
+		save.startSeason = WorldTime.yearPhase;
 		save.day = WorldTime.getDay();
 		save.time = WorldTime.getTimeOfDay();
 		save.cameraPosX = camera.position.x;

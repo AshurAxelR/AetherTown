@@ -96,7 +96,7 @@ public class Screenshot {
 			
 			int h = 18;
 			int y = height - 55;
-			String s = String.format("DAY %d, %s", WorldTime.getDay()+1, WorldTime.getFormattedTime());
+			String s = String.format("DAY %d, %s, %s", WorldTime.getDay()+1, WorldTime.getFormattedDate(), WorldTime.getFormattedTime());
 			g.drawString(s, width-40, y, GraphAssist.RIGHT, GraphAssist.CENTER); y += h;
 			if(AetherTown.level!=null) {
 				LevelInfo level = AetherTown.level.info;

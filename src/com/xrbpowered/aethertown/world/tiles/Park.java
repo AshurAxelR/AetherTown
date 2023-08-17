@@ -6,7 +6,8 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.env.Seasons;
+import com.xrbpowered.aethertown.render.TerrainMaterial;
+import com.xrbpowered.aethertown.render.env.SeasonalTexture;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -19,8 +20,6 @@ import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
-
-	public static final Seasons grassColor = new Seasons(new Color(0x70a545), new Color(0xf4fcfd));
 
 	public static final float treeRadius = 0.6f*Tile.size;
 	public static final float trunkRadius = 0.065f*Tile.size;
@@ -65,15 +64,26 @@ public class Park extends TileTemplate {
 	
 	@Override
 	public void createComponents() {
+		Texture treeTexture = new SeasonalTexture(new int[] {14, 77},
+				new Color[] {
+					new Color(0x496d00),
+					new Color(0xe0eef1)
+				});
+		Texture bushTexture = new SeasonalTexture(new int[] {14, 77},
+				new Color[] {
+					new Color(0x497522),
+					new Color(0xe9f2f4)
+				});
+		
 		tree = new TileComponent(
 				BasicGeometry.sphere(treeRadius, 8, -1, ObjectShader.vertexInfo),
-				new Seasons(new Color(0x496d00), new Color(0xe0eef1)).texture());
+				treeTexture);
 		trunk = new TileComponent(
 				BasicGeometry.cylinder(trunkRadius, 4, 1f, -1, ObjectShader.vertexInfo),
 				new Texture(new Color(0x665545)));
 		bush = new TileComponent(
 				BasicGeometry.sphere(bushRadius, 8, -0.5f, ObjectShader.vertexInfo),
-				new Seasons(new Color(0x497522), new Color(0xe9f2f4)).texture());
+				bushTexture);
 	}
 
 	@Override
@@ -87,11 +97,11 @@ public class Park extends TileTemplate {
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer r) {
 		if(isFlex(tile)) {
-			r.terrain.addHillTile(grassColor.color(), tile);
+			r.terrain.addHillTile(TerrainMaterial.park, tile);
 		}
 		else {
 			r.terrain.addWalls(tile);
-			r.terrain.addFlatTile(grassColor.color(), tile);
+			r.terrain.addFlatTile(TerrainMaterial.park, tile);
 		}
 		((ParkTile) tile).createTrees(r);
 		FenceGenerator.createFences(r, tile);

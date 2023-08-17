@@ -9,6 +9,7 @@ public class WorldTime {
 
 	public static final int daysInYear = 12*7;
 	public static final int equinoxDay = 19;
+	
 	public static float yearPhase = 0f;
 
 	private static final float timeFactor = 1f / (float)(60*60*24);
@@ -73,11 +74,6 @@ public class WorldTime {
 		int h = Integer.parseInt(s[0]);
 		int m = Integer.parseInt(s[1]);
 		return h/24f + m/(24f*60f);
-	}
-	
-	public static int season() {
-		// FIXME re-create season textures
-		return settings.season; // (timeOfYear>0.7f && timeOfYear<0.85f) ? Seasons.winter : Seasons.summer;
 	}
 
 }

@@ -6,6 +6,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
 import com.xrbpowered.aethertown.render.sprites.SpriteInfo;
@@ -135,7 +136,7 @@ public class Street extends TileTemplate {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		createBridge(r, tile, basey, miny);
-		r.terrain.addHillTile(TerrainBuilder.grassColor.color(), tile);
+		r.terrain.addHillTile(TerrainMaterial.hillGrass, tile);
 	}
 
 	public void autoAddHillBridge(StreetTile tile, int basey) {
