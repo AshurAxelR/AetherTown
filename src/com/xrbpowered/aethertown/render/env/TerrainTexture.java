@@ -10,7 +10,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class TerrainTexture extends SeasonalTexture {
 
-	public static final int[] days = {14, 77};
+	public static final int[] days = {14, 30, 67, 77};
 	
 	private static final TerrainMaterial defaultTerrain = TerrainMaterial.rock;
 	

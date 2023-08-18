@@ -64,14 +64,20 @@ public class Park extends TileTemplate {
 	
 	@Override
 	public void createComponents() {
-		Texture treeTexture = new SeasonalTexture(new int[] {14, 77},
+		Texture treeTexture = new SeasonalTexture(new int[] {14, 25, 40, 56, 70, 77},
 				new Color[] {
+					new Color(0x81bf45),
+					new Color(0x589220),
 					new Color(0x496d00),
+					new Color(0xcfc527),
+					new Color(0xd0a338),
 					new Color(0xe0eef1)
 				});
-		Texture bushTexture = new SeasonalTexture(new int[] {14, 77},
+		Texture bushTexture = new SeasonalTexture(new int[] {14, 25, 60, 77},
 				new Color[] {
+					new Color(0x90ce46),
 					new Color(0x497522),
+					new Color(0xdbb945),
 					new Color(0xe9f2f4)
 				});
 		
