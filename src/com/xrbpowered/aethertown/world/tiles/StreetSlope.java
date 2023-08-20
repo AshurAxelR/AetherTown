@@ -61,9 +61,24 @@ public class StreetSlope extends TileTemplate {
 		}
 	}
 	
+	public float getYOut(Tile tile, Dir d, float sout, float sx, float sz, float prevy) {
+		if(h==1 && tile.getFence(d)==FenceType.stepsOut) {
+			float y0 = Tile.ysize*tile.basey;
+			float y1 = Tile.ysize*(tile.basey-h);
+			float y = FenceGenerator.getFenceYOut(tile.basey, sout) - y0;
+
+			float s = sForXZ(sx, sz, tile.d);
+			float ys = MathUtils.lerp(y0, y1, s);
+			return ys + y;
+		}
+		else {
+			return super.getYOut(tile, d, sout, sx, sz, prevy);
+		}
+	}
+	
 	@Override
 	public int getFenceY(Tile tile, Corner c) {
-		c = c.rotate(tile.d); // FIXME wtf, Corner.rotate not working?
+		c = c.rotate(tile.d); // wtf, Corner.rotate not working?
 		if(tile.d==Dir.north || tile.d==Dir.south)  
 			return (c==Corner.ne || c==Corner.nw) ? tile.basey-h : tile.basey;
 		else
@@ -125,14 +140,6 @@ public class StreetSlope extends TileTemplate {
 		}
 	}
 
-	private static void setFence(StreetTile tile, Tile upTile, Dir d, int h0, int h1) {
-		FenceType fence = FenceGenerator.needsHandrail(tile, d, h0, h1);
-		// FIXME doesn't work in decoration cycle as it depends on the iteration order
-		if(fence==FenceType.stepsOut && upTile.getFence(d)!=FenceType.stepsOut)
-			fence = FenceType.none;
-		tile.setFence(d, fence);
-	}
-	
 	@Override
 	public void decorateTile(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
@@ -143,11 +150,26 @@ public class StreetSlope extends TileTemplate {
 		Dir dl = tile.d.ccw();
 		Dir dr = tile.d.cw();
 		int hh = h>1 ? h : 0;
+		tile.setFence(dl, FenceGenerator.needsHandrail(tile, dl, -hh, 0));
+		tile.setFence(dr, FenceGenerator.needsHandrail(tile, dr, 0, -hh));
+	}
+	
+	private static boolean postCheckFence(Tile tile, Tile upTile, Dir d) {
+		if(tile.getFence(d)==FenceType.stepsOut && upTile.getFence(d)!=FenceType.stepsOut) {
+			tile.setFence(d, FenceType.none);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	@Override
+	public boolean postDecorateTile(Tile tile, Random random) {
+		Dir dl = tile.d.ccw();
+		Dir dr = tile.d.cw();
 		Tile upTile = tile.getAdj(tile.d.flip());
-		setFence(tile, upTile, dl, -hh, 0);
-		setFence(tile, upTile, dr, 0, -hh);
-		// tile.setFence(dl, FenceGenerator.needsHandrail(tile, dl, -hh, 0));
-		// tile.setFence(dr, FenceGenerator.needsHandrail(tile, dr, 0, -hh));
+		return postCheckFence(tile, upTile, dl) || postCheckFence(tile, upTile, dr);
 	}
 	
 	@Override

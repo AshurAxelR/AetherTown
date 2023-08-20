@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
+import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -114,6 +115,40 @@ public abstract class FenceGenerator {
 		else {
 			return Float.NEGATIVE_INFINITY;
 		}
+	}
+	
+	private static boolean checkPole(Tile tile, Dir d, Dir ds) {
+		boolean pole = tile.getFence(ds)==FenceType.handrail;
+		if(!pole) {
+			Tile adjl = tile.getAdj(ds);
+			if(adjl!=null) {
+			pole = adjl.basey>=tile.basey && adjl.getFence(d)==FenceType.handrail;
+				if(!pole) {
+					adjl = adjl.getAdj(d);
+					pole = adjl!=null && adjl.basey>=tile.basey && adjl.getFence(ds.flip())==FenceType.handrail;
+				}
+			}
+		}
+		// TODO check adj wall, including house
+		return pole;
+	}
+	
+	public static boolean fillFenceGaps(Tile tile) {
+		boolean upd = false;
+		for(Dir d : Dir.values()) {
+			if(d==tile.d.flip() || tile.getFence(d)!=FenceType.none)
+				continue;
+			Tile adj = tile.getAdj(d);
+			if(adj!=null && (adj.d==d || tile.basey==adj.basey || (adj.t instanceof StreetSlope)) && adj.t!=Hill.template)
+				continue;
+			boolean polel = checkPole(tile, d, d.ccw());
+			boolean poler = checkPole(tile, d, d.cw());
+			if(polel && poler) {
+				tile.setFence(d, FenceType.handrail);
+				upd = true;
+			}
+		}
+		return upd;
 	}
 	
 }

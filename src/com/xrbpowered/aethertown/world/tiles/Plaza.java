@@ -34,6 +34,11 @@ public class Plaza extends TileTemplate {
 	}
 	
 	@Override
+	public boolean postDecorateTile(Tile tile, Random random) {
+		return FenceGenerator.fillFenceGaps(tile);
+	}
+
+	@Override
 	public void createGeometry(Tile tile, LevelRenderer r) {
 		plaza.addInstance(r, new TileObjectInfo(tile));
 		r.terrain.addWalls(tile);

@@ -114,6 +114,11 @@ public class Street extends TileTemplate {
 	}
 	
 	@Override
+	public boolean postDecorateTile(Tile tile, Random random) {
+		return FenceGenerator.fillFenceGaps(tile);
+	}
+	
+	@Override
 	public void createGeometry(Tile tile, LevelRenderer r) {
 		street.addInstance(r, new TileObjectInfo(tile));
 		if(((StreetTile) tile).bridge)

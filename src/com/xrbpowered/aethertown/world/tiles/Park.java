@@ -64,20 +64,23 @@ public class Park extends TileTemplate {
 	
 	@Override
 	public void createComponents() {
-		Texture treeTexture = new SeasonalTexture(new int[] {14, 25, 40, 56, 70, 77},
+		Texture treeTexture = new SeasonalTexture(new int[] {14, 25, 35, 48, 56, 65, 77},
 				new Color[] {
 					new Color(0x81bf45),
-					new Color(0x589220),
+					new Color(0x4b7a00),
 					new Color(0x496d00),
-					new Color(0xcfc527),
-					new Color(0xd0a338),
+					new Color(0x516a0c),
+					new Color(0xdebd4a),
+					new Color(0xd3a848),
 					new Color(0xe0eef1)
 				});
-		Texture bushTexture = new SeasonalTexture(new int[] {14, 25, 60, 77},
+		Texture bushTexture = new SeasonalTexture(new int[] {14, 22, 30, 50, 70, 77},
 				new Color[] {
-					new Color(0x90ce46),
+					new Color(0x74ad45),
+					new Color(0x56862d),
 					new Color(0x497522),
-					new Color(0xdbb945),
+					new Color(0x597c25),
+					new Color(0xaf793d),
 					new Color(0xe9f2f4)
 				});
 		
@@ -98,6 +101,14 @@ public class Park extends TileTemplate {
 		if(!isFlex(tile))
 			FenceGenerator.addHandrails(tile);
 		// TODO fill handrail gaps (for hills too)
+	}
+	
+	@Override
+	public boolean postDecorateTile(Tile tile, Random random) {
+		if(!isFlex(tile))
+			return FenceGenerator.fillFenceGaps(tile);
+		else
+			return false;
 	}
 	
 	@Override

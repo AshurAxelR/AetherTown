@@ -132,8 +132,7 @@ public class Level {
 
 		info.terrain.fillTerrain(this, random);
 		
-		int att = 0;
-		for(;; att++) {
+		for(int att=0;; att++) {
 			heightLimiter.revalidate();
 			if(!HillsGenerator.expand(this, random, 0, 0, -2, 2) && att>0) {
 				System.err.println("Failed to get refill tokens on att "+att);
@@ -147,7 +146,6 @@ public class Level {
 			}
 			StreetLayoutGenerator.trimStreets(this, random); // in case of removed plots
 		}
-		System.out.printf("Completed %d refill cycles\n", att+1);
 		if(!checkNulls())
 			throw new GeneratorException("Level incomplete");
 		
@@ -177,6 +175,15 @@ public class Level {
 				Tile tile = map[x][z];
 				tile.t.decorateTile(tile, random);
 			}
+		boolean upd = true;
+		while(upd) {
+			upd = false;
+			for(int x=0; x<levelSize; x++)
+				for(int z=0; z<levelSize; z++) {
+					Tile tile = map[x][z];
+					upd |= tile.t.postDecorateTile(tile, random);
+				}
+		}
 	}
 
 	public void createGeometry(LevelRenderer renderer) {

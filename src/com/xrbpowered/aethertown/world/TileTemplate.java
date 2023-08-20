@@ -75,7 +75,11 @@ public abstract class TileTemplate implements Generator {
 	
 	public void decorateTile(Tile tile, Random random) {
 	}
-	
+
+	public boolean postDecorateTile(Tile tile, Random random) {
+		return false;
+	}
+
 	public abstract void createComponents();
 	public abstract void createGeometry(Tile tile, LevelRenderer renderer);
 	

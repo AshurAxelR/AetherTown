@@ -48,7 +48,7 @@ public class ChurchT extends TileTemplate {
 	
 	@Override
 	public void createComponents() {
-		roofTexture = new SeasonalTexture(new int[] {10, 80}, new Color[] {new Color(0x57554a), new Color(0xe0eef1)});
+		roofTexture = new SeasonalTexture(new int[] {10, 77}, new Color[] {new Color(0x57554a), new Color(0xe0eef1)});
 		
 		mid = new IllumTileComponent(
 				ObjMeshLoader.loadObj("models/church/church_mid.obj", 0, 1f, ObjectShader.vertexInfo, null),
