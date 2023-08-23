@@ -139,7 +139,7 @@ public abstract class FenceGenerator {
 			if(d==tile.d.flip() || tile.getFence(d)!=FenceType.none)
 				continue;
 			Tile adj = tile.getAdj(d);
-			if(adj!=null && (adj.d==d || tile.basey==adj.basey || (adj.t instanceof StreetSlope)) && adj.t!=Hill.template)
+			if(adj==null || (adj.d==d || tile.basey==adj.basey || (adj.t instanceof StreetSlope)) && adj.t!=Hill.template)
 				continue;
 			boolean polel = checkPole(tile, d, d.ccw());
 			boolean poler = checkPole(tile, d, d.cw());
