@@ -29,7 +29,6 @@ public class ChurchGenerator extends HouseGeneratorBase {
 		marginBack = 2;
 		marginLeft = 1;
 		marginRight = 1;
-		illum = true;
 		return true;
 	}
 

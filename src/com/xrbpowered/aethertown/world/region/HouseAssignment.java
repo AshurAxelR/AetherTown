@@ -17,17 +17,12 @@ public abstract class HouseAssignment {
 		this.level = level;
 	}
 	
-	protected void assignHouse(int index, HouseRole role) {
+	protected void assignHouse(int index, HouseRole role, Random random) {
 		HouseGenerator house = level.houses.get(index);
 		house.role = role;
-		if(role==HouseRole.residential) {
+		house.arch = role.arch(house, random);
+		if(role==HouseRole.residential)
 			countRes++;
-			house.illum = false;
-		}
-		else {
-			house.illum = true;
-			// System.out.printf("%d: %s\n", index+1, role.title);
-		}
 	}
 	
 	public abstract HouseRole assignNext(int index, Random random);
@@ -35,11 +30,11 @@ public abstract class HouseAssignment {
 	public void assign(Random random) {
 		countRes = 0;
 		for(int i=0; i<level.houseCount; i++)
-			assignHouse(i, assignNext(i, random));
+			assignHouse(i, assignNext(i, random), random);
 	}
 
 	private static class Inn extends HouseAssignment {
-		private WRandom wAdd = new WRandom(1.2, 0.5, 0.4, 0.3, 0.1, 0.5, 0.1, 0.2);
+		private WRandom wAdd = new WRandom(1.2, 0.5, 0.4, 0.3, 0.5, 0.1, 0.2);
 		private boolean hasGiftShop = false;
 		private boolean hasSupermarket = false;
 		private boolean hasMuseum = false;
@@ -70,20 +65,19 @@ public abstract class HouseAssignment {
 					}
 					case 2: return HouseRole.randomRestaurant(random);
 					case 3: return HouseRole.randomFastFood(random);
-					case 4: return HouseRole.randomShop(random);
-					case 5: {
+					case 4: {
 						if(hasMuseum)
 							return assignNext(index, random);
 						hasMuseum = true;
 						return HouseRole.museum;
 					}
-					case 6: {
+					case 5: {
 						if(hasPostOffice)
 							return assignNext(index, random);
 						hasPostOffice = true;
 						return HouseRole.postOffice;
 					}
-					case 7: {
+					case 6: {
 						if(hasLibrary)
 							return assignNext(index, random);
 						hasLibrary = true;
@@ -91,6 +85,54 @@ public abstract class HouseAssignment {
 					}
 					default: throw new RuntimeException();
 				}
+			}
+		}
+	}
+
+	private static class Outpost extends HouseAssignment {
+		private Shuffle shInit = new Shuffle(4);
+		private WRandom wInit = new WRandom(0.75, 0.75, 1.5, 0.2, 0.3);
+		private int countConv = 0;
+		private WRandom wConv = new WRandom(2, 1);
+		
+		public Outpost(Level level) {
+			super(level);
+		}
+		
+		@Override
+		public HouseRole assignNext(int index, Random random) {
+			if(index==0)
+				return HouseRole.postOffice;
+			else if(index==1)
+				return HouseRole.inn;
+			else if(index<6) {
+				switch(shInit.next(random)) {
+					case 0: return HouseRole.supermarket;
+					case 1: return HouseRole.randomRestaurant(random);
+					case 2: return HouseRole.hospital;
+					case 3: {
+						switch(wInit.next(random)) {
+							case 0: return HouseRole.clothesShop;
+							case 1: return HouseRole.randomShop(random);
+							case 2: return HouseRole.randomFastFood(random);
+							case 3: return HouseRole.museum;
+							case 4: return HouseRole.office;
+							default: throw new RuntimeException();
+						}
+					}
+					default: throw new RuntimeException();
+				}
+			}
+			else {
+				if(countConv<countRes/5) {
+					countConv++;
+					switch(wConv.next(random)) {
+						case 0: return HouseRole.localShop;
+						case 1: return HouseRole.randomFastFood(random);
+						default: throw new RuntimeException();
+					}
+				}
+				return HouseRole.residential;
 			}
 		}
 	}
@@ -182,9 +224,8 @@ public abstract class HouseAssignment {
 		HouseRole.resetShuffle();
 		HouseAssignment ha;
 		switch(level.info.settlement) {
-			case inn:
-				ha = new Inn(level);
-				break;
+			case inn: ha = new Inn(level); break;
+			case outpost: ha = new Outpost(level); break;
 			case village:
 			default:
 				ha = new Village(level);

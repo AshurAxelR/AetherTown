@@ -28,6 +28,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 	
 	public int index = -1;
 	public HouseRole role = null;
+	public ArchitectureStyle arch = ArchitectureStyle.residential3;
 	
 	public static HouseGeneratorBase select(Level level, int h) {
 		if(h==0 && level.churches.size()<(level.houseCount+26)/30)

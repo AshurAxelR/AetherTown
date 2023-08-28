@@ -21,7 +21,14 @@ public class SeasonalTexture extends Texture {
 			ts[i] = TexColor.get(colors[i]);
 		fillArray(days);
 	}
-	
+
+	public SeasonalTexture(int[] days, Texture... ts) {
+		this(days.length);
+		for(int i=0; i<ts.length; i++)
+			this.ts[i] = ts[i];
+		fillArray(days);
+	}
+
 	protected void fillArray(int[] days) {
 		Texture last = ts[ts.length-1];
 		Texture t = last;
