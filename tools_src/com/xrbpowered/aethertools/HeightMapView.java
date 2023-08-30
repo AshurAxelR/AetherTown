@@ -29,6 +29,7 @@ public class HeightMapView extends UIElement {
 	
 	public static final Color colorBg = new Color(0xf5f5f5);
 	public static final Color colorGrid = new Color(0x11ffffff, true);
+	public static final Color colorBorder = new Color(0x77ffffff, true);
 	public static final ColorBlend heightColor = new ColorBlend(
 			new Color[] {
 					new Color(0x005500),
@@ -123,15 +124,35 @@ public class HeightMapView extends UIElement {
 				g.line(sx, sz, sx, sz+d*tileSize);
 				g.line(sx, sz, sx+d*tileSize, sz);
 			}
+		g.setColor(colorBorder);
+		g.drawRect(x0*tileSize+1, z0*tileSize+1, level.levelSize*tileSize-3, level.levelSize*tileSize-3);
 	}
 	
 	@Override
 	public void paint(GraphAssist g) {
 		g.pushAntialiasing(false);
 		for(Level level : AetherTown.levelCache.list()) {
-			paintLevelAt(g, level.info.x0*LevelInfo.baseSize-offsX, level.info.z0*LevelInfo.baseSize-offsZ, level);
+			if(level!=null && level.info!=null)
+				paintLevelAt(g, level.info.x0*LevelInfo.baseSize-offsX, level.info.z0*LevelInfo.baseSize-offsZ, level);
 		}
 		g.popAntialiasing();
+	}
+	
+	@Override
+	public boolean onMouseDown(float x, float y, Button button, int mods) {
+		if(button==Button.left) {
+			LevelInfo level = AetherTown.region.getLevel(
+					((int)x/tileSize+offsX)/LevelInfo.baseSize,
+					((int)y/tileSize+offsZ)/LevelInfo.baseSize
+				);
+			System.out.printf("Selected: [%d, %d]\n", level.x0, level.z0);
+			AetherTown.levelCache.addAllAdj(level, false);
+			AetherTown.levelCache.setActive(level, true);
+			repaint();
+			return true;
+		}
+		else
+			return super.onMouseDown(x, y, button, mods);
 	}
 
 	public static void main(String[] args) {
@@ -151,7 +172,7 @@ public class HeightMapView extends UIElement {
 		AetherTown.generateRegion(save);
 		AetherTown.levelCache.setActive(AetherTown.region.startLevel, true);
 		
-		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown height map", 1920, 1080);
+		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown height map", 1280, 960);
 		new HeightMapView(frame.getContainer());
 		frame.show();
 	}
