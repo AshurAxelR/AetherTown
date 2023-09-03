@@ -201,4 +201,11 @@ public class HouseT extends TileTemplate {
 		return house.arch.matchGround(tile, max);
 	}
 	
+	public static boolean allowLamp(Tile tile) {
+		if(tile.t!=template || tile.sub==null)
+			return true;
+		HouseGenerator house = (HouseGenerator) tile.sub.parent;
+		return house.role.allowLamp(tile.sub.i==0 && tile.sub.j==0);
+	}
+	
 }

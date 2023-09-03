@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.region;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.GeneratorException;
@@ -13,8 +14,9 @@ public class Region {
 
 	private static final int maxGeneratorAttempts = 3;
 	
-	public static final int sizex = 512;
-	public static final int sizez = 128;
+	public final RegionMode mode;
+	public final int sizex;
+	public final int sizez;
 	
 	public final long seed;
 	public LevelInfo[][] map = null;
@@ -22,6 +24,9 @@ public class Region {
 	public LevelInfo startLevel = null;
 	
 	public Region(long seed) {
+		this.mode = AetherTown.settings.regionMode;
+		this.sizex = mode.sizex;
+		this.sizez = mode.sizez;
 		this.seed = seed;
 	}
 	
@@ -74,33 +79,49 @@ public class Region {
 		throw new RuntimeException("Generator attempts limit reached");
 	}
 
-	private boolean expand(Random random, int minAdj) {
+	private boolean expand(Random random, int minAdj, boolean all) {
 		LinkedList<LevelInfo> add = new LinkedList<>();
 		for(int x=1; x<sizex-1; x++)
 			for(int z=1; z<sizez-1; z++) {
 				if(map[x][z]!=null)
 					continue;
 				int countAdj = 0;
-				for(Dir8 d : Dir8.values()) { // possibly Dir 4 after all?
+				for(Dir8 d : Dir8.values()) {
 					if(map[x+d.dx][z+d.dz]!=null)
 						countAdj++;
 				}
-				if(countAdj>=minAdj && countAdj-minAdj+1>=random.nextInt(6)) {
+				if(countAdj>=minAdj && (all || countAdj-minAdj+1>=random.nextInt(6))) {
+					if(countAdj<=5 && random.nextInt(2)==0) {
+						for(Dir d : Dir.shuffle(random)) {
+							Dir cw = d.cw();
+							int x1 = x+d.dx+cw.dx;
+							int z1 = z+d.dz+cw.dz;
+							if(map[x1][z1]==null && map[x+d.dx][z+d.dz]==null && map[x+cw.dx][z+cw.dz]==null) {
+								LevelInfo level = new LevelInfo(this, (x1<x) ? x1 : x, (z1<z) ? z1 : z, 2, random.nextLong());
+								level.setTerrain(LevelTerrainModel.random(level, random));
+								add.add(level);
+								break;
+							}
+						}
+					}
 					LevelInfo level = new LevelInfo(this, x, z, 1, random.nextLong());
 					level.setTerrain(LevelTerrainModel.random(level, random));
-					// TODO expand level: up size
 					add.add(level);
 				}
 			}
 		
+		int placed = 0;
 		for(LevelInfo level : add) {
-			level.place();
+			if(level.isFree()) {
+				level.place();
+				placed++;
+			}
 		}
-		return !add.isEmpty();
+		return placed>0;
 	}
 	
 	private void checkPeaks() {
-		// FIXME hack: fixing low-to-peak by lowering size 1 peaks
+		// hack: fixing low-to-peak by lowering size 1 peaks
 		for(int x=1; x<sizex-1; x++)
 			for(int z=1; z<sizez-1; z++) {
 				LevelInfo level = map[x][z];
@@ -129,14 +150,44 @@ public class Region {
 	
 	private void generate(Random random) {
 		resetGenerator();
-		new RegionPaths(this, random).generatePaths();
+		
+		switch(mode) {
+			case linear:
+				new RegionPaths(this, random).generatePaths();
+				break;
+			case oneLevel: {
+					LevelInfo level = new LevelInfo(this, sizex/2, sizez/2, 2, random.nextLong());
+					level.setTerrain(LevelTerrainModel.hill);
+					level.setSettlement(LevelSettlementType.village);
+					level.place();
+					startLevel = level;
+				}
+				break;
+			case smallPeak: {
+					int x0 = sizex/2;
+					int z0 = sizez/2;
+					LevelInfo level = new LevelInfo(this, x0, z0, 1, random.nextLong());
+					level.setTerrain(LevelTerrainModel.peak);
+					level.setSettlement(LevelSettlementType.village);
+					level.place();
+					startLevel = level;
+					for(Dir d : Dir.values()) {
+						level = new LevelInfo(this, x0+d.dx, z0+d.dz, 1, random.nextLong());
+						level.setTerrain(LevelTerrainModel.hill);
+						level.setSettlement(LevelSettlementType.outpost);
+						level.place();
+						connectLevels(x0, z0, d);
+					}
+				}
+				break;
+			default:
+				throw new RuntimeException("Unknown region mode: "+mode.name());
+		}
 		
 		checkPeaks();
-		
-		for(int minAdj=2;; minAdj+=2) {
-			if(!expand(random, minAdj))
-				break;
-		}
+		expand(random, 2, true);
+		expand(random, 4, true);
+		expand(random, 5, false);
 	}
 
 	public void connectLevels(int x, int z, Dir d) {
@@ -145,7 +196,7 @@ public class Region {
 		level.addConn(x+d.dx, z+d.dz, d.flip());
 	}
 	
-	public static boolean isInside(int x, int z) {
+	public boolean isInside(int x, int z) {
 		return (x>=0 && x<sizex && z>=0 && z<sizez);
 	}
 }

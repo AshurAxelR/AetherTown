@@ -13,8 +13,8 @@ public class SaveState extends AbstractConfig {
 
 	public long regionSeed = AetherTown.settings.regionSeed;
 	public boolean defaultStart = true;
-	public int levelx = Region.sizez/2;
-	public int levelz = Region.sizez/2;
+	public int levelx = 0;
+	public int levelz = 0;
 	
 	public int day = 0;
 	public float startSeason = AetherTown.settings.startSeason;
@@ -34,8 +34,8 @@ public class SaveState extends AbstractConfig {
 	
 	public void listVisited(Region region) {
 		visited.clear();
-		for(int x=0; x<Region.sizex; x++)
-			for(int z=0; z<Region.sizez; z++) {
+		for(int x=0; x<region.sizex; x++)
+			for(int z=0; z<region.sizez; z++) {
 				LevelInfo level = region.map[x][z];
 				if(level!=null && level.visited)
 					visited.add(new Vector2i(level.x0, level.z0));
@@ -44,6 +44,8 @@ public class SaveState extends AbstractConfig {
 	
 	public void assignVisited(Region region) {
 		for(Vector2i v : visited) {
+			if(!region.isInside(v.x, v.y))
+				continue;
 			LevelInfo level = region.map[v.x][v.y];
 			if(level!=null)
 				level.visited = true;
@@ -66,8 +68,6 @@ public class SaveState extends AbstractConfig {
 			try {
 				int x = Integer.parseInt(xz[0]);
 				int z = Integer.parseInt(xz[1]);
-				if(!Region.isInside(x, z))
-					return null;
 				list.add(new Vector2i(x, z));
 			}
 			catch (NumberFormatException e) {

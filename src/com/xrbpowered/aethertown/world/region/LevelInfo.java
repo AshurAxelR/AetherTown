@@ -115,7 +115,7 @@ public class LevelInfo {
 	public boolean isFree() {
 		for(int x=0; x<size; x++)
 			for(int z=0; z<size; z++) {
-				if(!Region.isInside(x0+x, z0+z) || region.map[x0+x][z0+z]!=null)
+				if(!region.isInside(x0+x, z0+z) || region.map[x0+x][z0+z]!=null)
 					return false;
 			}
 		return true;

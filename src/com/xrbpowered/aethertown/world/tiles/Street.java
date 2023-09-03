@@ -187,8 +187,9 @@ public class Street extends TileTemplate {
 				}
 			}
 			for(Dir d : Dir.shuffle(random)) {
-				TileTemplate adjt = tile.getAdjT(d);
-				if(adjt!=null && !Street.isAnyPath(adjt) && !(adjt instanceof Plaza)) {
+				Tile adj = tile.getAdj(d);
+				TileTemplate adjt = adj.t;
+				if(adjt!=null && !Street.isAnyPath(adjt) && !(adjt instanceof Plaza) && HouseT.allowLamp(adj)) {
 					tile.lampd = d;
 					tile.lamp = true;
 					break;

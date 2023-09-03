@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.util.HashSet;
 
+import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.SaveState;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
@@ -58,11 +60,12 @@ public class RegionMapView extends UIElement {
 		});
 		UIPanView view = (UIPanView) getParent();
 		view.setSize(getBase().getWindow().getClientWidth(), getBase().getWindow().getClientHeight());
-		centerAt(Region.sizez/2, Region.sizez/2);
+		if(region!=null)
+			centerAt(region.sizez/2, region.sizez/2);
 	}
 	
 	private static void paintInfo(GraphAssist g) {
-		if(!Region.isInside(hoverx, hoverz))
+		if(!region.isInside(hoverx, hoverz))
 			return;
 		g.fillRect(10, 10, 350, 55, colorTextBg);
 		int x = 20;
@@ -126,8 +129,8 @@ public class RegionMapView extends UIElement {
 				bookmarks.add(level);
 		}
 		
-		for(int x=0; x<Region.sizex; x++)
-			for(int z=0; z<Region.sizez; z++) {
+		for(int x=0; x<region.sizex; x++)
+			for(int z=0; z<region.sizez; z++) {
 				LevelInfo level = region.map[x][z];
 				if(level==null)
 					continue;
@@ -191,9 +194,9 @@ public class RegionMapView extends UIElement {
 		LevelNames.load();
 		Fonts.load();
 
-		long seed = System.currentTimeMillis();
-		System.out.printf("Region seed: %dL\n", seed);
-		region = new Region(seed);
+		AetherTown.settings.load();
+		SaveState save = new SaveState();
+		region = new Region(save.getRegionSeed());
 		region.generate();
 		
 		active = region.startLevel;

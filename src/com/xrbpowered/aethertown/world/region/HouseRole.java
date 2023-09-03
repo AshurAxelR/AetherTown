@@ -41,8 +41,10 @@ public class HouseRole {
 	}
 	
 	private static class ShopRole extends HouseRole {
-		private ShopRole(String title) {
+		private IllumPattern illum;
+		private ShopRole(String title, IllumPattern illum) {
 			super(title, colorShop);
+			this.illum = illum;
 		}
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
@@ -53,7 +55,7 @@ public class HouseRole {
 		}
 		@Override
 		public IllumPattern illum(int floor, ArchitectureStyle arch) {
-			return floor==0 || arch==ArchitectureStyle.shop2 ? IllumPattern.shop : null;
+			return floor==0 || arch==ArchitectureStyle.shop2 ? illum : null;
 		}
 	}
 
@@ -70,6 +72,20 @@ public class HouseRole {
 			return IllumPattern.restaurant;
 		}
 	}
+	
+	private static class HotelRole extends HouseRole {
+		private HotelRole(String title) {
+			super(title, colorHotel);
+		}
+		@Override
+		public ArchitectureStyle arch(HouseGenerator house, Random random) {
+			return isCityHouse(house, random) ? ArchitectureStyle.residential3 : ArchitectureStyle.residential2;
+		}
+		@Override
+		public IllumPattern illum(int floor, ArchitectureStyle arch) {
+			return floor==0 ? IllumPattern.hotel : IllumPattern.hotelRooms;
+		}
+	}
 
 	public static final HouseRole residential = new HouseRole("Residential", colorResidential) {
 		@Override
@@ -84,10 +100,19 @@ public class HouseRole {
 
 	public static final HouseRole postOffice = new HouseRole("Post Office", colorCivic);
 	public static final HouseRole civicCentre = new HouseRole("Civic Centre", colorCivic);
-	public static final HouseRole hospital = new HouseRole("Hospital", colorHospital);
+	public static final HouseRole hospital = new HouseRole("Hospital", colorHospital) {
+		@Override
+		public ArchitectureStyle arch(HouseGenerator house, Random random) {
+			return house.getFootprint()<=4 || isCityHouse(house, random) ? ArchitectureStyle.residential3 : ArchitectureStyle.residential2;
+		}
+		@Override
+		public IllumPattern illum(int floor, ArchitectureStyle arch) {
+			return floor==0 ? IllumPattern.hospital : IllumPattern.hospitalWards;
+		}
+	};
 	
-	public static final HouseRole hotel = new HouseRole("Hotel", colorHotel);
-	public static final HouseRole inn = new HouseRole("Inn", colorHotel);
+	public static final HouseRole hotel = new HotelRole("Hotel");
+	public static final HouseRole inn = new HotelRole("Inn");
 	
 	public static final HouseRole localShop = new LocalShopRole("Local Store", colorShopSmall);
 	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge) {
@@ -99,8 +124,12 @@ public class HouseRole {
 		public int doorType() {
 			return 1;
 		}
+		@Override
+		public boolean allowLamp(boolean atDoor) {
+			return !atDoor;
+		}
 	};
-	public static final HouseRole clothesShop = new ShopRole("Clothes Shop");
+	public static final HouseRole clothesShop = new ShopRole("Clothes Shop", IllumPattern.shop);
 	public static final HouseRole giftShop = new HouseRole("Gift Shop", colorShop) {
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
@@ -118,7 +147,7 @@ public class HouseRole {
 		}
 		@Override
 		public IllumPattern illum(int floor, ArchitectureStyle arch) {
-			return IllumPattern.office;
+			return floor==0 ? IllumPattern.shop : IllumPattern.office;
 		}
 	};
 	
@@ -140,6 +169,10 @@ public class HouseRole {
 	
 	public int doorType() {
 		return 0;
+	}
+	
+	public boolean allowLamp(boolean atDoor) {
+		return true;
 	}
 
 	protected static boolean isPark(HouseGenerator house) {
@@ -187,11 +220,11 @@ public class HouseRole {
 	private static final Shuffle.List<HouseRole> shopShuffle = new Shuffle.List<>(
 			clothesShop,
 			giftShop,
-			new ShopRole("Home Store"),
-			new ShopRole("Tech Store"),
-			new ShopRole("Hobby Shop"),
-			new ShopRole("Music Shop"),
-			new ShopRole("Art Shop")
+			new ShopRole("Home Store", IllumPattern.shop),
+			new ShopRole("Tech Store", IllumPattern.shop),
+			new ShopRole("Hobby Shop", IllumPattern.hotel),
+			new ShopRole("Art Shop", IllumPattern.hotel),
+			new ShopRole("Music Shop", IllumPattern.restaurant)
 	);
 	
 	public static HouseRole randomShop(Random random) {

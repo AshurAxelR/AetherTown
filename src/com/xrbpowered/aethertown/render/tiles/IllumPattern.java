@@ -9,11 +9,13 @@ public class IllumPattern {
 	private static final Vector3f one = new Vector3f(1, 1, 1);
 	
 	public static final IllumPattern legacy = new IllumPattern(new Vector3f(0.5f, 0.8f, 0.8f), one, false).setDim(0.35f, 0.1f);
-	// public static final IllumPattern shop = new IllumPattern(new Vector3f(0.9f, 0.8f, 0.9f), new Vector3f(0.95f, 0.85f, 1.0f), true);
-	// public static final IllumPattern shop = new IllumPattern();
 	public static final IllumPattern shop = new IllumPattern(new Vector3f(1.0f, 0.9f, 0.8f), new Vector3f(1.0f, 1.0f, 0.9f), true);
-	public static final IllumPattern office = new IllumPattern(new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setDim(0.25f, 0.2f);
-	public static final IllumPattern restaurant = new IllumPattern(new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(0.7f, 0.8f, 0.9f), false);
+	public static final IllumPattern office = new IllumPattern(new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setDim(0.65f, 0.3f);
+	public static final IllumPattern restaurant = new IllumPattern(new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(0.9f, 0.85f, 0.9f), false);
+	public static final IllumPattern hotel = new IllumPattern(new Vector3f(0.4f, 0.9f, 0.85f), new Vector3f(0.8f, 0.9f, 0.95f), false);
+	public static final IllumPattern hotelRooms = new IllumPattern(new Vector3f(0.6f, 0.85f, 0.85f), new Vector3f(0.9f, 0.9f, 0.95f), false).setDim(0.65f, 0.1f);
+	public static final IllumPattern hospital = new IllumPattern(new Vector3f(0.9f, 0.9f, 0.8f), new Vector3f(0.95f, 0.95f, 1.0f), true);
+	public static final IllumPattern hospitalWards = new IllumPattern(new Vector3f(0.9f, 0.9f, 0.5f), new Vector3f(0.95f, 0.95f, 0.9f), true).setDim(0.65f, 0.4f);
 	
 	public Vector3f low, high;
 	public boolean cool = false;

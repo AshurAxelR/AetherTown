@@ -23,6 +23,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.Region;
+import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -71,11 +72,28 @@ public class AetherTown extends UIClient {
 		
 		public float screenshotScale = 1f;
 		
+		public RegionMode regionMode = RegionMode.linear;
 		public long regionSeed = -1L;
 		public boolean nosave = false;
 		
 		public ClientConfig() {
 			super("./client.cfg");
+		}
+		
+		@Override
+		protected Object parseValue(String name, String value, Class<?> type) {
+			if(name.equals("regionMode"))
+				return RegionMode.valueOf(value);
+			else
+				return super.parseValue(name, value, type);
+		}
+		
+		@Override
+		protected String formatValue(String name, Object obj) {
+			if(name.equals("regionMode"))
+				return ((RegionMode) obj).name();
+			else
+				return super.formatValue(name, obj);
 		}
 	}
 	

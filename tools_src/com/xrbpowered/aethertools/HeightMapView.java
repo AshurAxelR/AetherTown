@@ -1,7 +1,10 @@
 package com.xrbpowered.aethertools;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+import java.util.HashMap;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.SaveState;
@@ -44,6 +47,8 @@ public class HeightMapView extends UIElement {
 	
 	private static boolean showGuide = false;
 	private int offsX, offsZ;
+	
+	private HashMap<LevelInfo, BufferedImage> imgCache = new HashMap<>();
 	
 	public HeightMapView(UIContainer parent) {
 		super(new UIPanView(parent) {
@@ -97,7 +102,9 @@ public class HeightMapView extends UIElement {
 		return true;
 	}
 	
-	private void paintLevelAt(GraphAssist g, int x0, int z0, Level level) {
+	private BufferedImage createLevelImage(Level level) {
+		BufferedImage img = new BufferedImage(level.levelSize*tileSize, level.levelSize*tileSize, BufferedImage.TYPE_INT_RGB);
+		GraphAssist g = new GraphAssist((Graphics2D) img.getGraphics());
 		for(int x=0; x<level.levelSize; x++)
 			for(int z=0; z<level.levelSize; z++) {
 				Tile tile = level.map[x][z];
@@ -113,27 +120,36 @@ public class HeightMapView extends UIElement {
 					c = new Color(b, b, b);
 				}
 				g.setColor(c);
-				g.fillRect((x0+x)*tileSize, (z0+z)*tileSize, tileSize, tileSize);
+				g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
 			}
 		g.setColor(colorGrid);
 		int d = LevelInfo.baseSize/2;
 		for(int x=0; x<level.levelSize; x+=d)
 			for(int z=0; z<level.levelSize; z+=d) {
-				int sx = (x0+x)*tileSize;
-				int sz = (z0+z)*tileSize;
+				int sx = x*tileSize;
+				int sz = z*tileSize;
 				g.line(sx, sz, sx, sz+d*tileSize);
 				g.line(sx, sz, sx+d*tileSize, sz);
 			}
 		g.setColor(colorBorder);
-		g.drawRect(x0*tileSize+1, z0*tileSize+1, level.levelSize*tileSize-3, level.levelSize*tileSize-3);
+		g.drawRect(1, 1, level.levelSize*tileSize-3, level.levelSize*tileSize-3);
+		g.setColor(Color.WHITE);
+		g.drawString(level.info.terrain.name, 10, 20);
+		return img;
 	}
 	
 	@Override
 	public void paint(GraphAssist g) {
 		g.pushAntialiasing(false);
 		for(Level level : AetherTown.levelCache.list()) {
-			if(level!=null && level.info!=null)
-				paintLevelAt(g, level.info.x0*LevelInfo.baseSize-offsX, level.info.z0*LevelInfo.baseSize-offsZ, level);
+			if(level!=null && level.info!=null) {
+				BufferedImage img = imgCache.get(level.info);
+				if(img==null) {
+					img = createLevelImage(level);
+					imgCache.put(level.info, img);
+				}
+				g.graph.drawImage(img, (level.info.x0*LevelInfo.baseSize-offsX)*tileSize, (level.info.z0*LevelInfo.baseSize-offsZ)*tileSize, null);
+			}
 		}
 		g.popAntialiasing();
 	}
@@ -167,8 +183,8 @@ public class HeightMapView extends UIElement {
 		LevelNames.load();
 		Fonts.load();
 
+		AetherTown.settings.load();
 		SaveState save = new SaveState();
-		// save.regionSeed = 0L;
 		AetherTown.generateRegion(save);
 		AetherTown.levelCache.setActive(AetherTown.region.startLevel, true);
 		

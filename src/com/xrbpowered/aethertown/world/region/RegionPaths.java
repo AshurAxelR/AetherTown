@@ -66,8 +66,8 @@ public class RegionPaths {
 	
 	private static final WRandom wnextDir = new WRandom(1, 0.5, 0.5, 0.5, 0.5);
 	
-	private static boolean zprob(double rnd, int z, int sign) {
-		double sz = sign*(z-Region.sizez/2)*2/(double)Region.sizez;
+	private boolean zprob(double rnd, int z, int sign) {
+		double sz = sign*(z-region.sizez/2)*2/(double)region.sizez;
 		double tan = 0.001*Math.tan(sz*Math.PI/2.0);
 		return rnd-0.5 < tan;
 	}
@@ -101,7 +101,7 @@ public class RegionPaths {
 		else if(dz==0)
 			dz = random.nextInt(level.size);
 		PathToken nt = new PathToken(level.x0+dx, level.z0+dz, d, pop);
-		if(!Region.isInside(nt.x, nt.z)) {
+		if(!region.isInside(nt.x, nt.z)) {
 			if(att>10)
 				throw new GeneratorException("Path out of region bounds");
 			return nextToken(level, d, pop, att+1);
@@ -113,7 +113,7 @@ public class RegionPaths {
 	private static final WRandom wsize = new WRandom(0.5, 1, 0.05);
 
 	public void generatePaths() {
-		addToken(new PathToken(Region.sizez/2, Region.sizez/2, null, -5));
+		addToken(new PathToken(region.sizez/2, region.sizez/2, null, -5));
 		while(!tokens.isEmpty()) {
 			PathToken t = tokens.removeFirst();
 			tokenCount--;
@@ -142,7 +142,7 @@ public class RegionPaths {
 			 	d = nextDir(t.enter, t.z);
 			}
 			
-			if(t.x<Region.sizex-Region.sizez/2) {
+			if(t.x<region.sizex-region.sizez/2) {
 				addToken(nextToken(level, d, t.pop+1, 0));
 				//if(random.nextInt(tokenCount*10+2)==0)
 				//	addToken(nextToken(level, nextDir(t.enter), t.pop+1));
