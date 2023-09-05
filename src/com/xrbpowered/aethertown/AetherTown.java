@@ -72,7 +72,7 @@ public class AetherTown extends UIClient {
 		
 		public float screenshotScale = 1f;
 		
-		public RegionMode regionMode = RegionMode.linear;
+		public RegionMode regionMode = RegionMode.defaultMode;
 		public long regionSeed = -1L;
 		public boolean nosave = false;
 		
@@ -83,7 +83,7 @@ public class AetherTown extends UIClient {
 		@Override
 		protected Object parseValue(String name, String value, Class<?> type) {
 			if(name.equals("regionMode"))
-				return RegionMode.valueOf(value);
+				return RegionMode.parseValue(value);
 			else
 				return super.parseValue(name, value, type);
 		}
@@ -91,7 +91,7 @@ public class AetherTown extends UIClient {
 		@Override
 		protected String formatValue(String name, Object obj) {
 			if(name.equals("regionMode"))
-				return ((RegionMode) obj).name();
+				return ((RegionMode) obj).formatValue();
 			else
 				return super.formatValue(name, obj);
 		}
@@ -657,7 +657,7 @@ public class AetherTown extends UIClient {
 	public static void generateRegion(SaveState save) {
 		long seed = save.getRegionSeed();
 		System.out.printf("Region seed: %dL\n", seed);
-		region = new Region(seed);
+		region = new Region(seed, save.regionMode);
 		region.generate();
 		save.assignVisited(region);
 		

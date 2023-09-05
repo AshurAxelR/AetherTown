@@ -7,10 +7,12 @@ import org.joml.Vector2i;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.Region;
+import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class SaveState extends AbstractConfig {
 
+	public RegionMode regionMode = AetherTown.settings.regionMode;
 	public long regionSeed = AetherTown.settings.regionSeed;
 	public boolean defaultStart = true;
 	public int levelx = 0;

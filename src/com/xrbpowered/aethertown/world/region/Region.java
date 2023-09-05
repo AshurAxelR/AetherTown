@@ -3,7 +3,6 @@ package com.xrbpowered.aethertown.world.region;
 import java.util.LinkedList;
 import java.util.Random;
 
-import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.GeneratorException;
@@ -23,13 +22,13 @@ public class Region {
 	
 	public LevelInfo startLevel = null;
 	
-	public Region(long seed) {
-		this.mode = AetherTown.settings.regionMode;
+	public Region(long seed, RegionMode mode) {
+		this.mode = mode;
 		this.sizex = mode.sizex;
 		this.sizez = mode.sizez;
 		this.seed = seed;
 	}
-	
+
 	public LevelInfo getLevel(int x, int z) {
 		if(!isInside(x, z) || map[x][z]==null)
 			return LevelInfo.createNullLevel(this, x, z);
@@ -150,39 +149,7 @@ public class Region {
 	
 	private void generate(Random random) {
 		resetGenerator();
-		
-		switch(mode) {
-			case linear:
-				new RegionPaths(this, random).generatePaths();
-				break;
-			case oneLevel: {
-					LevelInfo level = new LevelInfo(this, sizex/2, sizez/2, 2, random.nextLong());
-					level.setTerrain(LevelTerrainModel.hill);
-					level.setSettlement(LevelSettlementType.village);
-					level.place();
-					startLevel = level;
-				}
-				break;
-			case smallPeak: {
-					int x0 = sizex/2;
-					int z0 = sizez/2;
-					LevelInfo level = new LevelInfo(this, x0, z0, 1, random.nextLong());
-					level.setTerrain(LevelTerrainModel.peak);
-					level.setSettlement(LevelSettlementType.village);
-					level.place();
-					startLevel = level;
-					for(Dir d : Dir.values()) {
-						level = new LevelInfo(this, x0+d.dx, z0+d.dz, 1, random.nextLong());
-						level.setTerrain(LevelTerrainModel.hill);
-						level.setSettlement(LevelSettlementType.outpost);
-						level.place();
-						connectLevels(x0, z0, d);
-					}
-				}
-				break;
-			default:
-				throw new RuntimeException("Unknown region mode: "+mode.name());
-		}
+		mode.coreGenerate(this, random);
 		
 		checkPeaks();
 		expand(random, 2, true);
