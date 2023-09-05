@@ -99,6 +99,8 @@ public class SaveState extends AbstractConfig {
 			return parsePointList(value, bookmarks, true);
 		else if(name.equals("visited"))
 			return parsePointList(value, visited, false);
+		else if(name.equals("regionMode"))
+			return RegionMode.parseValue(value);
 		else
 			return super.parseValue(name, value, type);
 	}
@@ -111,6 +113,8 @@ public class SaveState extends AbstractConfig {
 			return formatPointList(bookmarks);
 		else if(name.equals("visited"))
 			return formatPointList(visited);
+		else if(name.equals("regionMode"))
+			return ((RegionMode) obj).formatValue();
 		else
 			return super.formatValue(name, obj);
 	}

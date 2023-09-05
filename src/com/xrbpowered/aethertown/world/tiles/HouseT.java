@@ -108,7 +108,7 @@ public class HouseT extends TileTemplate {
 	public void decorateTile(Tile atile, Random random) {
 		HouseTile tile = (HouseTile) atile;
 		HouseGenerator house = (HouseGenerator) tile.sub.parent;
-		tile.illum = new Vector3f[house.arch.floorCount()];
+		tile.illum = new Vector3f[house.arch.floorCount];
 		for(int f=0; f<tile.illum.length; f++)
 			tile.illum[f] = IllumPattern.calcMod(random, house.role.illum(f, house.arch));
 		if(tile.sub.i==0 && tile.sub.j==0 && tile.getAdj(tile.d.flip()).t==StreetSlope.template1)
@@ -132,11 +132,11 @@ public class HouseT extends TileTemplate {
 		int front = house.marginFront;
 		int back = house.fwd-house.marginBack;
 		
-		for(int f=0; f<arch.floorCount(); f++) {
+		for(int f=0; f<arch.floorCount; f++) {
 			Vector3f illum = tile.illum[f];
 			r.blockLighting.addLight(tile, tile.basey+arch.getLightY(f), illum, 0.35f, true);
 			if(sub.j==front)
-				(f==0 && sub.i==0 && sub.j==front ? arch.getDoor(house.role.doorType()) : arch.getWall(f, Dir.south, tile, yloc))
+				(f==0 && sub.i==0 && sub.j==front ? house.role.getDoor(arch) : arch.getWall(f, Dir.south, tile, yloc))
 						.addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d.flip()));
 			if(sub.i==left)
 				arch.getWall(f, Dir.west, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d.ccw()));

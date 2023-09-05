@@ -475,6 +475,7 @@ public class AetherTown extends UIClient {
 	
 	public void saveState() {
 		SaveState save = new SaveState();
+		save.regionMode = region.mode;
 		save.regionSeed = region.seed;
 		save.defaultStart = false;
 		save.levelx = levelInfo.x0;

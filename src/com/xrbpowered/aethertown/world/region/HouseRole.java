@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
+import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
+import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 
 public class HouseRole {
@@ -65,7 +67,7 @@ public class HouseRole {
 		}
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			return ArchitectureStyle.residential2;
+			return ArchitectureStyle.office2;
 		}
 		@Override
 		public IllumPattern illum(int floor, ArchitectureStyle arch) {
@@ -79,7 +81,7 @@ public class HouseRole {
 		}
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			return isCityHouse(house, random) ? ArchitectureStyle.residential3 : ArchitectureStyle.residential2;
+			return isCityHouse(house, random) ? ArchitectureStyle.hotel3 : ArchitectureStyle.hotel2;
 		}
 		@Override
 		public IllumPattern illum(int floor, ArchitectureStyle arch) {
@@ -103,7 +105,7 @@ public class HouseRole {
 	public static final HouseRole hospital = new HouseRole("Hospital", colorHospital) {
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			return house.getFootprint()<=4 || isCityHouse(house, random) ? ArchitectureStyle.residential3 : ArchitectureStyle.residential2;
+			return house.getFootprint()<=4 || isCityHouse(house, random) ? ArchitectureStyle.hotel3 : ArchitectureStyle.hotel2;
 		}
 		@Override
 		public IllumPattern illum(int floor, ArchitectureStyle arch) {
@@ -121,8 +123,8 @@ public class HouseRole {
 			return !isPark(house) && (house.getFootprint()<6 || house.getFootprint()<8 && isCityHouse(house, random)) ? ArchitectureStyle.shop3 : ArchitectureStyle.shop2;
 		}
 		@Override
-		public int doorType() {
-			return 1;
+		public IllumTileComponent getDoor(ArchitectureStyle arch) {
+			return ArchitectureTileSet.shopDoubleDoor;
 		}
 		@Override
 		public boolean allowLamp(boolean atDoor) {
@@ -143,7 +145,7 @@ public class HouseRole {
 	public static final HouseRole office = new HouseRole("Office", colorOffice) {
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			return ArchitectureStyle.residential3;
+			return ArchitectureStyle.office3;
 		}
 		@Override
 		public IllumPattern illum(int floor, ArchitectureStyle arch) {
@@ -160,15 +162,15 @@ public class HouseRole {
 	}
 	
 	public ArchitectureStyle arch(HouseGenerator house, Random random) {
-		return ArchitectureStyle.residential2;
+		return ArchitectureStyle.office2;
 	}
 	
 	public IllumPattern illum(int floor, ArchitectureStyle arch) {
 		return IllumPattern.shop;
 	}
 	
-	public int doorType() {
-		return 0;
+	public IllumTileComponent getDoor(ArchitectureStyle arch) {
+		return arch.getDoor();
 	}
 	
 	public boolean allowLamp(boolean atDoor) {

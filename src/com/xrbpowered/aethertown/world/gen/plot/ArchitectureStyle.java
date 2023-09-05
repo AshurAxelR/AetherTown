@@ -8,26 +8,49 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.HouseT.HouseTile;
 
-public abstract class ArchitectureStyle {
+public class ArchitectureStyle {
 
-	protected int[] floory;
-	protected int[] obsy;
-	protected int[] matchy;
-	protected int[] lighty;
+	protected final int[] floory;
+	protected final int[] obsy;
+	protected final int[] matchy;
+	protected final int[] lighty;
+
+	public final int floorCount;
+	protected final ArchitectureTileSet defaultSet;
 	
-	public int floorCount() {
-		return obsy.length;
+	public ArchitectureStyle(int floorCount, ArchitectureTileSet defaultSet) {
+		this.floorCount = floorCount;
+		this.defaultSet = defaultSet;
+		this.floory = new int[floorCount+1];
+		this.obsy = new int[floorCount];
+		this.matchy = new int[floorCount];
+		this.lighty = new int[floorCount];
+		int y = 0;
+		for(int i=0; i<floorCount; i++) {
+			ArchitectureTileSet set = getTileSet(i);
+			floory[i] = y;
+			obsy[i] = y + set.getObsY(i);
+			matchy[i] = y + set.getMatchY(i);
+			lighty[i] = y + set.getLightY(i);
+			y += set.getFloorHeight(i);
+		}
+		floory[floorCount] = y;
+	}
+
+	public ArchitectureStyle(int floorCount) {
+		this(floorCount, null);
+	}
+
+	public ArchitectureTileSet getTileSet(int floor) {
+		return defaultSet;
 	}
 	
-	public abstract ArchitectureTileSet getTileSet(int floor);
-	
-	public IllumTileComponent getDoor(int type) {
-		IllumTileComponent[] doors = getTileSet(0).doors;
-		return type<doors.length ? doors[type] : doors[0];
+	public IllumTileComponent getDoor() {
+		return getTileSet(0).getDefaultDoor();
 	}
 
 	public IllumTileComponent getWall(int floor, Dir d, HouseTile tile, boolean blank) {
-		return getTileSet(floor).getWall(floor, d, tile, blank);
+		return getTileSet(floor).getWall(floor, d, tile, blank || forceBlank(floor, d, tile));
 	}
 
 	private static boolean isObstructed(Tile tile, int[] yloc, int y, Dir d) {
@@ -56,16 +79,16 @@ public abstract class ArchitectureStyle {
 	}
 	
 	public int getRoofY() {
-		return floory[obsy.length];
+		return floory[floorCount];
 	}
 
 	public int maxGround() {
-		return matchy[matchy.length-1];
+		return matchy[floorCount-1];
 	}
 	
 	public boolean matchGround(HouseTile tile, int max) {
 		int ground = 0;
-		for(int i=0; i<matchy.length; i++) {
+		for(int i=0; i<floorCount; i++) {
 			if(max-tile.basey < matchy[i])
 				break;
 			ground = matchy[i];
@@ -86,125 +109,98 @@ public abstract class ArchitectureStyle {
 		return lighty[floor];
 	}
 	
-	public static ArchitectureStyle residential2 = new ArchitectureStyle() {{
-			this.floory = new int[] {0, 6, 12};
-			this.obsy = new int[] {2, 7};
-			this.matchy = new int[] {5, 11};
-			this.lighty = new int[] {4, 9};
-		}
+	protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+		return false;
+	}
+
+	private static boolean back(Dir d) {
+		return d==Dir.north;
+	}
+
+	private static boolean notFront(Dir d) {
+		return d!=Dir.south;
+	}
+
+	private static boolean groundNotFront(int floor, Dir d) {
+		return floor==0 && d!=Dir.south;
+	}
+
+	public static ArchitectureStyle residential2 = new ArchitectureStyle(2, baseSet);
+	public static ArchitectureStyle residential3 = new ArchitectureStyle(3, baseSet);
+
+	public static ArchitectureStyle office2 = new ArchitectureStyle(2, officeSet);
+	public static ArchitectureStyle office3 = new ArchitectureStyle(3, officeSet);
+
+	public static ArchitectureStyle shop1 = new ArchitectureStyle(1, shopSet) {
 		@Override
-		public ArchitectureTileSet getTileSet(int floor) {
-			return baseSet;
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return notFront(d);
 		}
 	};
 
-	public static ArchitectureStyle residential3 = new ArchitectureStyle() {{
-			this.floory = new int[] {0, 6, 12, 18};
-			this.obsy = new int[] {2, 7, 13};
-			this.matchy = new int[] {5, 11, 17};
-			this.lighty = new int[] {4, 9, 16};
-		}
-		@Override
-		public ArchitectureTileSet getTileSet(int floor) {
-			return baseSet;
-		}
-	};
-	
-	public static ArchitectureStyle shop1 = new ArchitectureStyle() {{
-			this.floory = new int[] {0, 6};
-			this.obsy = new int[] {1};
-			this.matchy = new int[] {6};
-			this.lighty = new int[] {3};
-		}
-		@Override
-		public ArchitectureTileSet getTileSet(int floor) {
-			return shopSet;
-		}
-		@Override
-		public IllumTileComponent getWall(int floor, Dir d, HouseTile tile, boolean blank) {
-			return super.getWall(floor, d, tile, blank || d!=Dir.south);
-		}
-	};
-
-	public static ArchitectureStyle shop2 = new ArchitectureStyle() {{
-			this.floory = new int[] {0, 6, 12};
-			this.obsy = new int[] {1, 6};
-			this.matchy = new int[] {6, 10};
-			this.lighty = new int[] {3, 9};
-		}
+	public static ArchitectureStyle shop2 = new ArchitectureStyle(2) {
 		@Override
 		public ArchitectureTileSet getTileSet(int floor) {
 			return floor==0 ? shopSet : officeSet;
 		}
 		@Override
-		public IllumTileComponent getWall(int floor, Dir d, HouseTile tile, boolean blank) {
-			return super.getWall(floor, d, tile, blank || floor==0 && d!=Dir.south);
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return groundNotFront(floor, d);
 		}
 	};
 	
-	public static ArchitectureStyle shop3 = new ArchitectureStyle() {{
-		this.floory = new int[] {0, 6, 12, 18};
-		this.obsy = new int[] {1, 6, 12};
-		this.matchy = new int[] {6, 10, 16};
-		this.lighty = new int[] {3, 9, 15};
-		}
-		@Override
-		public ArchitectureTileSet getTileSet(int floor) {
-			return floor==0 ? shopSet : baseSet;
-		}
-		@Override
-		public IllumTileComponent getWall(int floor, Dir d, HouseTile tile, boolean blank) {
-			return super.getWall(floor, d, tile, blank || floor==0 && d!=Dir.south);
-		}
-	};
-
-	public static ArchitectureStyle local2 = new ArchitectureStyle() {{
-			this.floory = new int[] {0, 6, 12};
-			this.obsy = new int[] {1, 7};
-			this.matchy = new int[] {6, 11};
-			this.lighty = new int[] {3, 9};
-		}
+	public static ArchitectureStyle shop3 = new ArchitectureStyle(3) {
 		@Override
 		public ArchitectureTileSet getTileSet(int floor) {
 			return floor==0 ? shopSet : officeSet;
 		}
 		@Override
-		public IllumTileComponent getWall(int floor, Dir d, HouseTile tile, boolean blank) {
-			return super.getWall(floor, d, tile, blank || floor==0 && d!=Dir.south);
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return groundNotFront(floor, d);
 		}
 	};
 
-	public static ArchitectureStyle local3 = new ArchitectureStyle() {{
-			this.floory = new int[] {0, 6, 12, 18};
-			this.obsy = new int[] {1, 7, 13};
-			this.matchy = new int[] {6, 11, 17};
-			this.lighty = new int[] {3, 9, 16};
-		}
+	public static ArchitectureStyle local2 = new ArchitectureStyle(2) {
 		@Override
 		public ArchitectureTileSet getTileSet(int floor) {
 			return floor==0 ? shopSet : baseSet;
 		}
 		@Override
-		public IllumTileComponent getWall(int floor, Dir d, HouseTile tile, boolean blank) {
-			return super.getWall(floor, d, tile, blank || floor==0 && d!=Dir.south);
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return groundNotFront(floor, d);
 		}
 	};
 
-	public static ArchitectureStyle openShop1 = new ArchitectureStyle() {{
-			this.floory = new int[] {0, 6};
-			this.obsy = new int[] {1};
-			this.matchy = new int[] {6};
-			this.lighty = new int[] {3};
-		}
+	public static ArchitectureStyle local3 = new ArchitectureStyle(3) {
 		@Override
 		public ArchitectureTileSet getTileSet(int floor) {
-			return shopSet;
+			return floor==0 ? shopSet : baseSet;
 		}
 		@Override
-		public IllumTileComponent getWall(int floor, Dir d, HouseTile tile, boolean blank) {
-			return super.getWall(floor, d, tile, blank || d==Dir.north);
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return groundNotFront(floor, d);
+		}
+	};
+
+	public static ArchitectureStyle openShop1 = new ArchitectureStyle(1, shopSet) {
+		@Override
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return back(d);
 		}
 	};
 	
+	public static ArchitectureStyle hotel2 = new ArchitectureStyle(2) {
+		@Override
+		public ArchitectureTileSet getTileSet(int floor) {
+			return floor==0 ? officeSet : baseSet;
+		}
+	};
+
+	public static ArchitectureStyle hotel3 = new ArchitectureStyle(3) {
+		@Override
+		public ArchitectureTileSet getTileSet(int floor) {
+			return floor==0 ? officeSet : baseSet;
+		}
+	};
 
 }
