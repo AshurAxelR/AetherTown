@@ -136,7 +136,7 @@ public class HouseT extends TileTemplate {
 			Vector3f illum = tile.illum[f];
 			r.blockLighting.addLight(tile, tile.basey+arch.getLightY(f), illum, 0.35f, true);
 			if(sub.j==front)
-				(f==0 && sub.i==0 && sub.j==front ? house.role.getDoor(arch) : arch.getWall(f, Dir.south, tile, yloc))
+				(f==0 && sub.i==0 && sub.j==front ? arch.getDoor() : arch.getWall(f, Dir.south, tile, yloc))
 						.addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d.flip()));
 			if(sub.i==left)
 				arch.getWall(f, Dir.west, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d.ccw()));
@@ -205,7 +205,7 @@ public class HouseT extends TileTemplate {
 		if(tile.t!=template || tile.sub==null)
 			return true;
 		HouseGenerator house = (HouseGenerator) tile.sub.parent;
-		return house.role.allowLamp(tile.sub.i==0 && tile.sub.j==0);
+		return tile.sub.i!=0 || tile.sub.j!=0 || house.arch.allowLampAtDoor();
 	}
 	
 }

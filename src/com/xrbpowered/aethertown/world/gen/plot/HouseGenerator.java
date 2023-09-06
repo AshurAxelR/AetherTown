@@ -28,6 +28,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 	
 	public int index = -1;
 	public HouseRole role = null;
+	public HouseRole addRole = null;
 	public ArchitectureStyle arch = ArchitectureStyle.residential3;
 	
 	public static HouseGeneratorBase select(Level level, int h) {
@@ -37,9 +38,16 @@ public class HouseGenerator extends HouseGeneratorBase {
 			return new HouseGenerator();
 	}
 	
+	public String getRoleTitle() {
+		if(addRole!=null)
+			return String.format("%s +%s", role.title, addRole.title);
+		else
+			return role.title;
+	}
+	
 	@Override
 	public String getInfo() {
-		return String.format("%d, %s: %s", index+1, startToken.level.info.name, role.title);
+		return String.format("%d, %s: %s", index+1, startToken.level.info.name, getRoleTitle());
 	}
 	
 	@Override

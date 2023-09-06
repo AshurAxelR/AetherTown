@@ -67,7 +67,7 @@ public class LevelMapView extends UIElement {
 		if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
 			String info = null;
 			if(tile.sub.parent instanceof HouseGenerator)
-				info = ((HouseGenerator) tile.sub.parent).role.title;
+				info = ((HouseGenerator) tile.sub.parent).getRoleTitle();
 			else if(tile.sub.parent instanceof ChurchGenerator)
 				info = tile.t.getTileInfo(tile);
 			g.setFont(Fonts.smallBold);

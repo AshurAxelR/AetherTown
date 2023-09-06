@@ -4,10 +4,8 @@ import java.awt.Color;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
-import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
-import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 
 public class HouseRole {
@@ -33,8 +31,10 @@ public class HouseRole {
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
 			if(isPark(house))
 				return ArchitectureStyle.shop1;
-			else
+			else {
+				house.addRole = residential;
 				return isCityHouse(house, random) ? ArchitectureStyle.local3 : ArchitectureStyle.local2;
+			}
 		}
 		@Override
 		public IllumPattern illum(int floor, ArchitectureStyle arch) {
@@ -50,8 +50,14 @@ public class HouseRole {
 		}
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			if(house.getFootprint()>=8)
-				return !isPark(house) ? ArchitectureStyle.local2 : ArchitectureStyle.shop1;
+			if(house.getFootprint()>=8) {
+				if(!isPark(house)) {
+					house.addRole = residential;
+					return ArchitectureStyle.local2;
+				}
+				else
+					return ArchitectureStyle.shop1;
+			}
 			else
 				return ArchitectureStyle.shop2;
 		}
@@ -120,15 +126,7 @@ public class HouseRole {
 	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge) {
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			return !isPark(house) && (house.getFootprint()<6 || house.getFootprint()<8 && isCityHouse(house, random)) ? ArchitectureStyle.shop3 : ArchitectureStyle.shop2;
-		}
-		@Override
-		public IllumTileComponent getDoor(ArchitectureStyle arch) {
-			return ArchitectureTileSet.shopDoubleDoor;
-		}
-		@Override
-		public boolean allowLamp(boolean atDoor) {
-			return !atDoor;
+			return !isPark(house) && (house.getFootprint()<6 || house.getFootprint()<8 && isCityHouse(house, random)) ? ArchitectureStyle.supermarket3 : ArchitectureStyle.supermarket2;
 		}
 	};
 	public static final HouseRole clothesShop = new ShopRole("Clothes Shop", IllumPattern.shop);
@@ -169,14 +167,6 @@ public class HouseRole {
 		return IllumPattern.shop;
 	}
 	
-	public IllumTileComponent getDoor(ArchitectureStyle arch) {
-		return arch.getDoor();
-	}
-	
-	public boolean allowLamp(boolean atDoor) {
-		return true;
-	}
-
 	protected static boolean isPark(HouseGenerator house) {
 		return house.startToken.level.info.settlement==LevelSettlementType.inn;
 	}
