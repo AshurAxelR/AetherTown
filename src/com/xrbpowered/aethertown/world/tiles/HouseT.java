@@ -110,7 +110,7 @@ public class HouseT extends TileTemplate {
 		HouseGenerator house = (HouseGenerator) tile.sub.parent;
 		tile.illum = new Vector3f[house.arch.floorCount];
 		for(int f=0; f<tile.illum.length; f++)
-			tile.illum[f] = IllumPattern.calcMod(random, house.role.illum(f, house.arch));
+			tile.illum[f] = IllumPattern.calcMod(random, house.arch.getIllum(f));
 		if(tile.sub.i==0 && tile.sub.j==0 && tile.getAdj(tile.d.flip()).t==StreetSlope.template1)
 			tile.steps = true;
 	}
@@ -194,11 +194,12 @@ public class HouseT extends TileTemplate {
 			}
 		}
 		HouseGenerator house = (HouseGenerator) tile.sub.parent;
-		if(maxGround>tile.basey+house.arch.maxGround()) {
+		ArchitectureStyle arch = ArchitectureStyle.fallback; // FIXME house.arch not available at this point!
+		if(maxGround>tile.basey+arch.maxGround()) {
 			house.remove();
 			return true;
 		}
-		return house.arch.matchGround(tile, max);
+		return arch.matchGround(tile, max);
 	}
 	
 	public static boolean allowLamp(Tile tile) {

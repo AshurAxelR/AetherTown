@@ -19,9 +19,8 @@ public abstract class HouseAssignment {
 	
 	protected void assignHouse(int index, HouseRole role, Random random) {
 		HouseGenerator house = level.houses.get(index);
-		house.role = role;
-		house.arch = role.arch(house, random);
-		if(role==HouseRole.residential)
+		HouseRole.assignRole(house, role, random);
+		if(house.role==HouseRole.residential || house.addRole==HouseRole.residential)
 			countRes++;
 	}
 	

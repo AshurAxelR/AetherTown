@@ -1,7 +1,5 @@
 package com.xrbpowered.aethertown.world.gen.plot;
 
-import static com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet.*;
-
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -20,6 +18,7 @@ public class ArchitectureStyle {
 	public final int floorCount;
 	protected final ArchitectureTileSet groundSet, tileSet;
 	protected IllumPattern groundIllum, illum;
+	protected DoorInfo doorInfo;
 	
 	public ArchitectureStyle(int floorCount, ArchitectureTileSet groundSet, ArchitectureTileSet tileSet) {
 		this.floorCount = floorCount;
@@ -61,6 +60,11 @@ public class ArchitectureStyle {
 	public ArchitectureStyle setIllum(IllumPattern illum) {
 		return setIllum(illum, illum);
 	}
+	
+	public ArchitectureStyle setDoorInfo(DoorInfo doorInfo) {
+		this.doorInfo = doorInfo;
+		return this;
+	}
 
 	public ArchitectureTileSet getTileSet(int floor) {
 		return floor==0 ? groundSet : tileSet;
@@ -71,7 +75,7 @@ public class ArchitectureStyle {
 	}
 
 	public DoorInfo getDoorInfo() {
-		return getTileSet(0).getDefaultDoor();
+		return doorInfo==null ? getTileSet(0).getDefaultDoor() : doorInfo;
 	}
 
 	public IllumTileComponent getDoor() {
@@ -158,73 +162,54 @@ public class ArchitectureStyle {
 		return floor==0 && d!=Dir.south;
 	}
 	
-	public static class Supermarket extends ArchitectureStyle {
-		public Supermarket(int floorCount) {
-			super(floorCount, shopSet, officeSet);
+	public static class BlankBack extends ArchitectureStyle {
+		public BlankBack(int floorCount, ArchitectureTileSet groundSet, ArchitectureTileSet tileSet) {
+			super(floorCount, groundSet, tileSet);
 		}
-		@Override
-		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return groundNotFront(floor, d);
+		public BlankBack(int floorCount, ArchitectureTileSet defaultSet) {
+			super(floorCount, defaultSet);
 		}
-		@Override
-		public DoorInfo getDoorInfo() {
-			return ArchitectureTileSet.shopDoubleDoor;
+		public BlankBack(int floorCount) {
+			super(floorCount);
 		}
-	}
-
-	public static ArchitectureStyle residential2 = new ArchitectureStyle(2, baseSet);
-	public static ArchitectureStyle residential3 = new ArchitectureStyle(3, baseSet);
-
-	public static ArchitectureStyle office2 = new ArchitectureStyle(2, officeSet);
-	public static ArchitectureStyle office3 = new ArchitectureStyle(3, officeSet);
-
-	public static ArchitectureStyle hotel2 = new ArchitectureStyle(2, officeSet, baseSet);
-	public static ArchitectureStyle hotel3 = new ArchitectureStyle(3, officeSet, baseSet);
-
-	public static ArchitectureStyle supermarket2 = new Supermarket(2);
-	public static ArchitectureStyle supermarket3 = new Supermarket(3);
-	
-	public static ArchitectureStyle shop1 = new ArchitectureStyle(1, shopSet) {
-		@Override
-		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return notFront(d);
-		}
-	};
-
-	public static ArchitectureStyle shop2 = new ArchitectureStyle(2, shopSet, officeSet) {
-		@Override
-		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return groundNotFront(floor, d);
-		}
-	};
-	
-	public static ArchitectureStyle shop3 = new ArchitectureStyle(3, shopSet, officeSet) {
-		@Override
-		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return groundNotFront(floor, d);
-		}
-	};
-
-	public static ArchitectureStyle local2 = new ArchitectureStyle(2, shopSet, baseSet) {
-		@Override
-		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return groundNotFront(floor, d);
-		}
-	};
-
-	public static ArchitectureStyle local3 = new ArchitectureStyle(3, shopSet, baseSet) {
-		@Override
-		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return groundNotFront(floor, d);
-		}
-	};
-
-	public static ArchitectureStyle openShop1 = new ArchitectureStyle(1, shopSet) {
 		@Override
 		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
 			return back(d);
 		}
-	};
-	
+	}
+
+	public static class BlankNotFront extends ArchitectureStyle {
+		public BlankNotFront(int floorCount, ArchitectureTileSet groundSet, ArchitectureTileSet tileSet) {
+			super(floorCount, groundSet, tileSet);
+		}
+		public BlankNotFront(int floorCount, ArchitectureTileSet defaultSet) {
+			super(floorCount, defaultSet);
+		}
+		public BlankNotFront(int floorCount) {
+			super(floorCount);
+		}
+		@Override
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return notFront(d);
+		}
+	}
+
+	public static class BlankGroundNotFront extends ArchitectureStyle {
+		public BlankGroundNotFront(int floorCount, ArchitectureTileSet groundSet, ArchitectureTileSet tileSet) {
+			super(floorCount, groundSet, tileSet);
+		}
+		public BlankGroundNotFront(int floorCount, ArchitectureTileSet defaultSet) {
+			super(floorCount, defaultSet);
+		}
+		public BlankGroundNotFront(int floorCount) {
+			super(floorCount);
+		}
+		@Override
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return groundNotFront(floor, d);
+		}
+	}
+
+	public static ArchitectureStyle fallback = new ArchitectureStyle(3, ArchitectureTileSet.baseSet);
 
 }
