@@ -120,6 +120,7 @@ public class LevelMapView extends UIElement {
 				if(tile==null)
 					continue;
 				Color c = new Color(0xfafafa);
+				Color addc = null;
 				if(Street.isAnyPath(tile.t))
 					c = Street.streetColor;
 				else if(tile.t==Park.template)
@@ -127,14 +128,26 @@ public class LevelMapView extends UIElement {
 				else if(tile.t instanceof Plaza)
 					c = Plaza.plazaColor;
 				else if(tile.sub!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
-					if(tile.sub.parent instanceof HouseGenerator)
-						c = ((HouseGenerator) tile.sub.parent).role.previewColor;
+					if(tile.sub.parent instanceof HouseGenerator) {
+						HouseGenerator house = (HouseGenerator) tile.sub.parent;
+						c = house.role.previewColor;
+						if(house.addRole!=null)
+							addc = house.addRole.previewColor;
+					}
 					else if(tile.sub.parent instanceof ChurchGenerator)
 						c = HouseRole.colorChurch;
 				}
 				
 				g.setColor(c);
 				g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
+				if(addc!=null && x==tile.sub.parent.maxx() && z==tile.sub.parent.maxz()) {
+					g.setColor(addc);
+					g.graph.fillPolygon(
+							new int[] {x*tileSize, x*tileSize+tileSize, x*tileSize+tileSize},
+							new int[] {z*tileSize+tileSize, z*tileSize+tileSize, z*tileSize},
+							3);
+				}
+				
 				if(Street.isAnyPath(tile.t)) {
 					g.setColor(colorStreetBorder);
 					for(Dir d : Dir.values()) {

@@ -25,20 +25,26 @@ public class HouseRole {
 	public static final Color colorOffice = new Color(0x77aaaa);
 	
 	private static class LocalShopRole extends HouseRole {
-		private LocalShopRole(String title, Color color) {
+		private boolean addOffice;
+		private LocalShopRole(String title, Color color, boolean addOffice) {
 			super(title, color,
 				new ArchitectureStyle.BlankGroundNotFront(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop),
 				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.shop, null),
-				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.shop, null)
+				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.shop, null),
+				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office)
 			);
+			this.addOffice = addOffice;
 		}
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
 			if(isPark(house))
 				return arch[0];
 			else {
-				house.addRole = residential;
-				return isCityHouse(house, random) ? arch[1] : arch[2];
+				house.addRole =  addOffice ? addCityRole(house, random) : residential;
+				if(house.addRole==residential)
+					return isCityHouse(house, random) ? arch[1] : arch[2];
+				else
+					return arch[3];
 			}
 		}
 	}
@@ -48,18 +54,24 @@ public class HouseRole {
 			super(title, colorShop,
 				new ArchitectureStyle.BlankGroundNotFront(1, ArchitectureTileSet.shopSet).setIllum(illum),
 				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(illum),
-				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, null)
+				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, null),
+				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, null),
+				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(illum, IllumPattern.office)
 			);
 		}
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
 			if(house.getFootprint()>=8) {
 				if(!isPark(house)) {
-					house.addRole = residential;
-					return arch[2];
+					house.addRole = addCityRole(house, random);
+					return house.addRole==residential ? arch[2] : arch[4];
 				}
 				else
 					return arch[0];
+			}
+			if(house.getFootprint()>=6 && !isPark(house) && !isCityHouse(house, random)) {
+				house.addRole = addCityRole(house, random);
+				return house.addRole==residential ? arch[3] : arch[4];
 			}
 			else
 				return arch[1];
@@ -112,7 +124,7 @@ public class HouseRole {
 	public static final HouseRole hotel = new HotelRole("Hotel");
 	public static final HouseRole inn = new HotelRole("Inn");
 	
-	public static final HouseRole localShop = new LocalShopRole("Local Store", colorShopSmall);
+	public static final HouseRole localShop = new LocalShopRole("Local Store", colorShopSmall, false);
 	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge,
 			new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop),
 			new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop)
@@ -165,6 +177,10 @@ public class HouseRole {
 		return (house.startToken.level.houseCount>=25 && random.nextInt(house.startToken.level.houseCount/5)>3);
 	}
 	
+	protected static HouseRole addCityRole(HouseGenerator house, Random random) {
+		return isCityHouse(house, random) ? office : residential;
+	}
+	
 	private static final Shuffle.List<HouseRole> restaurantShuffle = new Shuffle.List<>(
 		new RestaurantRole("Pub"),
 		new RestaurantRole("Italian Restaurant"),
@@ -184,15 +200,15 @@ public class HouseRole {
 	}
 
 	private static final Shuffle.List<HouseRole> fastFoodShuffle = new Shuffle.List<>(
-			new LocalShopRole("Sandwich Bar", colorFoodSmall),
-			new LocalShopRole("Burrito Bar", colorFoodSmall),
-			new LocalShopRole("Burger Bar", colorFoodSmall),
-			new LocalShopRole("Pizza Bar", colorFoodSmall),
-			new LocalShopRole("Coffee Shop", colorFoodSmall),
-			new LocalShopRole("Chinese Takeaway", colorFoodSmall),
-			new LocalShopRole("Fish and Chips", colorFoodSmall),
-			new LocalShopRole("Sushi Bar", colorFoodSmall),
-			new LocalShopRole("Chicken Grill Bar", colorFoodSmall)
+			new LocalShopRole("Sandwich Bar", colorFoodSmall, true),
+			new LocalShopRole("Burrito Bar", colorFoodSmall, true),
+			new LocalShopRole("Burger Bar", colorFoodSmall, true),
+			new LocalShopRole("Pizza Bar", colorFoodSmall, true),
+			new LocalShopRole("Coffee Shop", colorFoodSmall, true),
+			new LocalShopRole("Chinese Takeaway", colorFoodSmall, true),
+			new LocalShopRole("Fish and Chips", colorFoodSmall, true),
+			new LocalShopRole("Sushi Bar", colorFoodSmall, true),
+			new LocalShopRole("Chicken Grill Bar", colorFoodSmall, true)
 	);
 
 	public static HouseRole randomFastFood(Random random) {

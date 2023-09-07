@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.gen.plot;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -47,6 +48,14 @@ public abstract class PlotGenerator implements Generator {
 	
 	public Token tokenAt(int i, int j) {
 		return tokenAt(i, j, alignToken(i, j));
+	}
+
+	public int maxx() {
+		return startToken.x + MathUtils.max(0, fwd*d.dx, -left*dr.dx, right*dr.dx);
+	}
+
+	public int maxz() {
+		return startToken.z + MathUtils.max(0, fwd*d.dz, -left*dr.dz, right*dr.dz);
 	}
 
 	public boolean fits() {
