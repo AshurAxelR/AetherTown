@@ -150,18 +150,6 @@ public class ArchitectureStyle {
 		return false;
 	}
 
-	private static boolean back(Dir d) {
-		return d==Dir.north;
-	}
-
-	private static boolean notFront(Dir d) {
-		return d!=Dir.south;
-	}
-
-	private static boolean groundNotFront(int floor, Dir d) {
-		return floor==0 && d!=Dir.south;
-	}
-	
 	public static class BlankBack extends ArchitectureStyle {
 		public BlankBack(int floorCount, ArchitectureTileSet groundSet, ArchitectureTileSet tileSet) {
 			super(floorCount, groundSet, tileSet);
@@ -174,7 +162,23 @@ public class ArchitectureStyle {
 		}
 		@Override
 		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return back(d);
+			return d==Dir.north;
+		}
+	}
+	
+	public static class BlankGroundBack extends ArchitectureStyle {
+		public BlankGroundBack(int floorCount, ArchitectureTileSet groundSet, ArchitectureTileSet tileSet) {
+			super(floorCount, groundSet, tileSet);
+		}
+		public BlankGroundBack(int floorCount, ArchitectureTileSet defaultSet) {
+			super(floorCount, defaultSet);
+		}
+		public BlankGroundBack(int floorCount) {
+			super(floorCount);
+		}
+		@Override
+		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
+			return floor==0 && d==Dir.north;
 		}
 	}
 
@@ -190,7 +194,7 @@ public class ArchitectureStyle {
 		}
 		@Override
 		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return notFront(d);
+			return d!=Dir.south;
 		}
 	}
 
@@ -206,7 +210,7 @@ public class ArchitectureStyle {
 		}
 		@Override
 		protected boolean forceBlank(int floor, Dir d, HouseTile tile) {
-			return groundNotFront(floor, d);
+			return floor==0 && d!=Dir.south;
 		}
 	}
 

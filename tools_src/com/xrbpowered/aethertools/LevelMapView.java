@@ -146,6 +146,8 @@ public class LevelMapView extends UIElement {
 							new int[] {x*tileSize, x*tileSize+tileSize, x*tileSize+tileSize},
 							new int[] {z*tileSize+tileSize, z*tileSize+tileSize, z*tileSize},
 							3);
+					g.setColor(Color.WHITE);
+					g.line(x*tileSize, z*tileSize+tileSize, x*tileSize+tileSize, z*tileSize);
 				}
 				
 				if(Street.isAnyPath(tile.t)) {

@@ -7,6 +7,7 @@ import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
+import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet.DoorInfo;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 
 public class HouseRole {
@@ -81,7 +82,7 @@ public class HouseRole {
 	private static class RestaurantRole extends HouseRole {
 		private RestaurantRole(String title) {
 			super(title, colorFood,
-				new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant)
+				new ArchitectureStyle.BlankGroundBack(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant)
 			);
 		}
 	}
@@ -99,6 +100,25 @@ public class HouseRole {
 		}
 	}
 
+	private static class PostOffice extends HouseRole {
+		private DoorInfo door;
+		private PostOffice(String title, final DoorInfo door) {
+			super(title, colorCivic,
+				new ArchitectureStyle(1, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office).setDoorInfo(door),
+				new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office).setDoorInfo(door),
+				new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office).setDoorInfo(door)
+			);
+			this.door = door;
+		}
+		@Override
+		public ArchitectureStyle arch(HouseGenerator house, Random random) {
+			if(isPark(house))
+				return arch[0];
+			else
+				return !door.allowLamp && isCityHouse(house, random) ? arch[2] : arch[1];
+		}
+	}
+
 	public static final HouseRole residential = new HouseRole("Residential", colorResidential,
 			new ArchitectureStyle(2, ArchitectureTileSet.baseSet),
 			new ArchitectureStyle(3, ArchitectureTileSet.baseSet)
@@ -109,8 +129,8 @@ public class HouseRole {
 		}
 	};
 
-	public static final HouseRole postOffice = new HouseRole("Post Office", colorCivic);
-	public static final HouseRole civicCentre = new HouseRole("Civic Centre", colorCivic);
+	public static final HouseRole postOffice = new PostOffice("Post Office", ArchitectureTileSet.officeDoor);
+	public static final HouseRole civicCentre = new PostOffice("Civic Centre", ArchitectureTileSet.officeDoubleDoor);
 	public static final HouseRole hospital = new HouseRole("Hospital", colorHospital,
 			new ArchitectureStyle(2, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.hospital, IllumPattern.hospitalWards).setDoorInfo(ArchitectureTileSet.officeDoubleDoor),
 			new ArchitectureStyle(3, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.hospital, IllumPattern.hospitalWards).setDoorInfo(ArchitectureTileSet.officeDoubleDoor)
@@ -126,22 +146,28 @@ public class HouseRole {
 	
 	public static final HouseRole localShop = new LocalShopRole("Local Store", colorShopSmall, false);
 	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge,
-			new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop),
-			new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop)
+			new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop).setDoorInfo(ArchitectureTileSet.shopDoubleDoor),
+			new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop).setDoorInfo(ArchitectureTileSet.shopDoubleDoor)
 		) {
 		@Override
 		protected ArchitectureStyle arch(HouseGenerator house, Random random) {
 			return !isPark(house) && (house.getFootprint()<6 || house.getFootprint()<8 && isCityHouse(house, random)) ? arch[1] : arch[0];
 		}
 	};
-	public static final HouseRole clothesShop = new ShopRole("Clothes Shop", IllumPattern.shop);
+	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", IllumPattern.shop);
 	public static final HouseRole giftShop = new HouseRole("Gift Shop + Cafeteria", colorShop,
 		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop)
 	);
 	
-	public static final HouseRole museum = new HouseRole("Museum", colorCulture);
-	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture);
-	public static final HouseRole library = new HouseRole("Library", colorCulture);
+	public static final HouseRole museum = new HouseRole("Museum", colorCulture,
+		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel)
+	);
+	public static final HouseRole library = new HouseRole("Library", colorCulture,
+		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel)
+	);
+	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture,
+		new ArchitectureStyle.BlankNotFront(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant)
+	);
 	public static final HouseRole office = new HouseRole("Office", colorOffice,
 		new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office)
 	);
@@ -154,10 +180,6 @@ public class HouseRole {
 		this.title = title;
 		this.previewColor = color;
 		this.arch = arch;
-	}
-
-	private HouseRole(String title, Color color) {
-		this(title, color, new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop)); // FIXME remove default
 	}
 
 	protected ArchitectureStyle arch(HouseGenerator house, Random random) {
