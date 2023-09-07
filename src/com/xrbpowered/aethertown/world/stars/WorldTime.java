@@ -42,8 +42,7 @@ public class WorldTime {
 	}
 	
 	public static int getDayOfYear() {
-		float t = frac((float)Math.floor(time)/daysInYear + yearPhase);
-		return ((int)(t*daysInYear) + equinoxDay) % daysInYear;
+		return ((int)((float)Math.floor(time) + yearPhase*daysInYear) + equinoxDay + daysInYear) % daysInYear;
 	}
 	
 	public static String getFormattedTime(float t) {
