@@ -93,9 +93,9 @@ public class Hill extends TileTemplate {
 			res = true;
 		}
 		tile.maxDelta = MathUtils.maxDelta(yloc);
-		if(tile.maxDelta>1 || !tile.level.isInside(tile.x, tile.z, 2))
+		if(tile.maxDelta>1 || !tile.level.isInside(tile.x, tile.z, 2) || tile.level.info.terrain.noParks)
 			return res;
-
+		
 		Dir adjDir = null;
 		int y = 0;
 		int countUp = 0;

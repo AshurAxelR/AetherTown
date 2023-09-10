@@ -25,10 +25,6 @@ public class StreetConnector {
 		return (int)Math.ceil(h/ascFactor);
 	}
 	
-	private static int mdist(int i1, int j1, int i2, int j2) {
-		return Math.abs(i1-i2) + Math.abs(j1-j2);
-	}
-	
 	private class ConnPoint {
 		public int i, j;
 		public int x, z, basey;
@@ -54,11 +50,11 @@ public class StreetConnector {
 		}
 
 		public int mdist(ConnPoint conn) {
-			return Math.abs(x-conn.x) + Math.abs(z-conn.z);
+			return MathUtils.mdist(x, z, conn.x, conn.z);
 		}
 		
 		public int mdisty(ConnPoint conn) {
-			return Math.abs(x-conn.x) + Math.abs(z-conn.z) + lenForH(Math.abs(basey-conn.basey));
+			return MathUtils.mdist(x, z, conn.x, conn.z) + lenForH(Math.abs(basey-conn.basey));
 		}
 		
 		@Override
@@ -211,10 +207,10 @@ public class StreetConnector {
 		Dir dr = dnext;
 		for(int i=0, xi=startx, zi=startz; i<levelSize; i++, xi+=dnext.dx, zi+=dnext.dz) {
 			int j=0;
-			jloop: for(int xj=xi, zj=zi; j<levelSize; j++, xj+=din.dx, zj+=din.dz) {
+			jloop: for(int xj=xi, zj=zi; j<=levelSize/2; j++, xj+=din.dx, zj+=din.dz) {
 				Tile tile = level.map[xj][zj];
 				if(tile!=null) {
-					if(tile.t==Street.template && i>=margin && i<levelSize-margin && j<level.levelSize/2 &&
+					if(tile.t==Street.template && i>=margin && i<levelSize-margin &&
 						(tile.sub==null || tile.sub.parent.canConnect(tile, dout))) { 
 							connPoints.add(new ConnPoint(i, j, tile.x, tile.z, tile.basey));
 					}
@@ -442,8 +438,8 @@ public class StreetConnector {
 				if(i>=zMargin && i<levelSize-zMargin &&
 						i!=connS.i-1 && i!=connS.i+1 &&
 						i!=connD.i-1 && i!=connD.i+1) {
-					int distS = mdist(i, connS.i, j, connS.j) - 3;
-					int distD = mdist(i, connD.i, j, connD.j) - 3;
+					int distS = MathUtils.mdist(i, connS.i, j, connS.j) - 3;
+					int distD = MathUtils.mdist(i, connD.i, j, connD.j) - 3;
 					int ahdiff = (hdiff - hmod) / 4;
 					int dy = (ahdiff * distS / (distS+distD))*4 + hmod;
 					if(dy<=distS/2 && (hdiff-dy)<=distD/2)
@@ -536,10 +532,6 @@ public class StreetConnector {
 				connPoints.remove(connS);
 		}
 		return true;
-	}
-	
-	public boolean connectOut(LevelConnection lc, Random random) {
-		return connectOut(lc, random, true);
 	}
 
 }

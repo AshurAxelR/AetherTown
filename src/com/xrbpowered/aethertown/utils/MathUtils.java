@@ -50,6 +50,11 @@ public class MathUtils {
 		return clamp(x, 0f, 1f);
 	}
 
+	public static int mdist(int x1, int z1, int x2, int z2) {
+		// Manhattan distance
+		return Math.abs(x1-x2) + Math.abs(z1-z2);
+	}
+	
 	public static int min(int... x) {
 		int minx = x[0];
 		for(int i=1; i<x.length; i++) {

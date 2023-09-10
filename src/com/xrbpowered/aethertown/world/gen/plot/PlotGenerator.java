@@ -17,6 +17,8 @@ public abstract class PlotGenerator implements Generator {
 	public Token startToken;
 	public Dir d, dr;
 	
+	public boolean ignoreHeightLimit = false;
+	
 	public void setSize(int left, int right, int fwd) {
 		this.left = left;
 		this.right = right;
@@ -64,7 +66,7 @@ public abstract class PlotGenerator implements Generator {
 				if(ignoreToken(i, j))
 					continue;
 				Token t = tokenAt(i, j);
-				if(!t.fits() || !t.isFree())
+				if(!t.isFree() || !ignoreHeightLimit && !t.fits())
 					return false;
 			}
 		return true;

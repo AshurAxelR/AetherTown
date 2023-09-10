@@ -5,28 +5,43 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
+import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightGuideChunk;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
+import com.xrbpowered.aethertown.world.region.PortalSystem.PortalInfo;
 
 public class Region {
 
 	private static final int maxGeneratorAttempts = 3;
 	
-	public final RegionMode mode;
+	public final RegionCache cache;
 	public final int sizex;
 	public final int sizez;
 	
 	public final long seed;
 	public LevelInfo[][] map = null;
 	
+	public LevelInfo[] portals = null;
 	public LevelInfo startLevel = null;
 	
-	public Region(long seed, RegionMode mode) {
-		this.mode = mode;
-		this.sizex = mode.sizex;
-		this.sizez = mode.sizez;
+	public Region(RegionCache cache, long seed) {
+		this.cache = cache;
+		this.sizex = cache.mode.sizex;
+		this.sizez = cache.mode.sizez;
 		this.seed = seed;
+	}
+
+	public long seedXZ(int x, int z, int offs, long add) {
+		LevelInfo level = isInside(x, z) ? map[x][z] : null;
+		if(level!=null && level.fixed)
+			return level.seed;
+		else
+			return RandomSeed.seedXYZ(this.seed+add, x, z, offs);
+	}
+	
+	public long seedXZ(int x, int z, long add) {
+		return seedXZ(x, z, 0, add);
 	}
 
 	public LevelInfo getLevel(int x, int z) {
@@ -59,6 +74,7 @@ public class Region {
 	
 	private void resetGenerator() {
 		map = new LevelInfo[sizex][sizez];
+		portals = cache.portals.numPortals==0 ? null : new LevelInfo[cache.portals.numPortals];
 		startLevel = null;
 	}
 	
@@ -149,7 +165,7 @@ public class Region {
 	
 	private void generate(Random random) {
 		resetGenerator();
-		mode.coreGenerate(this, random);
+		cache.mode.coreGenerate(this, random);
 		
 		checkPeaks();
 		expand(random, 2, true);
@@ -161,6 +177,37 @@ public class Region {
 		map[x][z].addConn(x, z, d);
 		LevelInfo level = map[x+d.dx][z+d.dz];
 		level.addConn(x+d.dx, z+d.dz, d.flip());
+	}
+	
+	public boolean generatePortal(int index, int x0, int z0, Dir d) {
+		for(int x=x0-1; x<=x0+1; x++)
+			for(int z=z0-1; z<=z0+1; z++) {
+				if(!isInside(x, z) || map[x][z]!=null)
+					return false;
+			}
+		
+		int portalSeed = cache.portals.getPortalSeed(this.seed, index) * 9;
+		PortalInfo portal = cache.portals.createPortalInfo(this.seed, index);
+		if(portal.d!=d)
+			throw new RuntimeException("Portal direction mismatch");
+		
+		for(int dx=-1; dx<=1; dx++)
+			for(int dz=-1; dz<=1; dz++) {
+				int x = x0+dx;
+				int z = z0+dz;
+				LevelInfo level = new LevelInfo(this, x, z, 1, portalSeed, true);
+				level.setTerrain(LevelTerrainModel.lowest);
+				level.place();
+				if(x==x0 && z==z0) {
+					level.portal = portal;
+					portals[index] = level;
+				}
+				portalSeed++;
+			}
+		
+		connectLevels(x0, z0, d);
+		connectLevels(x0, z0, d.flip());
+		return true;
 	}
 	
 	public boolean isInside(int x, int z) {

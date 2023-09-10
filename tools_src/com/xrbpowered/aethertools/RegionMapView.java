@@ -14,6 +14,7 @@ import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.LevelSettlementType;
 import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
 import com.xrbpowered.aethertown.world.region.Region;
+import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -32,6 +33,7 @@ public class RegionMapView extends UIElement {
 	public static final Color colorText = new Color(0x777777);
 	public static final Color colorNotVisited = new Color(0xfafafa);
 	public static final Color colorActive = new Color(0xdd0000);
+	public static final Color colorPortal = new Color(0x00aaff);
 	
 	public static final Color[] colorLevel = { new Color(0xecf4db), new Color(0xddeebb), new Color(0xccdd88) };
 	public static final Color colorLevelBorder = new Color(0xdddddd);
@@ -167,6 +169,17 @@ public class RegionMapView extends UIElement {
 					g.setColor(colorNotVisited);
 					g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
 				}
+				
+				if(level.isPortal()) {
+					g.pushAntialiasing(true);
+					g.pushPureStroke(true);
+					g.setColor(colorPortal);
+					g.setStroke(2f);
+					g.graph.drawOval(level.x0*tileSize+1, level.z0*tileSize+1, tileSize-2, tileSize-2);
+					g.popAntialiasing();
+					g.resetStroke();
+					g.popPureStroke();
+				}
 			}
 
 		if(active!=null) {
@@ -196,7 +209,7 @@ public class RegionMapView extends UIElement {
 
 		AetherTown.settings.load();
 		SaveState save = new SaveState();
-		region = new Region(save.getRegionSeed(), save.regionMode);
+		region = new RegionCache(save.regionMode).get(save.getRegionSeed());
 		region.generate();
 		
 		active = region.startLevel;

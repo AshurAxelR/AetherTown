@@ -9,7 +9,14 @@ import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 
 public class LevelTerrainModel {
 
-	public static final LevelTerrainModel bottom = new LevelTerrainModel("bottom", -100, -90, -90, -80);
+	public static final LevelTerrainModel bottom = new LevelTerrainModel("bottom", true, -100, -90, -90, -80);
+	public static final LevelTerrainModel lowest = new LevelTerrainModel("lowest", true, -90, -80, -70, -70) {
+		@Override
+		public void fillTerrain(Level level, Random random) {
+			HillsGenerator.expand(level, random, 2, 20, -1, 1);
+			HillsGenerator.expand(level, random, 1, 0, -4, 2);
+		}
+	};
 	public static final LevelTerrainModel low = new LevelTerrainModel("low", -100, -50, -30, 0);
 	public static final LevelTerrainModel flat = new LevelTerrainModel("flat", -40, 0, 20, 40);
 	public static final LevelTerrainModel hill = new LevelTerrainModel("hill", -80, -20, 20, 80) {
@@ -35,15 +42,21 @@ public class LevelTerrainModel {
 	public final int maxy;
 	public final int starty, conny;
 	public final int edgey;
+	public final boolean noParks;
 	
-	private LevelTerrainModel(String name, int edgey, int conny, int starty, int maxy) {
+	private LevelTerrainModel(String name, boolean noParks, int edgey, int conny, int starty, int maxy) {
 		this.name = name;
+		this.noParks = noParks;
 		this.maxy = maxy;
 		this.starty = starty;
 		this.conny = conny;
 		this.edgey = edgey;
 	}
-	
+
+	private LevelTerrainModel(String name, int edgey, int conny, int starty, int maxy) {
+		this(name, false, edgey, conny, starty, maxy);
+	}
+
 	public void startTerrain(Token startToken, Random random) {
 		new HillsGenerator(20).setAmp(-2, 2).generate(startToken, random);
 	}

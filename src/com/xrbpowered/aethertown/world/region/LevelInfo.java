@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.utils.RandomSeed;
+import com.xrbpowered.aethertown.world.region.PortalSystem.PortalInfo;
 
 public class LevelInfo {
 
@@ -76,24 +76,31 @@ public class LevelInfo {
 	public final int x0, z0;
 	public final int size;
 	public final long seed;
+	public final boolean fixed;
 	public String name;
 	
 	public LevelTerrainModel terrain = LevelTerrainModel.hill;
 	public LevelSettlementType settlement = LevelSettlementType.none;
+	public PortalInfo portal = null;
 	
 	public ArrayList<LevelConnection> conns = new ArrayList<>();
 	
 	public boolean visited = false;
 	
-	public LevelInfo(Region region, int x, int z, int size, long seed) {
+	public LevelInfo(Region region, int x, int z, int size, long seed, boolean fixed) {
 		this.region = region;
 		this.x0 = x;
 		this.z0 = z;
 		this.size = size;
 		this.seed = seed;
+		this.fixed = fixed;
 		updateName();
 	}
-	
+
+	public LevelInfo(Region region, int x, int z, int size, long seed) {
+		this(region, x, z, size, seed, false);
+	}
+
 	private void updateName() {
 		this.name = LevelNames.next(new Random(seed+6173L), settlement);
 	}
@@ -104,12 +111,18 @@ public class LevelInfo {
 	}
 	
 	public LevelInfo setSettlement(LevelSettlementType settlement) {
+		if(fixed)
+			return this;
 		int levelSize = getLevelSize();
 		while(settlement.getStreetMargin(levelSize)<14)
 			settlement = settlement.demote();
 		this.settlement = settlement;
 		updateName();
 		return this;
+	}
+	
+	public boolean isPortal() {
+		return portal!=null;
 	}
 
 	public boolean isFree() {
@@ -161,12 +174,12 @@ public class LevelInfo {
 	@Override
 	public boolean equals(Object obj) {
 		LevelInfo info = (LevelInfo) obj;
-		return this.region==info.region && // TODO region.equals()
+		return this.region==info.region && // ok, as long as RegionCache is used
 				this.x0==info.x0 && this.z0==info.z0 && this.size==info.size;
 	}
 	
 	public static LevelInfo createNullLevel(Region region, int x, int z) {
-		long seed = RandomSeed.seedXY(region.seed+6799, x, z);
+		long seed = region.seedXZ(x, z, 6799L);
 		return new LevelInfo(region, x, z, 1, seed).setTerrain(LevelTerrainModel.nullTerrain);
 	}
 	

@@ -16,6 +16,10 @@ public abstract class RegionMode {
 	public abstract void coreGenerate(Region region, Random random);
 	public abstract String formatValue();
 	
+	public int getNumPortals() {
+		return 0;
+	}
+	
 	private static int intParam(String[] vs, int i, int def) {
 		return vs.length>i ? Integer.parseInt(vs[i]) : def;
 	}
@@ -33,6 +37,8 @@ public abstract class RegionMode {
 				return new OneLevel(intParam(vs, 1, 2), settlementParam(vs, 2, LevelSettlementType.village));
 			case "smallPeak":
 				return new SmallPeak(settlementParam(vs, 1, LevelSettlementType.village), settlementParam(vs, 2, LevelSettlementType.outpost));
+			case "twoPortals":
+				return twoPortals;
 			default:
 				System.err.printf("Unknown region mode: %s\n", vs[0]);
 				return defaultMode;
@@ -42,7 +48,7 @@ public abstract class RegionMode {
 	public static RegionMode linear = new RegionMode(512, 128) {
 		@Override
 		public void coreGenerate(Region region, Random random) {
-			new RegionPaths(region, random).generatePaths();
+			new LinearRegionPaths(region, random).generatePaths();
 		}
 		@Override
 		public String formatValue() {
@@ -101,6 +107,34 @@ public abstract class RegionMode {
 			return String.format("smallPeak,%s,%s", midSettlement.name(), sideSettlement.name());
 		}
 	}
+	
+	public static RegionMode twoPortals = new RegionMode(16, 16) {
+		@Override
+		public int getNumPortals() {
+			return 2;
+		}
+		@Override
+		public void coreGenerate(Region region, Random random) {
+			int x0 = sizex/2;
+			int z0 = sizez/2;
+			Dir[] dirs = new Dir[] {region.cache.portals.getPortalDir(region.seed, 0), region.cache.portals.getPortalDir(region.seed, 1)};
+			int index = 0;
+			for(Dir d : dirs) {
+				region.generatePortal(index, x0+2*d.flip().dx, z0+2*d.flip().dz, d);
+				index++;
+			}
+			LevelInfo level = new LevelInfo(region, x0, z0, 1, random.nextLong());
+			level.setTerrain(LevelTerrainModel.low);
+			level.place();
+			region.startLevel = level;
+			for(Dir d : dirs)
+				region.connectLevels(x0, z0, d.flip());
+		}
+		@Override
+		public String formatValue() {
+			return "twoPortals";
+		}
+	};
 	
 	public static RegionMode defaultMode = new OneLevel(2, LevelSettlementType.village);
 

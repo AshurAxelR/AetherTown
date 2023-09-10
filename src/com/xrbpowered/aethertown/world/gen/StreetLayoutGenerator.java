@@ -15,8 +15,10 @@ import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.StreetPresetGenerator;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Bench;
+import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class StreetLayoutGenerator extends TokenGenerator {
@@ -32,10 +34,22 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	
 	@Override
 	public boolean generate(Token startToken, Random random) {
+		LevelInfo info = startToken.level.info;
+		if(info.terrain.noParks) {
+			this.startToken = startToken;
+			Street.template.forceGenerate(startToken, random);
+			if(info.isPortal()) {
+				Monument.template.forceGenerate(startToken.next(info.portal.d.cw(), 0), random);
+				Monument.template.forceGenerate(startToken.next(info.portal.d.ccw(), 0), random);
+			}
+			return true;
+		}
 		clearTokens();
 		this.startToken = Crossroads.centerAt(startToken);
 		Crossroads start = new Crossroads();
-		start.generate(this.startToken, random);
+		start.ignoreHeightLimit = true;
+		if(!start.generate(this.startToken, random))
+			throw new GeneratorException("StreetLayoutGenerator: initial placement failed");
 		start.collectTokens(this, random);
 		return generate(random);
 	}
@@ -109,9 +123,9 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 	}
 	
-	private static void connectOut(Level level, Random random) {
+	private static void connectOut(Level level, Random random, boolean multi) {
 		for(LevelConnection lc : level.info.conns) {
-			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random))
+			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random, multi))
 				throw new GeneratorException("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
 		}
 	}
@@ -129,12 +143,18 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	}
 	
 	public static void finishLayout(Level level, Random random) {
-		reconnectStreets(level, random, false);
-		connectOut(level, random);
-		trimStreets(level, random);
-		for(PlotGenerator plot : level.plots)
-			plot.fillStreet(random);
-		reconnectStreets(level, random, true);
+		if(level.info.terrain.noParks) {
+			connectOut(level, random, false);
+			trimStreets(level, random);
+		}
+		else {
+			reconnectStreets(level, random, false);
+			connectOut(level, random, true);
+			trimStreets(level, random);
+			for(PlotGenerator plot : level.plots)
+				plot.fillStreet(random);
+			reconnectStreets(level, random, true);
+		}
 		level.heightLimiter.revalidate();
 	}
 }

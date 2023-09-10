@@ -5,7 +5,6 @@ import static com.xrbpowered.aethertown.world.region.LevelInfo.baseSize;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
 import com.xrbpowered.aethertown.world.region.Region;
 
@@ -43,7 +42,7 @@ public class HeightGuideChunk {
 	}
 
 	private int delta(int rx, int rz, int offs, float amp) {
-		return delta(new Random(RandomSeed.seedXYZ(region.seed+394634L, rx, rz, offs)), amp);
+		return delta(new Random(region.seedXZ(rx, rz, offs, 394634L)), amp);
 	}
 
 	private void plasma(int x0, int z0, int size, float amp, Random random) {
@@ -66,7 +65,7 @@ public class HeightGuideChunk {
 	}
 	
 	public HeightGuideChunk generate(boolean draft) {
-		Random random = new Random(RandomSeed.seedXY(region.seed+91271L, rx, rz));
+		Random random = new Random(region.seedXZ(rx, rz, 91271L));
 		
 		LevelTerrainModel[][] t = new LevelTerrainModel[3][3];
 		for(int dx=-1; dx<=1; dx++)

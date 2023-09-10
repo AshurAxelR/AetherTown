@@ -23,6 +23,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.Region;
+import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.client.UIClient;
@@ -102,6 +103,7 @@ public class AetherTown extends UIClient {
 	private DaytimeEnvironment environment = new DaytimeEnvironment();
 
 	public static AetherTown aether;
+	public static RegionCache regionCache;
 	public static Region region;
 	public static LevelCache levelCache;
 	public static Level level = null;
@@ -232,6 +234,7 @@ public class AetherTown extends UIClient {
 				uiTime.repaint();
 				environment.recalc(sky.sun.position);
 				updateEnvironment();
+				regionCache.portals.updateTime();
 				
 				super.updateTime(dt);
 			}
@@ -416,6 +419,7 @@ public class AetherTown extends UIClient {
 		levelCache.addAllAdj(info, true);
 		level = levelCache.setActive(info, true);
 		levelInfo = info;
+		regionCache.portals.updateLevel();
 		// levelCache.createRenderers(sky.buffer, tiles);
 		
 		LevelMapView.level = level;
@@ -443,6 +447,7 @@ public class AetherTown extends UIClient {
 		LevelInfo info = save.getLevel(region);
 		level = levelCache.setActive(info, true);
 		levelInfo = info;
+		regionCache.portals.updateLevel();
 		RegionMapView.region = region;
 		
 		LevelMapView.level = level;
@@ -475,7 +480,7 @@ public class AetherTown extends UIClient {
 	
 	public void saveState() {
 		SaveState save = new SaveState();
-		save.regionMode = region.mode;
+		save.regionMode = regionCache.mode;
 		save.regionSeed = region.seed;
 		save.defaultStart = false;
 		save.levelx = levelInfo.x0;
@@ -658,7 +663,8 @@ public class AetherTown extends UIClient {
 	public static void generateRegion(SaveState save) {
 		long seed = save.getRegionSeed();
 		System.out.printf("Region seed: %dL\n", seed);
-		region = new Region(seed, save.regionMode);
+		regionCache = new RegionCache(save.regionMode);
+		region = regionCache.get(seed);
 		region.generate();
 		save.assignVisited(region);
 		

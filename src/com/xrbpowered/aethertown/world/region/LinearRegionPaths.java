@@ -7,7 +7,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.GeneratorException;
 
-public class RegionPaths {
+public class LinearRegionPaths {
 
 	private static class PathToken {
 		public int x, z;
@@ -28,7 +28,7 @@ public class RegionPaths {
 	private LinkedList<PathToken> tokens = new LinkedList<>();
 	private int tokenCount = 0;
 
-	public RegionPaths(Region region, Random random) {
+	public LinearRegionPaths(Region region, Random random) {
 		this.region = region;
 		this.random = random;
 	}
