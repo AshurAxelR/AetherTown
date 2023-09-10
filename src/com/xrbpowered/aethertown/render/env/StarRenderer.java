@@ -65,6 +65,9 @@ public class StarRenderer {
 	
 	private StarShader starShader;
 	private StaticMesh stars = null;
+	private long seed = -1L;
+	private StaticMesh otherStars = null;
+	private long otherSeed = -1L;
 	
 	protected final Matrix4f transform = new Matrix4f();
 
@@ -112,12 +115,23 @@ public class StarRenderer {
 		return data;
 	}
 	
-	public void createStars(long seed) {
-		if(stars!=null)
-			stars.release();
-		Random random = new Random(seed);
-		ArrayList<Star> data = StarData.generate(random);
-		stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
+	public void updateStars(long seed) {
+		if(this.seed!=seed) {
+			StaticMesh m = stars;
+			long s = this.seed;
+			stars = otherStars;
+			this.seed = otherSeed;
+			otherStars = m;
+			otherSeed = s;
+		}
+		if(this.seed!=seed) {
+			if(stars!=null)
+				stars.release();
+			this.seed = seed;
+			System.out.printf("Generating stars for *%04d\n", seed%10000L);
+			ArrayList<Star> data = StarData.generate(new Random(seed));
+			stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
+		}
 	}
 	
 	public void render() {

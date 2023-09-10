@@ -25,6 +25,8 @@ public class Region {
 	public LevelInfo[] portals = null;
 	public LevelInfo startLevel = null;
 	
+	public boolean bookmark = false;
+	
 	public Region(RegionCache cache, long seed) {
 		this.cache = cache;
 		this.sizex = cache.mode.sizex;
@@ -102,7 +104,7 @@ public class Region {
 					continue;
 				int countAdj = 0;
 				for(Dir8 d : Dir8.values()) {
-					if(map[x+d.dx][z+d.dz]!=null)
+					if(map[x+d.dx][z+d.dz]!=null && !map[x+d.dx][z+d.dz].terrain.noParks)
 						countAdj++;
 				}
 				if(countAdj>=minAdj && (all || countAdj-minAdj+1>=random.nextInt(6))) {
@@ -164,6 +166,7 @@ public class Region {
 	}
 	
 	private void generate(Random random) {
+		System.out.printf("Generating region... *%04dL (%s)\n", this.seed%10000L, this.cache.mode.formatValue());
 		resetGenerator();
 		cache.mode.coreGenerate(this, random);
 		
@@ -212,5 +215,15 @@ public class Region {
 	
 	public boolean isInside(int x, int z) {
 		return (x>=0 && x<sizex && z>=0 && z<sizez);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Long.hashCode(seed);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return this.seed==((Region) obj).seed; // valid as long as RegionMode is globally the same
 	}
 }

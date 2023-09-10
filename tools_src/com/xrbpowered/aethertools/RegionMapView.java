@@ -209,8 +209,7 @@ public class RegionMapView extends UIElement {
 
 		AetherTown.settings.load();
 		SaveState save = new SaveState();
-		region = new RegionCache(save.regionMode).get(save.getRegionSeed());
-		region.generate();
+		region = new RegionCache(save.regionMode).get(save.regionSeed);
 		
 		active = region.startLevel;
 		showVisited = false;

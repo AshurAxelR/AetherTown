@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.world.region;
 
 import java.security.InvalidParameterException;
+import java.util.Random;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -13,6 +14,7 @@ public class PortalSystem {
 	private static final Dir[] preferredPortalDirs = {Dir.north, Dir.east, Dir.south};
 	
 	public Region otherRegion = null;
+	public LevelInfo otherLevel = null;
 
 	public static class PortalInfo {
 		public int index;
@@ -26,6 +28,7 @@ public class PortalSystem {
 	
 	private int phase = -1;
 	private LevelInfo portal = null;
+	private boolean portalPrimed = false;
 	
 	public PortalSystem(RegionCache regions) {
 		this.regions = regions;
@@ -35,6 +38,10 @@ public class PortalSystem {
 		else
 			throw new InvalidParameterException("Unsupported number of portals: "+n);
 		this.period = n>0 ? 42/n : 0;
+	}
+	
+	public int getPhase() {
+		return phase;
 	}
 	
 	public static LevelInfo findNearestPortal(LevelInfo level) {
@@ -55,12 +62,19 @@ public class PortalSystem {
 	}
 	
 	public void updateOtherRegion() {
-		if(numPortals==0 || portal==null)
+		if(numPortals==0 || portal==null) {
+			otherRegion = null;
+			otherLevel = null;
 			return;
-		System.out.printf("PortalSystem.nearestPortal[%d, %d] (index=%d)\n", portal.x0, portal.z0, portal.portal.index);
+		}
+		System.out.printf("PortalSystem.nearestPortal(%d) at [%d, %d]\n", portal.portal.index, portal.x0, portal.z0);
 		long seed = getOtherSeed(AetherTown.region.seed, portal.portal.index, phase);
-		System.out.printf("otherRegion: %d\n", seed);
-		// TODO update otherRegion
+		System.out.printf("otherRegion: %dL\n", seed);
+		otherRegion = regions.get(seed);
+		otherLevel = otherRegion.portals[portal.portal.otherIndex];
+		portalPrimed = false;
+		
+		AetherTown.levelCache.addAllAdj(AetherTown.levelInfo, false);
 	}
 	
 	public void updateTime() {
@@ -81,6 +95,27 @@ public class PortalSystem {
 		updateOtherRegion();
 	}
 
+	public void updateWalk(int x, int z) {
+		int portalx = portal.getLevelSize()/2;
+		int portalz = portal.getLevelSize()/2;
+		if(portalx==x && portalz==z) {
+			if(!portalPrimed)
+				System.out.println("Portal primed.");
+			portalPrimed = true;
+		}
+		else if(portalPrimed) {
+			int tx = (portalx-x)*portal.portal.d.dx;
+			int tz = (portalz-z)*portal.portal.d.dz;
+			if(tx>0 || tz>0) {
+				System.out.println("Portal triggered.");
+				AetherTown.aether.activatePortal();
+			}
+			else
+				System.out.println("Portal left.");
+			portalPrimed = false;
+		}
+	}
+	
 	public long getOtherSeed(long seed, int index, int phase) {
 		int n = 0;
 		int d = 0;
@@ -103,6 +138,7 @@ public class PortalSystem {
 	}
 	
 	public int getPortalSeed(long seed, int index) {
+		// FIXME 2 and 6 patterns don't work with phase
 		switch(numPortals) {
 			case 2:
 				if(index==0)
@@ -173,6 +209,10 @@ public class PortalSystem {
 		long tri = (getTrigram(seed, n)+d)&7;
 		long mask = ~(7L<<(n*3));
 		return (seed&mask) | (tri<<(n*3));
+	}
+	
+	public static long getRegionSeed(long seed) {
+		return seed<0L ? new Random().nextLong() & 0x7fff_ffff_ffff_ffffL : seed;
 	}
 
 }

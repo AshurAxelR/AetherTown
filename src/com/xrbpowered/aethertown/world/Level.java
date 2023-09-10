@@ -93,8 +93,8 @@ public class Level {
 	}
 
 	public void generate() {
-		System.out.printf("Generating... [%d, %d] %dL\n", info.x0, info.z0, info.seed);
-		Random random = new Random(info.seed);
+		System.out.printf("Generating... *%04dL:[%d, %d] %dL\n", info.region.seed%10000L, info.x0, info.z0, info.seed);
+		Random random = new Random(info.seed); // FIXME Same seed generates different levels regardless of HeightGuide. Why?
 		for(int att = 0; att<maxGeneratorAttempts; att++) {
 			if(att>0)
 				System.out.printf("Retrying...\nAttempt #%d\n", att+1);

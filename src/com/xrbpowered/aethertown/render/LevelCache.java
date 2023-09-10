@@ -2,8 +2,8 @@ package com.xrbpowered.aethertown.render;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 
 import org.joml.Vector3f;
 
@@ -12,6 +12,7 @@ import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
+import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
 import com.xrbpowered.gl.scene.CameraActor;
 
@@ -59,7 +60,7 @@ public class LevelCache {
 		return active.renderer;
 	}
 	
-	public LevelInfo add(LevelInfo info) {
+	public LevelInfo add(LevelInfo info, boolean markVisited) {
 		if(!infoMap.containsKey(info)) {
 			CacheEntry c = new CacheEntry(info);
 			generatorQueue.queueLevel(c);
@@ -70,33 +71,33 @@ public class LevelCache {
 			storage += info.size*info.size;
 			while(storage > storageLimit)
 				expel(getLRU());
-			
-			return info;
 		}
 		else {
-			return infoMap.get(info).info;
+			info = infoMap.get(info).info;
 		}
-	}
-	
-	public void addAll(List<LevelInfo> list) {
-		for(LevelInfo info : list)
-			add(info);
-	}
-	
-	public void addAllAdj(LevelInfo info, boolean markVisited) {
-		// prioritise origin:
-		add(info);
 		if(markVisited)
 			info.visited = true;
+		return info;
+	}
+	
+	public void addAllAdj(LevelInfo info, boolean markVisited, boolean followPortals) {
+		// prioritise origin:
+		add(info, markVisited);
+		if(followPortals && info.isPortal())
+			addAllAdj(info.region.cache.portals.otherLevel, markVisited, false);
 		
 		for(int x=info.x0-1; x<info.x0+info.size+1; x++)
 			for(int z=info.z0-1; z<info.z0+info.size+1; z++) {
 				if(x==info.x0 && z==info.z0)
 					continue;
-				LevelInfo level = add(info.region.getLevel(x, z));
-				if(markVisited)
-					level.visited = true;
+				LevelInfo level = add(info.region.getLevel(x, z), markVisited);
+				if(followPortals && level.isPortal())
+					add(info.region.cache.portals.otherLevel, markVisited);
 			}
+	}
+
+	public void addAllAdj(LevelInfo info, boolean markVisited) {
+		addAllAdj(info, markVisited, true);
 	}
 
 	public LevelInfo getLRU() {
@@ -167,9 +168,16 @@ public class LevelCache {
 		};
 	}
 	
-	public Level findHover(float x, float z) {
-		for (CacheEntry c : list) {
-			if(c.level==null || c.renderer==null) // FIXME call findHover again on renderer change
+	public HashSet<Region> regionsInUse() {
+		HashSet<Region> set = new HashSet<>();
+		for (CacheEntry c : list)
+			set.add(c.info.region);
+		return set;
+	}
+	
+	public Level findHover(Region region, float x, float z) {
+		for(CacheEntry c : list) {
+			if(c.level==null || c.renderer==null || c.info.region!=region) // FIXME call findHover again on renderer change
 				continue;
 			if(Level.hoverInside(c.level.levelSize, x - c.renderer.levelOffset.x, z - c.renderer.levelOffset.y))
 				return c.level;
@@ -211,12 +219,12 @@ public class LevelCache {
 
 	private ArrayList<LevelRenderer> renderQueue = new ArrayList<>();
 	
-	public void renderAll(RenderTarget target, CameraActor.Perspective camera) {
+	public void renderAll(RenderTarget target, CameraActor.Perspective camera, Region region) {
 		long time = System.currentTimeMillis();
 		renderedLevels = 0;
 		renderQueue.clear();
 		for(CacheEntry c : list) {
-			if(c.renderer==null)
+			if(c.renderer==null || c.info.region!=region)
 				continue;
 			if(c.renderer.levelDist(camera.position.x, camera.position.z) > camera.getFar()) {
 				if(c.lastRenderTime<0L)

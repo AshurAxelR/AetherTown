@@ -22,6 +22,7 @@ import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.region.PortalSystem;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
@@ -75,6 +76,7 @@ public class AetherTown extends UIClient {
 		
 		public RegionMode regionMode = RegionMode.defaultMode;
 		public long regionSeed = -1L;
+		public boolean revealRegion = false;
 		public boolean nosave = false;
 		
 		public ClientConfig() {
@@ -245,7 +247,7 @@ public class AetherTown extends UIClient {
 				if(levelCache.isMissingRenderers())
 					levelCache.createRenderers(sky.buffer, tiles);
 				sky.render(target, levelCache.activeLevelRenderer());
-				levelCache.renderAll(target, (Perspective)camera);
+				levelCache.renderAll(target, (Perspective)camera, region);
 				
 				if(showPointer) {
 					tiles.objShader.setLevel(levelCache.activeLevelRenderer());
@@ -323,7 +325,7 @@ public class AetherTown extends UIClient {
 		uiLookInfo.setVisible(false);
 		
 		uiBookmarks = new BookmarkPane(uiRoot);
-		uiBookmarks.restoreBookmarks(save, region);
+		uiBookmarks.restoreBookmarks(save, regionCache);
 		uiBookmarks.setVisible(false);
 		
 		uiLevelMap = new UIPane(getContainer(), true) {
@@ -349,6 +351,7 @@ public class AetherTown extends UIClient {
 				}
 			}
 		};
+		RegionMapView.showVisited = !settings.revealRegion;
 		uiRegionMapView = new RegionMapView(uiRegionMap);
 		uiRegionMapView.bookmarks = uiBookmarks;
 		uiRegionMap.setVisible(false);
@@ -396,6 +399,9 @@ public class AetherTown extends UIClient {
 			camera.position.y = pointActor.position.y+pawnHeight;
 			camera.updateTransform();
 		}
+		
+		if(levelInfo.isPortal())
+			regionCache.portals.updateWalk(hoverx, hoverz);
 	}
 	
 	private void updateEnvironment() {
@@ -415,7 +421,20 @@ public class AetherTown extends UIClient {
 		updateWalkY();
 	}
 	
+	public void activatePortal() {
+		if(levelInfo.isPortal()) {
+			LevelInfo other = regionCache.portals.otherLevel;
+			activateLevel(other);
+		}
+	}
+	
 	private void activateLevel(LevelInfo info) {
+		if(region!=info.region) {
+			region = info.region;
+			RegionMapView.region = region;
+			sky.stars.updateStars(region.seed);
+			System.out.printf("\nREGION switched to *%04dL\n\n", region.seed%10000L);
+		}
 		levelCache.addAllAdj(info, true);
 		level = levelCache.setActive(info, true);
 		levelInfo = info;
@@ -426,7 +445,7 @@ public class AetherTown extends UIClient {
 		RegionMapView.active = info;
 		info.visited = true;
 		
-		System.out.printf("Level switched to [%d, %d]\n", info.x0, info.z0);
+		System.out.printf("Level switched to *%04dL:[%d, %d]\n", info.region.seed%10000L, info.x0, info.z0);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
 		
 		if(uiBookmarks.isVisible())
@@ -434,14 +453,14 @@ public class AetherTown extends UIClient {
 	}
 	
 	private void checkLevelChange() {
-		Level l = levelCache.findHover(camera.position.x, camera.position.z);
+		Level l = levelCache.findHover(region, camera.position.x, camera.position.z);
 		if(l==null || l==level)
 			return;
 		LevelCache.adjustCameraPosition(level.info, l.info, camera.position);
 		camera.updateTransform();
 		activateLevel(l.info);
 	}
-	
+
 	private void changeRegion(SaveState save) {
 		// FIXME may not work with multiple regions in levelCache
 		LevelInfo info = save.getLevel(region);
@@ -454,7 +473,7 @@ public class AetherTown extends UIClient {
 		RegionMapView.active = info;
 		info.visited = true;
 
-		sky.stars.createStars(region.seed);
+		sky.stars.updateStars(region.seed);
 		// levelCache.createRenderers(sky.buffer, tiles);
 
 		WorldTime.setTime(save.startSeason, save.day, save.time);
@@ -599,6 +618,9 @@ public class AetherTown extends UIClient {
 			case KeyEvent.VK_ESCAPE:
 				requestExit();
 				break;
+			case KeyEvent.VK_BACK_SPACE:
+				activatePortal();
+				break;
 			case KeyEvent.VK_TAB:
 				autoWalk = false;
 				if(controllerEnabled)
@@ -661,11 +683,10 @@ public class AetherTown extends UIClient {
 	}
 	
 	public static void generateRegion(SaveState save) {
-		long seed = save.getRegionSeed();
+		long seed = PortalSystem.getRegionSeed(save.regionSeed);
 		System.out.printf("Region seed: %dL\n", seed);
 		regionCache = new RegionCache(save.regionMode);
 		region = regionCache.get(seed);
-		region.generate();
 		save.assignVisited(region);
 		
 		levelCache = new LevelCache();

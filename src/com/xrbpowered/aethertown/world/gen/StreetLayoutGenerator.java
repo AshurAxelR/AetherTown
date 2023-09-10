@@ -18,7 +18,6 @@ import com.xrbpowered.aethertown.world.gen.plot.StreetPresetGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Bench;
-import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class StreetLayoutGenerator extends TokenGenerator {
@@ -38,10 +37,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		if(info.terrain.noParks) {
 			this.startToken = startToken;
 			Street.template.forceGenerate(startToken, random);
-			if(info.isPortal()) {
-				Monument.template.forceGenerate(startToken.next(info.portal.d.cw(), 0), random);
-				Monument.template.forceGenerate(startToken.next(info.portal.d.ccw(), 0), random);
-			}
+			if(info.isPortal())
+				new PortalZoneGenerator().generate(startToken, random);
 			return true;
 		}
 		clearTokens();

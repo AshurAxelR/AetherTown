@@ -162,7 +162,7 @@ public class HeightMapView extends UIElement {
 					((int)y/tileSize+offsZ)/LevelInfo.baseSize
 				);
 			System.out.printf("Selected: [%d, %d]\n", level.x0, level.z0);
-			AetherTown.levelCache.addAllAdj(level, false);
+			AetherTown.levelCache.addAllAdj(level, false, false);
 			AetherTown.levelCache.setActive(level, true);
 			repaint();
 			return true;

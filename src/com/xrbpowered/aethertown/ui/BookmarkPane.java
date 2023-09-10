@@ -4,12 +4,11 @@ import static com.xrbpowered.aethertown.ui.ClickButton.*;
 
 import java.awt.Color;
 
-import org.joml.Vector2i;
-
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.SaveState;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
-import com.xrbpowered.aethertown.world.region.Region;
+import com.xrbpowered.aethertown.world.region.RegionCache;
+import com.xrbpowered.aethertown.world.region.UniversalLevelInfo;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
@@ -71,6 +70,7 @@ public class BookmarkPane extends UIPane {
 			@Override
 			public void onAction() {
 				bookmarks[selected] = null;
+				AetherTown.regionCache.verifyBookmarks(bookmarks);
 				updateSelection();
 			}
 		};
@@ -81,6 +81,7 @@ public class BookmarkPane extends UIPane {
 			@Override
 			public void onAction() {
 				bookmarks[selected] = AetherTown.level.info;
+				AetherTown.regionCache.verifyBookmarks(bookmarks);
 				updateSelection();
 			}
 		};
@@ -149,21 +150,23 @@ public class BookmarkPane extends UIPane {
 			else {
 				for(int j=0; j<nulls; j++)
 					save.bookmarks.add(null);
-				save.bookmarks.add(new Vector2i(level.x0, level.z0));
+				save.bookmarks.add(new UniversalLevelInfo(level));
 				nulls = 0;
 			}
 		}
 	}
 	
-	public void restoreBookmarks(SaveState save, Region region) {
+	public void restoreBookmarks(SaveState save, RegionCache regions) {
 		for(int i=0; i<numBookmarks; i++)
 			bookmarks[i] = null;
 		int i = 0;
-		for(Vector2i v : save.bookmarks) {
-			if(v!=null && i<numBookmarks)
-				bookmarks[i] = region.map[v.x][v.y];
+		for(UniversalLevelInfo v : save.bookmarks) {
+			if(v!=null && i<numBookmarks) {
+				bookmarks[i] = v.find(regions);
+			}
 			i++;
 		}
+		regions.verifyBookmarks(bookmarks);
 	}
 	
 }

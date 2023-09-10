@@ -2,12 +2,11 @@ package com.xrbpowered.aethertown;
 
 import java.util.LinkedList;
 
-import org.joml.Vector2i;
-
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionMode;
+import com.xrbpowered.aethertown.world.region.UniversalLevelInfo;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class SaveState extends AbstractConfig {
@@ -27,8 +26,9 @@ public class SaveState extends AbstractConfig {
 	public float cameraLookX = 0f;
 	public float cameraLookY = 0f;
 
-	public LinkedList<Vector2i> bookmarks = new LinkedList<Vector2i>();
-	public LinkedList<Vector2i> visited = new LinkedList<Vector2i>();
+	// FIXME bookmarks and visited are not compatible with inter-region travel
+	public LinkedList<UniversalLevelInfo> bookmarks = new LinkedList<UniversalLevelInfo>();
+	public LinkedList<UniversalLevelInfo> visited = new LinkedList<UniversalLevelInfo>();
 	
 	public SaveState() {
 		super("./save.cfg");
@@ -40,21 +40,21 @@ public class SaveState extends AbstractConfig {
 			for(int z=0; z<region.sizez; z++) {
 				LevelInfo level = region.map[x][z];
 				if(level!=null && level.visited)
-					visited.add(new Vector2i(level.x0, level.z0));
+					visited.add(new UniversalLevelInfo(level));
 			}
 	}
 	
 	public void assignVisited(Region region) {
-		for(Vector2i v : visited) {
-			if(!region.isInside(v.x, v.y))
+		for(UniversalLevelInfo v : visited) {
+			if(v.regionSeed!=region.seed || !region.isInside(v.x, v.z))
 				continue;
-			LevelInfo level = region.map[v.x][v.y];
+			LevelInfo level = region.map[v.x][v.z];
 			if(level!=null)
 				level.visited = true;
 		}
 	}
 	
-	private static Object parsePointList(String value, LinkedList<Vector2i> list, boolean allowNulls) {
+	private static Object parseLevelList(String value, LinkedList<UniversalLevelInfo> list, boolean allowNulls) {
 		list.clear();
 		if(value.isEmpty())
 			return list;
@@ -64,29 +64,22 @@ public class SaveState extends AbstractConfig {
 				list.add(null);
 				continue;
 			}
-			String[] xz = v.split(",");
-			if(xz.length!=2)
+			UniversalLevelInfo level = UniversalLevelInfo.parseValue(v);
+			if(level==null)
 				return null;
-			try {
-				int x = Integer.parseInt(xz[0]);
-				int z = Integer.parseInt(xz[1]);
-				list.add(new Vector2i(x, z));
-			}
-			catch (NumberFormatException e) {
-				return null;
-			}
+			list.add(level);
 		}
 		return list;
 	}
 
-	private static String formatPointList(LinkedList<Vector2i> list) {
+	private static String formatLevelList(LinkedList<UniversalLevelInfo> list) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
-		for(Vector2i v : list) {
+		for(UniversalLevelInfo v : list) {
 			if(!first) sb.append(";");
 			first = false;
 			if(v!=null)
-				sb.append(String.format("%d,%d", v.x, v.y));
+				sb.append(v.format());
 		}
 		return sb.toString();
 	}
@@ -96,9 +89,9 @@ public class SaveState extends AbstractConfig {
 		if(name.equals("time"))
 			return WorldTime.parseTime(value);
 		else if(name.equals("bookmarks"))
-			return parsePointList(value, bookmarks, true);
+			return parseLevelList(value, bookmarks, true);
 		else if(name.equals("visited"))
-			return parsePointList(value, visited, false);
+			return parseLevelList(value, visited, false);
 		else if(name.equals("regionMode"))
 			return RegionMode.parseValue(value);
 		else
@@ -110,17 +103,13 @@ public class SaveState extends AbstractConfig {
 		if(name.equals("time"))
 			return WorldTime.getFormattedTime((Float) obj);
 		else if(name.equals("bookmarks"))
-			return formatPointList(bookmarks);
+			return formatLevelList(bookmarks);
 		else if(name.equals("visited"))
-			return formatPointList(visited);
+			return formatLevelList(visited);
 		else if(name.equals("regionMode"))
 			return ((RegionMode) obj).formatValue();
 		else
 			return super.formatValue(name, obj);
-	}
-	
-	public long getRegionSeed() {
-		return regionSeed>=0L ? regionSeed : System.currentTimeMillis();
 	}
 	
 	public LevelInfo getLevel(Region region) {
