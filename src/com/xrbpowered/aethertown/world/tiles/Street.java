@@ -164,7 +164,7 @@ public class Street extends TileTemplate {
 	
 	public void addLamp(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
-		if(!tile.level.isInside(tile.x, tile.z, 5) || tile.level.info.isPortal() && tile.level.isInside(tile.x, tile.z, tile.level.levelSize/2-5)) {
+		if(!tile.level.isInside(tile.x, tile.z, 5) || tile.level.info.isPortal() && tile.level.isInside(tile.x, tile.z, tile.level.levelSize/2-10)) {
 			tile.lamp = false;
 			return;
 		}

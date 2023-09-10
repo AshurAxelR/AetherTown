@@ -15,9 +15,11 @@ in float ins_Size;
 
 out vec4 pass_Position;
 out vec2 pass_TexCoord;
+out vec4 pass_LevelPosition;
 
 void main(void) {
-	pass_Position = viewMatrix * (vec4(ins_Position, 1) + vec4(levelOffset.x, 0, levelOffset.y, 0));
+	pass_LevelPosition = vec4(ins_Position, 1);
+	pass_Position = viewMatrix * (pass_LevelPosition+ vec4(levelOffset.x, 0, levelOffset.y, 0));
 	gl_Position = projectionMatrix * pass_Position;
 	vec2 pos = -in_Position*ins_Size*fovFactor;
 	pos.x *= invAspectRatio;
