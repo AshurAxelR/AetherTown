@@ -164,18 +164,36 @@ public class Street extends TileTemplate {
 	
 	public void addLamp(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
-		if(!tile.level.isInside(tile.x, tile.z, 5) || tile.level.info.isPortal() && tile.level.isInside(tile.x, tile.z, tile.level.levelSize/2-10)) {
+		if(!tile.level.isInside(tile.x, tile.z, 4) || tile.level.info.isPortal()) {
 			tile.lamp = false;
+			if(tile.x==1) {
+				tile.lampd = Dir.north;
+				tile.lamp = true;
+			}
+			else if(tile.x==tile.level.levelSize-2) {
+				tile.lampd = Dir.south;
+				tile.lamp = true;
+			}
+			else if(tile.z==1) {
+				tile.lampd = Dir.east;
+				tile.lamp = true;
+			}
+			else if(tile.z==tile.level.levelSize-2) {
+				tile.lampd = Dir.west;
+				tile.lamp = true;
+			}
 			return;
 		}
-		boolean hasLamp = tile.lamp || random.nextInt(4)==0;
+		boolean hasLamp = tile.lamp || (tile.x+tile.z)%5==0;
 		if(!hasLamp) {
 			for(Dir d : Dir.values()) {
 				TileTemplate adjt = tile.getAdjT(d);
-				if(adjt==HouseT.template) {
+				if(adjt==HouseT.template)
 					hasLamp = random.nextInt(4)>0;
+				else if(adjt instanceof StreetSlope && ((StreetSlope) adjt).h>1)
+					hasLamp = true;
+				if(hasLamp)
 					break;
-				}
 			}
 		}
 		if(hasLamp) {

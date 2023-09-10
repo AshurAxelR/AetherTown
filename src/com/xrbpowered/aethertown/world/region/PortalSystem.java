@@ -61,6 +61,10 @@ public class PortalSystem {
 		return p;
 	}
 	
+	private int calcPhase() {
+		return period<1 ? 0 : WorldTime.getDayOfYear() % period;
+	}
+	
 	public void updateOtherRegion() {
 		if(numPortals==0 || portal==null) {
 			otherRegion = null;
@@ -78,7 +82,7 @@ public class PortalSystem {
 	}
 	
 	public void updateTime() {
-		int ph = WorldTime.getDayOfYear() % period;
+		int ph = calcPhase();
 		if(ph==phase)
 			return;
 		phase = ph;
@@ -91,7 +95,7 @@ public class PortalSystem {
 		if(p==portal)
 			return;
 		portal = p;
-		phase = WorldTime.getDayOfYear() % period;
+		phase = calcPhase();
 		updateOtherRegion();
 	}
 
