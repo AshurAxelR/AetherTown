@@ -275,9 +275,10 @@ public class StreetGenerator implements Generator, TokenProvider {
 			t = t.next(d, dylist[i]);
 			
 			TileTemplate temp = (dylist[i]==0) ? Street.template : slope;
-			StreetTile tile = (StreetTile) temp.forceGenerate(ts);
-			if(absdy>1 && dylist[i]==0)
-				tile.lamp = true;
+			temp.forceGenerate(ts);
+			//StreetTile tile = (StreetTile) temp.forceGenerate(ts);
+			//if(absdy>1 && dylist[i]==0)
+			//	tile.lamp = true;
 		}
 		endToken = t;
 		return tlist;

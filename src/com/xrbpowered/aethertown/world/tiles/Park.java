@@ -100,7 +100,6 @@ public class Park extends TileTemplate {
 		TerrainTile.addTrees((ParkTile) tile, random);
 		if(!isFlex(tile))
 			FenceGenerator.addHandrails(tile);
-		// TODO fill handrail gaps (for hills too)
 	}
 	
 	@Override

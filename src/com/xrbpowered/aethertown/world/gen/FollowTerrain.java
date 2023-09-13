@@ -10,6 +10,8 @@ import java.util.Iterator;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
@@ -150,17 +152,15 @@ public class FollowTerrain {
 	
 	private static int cost(int g, int y, int dy) {
 		int h = abs(dy);
-		if(h==0 && y>g+6)
-			return (y-g-6)/2;
+		if(h==0 && y>g+7)
+			return y-g-5;
 		int ymin = min(y, y+dy);
 		int ymax = max(y, y+dy);
 		int R = g>ymax+1 ? g-ymax-1 : g<ymin ? ymin-g : 0;
 		if(h>1) {
-			R *= 2;
+			R = R*2+1;
 			h = 6;
 		}
-		if(h>0)
-			R += 1;
 		return R*R + h;
 	}
 
@@ -182,7 +182,7 @@ public class FollowTerrain {
 	private DYOption[] getOptions(Head e) {
 		if(e.dy==0)
 			return useYDir ? getOptions(e, 0, e.ydir, e.ydir*2, e.ydir*4) : getOptions(e, 0, 1, -1, 2, -2, 4, -4);
-		else if(e.contSlope<2 || abs(e.dy)==1)
+		else if(e.contSlope<3 || abs(e.dy)==1)
 			return getOptions(e, 0, e.dy);
 		else
 			return getOptions(e, 0);
@@ -228,7 +228,7 @@ public class FollowTerrain {
 			return null; // must be multiple of 4
 		
 		int h = e.y>s.y ? 4 : -4;
-		DYOption[] optS = alldy>0 && (s.dy==0 || s.dy==h) ? (e.contSlope<=2 ? getOptions(s, h, 0) : getOptions(s, 0, h)) : getOptions(s, 0);
+		DYOption[] optS = alldy>0 && (s.dy==0 || s.dy==h) ? (e.contSlope<=3 ? getOptions(s, h, 0) : getOptions(s, 0, h)) : getOptions(s, 0);
 		
 		Result min = null;
 		DYOption sel = null;
@@ -342,6 +342,8 @@ public class FollowTerrain {
 		Result rs = fs.compute();
 		Result re = fe.compute();
 		iterations += fs.iterations + fe.iterations;
+		if(rs==null || re==null)
+			return null;
 		Result res = new Result(rs, mx, my, re);
 		res.cost = rs.cost + re.cost + calcCost(mx, my, 0) + calcCost(mx+1, my, 0);
 		return res;
@@ -370,10 +372,23 @@ public class FollowTerrain {
 		}
 	}
 	
-	public void apply(Result res) {
+	public void apply(Result res, Level level) {
 		if(res==null)
 			return;
-		// TODO apply follow-terrain
+		Dir d = streetDir;
+		Token t = new Token(level, anchorX+d.dx, starty, anchorZ+d.dz, d);
+		for(int i=0; i<=res.y.length; i++) {
+			Token ts = t;
+			int dy = (i<res.y.length ? res.y[i] : endy) - t.y;
+			if(dy>0)
+				ts = new Token(level, ts.x, ts.y+dy, ts.z, d.flip());
+			t = t.next(d, dy);
+			
+			TileTemplate temp = StreetSlope.getTemplate(abs(dy));
+			temp.forceGenerate(ts);
+			//if(absdy>1 && dy==0)
+			//	tile.lamp = true;
+		}
 	}
 	
 	public void print(PrintStream out) {
@@ -409,7 +424,7 @@ public class FollowTerrain {
 		int startdy = 0;
 		if(tileS.t instanceof StreetSlope) {
 			startdy = -((StreetSlope) tileS.t).h;
-			if(tileS.d!=d) {
+			if(tileS.d!=d.flip()) {
 				startdy = -startdy;
 				starty -= startdy;
 			}
@@ -420,7 +435,7 @@ public class FollowTerrain {
 		int enddy = 0;
 		if(tileE.t instanceof StreetSlope) {
 			enddy = -((StreetSlope) tileE.t).h;
-			if(tileE.d!=d.flip()) {
+			if(tileE.d!=d) {
 				enddy = -enddy;
 				endy -= enddy;
 			}
@@ -456,7 +471,7 @@ public class FollowTerrain {
 	}
 	
 	private static boolean isStreet(Level level, Tile tile, Dir d) {
-		if(tile==null)
+		if(tile==null || !level.isInside(tile.x, tile.z, 2))
 			return false;
 		if(tile.t!=Street.template && !(tile.t instanceof StreetSlope) || tile.sub!=null)
 			return false;
