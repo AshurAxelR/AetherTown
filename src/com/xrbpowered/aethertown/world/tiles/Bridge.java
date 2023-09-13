@@ -41,7 +41,7 @@ public class Bridge extends TileTemplate {
 		return t.level.isInside(t.x, t.z); // TODO check under
 	}
 	
-	public Tile forceGenerate(Token t, Random random) {
+	public Tile forceGenerate(Token t) {
 		Tile under = t.level.map[t.x][t.z];
 		BridgeTile tile = (BridgeTile) createTile();
 		if(under==null) {

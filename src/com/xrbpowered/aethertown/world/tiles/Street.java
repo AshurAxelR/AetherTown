@@ -263,7 +263,7 @@ public class Street extends TileTemplate {
 		if(res==1) {
 			if(park!=null) {
 				if(park.sub==null) {
-					Bench.templatePlaza.forceGenerate(Token.forTile(park), random);
+					Bench.templatePlaza.forceGenerate(Token.forTile(park));
 					return 0;
 				}
 				else if(park.sub.parent instanceof LargeParkGenerator) {

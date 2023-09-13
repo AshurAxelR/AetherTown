@@ -154,7 +154,7 @@ public abstract class PresetPlotGenerator extends PlotGenerator {
 	@Override
 	protected Tile placeAt(Token t, int i, int j, Random random) {
 		TileTemplate temp = sett(ti(i, j), tj(i, j));
-		return temp.forceGenerate(t, random).makeSub(this, i, j);
+		return temp.forceGenerate(t).makeSub(this, i, j);
 	}
 
 }

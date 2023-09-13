@@ -45,7 +45,7 @@ public class ChurchGenerator extends HouseGeneratorBase {
 			HeightLimiter.updateAt(t, HeightLimiter.maxWall, 2, 3);
 			return tile;
 		}
-		return temp.forceGenerate(t, random).makeSub(this, i, j);
+		return temp.forceGenerate(t).makeSub(this, i, j);
 	}
 	
 	private static String selectName(Level level, Random random) {

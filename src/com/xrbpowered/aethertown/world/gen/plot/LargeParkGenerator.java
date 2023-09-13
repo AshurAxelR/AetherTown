@@ -53,7 +53,7 @@ public class LargeParkGenerator extends PlotGenerator {
 			temp = Bench.templatePlaza;
 		else
 			temp = Plaza.template;
-		return temp.forceGenerate(t, random).makeSub(this, i, j);
+		return temp.forceGenerate(t).makeSub(this, i, j);
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.world.gen;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -36,7 +37,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		LevelInfo info = startToken.level.info;
 		if(info.terrain.noParks) {
 			this.startToken = startToken;
-			Street.template.forceGenerate(startToken, random);
+			Street.template.forceGenerate(startToken);
 			if(info.isPortal())
 				new PortalZoneGenerator().generate(startToken, random);
 			return true;
@@ -153,5 +154,19 @@ public class StreetLayoutGenerator extends TokenGenerator {
 			reconnectStreets(level, random, true);
 		}
 		level.heightLimiter.revalidate();
+	}
+	
+	public static void followTerrain(Level level) {
+		ArrayList<FollowTerrain> fts = FollowTerrain.findStreets(level);
+		/*try {
+			PrintStream out = new PrintStream(String.format("fts_%d_%d.txt", level.info.x0, level.info.z0));
+			for(FollowTerrain ft : fts)
+				ft.print(out);
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		}*/
+		for(FollowTerrain ft : fts)
+			ft.apply(ft.compute());
 	}
 }

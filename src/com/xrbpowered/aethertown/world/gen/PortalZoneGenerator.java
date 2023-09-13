@@ -19,20 +19,20 @@ public class PortalZoneGenerator implements Generator {
 		for(Dir d : Dir.values()) {
 			if(d==d0 || d==d0.flip()) {
 				for(int i=1; i<=radius; i++)
-					Street.template.forceGenerate(new Token(t.level, t.x+i*d.dx, t.y, t.z+i*d.dz, d), random);
+					Street.template.forceGenerate(new Token(t.level, t.x+i*d.dx, t.y, t.z+i*d.dz, d));
 			}
 			else {
-				Monument.template.forceGenerate(t.next(d, 0), random);
+				Monument.template.forceGenerate(t.next(d, 0));
 				for(int i=2; i<=radius; i++)
-					Plaza.template.forceGenerate(new Token(t.level, t.x+i*d.dx, t.y, t.z+i*d.dz, d), random);
+					Plaza.template.forceGenerate(new Token(t.level, t.x+i*d.dx, t.y, t.z+i*d.dz, d));
 			}
 		}
 		for(int i=1; i<=radius; i++)
 			for(int j=1; j<=radius; j++) {
-				Plaza.template.forceGenerate(new Token(t.level, t.x+i, t.y, t.z+j, Dir.east), random);
-				Plaza.template.forceGenerate(new Token(t.level, t.x+i, t.y, t.z-j, Dir.east), random);
-				Plaza.template.forceGenerate(new Token(t.level, t.x-i, t.y, t.z+j, Dir.west), random);
-				Plaza.template.forceGenerate(new Token(t.level, t.x-i, t.y, t.z-j, Dir.west), random);
+				Plaza.template.forceGenerate(new Token(t.level, t.x+i, t.y, t.z+j, Dir.east));
+				Plaza.template.forceGenerate(new Token(t.level, t.x+i, t.y, t.z-j, Dir.east));
+				Plaza.template.forceGenerate(new Token(t.level, t.x-i, t.y, t.z+j, Dir.west));
+				Plaza.template.forceGenerate(new Token(t.level, t.x-i, t.y, t.z-j, Dir.west));
 			}
 		return false;
 	}

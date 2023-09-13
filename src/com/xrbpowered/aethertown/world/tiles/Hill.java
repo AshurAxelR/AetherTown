@@ -119,7 +119,7 @@ public class Hill extends TileTemplate {
 			}
 		}
 		if(adjDir!=null && countUp>1) {
-			gen.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()), random);
+			gen.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()));
 			return true;
 		}
 		else

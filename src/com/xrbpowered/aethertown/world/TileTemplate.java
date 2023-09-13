@@ -94,14 +94,14 @@ public abstract class TileTemplate implements Generator {
 	@Override
 	public boolean generate(Token t, Random random) {
 		if(canGenerate(t)) {
-			forceGenerate(t, random);
+			forceGenerate(t);
 			return true;
 		}
 		else
 			return false;
 	}
 
-	public Tile forceGenerate(Token t, Random random) {
+	public Tile forceGenerate(Token t) {
 		Tile tile = createTile();
 		tile.place(t);
 		updateHeightLimit(t);

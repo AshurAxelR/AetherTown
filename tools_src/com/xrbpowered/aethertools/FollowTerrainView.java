@@ -2,14 +2,16 @@ package com.xrbpowered.aethertools;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.util.ArrayList;
 
+import com.xrbpowered.aethertown.world.gen.FollowTerrain;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.base.UIZoomView;
 import com.xrbpowered.zoomui.swing.SwingFrame;
 import com.xrbpowered.zoomui.swing.SwingWindowFactory;
 
-public class FollowTerrainTest extends UIContainer {
+public class FollowTerrainView extends UIContainer {
 
 	private static final int tilex = 64;
 	private static final int tiley = 8;
@@ -18,6 +20,12 @@ public class FollowTerrainTest extends UIContainer {
 	private static final Color tooltipColor = new Color(0xfafafa);
 	private static final Color tooltipBorderColor = new Color(0xeeeeee);
 	
+	private static final Color guideColor = new Color(0x77dd33);
+	private static final Color edgeColor = new Color(0x555555);
+	private static final Color resColor = new Color(0xdd0000);
+	private static final Color joinColor = new Color(0xffaaaa);
+	// private static final Color debugColor = new Color(0xeeeeee);
+
 	public static class LineData {
 		public int offs;
 		public int[] y;
@@ -52,36 +60,44 @@ public class FollowTerrainTest extends UIContainer {
 	}
 	
 	private LineData guide;
-	private LineData res = null;
+	private ArrayList<LineData> lines = new ArrayList<>();
 	private LineData start = null;
 	private LineData end = null;
 	
-	private static final int[] g = {0, 1, 0, -2, -3, 2, 4, 6, 5, 3, 1, 0, 2, 7, 8, 9};
-	//private static final int[] g = {0, 1, 0, -12, -13, -3, 2, 4, 6, 5};
-	//private static final int[] g = {0, 1, 0, 2, 5};
-	//private static final int[] g = {0};
-	private static final int sy = 0;
-	private static final int sdy =0;
-	private static final int ey = 12;
-	private static final int edy = 0;
+	// private static final int sy=0, sdy=0, ey = 4, edy = 0;
+	// private static final int[] g = {0, 1, 0, -2, -3, 2, 4, 6, 5, 8, 10, 9, -2, -7, -5, -5, -3, 5, 7, 8, 10, 10, 11, 10, 12, 14, 13};
+	private static final int sy=29, sdy=0, ey=32, edy=0;
+	private static final int[] g = {30, 31, 33, 33, 30, 30, 32, 34, 34};
 	
-	public FollowTerrainTest(UIContainer parent) {
+	private void createLines(FollowTerrain.Result r) {
+		if(r.subS!=null && r.subE!=null) {
+			lines.add(new LineData(r.subE.x-3, new int[] {r.subS.y[r.subS.y.length-1], r.my, r.my, r.subE.y[0]}, joinColor));
+			createLines(r.subS);
+			createLines(r.subE);
+		}
+		else {
+			lines.add(new LineData(r.x, r.y, resColor));
+		}
+	}
+	
+	public FollowTerrainView(UIContainer parent) {
 		super(new UIZoomView(parent) {
 			@Override
 			protected void paintSelf(GraphAssist g) {
 				g.fill(this, Color.WHITE);
 			}
 		});
-		guide = new LineData(0, g, new Color(0x77dd33));
-		FollowTerrain ft = new FollowTerrain(true, sy, sdy, ey, edy, g);
+		guide = new LineData(0, g, guideColor);
+		FollowTerrain ft = new FollowTerrain(sy, sdy, ey, edy, g); // .useDir(false);
 		FollowTerrain.Result r = ft.compute();
-		Color edgeColor = new Color(0x555555);
 		if(r!=null) {
-			res = new LineData(0, r.y, new Color(0xdd0000));
+			System.out.printf("Computed in %d iterations, cost=%d\n", ft.iterations, r.cost);
+			createLines(r);
 			start = new LineData(-2, new int[] {sy-sdy, sy, r.y[0]}, edgeColor);
-			end = new LineData(r.y.length-1, new int[] {r.y[r.y.length-1], ey, ey+edy}, edgeColor);
+			end = new LineData(g.length-1, new int[] {r.y[r.y.length-1], ey, ey+edy}, edgeColor);
 		}
 		else {
+			System.out.printf("No solution in %d iterations\n", ft.iterations);
 			start = new LineData(-2, new int[] {sy-sdy, sy}, edgeColor);
 			end = new LineData(g.length, new int[] {ey, ey+edy}, edgeColor);
 		}
@@ -99,13 +115,13 @@ public class FollowTerrainTest extends UIContainer {
 			start.paint(g);
 		if(end!=null)
 			end.paint(g);
-		if(res!=null)
-			res.paint(g);
+		for(LineData line : lines)
+			line.paint(g);
 	}
 	
 	public static void main(String[] args) {
-		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("FollowTerrainTest", 1200, 800);
-		new FollowTerrainTest(frame.getContainer());
+		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("FollowTerrain", 1200, 800);
+		new FollowTerrainView(frame.getContainer());
 		frame.show();
 		// frame.maximize();
 	}

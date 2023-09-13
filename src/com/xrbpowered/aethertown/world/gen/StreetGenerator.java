@@ -275,7 +275,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 			t = t.next(d, dylist[i]);
 			
 			TileTemplate temp = (dylist[i]==0) ? Street.template : slope;
-			StreetTile tile = (StreetTile) temp.forceGenerate(ts, random);
+			StreetTile tile = (StreetTile) temp.forceGenerate(ts);
 			if(absdy>1 && dylist[i]==0)
 				tile.lamp = true;
 		}
@@ -321,7 +321,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 			generateSide(dleft, tlist, sidew, random);
 		}
 		if(endToken.isFree()) {
-			StreetTile tile = (StreetTile) Street.template.forceGenerate(endToken, random);
+			StreetTile tile = (StreetTile) Street.template.forceGenerate(endToken);
 			tile.lamp = true;
 		}
 		return tlist;

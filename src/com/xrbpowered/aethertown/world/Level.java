@@ -115,7 +115,9 @@ public class Level {
 		resetGenerator();
 		
 		Token startToken = new Token(this, getStartX(), info.terrain.starty, getStartZ(), Dir.north);
+		boolean genStreets = false;
 		if(info.settlement.maxHouses>0 || !info.conns.isEmpty()) {
+			genStreets = true;
 			StreetLayoutGenerator gen = new StreetLayoutGenerator(info.settlement.maxHouses);
 			gen.generate(startToken, random);
 			startx = gen.startToken.x;
@@ -138,6 +140,14 @@ public class Level {
 				System.err.println("Failed to get refill tokens on att "+att);
 				break;
 			}
+			
+			if(genStreets) {
+				genStreets = false;
+				h.calculate(true);
+				StreetLayoutGenerator.followTerrain(this);
+				heightLimiter.revalidate();
+			}
+			
 			if(finalizeTiles(random))
 				break;
 			if(att>=maxRefillAttempts-1) {
