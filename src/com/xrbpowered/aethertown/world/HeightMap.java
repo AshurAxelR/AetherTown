@@ -54,55 +54,85 @@ public class HeightMap {
 		return yloc;
 	}
 	
-	private static int calcy(Level level, int x, int z) {
-		int max = 0;
-		boolean first = true;
-		int minf = 0;
-		int maxFix = 0;
-		for(Corner c : Corner.values()) {
-			int fix, y;
-			int cx = x+c.tx;
-			int cz = z+c.tz;
-			
-			if(level.isInside(cx, cz)) {
-				Tile t = level.map[cx][cz];
-				if(t==null)
-					continue;
-				fix = t.t.getFixedYStrength();
-				y = t.getGroundY();
-			}
-			else {
-				if(cx<0) cx = 0;
-				if(cx>level.levelSize) cx = level.levelSize;
-				if(cz<0) cz = 0;
-				if(cz>level.levelSize) cz = level.levelSize;
-				fix = 0;
-				y = level.heightGuide.gety(cx, cz);
-			}
-			
-			if(fix>0) {
-				if(fix>maxFix || (y<minf && fix==maxFix)) {
-					minf = y;
-					maxFix = fix;
+	private static class CalcY {
+		public int max = 0;
+		public boolean first = true;
+		public int minf = 0;
+		public int maxFix = 0;
+		
+		private void prepare(Level level, int x, int z) {
+			max = 0;
+			first = true;
+			minf = 0;
+			maxFix = 0;
+			for(Corner c : Corner.values()) {
+				int fix, y;
+				int cx = x+c.tx;
+				int cz = z+c.tz;
+				
+				if(level.isInside(cx, cz)) {
+					Tile t = level.map[cx][cz];
+					if(t==null)
+						continue;
+					fix = t.t.getFixedYStrength();
+					y = t.getGroundY();
 				}
-			}
-			else {
-				if(first || y>max) {
-					max = y;
-					first = false;
+				else {
+					if(cx<0) cx = 0;
+					if(cx>level.levelSize) cx = level.levelSize;
+					if(cz<0) cz = 0;
+					if(cz>level.levelSize) cz = level.levelSize;
+					fix = 0;
+					y = level.heightGuide.gety(cx, cz);
+				}
+				
+				if(fix>0) {
+					if(fix>maxFix || (y<minf && fix==maxFix)) {
+						minf = y;
+						maxFix = fix;
+					}
+				}
+				else {
+					if(first || y>max) {
+						max = y;
+						first = false;
+					}
 				}
 			}
 		}
-		if(first)
-			return minf;
-		else if(maxFix==0)
-			return max;
-		else if(minf>max+4)
-			return max+4;
-		else
-			return minf;
+		
+		private int calc(Level level, int x, int z) {
+			prepare(level, x, z);
+			if(first)
+				return minf;
+			else if(maxFix==0)
+				return max;
+			else if(minf>max+4) {
+				if(minf>max+6)
+					return max+2;
+				else
+					return max;
+			}
+			else
+				return minf;
+		}
+		
+		private int applyBlur(Level level, int x, int z, int blury) {
+			prepare(level, x, z);
+			if(first)
+				return minf;
+			else if(maxFix==0)
+				return blury;
+			else if(minf>blury+4)
+				return blury;
+			else
+				return minf;
+		}
+
 	}
 	
+	private static CalcY calcy = new CalcY();
+
 	private static int blur(int y, int y1, int y2) {
 		int min = Math.min(y1, y2);
 		int max = Math.max(y1, y2);
@@ -139,12 +169,13 @@ public class HeightMap {
 	public void calculate(boolean blur) {
 		for(int x=0; x<=levelSize; x++)
 			for(int z=0; z<=levelSize; z++) {
-				this.y[x][z] = calcy(level, x, z);
+				this.y[x][z] = calcy.calc(level, x, z);
 			}
 		if(blur) {
 			for(int x=1; x<levelSize; x++)
 				for(int z=1; z<levelSize; z++) {
-					this.y[x][z] = blur(this.y[x][z], this.y[x][z-1], this.y[x+1][z], this.y[x][z+1], this.y[x-1][z]);
+					int blury = blur(this.y[x][z], this.y[x][z-1], this.y[x+1][z], this.y[x][z+1], this.y[x-1][z]);
+					this.y[x][z] = calcy.applyBlur(level, x, z, blury);
 				}
 		}
 		for(int x=0; x<levelSize; x++)
