@@ -84,9 +84,11 @@ public class TerrainTile extends Tile {
 		if(tile.basey<=-120)
 			return;
 		if(random.nextInt(4)==0 && random.nextInt(60)>-tile.basey) {
-			Tree tree = new Tree().generate(tile, random);
-			if(tree!=null)
-				tile.trees.add(tree);
+			if(tile.getAdjBlockY()-tile.basey<4) {
+				Tree tree = new Tree().generate(tile, random);
+				if(tree!=null)
+					tile.trees.add(tree);
+			}
 		}
 		int numBushes = random.nextInt(7) - 3;
 		for(int i=0; i<numBushes; i++) {

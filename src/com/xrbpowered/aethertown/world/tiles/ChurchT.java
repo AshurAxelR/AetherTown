@@ -37,6 +37,11 @@ public class ChurchT extends TileTemplate {
 	}
 	
 	@Override
+	public int getBlockY(Tile tile) {
+		return tile.basey+15;
+	}
+	
+	@Override
 	public int getFenceY(Tile tile, Corner c) {
 		return tile.basey+12;
 	}

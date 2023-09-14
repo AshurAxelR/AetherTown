@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.world;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 
@@ -85,6 +86,19 @@ public class Tile {
 	public TileTemplate getAdjT(Dir d) {
 		Tile tile = getAdj(d);
 		return tile!=null ? tile.t : null; 
+	}
+	
+	public int getAdjBlockY() {
+		int max = basey;
+		for(Dir8 d : Dir8.values()) {
+			Tile adj = getAdj(d.dx, d.dz);
+			if(adj!=null) {
+				int y = adj.t.getBlockY(adj);
+				if(y>max)
+					max = y;
+			}
+		}
+		return max;
 	}
 
 	public static Tile getAdj(Level level, int tx, int tz, int dx, int dz) {

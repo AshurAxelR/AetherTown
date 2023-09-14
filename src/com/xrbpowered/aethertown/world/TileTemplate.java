@@ -23,6 +23,10 @@ public abstract class TileTemplate implements Generator {
 	public int getGroundY(Tile tile) {
 		return tile.basey;
 	}
+	
+	public int getBlockY(Tile tile) {
+		return tile.basey;
+	}
 
 	public int getFenceY(Tile tile, Corner c) {
 		return tile.basey;

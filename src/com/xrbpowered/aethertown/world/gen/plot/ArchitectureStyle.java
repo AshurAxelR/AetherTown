@@ -5,7 +5,6 @@ import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet.DoorInfo;
-import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.HouseT.HouseTile;
 
 public class ArchitectureStyle {
@@ -95,15 +94,8 @@ public class ArchitectureStyle {
 		int y1 = yloc[d.rightCorner().ordinal()];
 		int gy = y;
 		Tile adj = tile.getAdj(d);
-		if(adj!=null) {
-			if(adj.t==HouseT.template) {
-				HouseGenerator adjHouse = (HouseGenerator) adj.sub.parent;
-				gy = adj.basey + adjHouse.arch.getRoofY() + HouseT.roofHeight;
-			}
-			else {
-				gy = adj.getGroundY();
-			}
-		}
+		if(adj!=null)
+			gy = adj.t.getBlockY(adj);
 		return (y0>y) || (y1>y) || (gy>y);
 	}
 	

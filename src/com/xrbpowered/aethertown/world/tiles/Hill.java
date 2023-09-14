@@ -20,6 +20,7 @@ public class Hill extends TileTemplate {
 	
 	public class HillTile extends TerrainTile {
 		public Integer maxDelta = null;
+		public int miny;
 		
 		public HillTile() {
 			super(Hill.this);
@@ -42,6 +43,13 @@ public class Hill extends TileTemplate {
 	}
 
 	@Override
+	public int getBlockY(Tile atile) {
+		HillTile tile = (HillTile) atile;
+		int maxDelta = getMaxDelta(tile);
+		return tile.miny+maxDelta/2;
+	}
+	
+	@Override
 	public int getFenceY(Tile tile, Corner c) {
 		return HeightMap.tiley(tile, c);
 	}
@@ -62,15 +70,15 @@ public class Hill extends TileTemplate {
 	
 	@Override
 	public void decorateTile(Tile tile, Random random) {
-		TerrainTile.addTrees((HillTile) tile, random);
+		int maxd = getMaxDelta(tile);
+		if(maxd<10)
+			TerrainTile.addTrees((HillTile) tile, random);
 	}
 	
 	@Override
 	public void createGeometry(Tile tile, LevelRenderer r) {
 		r.terrain.addHillTile(TerrainMaterial.hillGrass, tile);
-		int maxd = getMaxDelta(tile);
-		if(maxd<10)
-			((HillTile) tile).createTrees(r);
+		((HillTile) tile).createTrees(r);
 	}
 	
 	public int getMaxDelta(Tile atile) {
@@ -78,6 +86,7 @@ public class Hill extends TileTemplate {
 		if(tile.maxDelta==null) {
 			int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 			tile.maxDelta = MathUtils.maxDelta(yloc);
+			tile.miny = MathUtils.min(yloc);
 		}
 		return tile.maxDelta;
 	}
