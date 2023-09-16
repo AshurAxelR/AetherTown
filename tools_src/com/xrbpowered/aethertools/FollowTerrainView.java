@@ -68,9 +68,15 @@ public class FollowTerrainView extends UIContainer {
 	// private static final int[] g = {0, 1, 0, -2, -3, 2, 4, 6, 5, 8, 10, 9, -2, -7, -5, -5, -3, 5, 7, 8, 10, 10, 11, 10, 12, 14, 13};
 	// private static final int sy=-25, sdy=0, ey=-21, edy=1;
 	// private static final int[] g = {-25, -25, -26, -23, -21, -20, -18, -18, -20, -21};
-	private static final int sy=-5, sdy=0, ey=-1, edy=0;
-	private static final int[] g = {-2, 2, 5, 9, 12, 13, 13, 15};
-	
+	// private static final int sy=-5, sdy=0, ey=-1, edy=0;
+	// private static final int[] g = {-2, 2, 5, 9, 12, 13, 13, 15};
+	// private static final int sy=56, sdy=0, ey=48, edy=0;
+	// private static final int[] g = {51, 44, 45};
+	// private static final int sy=-34, sdy=0, ey=-21, edy=1;
+	// private static final int[] g = {-30, -31, -29, -30, -28, -28, -28, -27, -27, -27, -27, -25, -24, -25, -25, -26, -23, -21, -20, -18, -18, -20, -21};
+	private static final int sy=-4, sdy=-1, ey=13, edy=0;
+	private static final int[] g = {-8, -11, -11, -5, 3, 5, 6, 4, 3, 2, 2, 5, 6, 7, 13, 14, 12, 11, 11};
+
 	private void createLines(FollowTerrain.Result r) {
 		if(r.s!=null && r.e!=null) {
 			lines.add(new LineData(r.e.x-3, new int[] {r.s.gety(r.s.length-1), r.my, r.my, r.e.gety(0)}, joinColor));

@@ -14,6 +14,7 @@ import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Street;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
 public class FollowTerrain {
@@ -22,6 +23,8 @@ public class FollowTerrain {
 	private static final boolean sortOpts = true;
 	private static final boolean useYDir = true;
 
+	private static final boolean storeDebugInfo = false;
+	
 	public class Result {
 		public final int x;
 		public final int length;
@@ -96,7 +99,7 @@ public class FollowTerrain {
 
 		public Head(int y, int dy, int dx, int ydir) {
 			this.y = y;
-			this.dy = dx*dy;
+			this.dy = dy;
 			this.dx = dx;
 			this.x = dx>0 ? startx : endx;
 			this.ydir = ydir;
@@ -219,7 +222,7 @@ public class FollowTerrain {
 		int minCost = 0;
 		for(DYOption os : optS)
 			for(DYOption oe : optE) {
-				if(s.y+os.dy==e.y+oe.dy && (os.dy==-oe.dy || os.dy==0 || oe.dy==0)) {
+				if(s.y+os.dy==e.y-oe.dy && (os.dy==oe.dy || os.dy==0 || oe.dy==0)) {
 					int cost = max(os.cost, oe.cost);
 					if(sel==null || cost<minCost) {
 						sel = os;
@@ -244,8 +247,8 @@ public class FollowTerrain {
 		if(alldy%4!=0)
 			return null; // must be multiple of 4
 		
-		int h = e.y>s.y ? 4 : -4;
-		DYOption[] optS = alldy>0 && (s.dy==0 || s.dy==h) ? (e.contSlope<=3 ? getOptions(s, h, 0) : getOptions(s, 0, h)) : getOptions(s, 0);
+		int dy = e.y>s.y ? 4 : -4;
+		DYOption[] optS = alldy>0 && (s.dy==0 || s.dy==dy) ? (e.contSlope<=3 ? getOptions(s, dy, 0) : getOptions(s, 0, dy)) : getOptions(s, 0);
 		
 		Result min = null;
 		DYOption sel = null;
@@ -318,6 +321,7 @@ public class FollowTerrain {
 		}
 		
 		else {
+			// expand end
 			if(sortOpts)
 				Arrays.sort(optE);
 			Result min = null;
@@ -402,7 +406,9 @@ public class FollowTerrain {
 			t = t.next(d, dy);
 			
 			TileTemplate temp = StreetSlope.getTemplate(abs(dy));
-			temp.forceGenerate(ts);
+			StreetTile st = (StreetTile) temp.forceGenerate(ts);
+			if(storeDebugInfo)
+				st.debugFT = this;
 		}
 	}
 	
@@ -439,10 +445,10 @@ public class FollowTerrain {
 		int startdy = 0;
 		if(tileS.t instanceof StreetSlope) {
 			startdy = -((StreetSlope) tileS.t).h;
-			if(tileS.d!=d.flip()) {
+			if(tileS.d!=d)
 				startdy = -startdy;
-				starty -= startdy;
-			}
+			else
+				starty += startdy;
 		}
 		
 		Tile tileE = level.map[x][z];

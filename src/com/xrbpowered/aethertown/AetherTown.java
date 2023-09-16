@@ -27,6 +27,7 @@ import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
@@ -543,6 +544,14 @@ public class AetherTown extends UIClient {
 		for(int i=0; i<4; i++)
 			System.out.printf("%d; ", yloc[i]);
 		System.out.println();
+		
+		if(tile!=null && tile instanceof StreetTile) {
+			StreetTile st = (StreetTile) tile;
+			if(st.debugFT!=null) {
+				System.out.println("FollowTerrain:");
+				st.debugFT.print(System.out);
+			}
+		}
 	}
 	
 	private void showRegionMap(boolean show) {

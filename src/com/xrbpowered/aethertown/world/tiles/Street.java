@@ -23,6 +23,7 @@ import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.gen.FollowTerrain;
 import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
@@ -48,6 +49,8 @@ public class Street extends TileTemplate {
 		public Dir lampd = null;
 		public boolean bridge = false;
 		public boolean forceExpand = false;
+		
+		public FollowTerrain debugFT = null; // FIXME remove debug
 		
 		public StreetTile(TileTemplate t) {
 			super(t);
