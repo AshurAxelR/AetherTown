@@ -24,48 +24,65 @@ public class FollowTerrain {
 
 	public class Result {
 		public final int x;
-		public final int[] y;
+		public final int length;
 		public int cost;
 		
-		public Result subS = null;
-		public Result subE = null;
-		public int mx, my;
+		public final Result s;
+		public final int my;
+		public final Result e;
 		
 		public Result(int x, int y) {
 			this.x = x;
-			this.y = new int[] {y};
+			this.length = 1;
+			this.s = null;
+			this.my = y;
+			this.e = null;
 		}
 
 		public Result(int sy, Result e) {
 			this.x = e.x-1;
-			this.y = new int[e.y.length+1];
-			this.y[0] = sy;
-			for(int i=0; i<e.y.length; i++)
-				this.y[i+1] = e.y[i];
+			this.length =e.length+1;
+			this.s = null;
+			this.my = sy;
+			this.e = e;
 		}
 
 		public Result(Result s, int ey) {
 			this.x = s.x;
-			this.y = new int[s.y.length+1];
-			for(int i=0; i<s.y.length; i++)
-				this.y[i] = s.y[i];
-			this.y[s.y.length] = ey;
+			this.length = s.length+1;
+			this.s = s;
+			this.my = ey;
+			this.e = null;
 		}
 		
-		public Result(Result s, int mx, int my, Result e) {
+		public Result(Result s, int my, Result e) {
 			this.x = s.x;
-			this.subS = s;
-			this.subE = e;
-			this.mx = mx;
+			this.length = s.length+e.length+2;
+			this.s = s;
 			this.my = my;
-			this.y = new int[s.y.length+2+e.y.length];
-			int j = 0;
-			for(int i=0; i<s.y.length; i++)
-				this.y[j++] = s.y[i];
-			this.y[j++] = my;
-			this.y[j++] = my;
-			for(int i=0; i<e.y.length; i++)
-				this.y[j++] = e.y[i];
+			this.e = e;
+		}
+		
+		public int gety(int i) {
+			if(s!=null && i<s.length)
+				return s.gety(i);
+			if(e!=null) {
+				i = i-(e.x-x);
+				if(i>=0)
+					return e.gety(i);
+			}
+			return my;
+		}
+		
+		public String toString() {
+			if(s==null && e==null)
+				return String.format("[%d]", my);
+			else if(s==null)
+				return String.format("[%d, %s]", my, e.toString());
+			else if(e==null)
+				return String.format("[%s, %d]", s.toString(), my);
+			else
+				return String.format("[%s, %d, %s]", s.toString(), my, e.toString());
 		}
 	}
 	
@@ -202,7 +219,7 @@ public class FollowTerrain {
 		int minCost = 0;
 		for(DYOption os : optS)
 			for(DYOption oe : optE) {
-				if(s.y+os.dy==e.y-oe.dy && (os.dy==oe.dy || os.dy==0 || oe.dy==0)) {
+				if(s.y+os.dy==e.y+oe.dy && (os.dy==-oe.dy || os.dy==0 || oe.dy==0)) {
 					int cost = max(os.cost, oe.cost);
 					if(sel==null || cost<minCost) {
 						sel = os;
@@ -344,7 +361,7 @@ public class FollowTerrain {
 		iterations += fs.iterations + fe.iterations;
 		if(rs==null || re==null)
 			return null;
-		Result res = new Result(rs, mx, my, re);
+		Result res = new Result(rs, my, re);
 		res.cost = rs.cost + re.cost + calcCost(mx, my, 0) + calcCost(mx+1, my, 0);
 		return res;
 	}
@@ -377,17 +394,15 @@ public class FollowTerrain {
 			return;
 		Dir d = streetDir;
 		Token t = new Token(level, anchorX+d.dx, starty, anchorZ+d.dz, d);
-		for(int i=0; i<=res.y.length; i++) {
+		for(int i=0; i<=res.length; i++) {
 			Token ts = t;
-			int dy = (i<res.y.length ? res.y[i] : endy) - t.y;
+			int dy = (i<res.length ? res.gety(i) : endy) - t.y;
 			if(dy>0)
 				ts = new Token(level, ts.x, ts.y+dy, ts.z, d.flip());
 			t = t.next(d, dy);
 			
 			TileTemplate temp = StreetSlope.getTemplate(abs(dy));
 			temp.forceGenerate(ts);
-			//if(absdy>1 && dy==0)
-			//	tile.lamp = true;
 		}
 	}
 	

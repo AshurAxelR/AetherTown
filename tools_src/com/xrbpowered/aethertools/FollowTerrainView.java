@@ -66,17 +66,22 @@ public class FollowTerrainView extends UIContainer {
 	
 	// private static final int sy=0, sdy=0, ey = 4, edy = 0;
 	// private static final int[] g = {0, 1, 0, -2, -3, 2, 4, 6, 5, 8, 10, 9, -2, -7, -5, -5, -3, 5, 7, 8, 10, 10, 11, 10, 12, 14, 13};
-	private static final int sy=29, sdy=0, ey=32, edy=0;
-	private static final int[] g = {30, 31, 33, 33, 30, 30, 32, 34, 34};
+	// private static final int sy=-25, sdy=0, ey=-21, edy=1;
+	// private static final int[] g = {-25, -25, -26, -23, -21, -20, -18, -18, -20, -21};
+	private static final int sy=-5, sdy=0, ey=-1, edy=0;
+	private static final int[] g = {-2, 2, 5, 9, 12, 13, 13, 15};
 	
 	private void createLines(FollowTerrain.Result r) {
-		if(r.subS!=null && r.subE!=null) {
-			lines.add(new LineData(r.subE.x-3, new int[] {r.subS.y[r.subS.y.length-1], r.my, r.my, r.subE.y[0]}, joinColor));
-			createLines(r.subS);
-			createLines(r.subE);
+		if(r.s!=null && r.e!=null) {
+			lines.add(new LineData(r.e.x-3, new int[] {r.s.gety(r.s.length-1), r.my, r.my, r.e.gety(0)}, joinColor));
+			createLines(r.s);
+			createLines(r.e);
 		}
 		else {
-			lines.add(new LineData(r.x, r.y, resColor));
+			int y[] = new int[r.length];
+			for(int i=0; i<y.length; i++)
+				y[i] = r.gety(i);
+			lines.add(new LineData(r.x, y, resColor));
 		}
 	}
 	
@@ -92,9 +97,10 @@ public class FollowTerrainView extends UIContainer {
 		FollowTerrain.Result r = ft.compute();
 		if(r!=null) {
 			System.out.printf("Computed in %d iterations, cost=%d\n", ft.iterations, r.cost);
+			System.out.println(r.toString());
 			createLines(r);
-			start = new LineData(-2, new int[] {sy-sdy, sy, r.y[0]}, edgeColor);
-			end = new LineData(g.length-1, new int[] {r.y[r.y.length-1], ey, ey+edy}, edgeColor);
+			start = new LineData(-2, new int[] {sy-sdy, sy, r.gety(0)}, edgeColor);
+			end = new LineData(g.length-1, new int[] {r.gety(r.length-1), ey, ey+edy}, edgeColor);
 		}
 		else {
 			System.out.printf("No solution in %d iterations\n", ft.iterations);
