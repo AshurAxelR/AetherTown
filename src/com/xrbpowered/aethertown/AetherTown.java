@@ -27,6 +27,7 @@ import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
+import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -529,7 +530,7 @@ public class AetherTown extends UIClient {
 		if(level.heightLimiter!=null)
 			System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
 		if(tile!=null) {
-			System.out.printf("\t%s: basey=%d, ground=%d, d=%s\n", tile.t.getClass().getSimpleName(), tile.basey, tile.getGroundY() , tile.d.name());
+			System.out.printf("\t%s: basey=%d, ground=%d, block=%d, d=%s\n", tile.t.getClass().getSimpleName(), tile.basey, tile.getGroundY(), tile.t.getBlockY(tile), tile.d.name());
 			if(tile.sub!=null)
 				System.out.printf("\t%s: [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.sub.i, tile.sub.j);
 			System.out.print("\tfenceY: ");
@@ -551,6 +552,10 @@ public class AetherTown extends UIClient {
 				System.out.println("FollowTerrain:");
 				st.debugFT.print(System.out);
 			}
+		}
+		if(tile!=null && tile instanceof HillTile) {
+			HillTile ht = (HillTile) tile;
+			System.out.printf("miny=%d, maxDelta=%d\n\n", ht.miny, ht.maxDelta);
 		}
 	}
 	
