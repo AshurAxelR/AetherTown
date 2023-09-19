@@ -166,7 +166,7 @@ public class Level {
 			}
 			StreetLayoutGenerator.trimStreets(this, random); // in case of removed plots
 		}
-		if(!checkNulls())
+		if(houses==null || !checkNulls())
 			throw new GeneratorException("Level incomplete");
 		
 		decorate(random);
