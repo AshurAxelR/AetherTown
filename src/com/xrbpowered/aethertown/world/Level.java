@@ -111,6 +111,12 @@ public class Level {
 		throw new RuntimeException("Generator attempts limit reached");
 	}
 
+	private void checkHouseCount() {
+		if(houseCount<info.settlement.minHouses)
+			throw new GeneratorException("Settlement is too small: %d vs %d min for %s",
+					houseCount, info.settlement.minHouses, info.settlement.title);
+	}
+	
 	private void generate(Random random) {
 		resetGenerator();
 		
@@ -122,10 +128,7 @@ public class Level {
 			gen.generate(startToken, random);
 			startx = gen.startToken.x;
 			startz = gen.startToken.z;
-			
-			if(houseCount<info.settlement.minHouses)
-				throw new GeneratorException("Settlement is too small: %d vs %d min for %s",
-						houseCount, info.settlement.minHouses, info.settlement.title);
+			checkHouseCount();
 			StreetLayoutGenerator.finishLayout(this, random);
 		}
 		else {
@@ -148,6 +151,13 @@ public class Level {
 				heightLimiter.revalidate();
 			}
 			
+			if(houses==null) {
+				houses = HouseGenerator.listHouses(this, random);
+				houseCount = houses.size();
+				checkHouseCount();
+				HouseAssignment.assignHouses(this, random);
+			}
+			
 			if(finalizeTiles(random))
 				break;
 			if(att>=maxRefillAttempts-1) {
@@ -158,10 +168,6 @@ public class Level {
 		}
 		if(!checkNulls())
 			throw new GeneratorException("Level incomplete");
-		
-		houses = HouseGenerator.listHouses(this, random);
-		houseCount = houses.size();
-		HouseAssignment.assignHouses(this, random);
 		
 		decorate(random);
 		

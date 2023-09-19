@@ -121,6 +121,14 @@ public class HouseGenerator extends HouseGeneratorBase {
 		return err;
 	}
 	
+	public static void resetHouseList(Level level) {
+		if(level.houses==null)
+			return;
+		for(HouseGenerator house : level.houses)
+			house.index = -1;
+		level.houses = null;
+	}
+	
 	public static ArrayList<HouseGenerator> listHouses(Level level, Random random) {
 		ArrayList<HouseGenerator> houses = new ArrayList<>();
 		boolean[][] visited = new boolean[level.levelSize][level.levelSize];

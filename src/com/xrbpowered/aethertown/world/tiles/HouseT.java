@@ -200,12 +200,12 @@ public class HouseT extends TileTemplate {
 			}
 		}
 		HouseGenerator house = (HouseGenerator) tile.sub.parent;
-		ArchitectureStyle arch = ArchitectureStyle.fallback; // FIXME house.arch not available at this point!
-		if(maxGround>tile.basey+arch.maxGround()) {
+		if(maxGround>tile.basey+house.arch.maxGround()) {
 			house.remove();
+			HouseGenerator.resetHouseList(tile.level);
 			return true;
 		}
-		return arch.matchGround(tile, max);
+		return house.arch.matchGround(tile, max);
 	}
 	
 	public static boolean allowLamp(Tile tile) {
