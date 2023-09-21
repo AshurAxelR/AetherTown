@@ -22,6 +22,7 @@ public abstract class HouseAssignment {
 		HouseRole.assignRole(house, role, random);
 		if(house.role==HouseRole.residential || house.addRole==HouseRole.residential)
 			countRes++;
+		house.illumTriggerOffs = random.nextFloat();
 	}
 	
 	public abstract HouseRole assignNext(int index, Random random);

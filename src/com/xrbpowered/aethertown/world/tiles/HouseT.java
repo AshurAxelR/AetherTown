@@ -141,7 +141,8 @@ public class HouseT extends TileTemplate {
 		
 		for(int f=0; f<arch.floorCount; f++) {
 			IllumLayer illumLayer = arch.getIllumLayer(f);
-			float illumTrigger = 1.75f; // TODO house illum trigger
+			IllumPattern illum = arch.getIllum(f);
+			float illumTrigger = illum==null ? 0f : illum.getTrigger(house.illumTriggerOffs);
 			Vector3f illumMod = tile.illum[f];
 			r.blockLighting.addLight(illumLayer, tile, tile.basey+arch.getLightY(f), illumMod, 0.35f, true);
 			if(sub.j==front)

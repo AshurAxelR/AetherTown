@@ -4,6 +4,10 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform vec2 levelOffset = vec2(0, 0);
 
+#ifdef ILLUM_TILE
+uniform int illumMask = 0;
+#endif
+
 in vec3 in_Position;
 in vec3 in_Normal;
 in vec2 in_TexCoord;
@@ -25,7 +29,6 @@ out vec4 pass_LevelPosition;
 out vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
 flat out vec3 pass_illumMod;
-flat out int pass_illumMask;
 flat out float pass_illumTrigger;
 #endif
 
@@ -63,7 +66,6 @@ void main(void) {
 	pass_TexCoord = in_TexCoord;
 	#ifdef ILLUM_TILE
 	pass_illumMod = ins_illumMod;
-	pass_illumMask = int(ins_illumMask);
-	pass_illumTrigger = ins_illumTrigger;
+	pass_illumTrigger = (int(ins_illumMask) & illumMask)!=0 ? ins_illumTrigger : 0;
 	#endif
 }

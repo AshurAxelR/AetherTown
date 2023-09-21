@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.region;
 import java.awt.Color;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
@@ -30,8 +31,8 @@ public class HouseRole {
 		private LocalShopRole(String title, Color color, boolean addOffice) {
 			super(title, color,
 				new ArchitectureStyle.BlankGroundNotFront(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop),
-				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.shop, null),
-				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.shop, null),
+				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.shop, (IllumPattern)null),
+				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.shop, (IllumPattern)null),
 				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office)
 			);
 			this.addOffice = addOffice;
@@ -53,11 +54,11 @@ public class HouseRole {
 	private static class ShopRole extends HouseRole {
 		private ShopRole(String title, IllumPattern illum) {
 			super(title, colorShop,
-				new ArchitectureStyle.BlankGroundNotFront(1, ArchitectureTileSet.shopSet).setIllum(illum),
-				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(illum),
-				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, null),
-				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, null),
-				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(illum, IllumPattern.office)
+				new ArchitectureStyle.BlankGroundNotFront(1, ArchitectureTileSet.shopSet).setIllum(illum, IllumLayer.shopping),
+				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(illum, IllumLayer.shopping),
+				new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, IllumLayer.shopping, null, null),
+				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, IllumLayer.shopping, null, null),
+				new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(illum, IllumLayer.shopping, IllumPattern.office, null)
 			);
 		}
 		@Override
@@ -104,9 +105,11 @@ public class HouseRole {
 		private DoorInfo door;
 		private PostOffice(String title, final DoorInfo door) {
 			super(title, colorCivic,
-				new ArchitectureStyle(1, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office).setDoorInfo(door),
-				new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office).setDoorInfo(door),
-				new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office).setDoorInfo(door)
+				new ArchitectureStyle(1, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(door),
+				new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(door),
+				new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(door),
+				new ArchitectureStyle(2, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, null, null).setDoorInfo(door),
+				new ArchitectureStyle(3, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, null, null).setDoorInfo(door)
 			);
 			this.door = door;
 		}
@@ -114,8 +117,10 @@ public class HouseRole {
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
 			if(isPark(house))
 				return arch[0];
+			else if(!door.allowLamp)
+				return isCityHouse(house, random) ? arch[2] : arch[1];
 			else
-				return !door.allowLamp && isCityHouse(house, random) ? arch[2] : arch[1];
+				return house.getFootprint()<=4 || isCityHouse(house, random) ? arch[4] : arch[3];
 		}
 	}
 
@@ -156,20 +161,20 @@ public class HouseRole {
 	};
 	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", IllumPattern.shop);
 	public static final HouseRole giftShop = new HouseRole("Gift Shop + Cafeteria", colorShop,
-		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop)
+		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop, IllumLayer.living)
 	);
 	
 	public static final HouseRole museum = new HouseRole("Museum", colorCulture,
-		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel)
+		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel, IllumLayer.officeHours)
 	);
 	public static final HouseRole library = new HouseRole("Library", colorCulture,
-		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel)
+		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel, IllumLayer.officeHours)
 	);
 	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture,
-		new ArchitectureStyle.BlankNotFront(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant)
+		new ArchitectureStyle.BlankNotFront(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant, IllumLayer.leisure)
 	);
 	public static final HouseRole office = new HouseRole("Office", colorOffice,
-		new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop, IllumPattern.office)
+		new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumPattern.office)
 	);
 	
 	public final String title;
@@ -187,6 +192,7 @@ public class HouseRole {
 	}
 	
 	public static void assignRole(HouseGenerator house, HouseRole role, Random random) {
+		house.addRole = null;
 		house.role = role;
 		house.arch = role.arch(house, random);
 	}

@@ -2,11 +2,14 @@ package com.xrbpowered.aethertown.render.tiles;
 
 public class IllumLayer {
 
-	public static final IllumLayer[] layers = new IllumLayer[16];
+	public static final IllumLayer[] layers = new IllumLayer[8];
 	private static int nextIndex = 0;
 	
 	public static final IllumLayer alwaysOn = new IllumLayer(0, 24);
-	public static final IllumLayer placeholder = new IllumLayer(6, 22); // FIXME placeholder
+	public static final IllumLayer living = new IllumLayer(6, 23);
+	public static final IllumLayer officeHours = new IllumLayer(8, 18);
+	public static final IllumLayer leisure = new IllumLayer(9, 22);
+	public static final IllumLayer shopping = new IllumLayer(9, 20);
 
 	public final int index;
 	

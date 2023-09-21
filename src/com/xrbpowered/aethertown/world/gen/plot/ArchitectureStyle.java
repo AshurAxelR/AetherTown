@@ -18,15 +18,16 @@ public class ArchitectureStyle {
 
 	public final int floorCount;
 	protected final ArchitectureTileSet groundSet, tileSet;
-	protected IllumPattern groundIllum, illum;
+	protected IllumPattern groundIllum = null;
+	protected IllumPattern illum = null;
+	protected IllumLayer groundIllumLayer = null;
+	protected IllumLayer illumLayer = null;
 	protected DoorInfo doorInfo;
 	
 	public ArchitectureStyle(int floorCount, ArchitectureTileSet groundSet, ArchitectureTileSet tileSet) {
 		this.floorCount = floorCount;
 		this.groundSet = groundSet;
 		this.tileSet = tileSet;
-		this.groundIllum = null;
-		this.illum = null;
 		
 		this.floory = new int[floorCount+1];
 		this.obsy = new int[floorCount];
@@ -58,10 +59,22 @@ public class ArchitectureStyle {
 		return this;
 	}
 
+	public ArchitectureStyle setIllum(IllumPattern groundIllum, IllumLayer groundLayer, IllumPattern illum, IllumLayer layer) {
+		this.groundIllum = groundIllum;
+		this.illum = illum;
+		this.groundIllumLayer = groundLayer;
+		this.illumLayer = layer;
+		return this;
+	}
+
 	public ArchitectureStyle setIllum(IllumPattern illum) {
 		return setIllum(illum, illum);
 	}
-	
+
+	public ArchitectureStyle setIllum(IllumPattern illum, IllumLayer layer) {
+		return setIllum(illum, layer, illum, layer);
+	}
+
 	public ArchitectureStyle setDoorInfo(DoorInfo doorInfo) {
 		this.doorInfo = doorInfo;
 		return this;
@@ -76,6 +89,9 @@ public class ArchitectureStyle {
 	}
 
 	public IllumLayer getIllumLayer(int floor) {
+		IllumLayer layer = floor==0 ? groundIllumLayer : illumLayer;
+		if(layer!=null)
+			return layer;
 		IllumPattern illum = getIllum(floor);
 		return illum==null ? null : illum.layer;
 	}
