@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -139,17 +140,23 @@ public class HouseT extends TileTemplate {
 		int back = house.fwd-house.marginBack;
 		
 		for(int f=0; f<arch.floorCount; f++) {
-			Vector3f illum = tile.illum[f];
-			r.blockLighting.addLight(tile, tile.basey+arch.getLightY(f), illum, 0.35f, true);
+			IllumLayer illumLayer = arch.getIllumLayer(f);
+			float illumTrigger = 1.75f; // TODO house illum trigger
+			Vector3f illumMod = tile.illum[f];
+			r.blockLighting.addLight(illumLayer, tile, tile.basey+arch.getLightY(f), illumMod, 0.35f, true);
 			if(sub.j==front)
 				(f==0 && sub.i==0 && sub.j==front ? arch.getDoor() : arch.getWall(f, Dir.south, tile, yloc))
-						.addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d.flip()));
+						.addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0)
+						.illum(illumLayer, illumTrigger).illumMod(illumMod).rotate(tile.d.flip()));
 			if(sub.i==left)
-				arch.getWall(f, Dir.west, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d.ccw()));
+				arch.getWall(f, Dir.west, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0)
+						.illum(illumLayer, illumTrigger).illumMod(illumMod).rotate(tile.d.ccw()));
 			if(sub.i==right)
-				arch.getWall(f, Dir.east, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d.cw()));
+				arch.getWall(f, Dir.east, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0)
+						.illum(illumLayer, illumTrigger).illumMod(illumMod).rotate(tile.d.cw()));
 			if(sub.j==back)
-				arch.getWall(f, Dir.north, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0).illumMod(illum).rotate(tile.d));
+				arch.getWall(f, Dir.north, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0)
+						.illum(illumLayer, illumTrigger).illumMod(illumMod).rotate(tile.d));
 		}
 
 		int roofy = arch.getRoofY();

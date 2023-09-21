@@ -1,14 +1,15 @@
 package com.xrbpowered.aethertown.render.tiles;
 
-import java.awt.Color;
-
 import org.joml.Vector3f;
 
+import com.xrbpowered.aethertown.render.BlockLighting;
 import com.xrbpowered.aethertown.world.Tile;
 
 public class IllumTileObjectInfo extends TileObjectInfo {
 
 	public Vector3f illumMod = new Vector3f(1, 1, 1);
+	public int illumMask = IllumLayer.alwaysOn.mask();
+	public float illumTrigger = BlockLighting.illumTrigger;
 	
 	public IllumTileObjectInfo(TileObjectInfo info) {
 		super(info);
@@ -34,29 +35,27 @@ public class IllumTileObjectInfo extends TileObjectInfo {
 		super(tile, dout, dy);
 	}
 
-	public IllumTileObjectInfo illumMod(float r, float g, float b) {
-		illumMod.set(r, g, b);
-		return this;
-	}
-
-	public IllumTileObjectInfo illumMod(Vector3f c) {
-		if(c==null)
+	public IllumTileObjectInfo illumMod(Vector3f mod) {
+		if(mod==null)
 			illumOff();
 		else
-			illumMod.set(c);
-		return this;
-	}
-	
-	public IllumTileObjectInfo illumMod(Color c) {
-		if(c==null)
-			illumOff();
-		else
-			illumMod.set(c.getRed()/255f, c.getGreen()/255f, c.getBlue()/255f);
+			illumMod.set(mod);
 		return this;
 	}
 	
 	public IllumTileObjectInfo illumOff() {
 		illumMod.set(0, 0, 0);
+		return this;
+	}
+	
+	public IllumTileObjectInfo illum(IllumLayer layer) {
+		illumMask = (layer==null) ? 0 : layer.mask();
+		return this;
+	}
+
+	public IllumTileObjectInfo illum(IllumLayer layer, float trigger) {
+		illum(layer);
+		illumTrigger = trigger;
 		return this;
 	}
 

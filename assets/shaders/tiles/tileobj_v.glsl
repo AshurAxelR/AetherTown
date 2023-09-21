@@ -14,6 +14,8 @@ in float ins_ScaleY;
 in float ins_Rotation;
 #ifdef ILLUM_TILE
 in vec3 ins_illumMod;
+in float ins_illumMask;
+in float ins_illumTrigger;
 #endif
 
 out vec4 pass_Position;
@@ -22,7 +24,9 @@ out vec2 pass_TexCoord;
 out vec4 pass_LevelPosition;
 out vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
-out vec3 pass_illumMod;
+flat out vec3 pass_illumMod;
+flat out int pass_illumMask;
+flat out float pass_illumTrigger;
 #endif
 
 mat4 translationMatrix(vec3 t) {
@@ -59,5 +63,7 @@ void main(void) {
 	pass_TexCoord = in_TexCoord;
 	#ifdef ILLUM_TILE
 	pass_illumMod = ins_illumMod;
+	pass_illumMask = int(ins_illumMask);
+	pass_illumTrigger = ins_illumTrigger;
 	#endif
 }

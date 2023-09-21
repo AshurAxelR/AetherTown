@@ -15,6 +15,8 @@ public class TileRenderer {
 	public final SpriteShader spriteShader;
 	public final ObjectShader objShader;
 
+	public int illumMask = 0;
+	
 	public TileRenderer() {
 		shader = new TileObjectShader();
 		lightShader = new IllumTileObjectShader();
@@ -35,6 +37,7 @@ public class TileRenderer {
 		environment.updateShader(lightShader);
 		environment.updateShader(spriteShader);
 		environment.updateShader(objShader);
+		illumMask = environment.illumMask;
 	}
 	
 	public void setLevel(LevelRenderer r) {

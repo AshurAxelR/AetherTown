@@ -5,6 +5,7 @@ import java.awt.Color;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.world.Tile;
@@ -40,7 +41,7 @@ public class Monument extends Plaza {
 		pillar.addInstance(r, info);
 		statue.addInstance(r, new TileObjectInfo(tile, 0, 10.3f, 0));
 		r.pointLights.setLight(tile, -0.35f*tile.d.dx, 9f, -0.35f*tile.d.dz, 5f);
-		r.blockLighting.addLight(tile, tile.basey+9, Street.lampLightColor, 0.4f, false);
+		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+9, Street.lampLightColor, 0.4f, false);
 	}
 	
 }

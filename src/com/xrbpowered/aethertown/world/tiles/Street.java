@@ -10,6 +10,7 @@ import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
 import com.xrbpowered.aethertown.render.sprites.SpriteInfo;
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -230,7 +231,7 @@ public class Street extends TileTemplate {
 		lampPost.addInstance(r, new TileObjectInfo(tile, dx, dy, dz));
 		coronaSprite.addInstance(r, new SpriteInfo(tile, dx, dy+5.75f, dz).size(Tile.size*0.75f));
 		r.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
-		r.blockLighting.addLight(tile, tile.basey+5, lampLightColor, 0.5f, false);
+		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+5, lampLightColor, 0.5f, false);
 	}
 	
 	/**

@@ -5,11 +5,15 @@ import static com.xrbpowered.gl.res.shader.Shader.uniform;
 import java.awt.Color;
 
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL20;
 
+import com.xrbpowered.aethertown.render.BlockLighting;
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.utils.ColorBlend;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.res.shader.Shader;
 
 public class ShaderEnvironment {
@@ -36,6 +40,8 @@ public class ShaderEnvironment {
 	public float lightWashTop = 1f;
 	public float lightWashBottom = 1f;
 	public float lightSkyWash = 1f;
+	
+	public int illumMask = 0;
 	
 	public ShaderEnvironment() {
 	}
@@ -68,6 +74,12 @@ public class ShaderEnvironment {
 		this.lightSkyDirection.set(x, y, z);
 		return this;
 	}
+	
+	public void recalc(Vector4f sun) {
+		lightDirection.set(-sun.x, -Math.abs(sun.y), -sun.z);
+		lightSkyDirection.set(-sun.x, -sun.y, -sun.z);
+		illumMask = IllumLayer.getMask(WorldTime.getHourOfDay());
+	}
 
 	public void updateShader(Shader shader) {
 		int pId = shader.getProgramId();
@@ -78,6 +90,9 @@ public class ShaderEnvironment {
 		uniform(GL20.glGetUniformLocation(pId, "zenithColor"), zenithColor);
 		uniform(GL20.glGetUniformLocation(pId, "lightSkyColor"), lightSkyColor);
 		uniform(GL20.glGetUniformLocation(pId, "lightSkyDirection"), lightSkyDirection);
+
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "illumTrigger"), BlockLighting.illumTrigger);
+		GL20.glUniform1i(GL20.glGetUniformLocation(pId, "illumMask"), illumMask);
 		
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "fogNear"), fogNear);
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "fogFar"), fogFar);

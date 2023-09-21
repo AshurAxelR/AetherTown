@@ -32,6 +32,10 @@ public class WorldTime {
 		return frac(time/daysInYear + yearPhase);
 	}
 	
+	public static int getHourOfDay() {
+		return Math.round(getTimeOfDay()*60*60*24)/3600;
+	}
+	
 	public static void setTime(float startSeason, int day, float t) {
 		yearPhase = startSeason;
 		time = day + t;

@@ -6,9 +6,8 @@ import org.joml.Vector3f;
 
 public class IllumPattern {
 
-	private static final Vector3f one = new Vector3f(1, 1, 1);
+	public static final IllumPattern legacy = new IllumPattern(new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(1, 1, 1), false).setDim(0.35f, 0.1f);
 	
-	public static final IllumPattern legacy = new IllumPattern(new Vector3f(0.5f, 0.8f, 0.8f), one, false).setDim(0.35f, 0.1f);
 	public static final IllumPattern shop = new IllumPattern(new Vector3f(1.0f, 0.9f, 0.8f), new Vector3f(1.0f, 1.0f, 0.9f), true);
 	public static final IllumPattern office = new IllumPattern(new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setDim(0.65f, 0.3f);
 	public static final IllumPattern restaurant = new IllumPattern(new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(0.9f, 0.85f, 0.9f), false);
@@ -17,21 +16,11 @@ public class IllumPattern {
 	public static final IllumPattern hospital = new IllumPattern(new Vector3f(0.9f, 0.9f, 0.8f), new Vector3f(0.95f, 0.95f, 1.0f), true);
 	public static final IllumPattern hospitalWards = new IllumPattern(new Vector3f(0.9f, 0.9f, 0.5f), new Vector3f(0.95f, 0.95f, 0.9f), true).setDim(0.65f, 0.4f);
 	
+	public IllumLayer layer = IllumLayer.placeholder;
 	public Vector3f low, high;
 	public boolean cool = false;
 	public float dimRate = 0;
 	public float dim = 0.05f;
-	public float open = -1f;
-	public float close = 2f;
-
-	public IllumPattern(Vector3f mod) {
-		this.low = mod;
-		this.high = mod;
-	}
-
-	public IllumPattern() {
-		this(one);
-	}
 
 	public IllumPattern(Vector3f low, Vector3f high, boolean cool) {
 		this.low = low;
@@ -45,12 +34,6 @@ public class IllumPattern {
 		return this;
 	}
 	
-	public IllumPattern schedule(int open, int close) {
-		this.open = open/24f;
-		this.close = close/24f;
-		return this;
-	}
-
 	public static Vector3f calcMod(Random random, IllumPattern illum) {
 		if(illum==null)
 			return null;

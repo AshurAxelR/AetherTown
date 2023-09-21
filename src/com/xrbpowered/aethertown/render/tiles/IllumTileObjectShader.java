@@ -10,7 +10,9 @@ public class IllumTileObjectShader extends TileObjectShader {
 			.addAttrib("ins_ScaleXZ", 1)
 			.addAttrib("ins_ScaleY", 1)
 			.addAttrib("ins_Rotation", 1)
-			.addAttrib("ins_illumMod", 3);
+			.addAttrib("ins_illumMod", 3)
+			.addAttrib("ins_illumMask", 1)
+			.addAttrib("ins_illumTrigger", 1);
 	
 	public static final String[] samplerNames = {"texSky", "dataPointLights", "dataBlockLighting", "texDiffuse", "texIllum"};
 	public static final String[] shaderDefs = {"ILLUM_TILE"};
@@ -35,6 +37,8 @@ public class IllumTileObjectShader extends TileObjectShader {
 		data[offs+6] = obj.illumMod.x;
 		data[offs+7] = obj.illumMod.y;
 		data[offs+8] = obj.illumMod.z;
+		data[offs+9] = obj.illumMask;
+		data[offs+10] = obj.illumTrigger;
 	}
 	
 }

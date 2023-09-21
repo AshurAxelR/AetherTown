@@ -11,6 +11,7 @@ public class DaytimeEnvironment extends ShaderEnvironment {
 		super(s);
 	}
 	
+	@Override
 	public void recalc(Vector4f sun) {
 		float c = (float)Math.toDegrees(Math.atan(sun.y));
 		if(c<-18f)
@@ -24,8 +25,7 @@ public class DaytimeEnvironment extends ShaderEnvironment {
 		else
 			copyFrom(clearDay);
 		
-		lightDirection.set(-sun.x, -Math.abs(sun.y), -sun.z);
-		lightSkyDirection.set(-sun.x, -sun.y, -sun.z);
+		super.recalc(sun);
 	}
 
 }

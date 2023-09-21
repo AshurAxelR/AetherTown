@@ -79,7 +79,7 @@ public class TileObjectShader extends CameraShader implements ObjectInfoUser {
 		uniform(GL20.glGetUniformLocation(pId, "levelOffset"), level.levelOffset);
 		level.sky.bindTexture(0);
 		level.pointLights.bind(1);
-		level.blockLighting.bind(2);
+		level.blockLighting.bind(level.tiles.illumMask, 2);
 	}
 
 }

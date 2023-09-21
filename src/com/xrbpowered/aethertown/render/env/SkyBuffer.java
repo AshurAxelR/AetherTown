@@ -62,7 +62,7 @@ public class SkyBuffer {
 		int pId = shader.getProgramId();
 		GL20.glUseProgram(pId);
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level==null ? 0 : level.level.levelSize);
-		level.blockLighting.bind(0);
+		level.blockLighting.bind(level.tiles.illumMask, 0);
 	}
 	
 	public void render(RenderTarget target, LevelRenderer level) {

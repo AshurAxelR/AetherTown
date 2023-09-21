@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.LevelRenderer;
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.GeneratorException;
@@ -80,7 +81,7 @@ public class Bridge extends TileTemplate {
 			// FIXME under bridge create geometry via TileTemplate.createGeometry()
 			Street.street.addInstance(r, new TileObjectInfo(tile, 0, -tile.h, 0));
 			r.pointLights.setLight(tile, 0, -tile.h+5.5f, 0, 4.5f);
-			r.blockLighting.addLight(tile, tile.basey-tile.h+5, Street.lampLightColor, 0.5f, false);
+			r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey-tile.h+5, Street.lampLightColor, 0.5f, false);
 		}
 		else {
 			throw new GeneratorException("Not supported yet.");

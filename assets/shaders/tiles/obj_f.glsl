@@ -23,6 +23,9 @@ uniform vec4 shadowColor = vec4(0.250, 0.349, 0.6, 1);
 
 uniform vec4 pointLightColor = vec4(1.0, 0.98, 0.9, 1);
 uniform float illumTrigger = 2;
+#ifdef ILLUM_TILE
+uniform int illumMask = 0;
+#endif
 
 uniform float fogNear = 40;
 uniform float fogFar = 160;
@@ -38,7 +41,9 @@ in vec2 pass_TexCoord;
 in vec4 pass_LevelPosition;
 in vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
-in vec3 pass_illumMod;
+flat in vec3 pass_illumMod;
+flat in int pass_illumMask;
+flat in float pass_illumTrigger;
 #endif
 
 out vec4 out_Color;
@@ -94,7 +99,7 @@ void main(void) {
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	#ifdef ILLUM_TILE
-	if(illum<illumTrigger) {
+	if(illum<pass_illumTrigger && (pass_illumMask & illumMask)!=0) {
 		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
 		out_Color = max(out_Color, illumColor);
 		float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));

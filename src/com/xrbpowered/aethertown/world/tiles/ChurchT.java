@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.env.SeasonalTexture;
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
@@ -25,6 +26,8 @@ public class ChurchT extends TileTemplate {
 	
 	private static final Color blockLightColor = new Color(0x5e4123);
 	private static final Color backLightColor = new Color(0x694c2d);
+	private static final IllumLayer illumLayer = IllumLayer.alwaysOn;
+	private static final float illumTrigger = 1.25f;
 	
 	private static IllumTileComponent mid, front1, front2, front3, front4, back1, back2;
 	private static TileComponent midRoof, chapelRoof;
@@ -97,7 +100,7 @@ public class ChurchT extends TileTemplate {
 		SubInfo sub = tile.sub;
 		if(sub.i==0) {
 			Dir dr = tile.sub.parent.dr;
-			IllumTileObjectInfo info = new IllumTileObjectInfo(tile, 0.5f*dr.dx, 0, 0.5f*dr.dz);
+			IllumTileObjectInfo info = new IllumTileObjectInfo(tile, 0.5f*dr.dx, 0, 0.5f*dr.dz).illum(illumLayer, illumTrigger);
 			TileObjectInfo roofInfo = new TileObjectInfo(tile, 0.5f*dr.dx, 0, 0.5f*dr.dz);
 			if(sub.j==1) {
 				front1.addInstance(r, info);
@@ -117,11 +120,11 @@ public class ChurchT extends TileTemplate {
 			midRoof.addInstance(r, roofInfo);
 		}
 		if(sub.j==1)
-			r.blockLighting.addLight(tile, tile.basey+8, Street.lampLightColor, 0.4f, false);
+			r.blockLighting.addLight(illumLayer, tile, tile.basey+8, Street.lampLightColor, 0.4f, false);
 		else if(sub.j==sub.parent.fwd-2)
-			r.blockLighting.addLight(tile, tile.basey+10, blockLightColor, 0.7f, true);
+			r.blockLighting.addLight(illumLayer, tile, tile.basey+10, blockLightColor, 0.7f, true);
 		else
-			r.blockLighting.addLight(tile, tile.basey+8, backLightColor, 0.4f, true);
+			r.blockLighting.addLight(illumLayer, tile, tile.basey+8, backLightColor, 0.4f, true);
 	}
 
 }
