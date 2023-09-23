@@ -39,7 +39,6 @@ in vec4 pass_LevelPosition;
 in vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
 flat in vec3 pass_illumMod;
-flat in float pass_illumTrigger;
 #endif
 
 out vec4 out_Color;
@@ -95,12 +94,10 @@ void main(void) {
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	#ifdef ILLUM_TILE
-	if(illum<pass_illumTrigger) {
-		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
-		out_Color = max(out_Color, illumColor);
-		float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
-		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
-	}
+	vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
+	out_Color = max(out_Color, illumColor);
+	float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
+	viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
 	#endif
 	
 	vec4 fogColor = texture(texSky, pass_SkyCoord);

@@ -5,6 +5,7 @@ uniform mat4 viewMatrix;
 uniform vec2 levelOffset = vec2(0, 0);
 
 #ifdef ILLUM_TILE
+uniform vec4 lightColor = vec4(1, 0.949, 0.850, 1);
 uniform int illumMask = 0;
 #endif
 
@@ -29,7 +30,6 @@ out vec4 pass_LevelPosition;
 out vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
 flat out vec3 pass_illumMod;
-flat out float pass_illumTrigger;
 #endif
 
 mat4 translationMatrix(vec3 t) {
@@ -65,7 +65,7 @@ void main(void) {
 	pass_Normal = normalize(vec3(modelMatrix * vec4(in_Normal, 0)));
 	pass_TexCoord = in_TexCoord;
 	#ifdef ILLUM_TILE
-	pass_illumMod = ins_illumMod;
-	pass_illumTrigger = (int(ins_illumMask) & illumMask)!=0 ? ins_illumTrigger : 0;
+	float illum = lightColor.x+lightColor.y+lightColor.z;
+	pass_illumMod = ((int(ins_illumMask) & illumMask)!=0 && illum < ins_illumTrigger) ? ins_illumMod : vec3(0);
 	#endif
 }
