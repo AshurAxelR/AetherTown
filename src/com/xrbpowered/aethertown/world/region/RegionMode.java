@@ -3,6 +3,9 @@ package com.xrbpowered.aethertown.world.region;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.GeneratorException;
+import com.xrbpowered.aethertown.world.region.paths.LinearRegionPaths;
+import com.xrbpowered.aethertown.world.region.paths.PortalRegionPaths;
 
 public abstract class RegionMode {
 
@@ -45,10 +48,19 @@ public abstract class RegionMode {
 		}
 	}
 	
-	public static RegionMode linear = new RegionMode(512, 128) {
+	public static RegionMode linear = new RegionMode(160, 128) {
+		@Override
+		public int getNumPortals() {
+			return 6;
+		}
 		@Override
 		public void coreGenerate(Region region, Random random) {
 			new LinearRegionPaths(region, random).generatePaths();
+			for(int index=0; index<getNumPortals(); index++) {
+				Dir d = region.cache.portals.getPortalDir(region.seed, index);
+				if(!new PortalRegionPaths(region, d.flip()).scanAndPlace(index, random))
+					throw new GeneratorException("Can't connect portal %d (%s)", index, d.name());
+			}
 		}
 		@Override
 		public String formatValue() {
@@ -120,7 +132,7 @@ public abstract class RegionMode {
 			Dir[] dirs = new Dir[] {region.cache.portals.getPortalDir(region.seed, 0), region.cache.portals.getPortalDir(region.seed, 1)};
 			int index = 0;
 			for(Dir d : dirs) {
-				region.generatePortal(index, x0+2*d.flip().dx, z0+2*d.flip().dz, d);
+				region.generatePortal(index, x0+2*d.flip().dx, z0+2*d.flip().dz, d, random);
 				index++;
 			}
 			LevelInfo level = new LevelInfo(region, x0, z0, 1, random.nextLong());

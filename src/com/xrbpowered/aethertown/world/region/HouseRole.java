@@ -8,7 +8,6 @@ import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
-import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet.DoorInfo;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 
 public class HouseRole {
@@ -44,7 +43,7 @@ public class HouseRole {
 			else {
 				house.addRole =  addOffice ? addCityRole(house, random) : residential;
 				if(house.addRole==residential)
-					return isCityHouse(house, random) ? arch[1] : arch[2];
+					return house.getFootprint()<=4 || isCityHouse(house, random) ? arch[2] : arch[1];
 				else
 					return arch[3];
 			}
@@ -101,29 +100,6 @@ public class HouseRole {
 		}
 	}
 
-	private static class PostOffice extends HouseRole {
-		private DoorInfo door;
-		private PostOffice(String title, final DoorInfo door) {
-			super(title, colorCivic,
-				new ArchitectureStyle(1, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(door),
-				new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(door),
-				new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(door),
-				new ArchitectureStyle(2, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, null, null).setDoorInfo(door),
-				new ArchitectureStyle(3, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, null, null).setDoorInfo(door)
-			);
-			this.door = door;
-		}
-		@Override
-		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			if(isPark(house))
-				return arch[0];
-			else if(!door.allowLamp)
-				return isCityHouse(house, random) ? arch[2] : arch[1];
-			else
-				return house.getFootprint()<=4 || isCityHouse(house, random) ? arch[4] : arch[3];
-		}
-	}
-
 	public static final HouseRole residential = new HouseRole("Residential", colorResidential,
 			new ArchitectureStyle(2, ArchitectureTileSet.baseSet),
 			new ArchitectureStyle(3, ArchitectureTileSet.baseSet)
@@ -134,8 +110,30 @@ public class HouseRole {
 		}
 	};
 
-	public static final HouseRole postOffice = new PostOffice("Post Office", ArchitectureTileSet.officeDoor);
-	public static final HouseRole civicCentre = new PostOffice("Civic Centre", ArchitectureTileSet.officeDoubleDoor);
+	public static final HouseRole postOffice = new HouseRole("Post Office", colorCivic,
+			new ArchitectureStyle(1, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living),
+			new ArchitectureStyle(2, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, null, null),
+			new ArchitectureStyle(3, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, null, null)
+		) {
+		@Override
+		public ArchitectureStyle arch(HouseGenerator house, Random random) {
+			if(isPark(house))
+				return arch[0];
+			else {
+				house.addRole = residential;
+				return house.getFootprint()<=4 || isCityHouse(house, random) ? arch[2] : arch[1];
+			}
+		}
+	};
+	public static final HouseRole civicCentre = new HouseRole("Civic Centre", colorCivic,
+			new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(ArchitectureTileSet.officeDoubleDoor),
+			new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(ArchitectureTileSet.officeDoubleDoor)
+		) {
+		@Override
+		public ArchitectureStyle arch(HouseGenerator house, Random random) {
+			return house.getFootprint()<8 && isCityHouse(house, random) ? arch[1] : arch[0];
+		}
+	};
 	public static final HouseRole hospital = new HouseRole("Hospital", colorHospital,
 			new ArchitectureStyle(2, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.hospital, IllumPattern.hospitalWards).setDoorInfo(ArchitectureTileSet.officeDoubleDoor),
 			new ArchitectureStyle(3, ArchitectureTileSet.officeSet, ArchitectureTileSet.baseSet).setIllum(IllumPattern.hospital, IllumPattern.hospitalWards).setDoorInfo(ArchitectureTileSet.officeDoubleDoor)

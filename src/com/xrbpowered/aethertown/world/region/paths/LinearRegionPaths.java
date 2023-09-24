@@ -1,41 +1,36 @@
-package com.xrbpowered.aethertown.world.region;
+package com.xrbpowered.aethertown.world.region.paths;
 
-import java.util.LinkedList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.GeneratorException;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
+import com.xrbpowered.aethertown.world.region.LevelSettlementType;
+import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
+import com.xrbpowered.aethertown.world.region.Region;
 
 public class LinearRegionPaths {
 
 	private static class PathToken {
 		public int x, z;
 		public Dir enter;
-		public int pop;
 		
-		public PathToken(int x, int z, Dir enter, int pop) {
+		public PathToken(int x, int z, Dir enter) {
 			this.x = x;
 			this.z = z;
 			this.enter = enter;
-			this.pop = pop;
 		}
 	}
 
 	public final Region region;
 	public final Random random;
 	
-	private LinkedList<PathToken> tokens = new LinkedList<>();
-	private int tokenCount = 0;
+	private PathToken token;
 
 	public LinearRegionPaths(Region region, Random random) {
 		this.region = region;
 		this.random = random;
-	}
-	
-	private void addToken(PathToken t) {
-		tokens.add(t);
-		tokenCount++;
 	}
 	
 	private LevelInfo checkSize(PathToken t, int s) {
@@ -89,7 +84,7 @@ public class LinearRegionPaths {
 		}
 	}
 	
-	private PathToken nextToken(LevelInfo level, Dir d, int pop, int att) {
+	private PathToken nextToken(LevelInfo level, Dir d, int att) {
 		int dx = d.dx;
 		int dz = d.dz;
 		if(dx>0)
@@ -100,11 +95,11 @@ public class LinearRegionPaths {
 			dz *= level.size;
 		else if(dz==0)
 			dz = random.nextInt(level.size);
-		PathToken nt = new PathToken(level.x0+dx, level.z0+dz, d, pop);
+		PathToken nt = new PathToken(level.x0+dx, level.z0+dz, d);
 		if(!region.isInside(nt.x, nt.z)) {
 			if(att>10)
 				throw new GeneratorException("Path out of region bounds");
-			return nextToken(level, d, pop, att+1);
+			return nextToken(level, d, att+1);
 		}
 		else
 			return nt;
@@ -113,16 +108,16 @@ public class LinearRegionPaths {
 	private static final WRandom wsize = new WRandom(0.5, 1, 0.05);
 
 	public void generatePaths() {
-		addToken(new PathToken(region.sizez/2, region.sizez/2, null, -5));
-		while(!tokens.isEmpty()) {
-			PathToken t = tokens.removeFirst();
-			tokenCount--;
+		token = new PathToken(region.sizez/2, region.sizez/2, null);
+		while(token!=null) {
+			PathToken t = token;
+			token = null;
 			int s = (region.startLevel==null) ? 1 : wsize.next(random)+1;
 			LevelInfo level = checkSize(t, s);
 			if(level==null) {
 				region.connectLevels(t.x, t.z, t.enter.flip());
-				if(tokenCount<1)
-					addToken(nextToken(region.map[t.x][t.z], Dir.east, t.pop+1, 0));
+				if(token==null)
+					token = nextToken(region.map[t.x][t.z], Dir.east, 0);
 				continue;
 			}
 			
@@ -142,11 +137,8 @@ public class LinearRegionPaths {
 			 	d = nextDir(t.enter, t.z);
 			}
 			
-			if(t.x<region.sizex-region.sizez/2) {
-				addToken(nextToken(level, d, t.pop+1, 0));
-				//if(random.nextInt(tokenCount*10+2)==0)
-				//	addToken(nextToken(level, nextDir(t.enter), t.pop+1));
-			}
+			if(t.x<region.sizex-region.sizez/2)
+				token = nextToken(level, d, 0);
 		}
 	}
 

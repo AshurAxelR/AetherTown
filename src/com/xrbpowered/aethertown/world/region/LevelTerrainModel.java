@@ -18,7 +18,7 @@ public class LevelTerrainModel {
 		}
 	};
 	public static final LevelTerrainModel low = new LevelTerrainModel("low", -100, -50, -30, 0);
-	public static final LevelTerrainModel flat = new LevelTerrainModel("flat", -40, 0, 20, 40);
+	public static final LevelTerrainModel flat = new LevelTerrainModel("flat", -40, 0, 20, 40).pathToBottom(low);
 	public static final LevelTerrainModel hill = new LevelTerrainModel("hill", -80, -20, 20, 80) {
 		@Override
 		public void fillTerrain(Level level, Random random) {
@@ -26,7 +26,7 @@ public class LevelTerrainModel {
 			HillsGenerator.expand(level, random, 5, 15, -2, 4);
 			HillsGenerator.expand(level, random, 1, 0, -8, 2);
 		}
-	};
+	}.pathToBottom(low);
 	public static final LevelTerrainModel peak = new LevelTerrainModel("peak", -60, 10, 60, 100) {
 		@Override
 		public void fillTerrain(Level level, Random random) {
@@ -34,7 +34,7 @@ public class LevelTerrainModel {
 			HillsGenerator.expand(level, random, 5, 15, -8, 0);
 			HillsGenerator.expand(level, random, 1, 0, -6, 2);
 		}
-	};
+	}.pathToBottom(hill);
 
 	public static LevelTerrainModel nullTerrain = bottom;
 	
@@ -43,6 +43,8 @@ public class LevelTerrainModel {
 	public final int starty, conny;
 	public final int edgey;
 	public final boolean noParks;
+	
+	public LevelTerrainModel pathToBottom = null;
 	
 	private LevelTerrainModel(String name, boolean noParks, int edgey, int conny, int starty, int maxy) {
 		this.name = name;
@@ -55,6 +57,11 @@ public class LevelTerrainModel {
 
 	private LevelTerrainModel(String name, int edgey, int conny, int starty, int maxy) {
 		this(name, false, edgey, conny, starty, maxy);
+	}
+	
+	protected LevelTerrainModel pathToBottom(LevelTerrainModel path) {
+		this.pathToBottom = path;
+		return this;
 	}
 
 	public void startTerrain(Token startToken, Random random) {

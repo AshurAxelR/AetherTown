@@ -35,11 +35,7 @@ public class Region {
 	}
 
 	public long seedXZ(int x, int z, int offs, long add) {
-		LevelInfo level = isInside(x, z) ? map[x][z] : null;
-		if(level!=null && level.fixed)
-			return level.seed;
-		else
-			return RandomSeed.seedXYZ(this.seed+add, x, z, offs);
+		return RandomSeed.seedXYZ(this.seed+add, x, z, offs);
 	}
 	
 	public long seedXZ(int x, int z, long add) {
@@ -181,15 +177,20 @@ public class Region {
 		LevelInfo level = map[x+d.dx][z+d.dz];
 		level.addConn(x+d.dx, z+d.dz, d.flip());
 	}
-	
-	public boolean generatePortal(int index, int x0, int z0, Dir d) {
+
+	public boolean canGeneratePortal(int x0, int z0) {
 		for(int x=x0-1; x<=x0+1; x++)
 			for(int z=z0-1; z<=z0+1; z++) {
 				if(!isInside(x, z) || map[x][z]!=null)
 					return false;
 			}
+		return true;
+	}
+
+	public boolean generatePortal(int index, int x0, int z0, Dir d, Random random) {
+		if(!canGeneratePortal(x0, z0))
+			return false;
 		
-		int portalSeed = cache.portals.getPortalSeed(this.seed, index) * 9;
 		PortalInfo portal = cache.portals.createPortalInfo(this.seed, index);
 		if(portal.d!=d)
 			throw new RuntimeException("Portal direction mismatch");
@@ -198,14 +199,13 @@ public class Region {
 			for(int dz=-1; dz<=1; dz++) {
 				int x = x0+dx;
 				int z = z0+dz;
-				LevelInfo level = new LevelInfo(this, x, z, 1, portalSeed, true);
+				LevelInfo level = new LevelInfo(this, x, z, 1, random.nextLong(), true);
 				level.setTerrain(LevelTerrainModel.lowest);
 				level.place();
 				if(x==x0 && z==z0) {
 					level.portal = portal;
 					portals[index] = level;
 				}
-				portalSeed++;
 			}
 		
 		connectLevels(x0, z0, d);
