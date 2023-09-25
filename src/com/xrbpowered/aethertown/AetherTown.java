@@ -130,7 +130,7 @@ public class AetherTown extends UIClient {
 	
 	private UIOffscreen uiRender;
 	private UINode uiRoot;
-	private UIPane uiTime, uiCompass, uiLookInfo, uiDebugInfo;
+	private UIPane uiTime, uiLookInfo, uiDebugInfo;
 	private BookmarkPane uiBookmarks;
 	
 	private UIPane uiLevelMap;
@@ -262,7 +262,6 @@ public class AetherTown extends UIClient {
 			@Override
 			public void layout() {
 				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
-				uiCompass.setLocation(getWidth()-uiCompass.getWidth()-20, uiTime.getY());
 				uiLookInfo.setLocation(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
 				uiBookmarks.setLocation(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
 				super.layout();
@@ -279,10 +278,10 @@ public class AetherTown extends UIClient {
 					y = g.drawString(String.format("%.1f fps", getFps()), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
 					// float a = 90f - (float)Math.toDegrees(Math.acos(sky.sun.position.dot(0, 1, 0, 0)));
 					// y = g.drawString(String.format("Sun angle: %.1f\u00b0", a), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+					String s = String.format("[%d, %d] %s", hoverx, hoverz, Dir8.values()[compass].name().toUpperCase());
 					if(level!=null && level.isInside(hoverx, hoverz) && level.map[hoverx][hoverz]!=null)
-						y = g.drawString(String.format("[%d, %d] y=%d", hoverx, hoverz, level.map[hoverx][hoverz].basey), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
-					else
-						y = g.drawString(String.format("[%d, %d]", hoverx, hoverz), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+						s += String.format(" y:%d", level.map[hoverx][hoverz].basey);
+					y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
 				}
 				@Override
 				public void updateTime(float dt) {
@@ -305,18 +304,6 @@ public class AetherTown extends UIClient {
 			}
 		};
 		uiTime.setSize(220, 32);
-		
-		uiCompass = new UIPane(uiRoot, false) {
-			@Override
-			protected void paintSelf(GraphAssist g) {
-				clear(g, bgColor);
-				g.setColor(Color.WHITE);
-				g.setFont(Fonts.large);
-				String s = Dir8.values()[compass].name().toUpperCase();
-				g.drawString(s, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
-			}
-		};
-		uiCompass.setSize(100, 32);
 		
 		uiLookInfo = new UIPane(uiRoot, false) {
 			@Override
@@ -393,7 +380,6 @@ public class AetherTown extends UIClient {
 		int comp = (int)Math.round(-camera.rotation.y*4.0/Math.PI) & 0x07;
 		if(comp!=compass) {
 			compass = comp;
-			uiCompass.repaint();
 		}
 		
 		pointActor.position.x = camera.position.x;
