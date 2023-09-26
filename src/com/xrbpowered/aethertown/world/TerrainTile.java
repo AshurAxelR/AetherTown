@@ -1,12 +1,15 @@
 package com.xrbpowered.aethertown.world;
 
+import static com.xrbpowered.aethertown.world.tiles.Park.bush;
+import static com.xrbpowered.aethertown.world.tiles.Park.bushRadius;
+import static com.xrbpowered.aethertown.world.tiles.Park.tree;
+import static com.xrbpowered.aethertown.world.tiles.Park.trunk;
+
 import java.util.ArrayList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
-import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
-
-import static com.xrbpowered.aethertown.world.tiles.Park.*;
+import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
 
 public class TerrainTile extends Tile {
 
@@ -28,8 +31,8 @@ public class TerrainTile extends Tile {
 			float tx = Tile.size*(px-0.5f);
 			float tz = Tile.size*(pz-0.5f);
 			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
-			tree.addInstance(r, new TileObjectInfo(x+tx, y0+ty, z+tz).scale(s, sy));
-			trunk.addInstance(r, new TileObjectInfo(x+tx, y0, z+tz).scale(1f, 0.2f*Tile.size+ty));
+			tree.addInstance(r, new ScaledTileObjectInfo(x+tx, y0+ty, z+tz).scale(s, sy));
+			trunk.addInstance(r, new ScaledTileObjectInfo(x+tx, y0, z+tz).scale(1f, 0.2f*Tile.size+ty));
 		}
 	}
 
@@ -62,7 +65,7 @@ public class TerrainTile extends Tile {
 			float tx = Tile.size*(px - 0.5f);
 			float tz = Tile.size*(pz - 0.5f);
 			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
-			bush.addInstance(r, new TileObjectInfo(x+tx, y0, z+tz).scale(s, sy));
+			bush.addInstance(r, new ScaledTileObjectInfo(x+tx, y0, z+tz).scale(s, sy));
 		}
 	}
 	

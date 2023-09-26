@@ -7,14 +7,10 @@ import com.xrbpowered.aethertown.world.Tile;
 
 public class TileObjectInfo extends ObjectInfo {
 
-	public float scaleXZ = 1f;
-	public float scaleY = 1f;
 	public float rotation = 0f;
 
 	public TileObjectInfo(TileObjectInfo info) {
 		super(info);
-		this.scaleXZ = info.scaleXZ;
-		this.scaleY = info.scaleY;
 		this.rotation = info.rotation;
 	}
 	
@@ -39,18 +35,6 @@ public class TileObjectInfo extends ObjectInfo {
 	public TileObjectInfo(Tile tile, float dout, float dy) {
 		super(tile, tile.d.dx*dout, dy, tile.d.dz*dout);
 		rotate(tile.d);
-	}
-
-	public TileObjectInfo scale(float xz, float y) {
-		this.scaleXZ = xz;
-		this.scaleY = y;
-		return this;
-	}
-
-	public TileObjectInfo scale(float s) {
-		this.scaleXZ = s;
-		this.scaleY = s;
-		return this;
 	}
 
 	public TileObjectInfo rotate(float a) {

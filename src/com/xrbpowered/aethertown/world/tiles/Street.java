@@ -13,6 +13,8 @@ import com.xrbpowered.aethertown.render.sprites.SpriteInfo;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
+import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -104,7 +106,7 @@ public class Street extends TileTemplate {
 		bridge = new TileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(TerrainBuilder.wallColor));
-		bridgeSupport = new TileComponent(
+		bridgeSupport = new ScaledTileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture(TerrainBuilder.wallColor));
 		FenceGenerator.createComponents();
@@ -138,7 +140,7 @@ public class Street extends TileTemplate {
 		int sh = basey-6-lowy;
 		bridge.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0));
 		if(sh>0)
-			bridgeSupport.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
+			bridgeSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
 	}
 
 	public void createHillBridge(LevelRenderer r, Tile tile, int basey) {

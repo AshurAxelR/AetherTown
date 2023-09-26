@@ -13,8 +13,6 @@ public class TileObjectShader extends CameraShader implements ObjectInfoUser {
 
 	public static final InstanceInfo instanceInfo = new InstanceInfo(ObjectShader.vertexInfo)
 			.addAttrib("ins_Position", 3)
-			.addAttrib("ins_ScaleXZ", 1)
-			.addAttrib("ins_ScaleY", 1)
 			.addAttrib("ins_Rotation", 1);
 	
 	public static final String[] samplerNames = {"texSky", "dataPointLights", "dataBlockLighting", "texDiffuse"};
@@ -67,9 +65,7 @@ public class TileObjectShader extends CameraShader implements ObjectInfoUser {
 		data[offs+0] = obj.position.x;
 		data[offs+1] = obj.position.y;
 		data[offs+2] = obj.position.z;
-		data[offs+3] = obj.scaleXZ;
-		data[offs+4] = obj.scaleY;
-		data[offs+5] = obj.rotation;
+		data[offs+3] = obj.rotation;
 	}
 	
 	public void setLevel(LevelRenderer level) {

@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.render.env.SeasonalTexture;
+import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -84,13 +85,13 @@ public class Park extends TileTemplate {
 					new Color(0xe9f2f4)
 				});
 		
-		tree = new TileComponent(
+		tree = new ScaledTileComponent(
 				BasicGeometry.sphere(treeRadius, 8, -1, ObjectShader.vertexInfo),
 				treeTexture);
-		trunk = new TileComponent(
+		trunk = new ScaledTileComponent(
 				BasicGeometry.cylinder(trunkRadius, 4, 1f, -1, ObjectShader.vertexInfo),
 				new Texture(new Color(0x665545)));
-		bush = new TileComponent(
+		bush = new ScaledTileComponent(
 				BasicGeometry.sphere(bushRadius, 8, -0.5f, ObjectShader.vertexInfo),
 				bushTexture);
 	}

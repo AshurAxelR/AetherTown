@@ -11,6 +11,7 @@ import com.xrbpowered.gl.scene.CameraActor;
 public class TileRenderer {
 
 	public final TileObjectShader shader;
+	public final ScaledTileObjectShader scaleShader;
 	public final IllumTileObjectShader lightShader;
 	public final SpriteShader spriteShader;
 	public final ObjectShader objShader;
@@ -19,6 +20,7 @@ public class TileRenderer {
 	
 	public TileRenderer() {
 		shader = new TileObjectShader();
+		scaleShader = new ScaledTileObjectShader();
 		lightShader = new IllumTileObjectShader();
 		spriteShader = new SpriteShader();
 		objShader = new ObjectShader();
@@ -26,6 +28,7 @@ public class TileRenderer {
 	
 	public TileRenderer setCamera(CameraActor camera) {
 		shader.setCamera(camera);
+		scaleShader.setCamera(camera);
 		lightShader.setCamera(camera);
 		spriteShader.setCamera(camera);
 		objShader.setCamera(camera);
@@ -34,6 +37,7 @@ public class TileRenderer {
 
 	public void updateEnvironment(ShaderEnvironment environment) {
 		environment.updateShader(shader);
+		environment.updateShader(scaleShader);
 		environment.updateShader(lightShader);
 		environment.updateShader(spriteShader);
 		environment.updateShader(objShader);
@@ -42,6 +46,7 @@ public class TileRenderer {
 	
 	public void setLevel(LevelRenderer r) {
 		shader.setLevel(r);
+		scaleShader.setLevel(r);
 		lightShader.setLevel(r);
 		spriteShader.setLevel(r);
 		objShader.setLevel(r); // FIXME setLevel on shader.use()
@@ -50,6 +55,7 @@ public class TileRenderer {
 	public LevelComponentRenderer[] createRenderers(LevelRenderer r) {
 		return new LevelComponentRenderer[] {
 			TileComponent.createRenderer(r, shader),
+			ScaledTileComponent.createRenderer(r, scaleShader),
 			IllumTileComponent.createRenderer(r, lightShader),
 			SpriteComponent.createRenderer(r, spriteShader)
 		};
@@ -57,6 +63,7 @@ public class TileRenderer {
 	
 	public void releaseRenderers(LevelRenderer r) {
 		TileComponent.releaseRenderer(r);
+		ScaledTileComponent.releaseRenderer(r);
 		IllumTileComponent.releaseRenderer(r);
 		SpriteComponent.releaseRenderer(r);
 	}

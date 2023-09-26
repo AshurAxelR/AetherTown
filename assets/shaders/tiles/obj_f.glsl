@@ -11,7 +11,7 @@ uniform sampler2D dataPointLights;
 uniform sampler2D dataBlockLighting;
 uniform sampler2D texDiffuse;
 #ifdef ILLUM_TILE
-uniform sampler2D texIllum;
+	uniform sampler2D texIllum;
 #endif
 
 uniform float levelSize;
@@ -38,7 +38,7 @@ in vec2 pass_TexCoord;
 in vec4 pass_LevelPosition;
 in vec2 pass_SkyCoord;
 #ifdef ILLUM_TILE
-flat in vec3 pass_illumMod;
+	flat in vec3 pass_illumMod;
 #endif
 
 out vec4 out_Color;
@@ -94,10 +94,10 @@ void main(void) {
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	#ifdef ILLUM_TILE
-	vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
-	out_Color = max(out_Color, illumColor);
-	float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
-	viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
+		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
+		out_Color = max(out_Color, illumColor);
+		float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
+		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
 	#endif
 	
 	vec4 fogColor = texture(texSky, pass_SkyCoord);
