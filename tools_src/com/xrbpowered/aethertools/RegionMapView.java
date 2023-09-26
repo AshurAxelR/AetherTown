@@ -175,7 +175,7 @@ public class RegionMapView extends UIElement {
 					g.pushPureStroke(true);
 					g.setColor(colorPortal);
 					g.setStroke(2f);
-					g.graph.drawOval(level.x0*tileSize+1, level.z0*tileSize+1, tileSize-2, tileSize-2);
+					g.graph.drawOval(level.x0*tileSize+3, level.z0*tileSize+3, tileSize-6, tileSize-6);
 					g.popAntialiasing();
 					g.resetStroke();
 					g.popPureStroke();

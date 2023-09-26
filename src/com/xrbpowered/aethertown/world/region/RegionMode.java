@@ -35,7 +35,7 @@ public abstract class RegionMode {
 		String[] vs = value.split(",\\s*", 10);
 		switch(vs[0]) {
 			case "linear":
-				return linear;
+				return new Linear(intParam(vs, 1, 64));
 			case "oneLevel":
 				return new OneLevel(intParam(vs, 1, 2), settlementParam(vs, 2, LevelSettlementType.village));
 			case "smallPeak":
@@ -48,7 +48,10 @@ public abstract class RegionMode {
 		}
 	}
 	
-	public static RegionMode linear = new RegionMode(160, 128) {
+	public static class Linear extends RegionMode {
+		public Linear(int addWidth) {
+			super(addWidth+128, 128);
+		}
 		@Override
 		public int getNumPortals() {
 			return 6;
@@ -58,15 +61,15 @@ public abstract class RegionMode {
 			new LinearRegionPaths(region, random).generatePaths();
 			for(int index=0; index<getNumPortals(); index++) {
 				Dir d = region.cache.portals.getPortalDir(region.seed, index);
-				if(!new PortalRegionPaths(region, d.flip()).scanAndPlace(index, random))
+				if(!new PortalRegionPaths(region, d.flip()).scanAndPlace(index, 56, random))
 					throw new GeneratorException("Can't connect portal %d (%s)", index, d.name());
 			}
 		}
 		@Override
 		public String formatValue() {
-			return "linear";
+			return String.format("linear,%d", sizex-128);
 		}
-	};
+	}
 
 	public static class OneLevel extends RegionMode {
 		public final int size;

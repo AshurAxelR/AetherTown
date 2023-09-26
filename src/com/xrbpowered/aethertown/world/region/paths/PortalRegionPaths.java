@@ -19,19 +19,22 @@ public class PortalRegionPaths {
 		this.dnext = d.cw();
 	}
 	
-	public boolean scanAndPlace(int index, Random random) {
+	public boolean scanAndPlace(int index, int startMargin, Random random) {
 		int isize = dnext.dx!=0 ? region.sizex : region.sizez;
 		int jsize = din.dx!=0 ? region.sizex : region.sizez;
+		int startx, startz;
+		if(dnext.dx!=0)
+			startx = random.nextInt(region.sizex-startMargin*2)+startMargin;
+		else
+			startx = dout.rightCorner().dx<0 ? 0 : region.sizex-1;
+		if(dnext.dz!=0)
+			startz = random.nextInt(region.sizez-startMargin*2)+startMargin;
+		else
+			startz = dout.rightCorner().dz<0 ? 0 : region.sizez-1;
+		
 		for(int i=0; i<isize-1; i++) {
-			int xi, zi;
-			if(dnext.dx!=0)
-				xi = region.sizex/2 + (i%2==0 ? 1 : -1)*(i/2)*dnext.dx;
-			else
-				xi = dout.rightCorner().dx<0 ? 0 : region.sizex-1;
-			if(dnext.dz!=0)
-				zi = region.sizez/2 + (i%2==0 ? 1 : -1)*(i/2)*dnext.dz;
-			else
-				zi = dout.rightCorner().dz<0 ? 0 : region.sizez-1;
+			int xi = startx + (i%2==0 ? 1 : -1)*(i/2)*dnext.dx;
+			int zi = startz + (i%2==0 ? 1 : -1)*(i/2)*dnext.dz;
 			for(int j=0, xj=xi, zj=zi; j<jsize; j++, xj+=din.dx, zj+=din.dz) {
 				if(!region.isInside(xj, zj))
 					break;
