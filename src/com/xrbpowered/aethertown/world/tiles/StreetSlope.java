@@ -133,10 +133,10 @@ public class StreetSlope extends TileTemplate {
 					handrailTex);
 			stepsL = new TileComponent(
 					ObjMeshLoader.loadObj("models/fences/steps_out_s1l.obj", 0, 1f, ObjectShader.vertexInfo, null),
-					TexColor.get(Street.streetColor));
+					TexColor.get(TerrainBuilder.wallColor));
 			stepsR = new TileComponent(
 					ObjMeshLoader.loadObj("models/fences/steps_out_s1r.obj", 0, 1f, ObjectShader.vertexInfo, null),
-					TexColor.get(Street.streetColor));
+					TexColor.get(TerrainBuilder.wallColor));
 		}
 	}
 
@@ -154,7 +154,7 @@ public class StreetSlope extends TileTemplate {
 		tile.setFence(dr, FenceGenerator.needsHandrail(tile, dr, 0, -hh));
 	}
 	
-	private static boolean postCheckFence(Tile tile, Tile upTile, Dir d) {
+	/*private static boolean postCheckFence(Tile tile, Tile upTile, Dir d) {
 		if(tile.getFence(d)==FenceType.stepsOut && upTile.getFence(d)!=FenceType.stepsOut) {
 			tile.setFence(d, FenceType.none);
 			return true;
@@ -170,7 +170,7 @@ public class StreetSlope extends TileTemplate {
 		Dir dr = tile.d.cw();
 		Tile upTile = tile.getAdj(tile.d.flip());
 		return postCheckFence(tile, upTile, dl) || postCheckFence(tile, upTile, dr);
-	}
+	}*/
 	
 	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {

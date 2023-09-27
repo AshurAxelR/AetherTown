@@ -149,7 +149,18 @@ public class Park extends TileTemplate {
 			tile.basey = miny;
 			return true;
 		}
-		tile.flex = (miny==tile.basey-1);
+		if(!tile.flex) {
+			for(Dir d : Dir.values()) {
+				Tile adj = tile.getAdj(d);
+				if(adj!=null && adj.t instanceof StreetSlope && ((StreetSlope) adj.t).h==1
+						&& Math.abs(adj.basey-tile.basey)<=1 && Math.abs(adj.basey-miny)<=1) {
+					tile.basey = adj.basey;
+					tile.flex = true;
+					return true;
+				}
+			}
+			tile.flex = (miny==tile.basey-1);
+		}
 		return false;
 	}
 	

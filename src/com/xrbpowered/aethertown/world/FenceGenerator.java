@@ -42,8 +42,8 @@ public abstract class FenceGenerator {
 	}
 	
 	public static FenceType needsHandrail(Tile tile, Dir d, int dy0, int dy1) {
-		Corner c0 = d.leftCorner();
-		Corner c1 = d.rightCorner();
+		Corner cl = d.leftCorner();
+		Corner cr = d.rightCorner();
 		Tile adj = tile.getAdj(d);
 		if(adj==null)
 			return FenceType.none;
@@ -53,12 +53,12 @@ public abstract class FenceGenerator {
 			if(tile.basey>=miny+(adj.t==Hill.template ? 8 : 4))
 				return FenceType.handrail;
 		}
-		int h0 = tile.t.getFenceY(tile, c0) - (adj.t.getFenceY(adj, c0.flipOver(d))+dy0);
-		int h1 = tile.t.getFenceY(tile, c1) - (adj.t.getFenceY(adj, c1.flipOver(d))+dy1);
-		if(h0>1 || h1>1)
+		int hl = tile.t.getFenceY(tile, cl) - (adj.t.getFenceY(adj, cl.flipOver(d))+dy0);
+		int hr = tile.t.getFenceY(tile, cr) - (adj.t.getFenceY(adj, cr.flipOver(d))+dy1);
+		if(hl>1 || hr>1)
 			return FenceType.handrail;
-		if(h0>0 || h1>0) {
-			if(adj.basey>=tile.basey-1)
+		if(hl>0 || hr>0) {
+			if(adj.basey>=tile.basey-1 || (tile.t instanceof StreetSlope))
 				return FenceType.stepsOut;
 			else
 				return FenceType.handrail;
