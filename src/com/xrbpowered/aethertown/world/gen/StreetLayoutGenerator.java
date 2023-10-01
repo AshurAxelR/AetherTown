@@ -168,5 +168,6 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}*/
 		for(FollowTerrain ft : fts)
 			ft.apply(ft.compute(), level);
+		FollowTerrain.levelCorners(level);
 	}
 }

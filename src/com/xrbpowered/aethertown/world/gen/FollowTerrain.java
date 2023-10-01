@@ -541,4 +541,51 @@ public class FollowTerrain {
 		return fts;
 	}
 
+	public static void levelCorners(Level level) {
+		for(int x=1; x<level.levelSize-1; x++)
+			for(int z=1; z<level.levelSize-1; z++) {
+				Tile tile = level.map[x][z];
+				if(tile==null || tile.t!=Street.template)
+					continue;
+				
+				boolean blocked = false;
+				Tile[] slopes = new Tile[4];
+				int numSlopes = 0;
+				int targety = 0;
+				for(Dir d : Dir.values()) {
+					Tile adj = tile.getAdj(d);
+					if(isStreet(level, adj, d)) {
+						if(adj.t instanceof StreetSlope) {
+							int h = ((StreetSlope) adj.t).h;
+							if(adj.d==d)
+								h = -h;
+							int y = tile.basey+h;
+							if(numSlopes==0 || y==targety) {
+								targety = y;
+								slopes[d.ordinal()] = adj;
+								numSlopes++; 
+							}
+							else
+								blocked = true;
+						}
+						else
+							blocked = true;
+					}
+					else if(adj!=null && adj.t!=Hill.template && (adj.d==d.flip() || Street.isAnyPath(adj.t)))
+						blocked = true;
+					if(blocked)
+						break;
+				}
+				
+				if(!blocked && numSlopes>1) {
+					Street.template.forceGenerate(new Token(tile.level, tile.x, targety, tile.z, tile.d));
+					for(Dir d : Dir.values()) {
+						Tile adj = slopes[d.ordinal()];
+						if(adj!=null)
+							Street.template.forceGenerate(new Token(adj.level, adj.x, targety, adj.z, adj.d));
+					}
+				}
+			}
+	}
+	
 }

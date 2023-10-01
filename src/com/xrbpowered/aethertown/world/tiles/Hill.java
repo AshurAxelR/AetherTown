@@ -124,6 +124,10 @@ public class Hill extends TileTemplate {
 			Tile adj = tile.getAdj(d);
 			if(adj==null)
 				continue;
+			if(adj.t==Hill.template && Math.abs(adj.basey-tile.basey)>4) {
+				adjDir = null;
+				break;
+			}
 			if(adj.t==Park.template || adj.t==Street.template || (adj.t instanceof Plaza)) {
 				if(Math.abs(adj.basey-tile.basey)<=1) {
 					if(adjDir==null || adj.t==Street.template) {
