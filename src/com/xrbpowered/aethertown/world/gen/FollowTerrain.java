@@ -571,7 +571,7 @@ public class FollowTerrain {
 						else
 							blocked = true;
 					}
-					else if(adj!=null && adj.t!=Hill.template && (adj.d==d.flip() || Street.isAnyPath(adj.t)))
+					else if(adj!=null && adj.t!=Hill.template && (adj.d==d || Street.isAnyPath(adj.t)))
 						blocked = true;
 					if(blocked)
 						break;
