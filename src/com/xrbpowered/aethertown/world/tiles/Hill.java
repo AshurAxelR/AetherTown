@@ -97,8 +97,17 @@ public class Hill extends TileTemplate {
 		boolean res = false;
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
-		if(miny!=tile.basey) {
-			tile.basey = miny;
+		int maxy = MathUtils.max(yloc);
+		int basey = miny;
+		for(Dir d : Dir.values()) {
+			Tile adj = tile.getAdj(d);
+			if(adj==null)
+				continue;
+			if(Street.isAnyStreet(adj.t) && maxy>adj.basey && basey<adj.basey-1)
+				basey = adj.basey-1;
+		}
+		if(basey!=tile.basey) {
+			tile.basey = basey;
 			res = true;
 		}
 		tile.miny = miny;
@@ -109,6 +118,7 @@ public class Hill extends TileTemplate {
 		Dir adjDir = null;
 		int y = 0;
 		int countUp = 0;
+		int countBench = 0;
 		TileTemplate gen = Park.template;
 		for(Dir d : Dir.shuffle(random)) {
 			Tile adj = tile.getAdj(d);
@@ -124,11 +134,14 @@ public class Hill extends TileTemplate {
 						gen = Bench.templatePark;
 				}
 			}
-			if(adj!=null && adj.basey>tile.basey-2) {
+			if(adj.t instanceof Bench)
+				countBench++;
+			if(adj.basey>tile.basey-2)
 				countUp++;
-			}
 		}
 		if(adjDir!=null && countUp>1) {
+			if(gen instanceof Bench && countBench>0)
+				gen = Park.template;
 			gen.forceGenerate(new Token(tile.level, tile.x, y, tile.z, adjDir.flip()));
 			return true;
 		}
