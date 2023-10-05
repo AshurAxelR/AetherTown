@@ -99,12 +99,14 @@ public class Hill extends TileTemplate {
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);
 		int basey = miny;
-		for(Dir d : Dir.values()) {
-			Tile adj = tile.getAdj(d);
-			if(adj==null)
-				continue;
-			if(Street.isAnyStreet(adj.t) && maxy>adj.basey && basey<adj.basey-1)
-				basey = adj.basey-1;
+		if(tile.level.isInside(tile.x, tile.z, 1)) {
+			for(Dir d : Dir.values()) {
+				Tile adj = tile.getAdj(d);
+				if(adj==null)
+					continue;
+				if(Street.isAnyStreet(adj.t) && maxy>adj.basey && basey<adj.basey-1)
+					basey = adj.basey-1;
+			}
 		}
 		if(basey!=tile.basey) {
 			tile.basey = basey;
