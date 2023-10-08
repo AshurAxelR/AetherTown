@@ -7,7 +7,8 @@ public class HeightLimiter {
 	public static final int maxCliff = 18; //24;
 	public static final int maxWall = 12; //8;
 	public static final int maxBridge = 18; //8;
-	public static final int maxEdge = 8;
+	public static final int maxEdge = 4; // 8
+	public static final int maxHeight = 200;
 
 	private static final int maxUpdate = 120;
 
@@ -32,8 +33,8 @@ public class HeightLimiter {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
 				int dy = Level.edgeDist(levelSize, x, z)*maxEdge;
-				miny[x][z] = level.heightGuide.gety(x, z); // Math.max(level.info.terrain.miny, level.heightGuide.gety(x, z)-dy);
-				maxy[x][z] = Math.min(level.info.terrain.maxy, level.heightGuide.gety(x, z)+dy);
+				miny[x][z] = level.heightGuide.gety(x, z);
+				maxy[x][z] = Math.min(maxHeight, level.heightGuide.gety(x, z)+dy);
 			}
 	}
 	

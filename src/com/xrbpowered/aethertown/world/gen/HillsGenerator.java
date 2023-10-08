@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.gen;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Level;
@@ -40,13 +41,13 @@ public class HillsGenerator extends TokenGenerator {
 	}
 
 	@Override
-	protected boolean checkToken(Token t) {
+	protected boolean checkToken(Token t, Random random) {
 		Tile tile = t.level.map[t.x][t.z];
 		if(tile!=null) {
 			if(tile.t==Street.template &&  t.y<tile.basey+4 && tile.getAdj(t.d)==null) {
 				t.x = t.x + t.d.dx;
 				t.z = t.z + t.d.dz;
-				return t.isInside() ? checkToken(t) : false;
+				return t.isInside() ? checkToken(t, random) : false;
 			}
 			else
 				return false;
@@ -60,13 +61,17 @@ public class HillsGenerator extends TokenGenerator {
 		int miny = t.level.heightLimiter.miny[t.x][t.z];
 		int maxy = t.level.heightLimiter.maxy[t.x][t.z];
 		if(miny<=maxy) {
-			if(t.y>maxy)
-				t.y = maxy;
-			if(t.y<miny)
-				t.y = miny;
+			if(t.y>maxy) {
+				int lowy = Math.max(miny, maxy - (maxdy-mindy));
+				t.y = random.nextInt(maxy-lowy+1) + lowy;
+			}
+			if(t.y<miny) {
+				int hiy = Math.min(maxy, miny + (maxdy-mindy));
+				t.y = random.nextInt(hiy-miny+1) + miny;
+			}
 		}
 		else {
-			t.y = (miny+maxy)/2;
+			t.y = random.nextInt(miny-maxy+1) + maxy; //(miny+maxy)/2;
 		}
 		return true;
 	}
@@ -78,6 +83,59 @@ public class HillsGenerator extends TokenGenerator {
 		}
 	}
 	
+	private static Token hillToken(Level level, Random random, int margin, float slope) {
+		int x = random.nextInt(level.levelSize-margin*2+1)+margin; 
+		int z = random.nextInt(level.levelSize-margin*2+1)+margin;
+		if(level.map[x][z]!=null)
+			return null;
+		
+		boolean free = true;
+		for(int j=1; j<4; j++)
+			for(Dir8 d : Dir8.values()) {
+				if(level.map[x+j*d.dx][z+j*d.dz]!=null) {
+					free = false;
+					break;
+				}
+			}
+		if(!free)
+			return null;
+		
+		int tx = x;
+		int tz = z;
+		int mid = level.levelSize/2;
+		int dist = 0;
+		int ty = 0;
+		for(;;) {
+			if(tx!=mid && random.nextBoolean())
+				tx += (tx>mid) ? -1 : 1;
+			else
+				tz += (tz>mid) ? -1 : 1;
+			dist++;
+			Tile tile = level.map[tx][tz];
+			if(tile!=null) {
+				ty = tile.basey;
+				break;
+			}
+		}
+		
+		int miny = level.heightLimiter.miny[x][z];
+		int maxy = level.heightLimiter.maxy[x][z];
+		int midy = (miny+maxy)/2;
+		int y = (int)(ty + dist*slope);
+		if(y>midy)
+			y = midy + random.nextInt(maxy-midy+1);
+		return new Token(level, x, y, z, Dir.random(random));
+	}
+
+	public static void makeHills(Level level, Random random, int count, int limit, float slope) {
+		for(int i=0; i<count*level.info.size*level.info.size; i++) {
+			HillsGenerator hillsGen = new HillsGenerator(limit).setAmp(-2, 2);
+			Token t = hillToken(level, random, 8, slope);
+			if(t!=null)
+				hillsGen.generate(t, random);
+		}
+	}
+
 	private static void expandTokens(Level level, HillsGenerator gen, Random random, int skip) {
 		for(int x=0; x<level.levelSize; x++)
 			for(int z=0; z<level.levelSize; z++) {

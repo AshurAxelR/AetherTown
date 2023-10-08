@@ -34,7 +34,7 @@ public abstract class TokenGenerator implements Generator {
 		return countTokens;
 	}
 	
-	protected boolean checkToken(Token t) {
+	protected boolean checkToken(Token t, Random random) {
 		return t.level.map[t.x][t.z]==null;
 	}
 	
@@ -62,7 +62,7 @@ public abstract class TokenGenerator implements Generator {
 			countTokens--;
 			if(!t.level.isInside(t.x, t.z))
 				continue;
-			if(!checkToken(t))
+			if(!checkToken(t, random))
 				continue;
 			
 			Generator gen = (t.gen==null) ? selectGenerator(t, random) : t.gen;
