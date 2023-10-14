@@ -20,7 +20,6 @@ public class Hill extends TileTemplate {
 	
 	public class HillTile extends TerrainTile {
 		public Integer maxDelta = null;
-		public Integer miny = null;
 		
 		public HillTile() {
 			super(Hill.this);
@@ -42,13 +41,6 @@ public class Hill extends TileTemplate {
 		return 0;
 	}
 
-	@Override
-	public int getBlockY(Tile atile) {
-		HillTile tile = (HillTile) atile;
-		getMaxDelta(tile); // make sure miny and maxDelta exist
-		return tile.miny+tile.maxDelta/2;
-	}
-	
 	@Override
 	public int getFenceY(Tile tile, Corner c) {
 		return HeightMap.tiley(tile, c);
@@ -86,7 +78,6 @@ public class Hill extends TileTemplate {
 		if(tile.maxDelta==null) {
 			int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 			tile.maxDelta = MathUtils.maxDelta(yloc);
-			tile.miny = MathUtils.min(yloc);
 		}
 		return tile.maxDelta;
 	}
@@ -112,7 +103,6 @@ public class Hill extends TileTemplate {
 			tile.basey = basey;
 			res = true;
 		}
-		tile.miny = miny;
 		tile.maxDelta = MathUtils.maxDelta(yloc);
 		if(tile.maxDelta>1 || !tile.level.isInside(tile.x, tile.z, 2) || tile.level.info.terrain.noParks)
 			return res;

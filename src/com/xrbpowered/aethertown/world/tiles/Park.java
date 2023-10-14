@@ -22,10 +22,6 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
 
-	public static final float treeRadius = 0.6f*Tile.size;
-	public static final float trunkRadius = 0.065f*Tile.size;
-	public static final float bushRadius = 0.3f*Tile.size;
-	
 	public static final Park template = new Park();
 	
 	public static TileComponent tree, trunk, bush;
@@ -86,13 +82,13 @@ public class Park extends TileTemplate {
 				});
 		
 		tree = new ScaledTileComponent(
-				BasicGeometry.sphere(treeRadius, 8, -1, ObjectShader.vertexInfo),
+				BasicGeometry.sphere(1f, 8, -1, ObjectShader.vertexInfo),
 				treeTexture);
 		trunk = new ScaledTileComponent(
-				BasicGeometry.cylinder(trunkRadius, 4, 1f, -1, ObjectShader.vertexInfo),
-				new Texture(new Color(0x665545)));
+				BasicGeometry.cylinder(0.26f, 4, 1f, -1, ObjectShader.vertexInfo),
+				new Texture(new Color(0x615746)));
 		bush = new ScaledTileComponent(
-				BasicGeometry.sphere(bushRadius, 8, -0.5f, ObjectShader.vertexInfo),
+				BasicGeometry.sphere(1f, 8, -0.5f, ObjectShader.vertexInfo),
 				bushTexture);
 	}
 

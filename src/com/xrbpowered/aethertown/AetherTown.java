@@ -17,6 +17,7 @@ import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.utils.ParseParams;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -541,7 +542,7 @@ public class AetherTown extends UIClient {
 		}
 		if(tile!=null && tile instanceof HillTile) {
 			HillTile ht = (HillTile) tile;
-			System.out.printf("miny=%d, maxDelta=%d\n\n", ht.miny, ht.maxDelta);
+			System.out.printf("miny=%d, maxDelta=%d\n\n", MathUtils.min(yloc), ht.maxDelta);
 		}
 	}
 	
