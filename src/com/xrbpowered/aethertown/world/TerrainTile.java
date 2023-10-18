@@ -1,8 +1,6 @@
 package com.xrbpowered.aethertown.world;
 
-import static com.xrbpowered.aethertown.world.tiles.Park.bush;
-import static com.xrbpowered.aethertown.world.tiles.Park.tree;
-import static com.xrbpowered.aethertown.world.tiles.Park.trunk;
+import static com.xrbpowered.aethertown.world.tiles.Park.*;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -15,6 +13,7 @@ import com.xrbpowered.aethertown.world.tiles.Hill;
 public class TerrainTile extends Tile {
 
 	public static final float treeRadius = 2.4f;
+	public static final float pineRadius = 1.4f;
 	public static final float bushRadius = 1.2f;
 	
 	public static class Tree {
@@ -56,6 +55,45 @@ public class TerrainTile extends Tile {
 			return this;
 		}
 	}
+	
+	public static class PineTree extends Tree {
+		public Tree generate(TerrainTile tile, Random random) {
+			px = random.nextFloat()*0.4f + 0.3f;
+			pz = random.nextFloat()*0.4f + 0.3f;
+			ty = 0.3f+random.nextFloat()*0.7f;
+			s = 0.8f+random.nextFloat()*1.0f;
+			sy = s*(2.8f+random.nextFloat()*2.2f);
+			return this;
+		}
+		
+		public void addInstance(TerrainTile tile, LevelRenderer r) {
+			float x = tile.x*size;
+			float z = tile.z*size;
+			float tx = size*(px-0.5f);
+			float tz = size*(pz-0.5f);
+			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
+			pine.addInstance(r, new ScaledTileObjectInfo(x+tx, y0+ty, z+tz).scale(pineRadius*s, pineRadius*sy));
+			trunk.addInstance(r, new ScaledTileObjectInfo(x+tx, y0-0.2f, z+tz).scale(s*0.8f, 0.3f*pineRadius*sy+ty));
+		}
+	}
+
+	public static class ForestPineTree extends PineTree {
+		public int n;
+		
+		public ForestPineTree(int n) {
+			this.n = n;
+		}
+		
+		public Tree generate(TerrainTile tile, Random random) {
+			px = random.nextFloat()*0.8f + 0.1f;
+			pz = random.nextFloat()*0.8f + 0.1f;
+			ty = 1.3f+0.8f*(n-1)+random.nextFloat()*(1.8f+0.5f*n);
+			s = 1f-0.05f*n+random.nextFloat()*0.6f;
+			sy = s*(3f+random.nextFloat()*1.6f);
+			return this;
+		}
+	}
+
 
 	public static class TallTree extends Tree {
 		public float[] a = new float[3];
@@ -145,29 +183,58 @@ public class TerrainTile extends Tile {
 			bush.addInstance(this, r);
 	}
 	
+	private static Tree randomTree(Random random, boolean forest, int numTrees, int blockh, boolean wilderness) {
+		if(forest) {
+			if(wilderness && random.nextFloat() < 0.75f)
+				return new ForestPineTree(numTrees);
+			else
+				return new ForestTree(numTrees);
+		}
+		if(wilderness && random.nextFloat() < 0.85f)
+			return new PineTree();
+		if(!wilderness && blockh<3 && random.nextFloat() < 0.2f)
+			return new PineTree();
+		if(random.nextFloat() < 0.3f)
+			return new TallTree();
+		return new Tree();
+	}
+	
 	public static void addTrees(TerrainTile tile, Random random) {
 		if(tile.basey<=-120)
 			return;
-		if(random.nextFloat()<0.4f && random.nextInt(100)>-tile.basey) {
+		boolean hasPine = false;
+		if(random.nextFloat()<0.7f && random.nextInt(100)>-tile.basey) {
 			int adjTrees = 0;
+			boolean wilderness = false;
 			if(tile.t==Hill.template) {
+				wilderness = true;
 				for(Dir d : Dir.values()) {
 					Tile adj = tile.getAdj(d);
 					if(adj==null || (adj instanceof TerrainTile && !((TerrainTile) adj).trees.isEmpty()))
 						adjTrees++;
+					if(adj!=null && adj.t!=Hill.template)
+						wilderness = false;
 				}
 			}
 			boolean forest = random.nextFloat()<0.3f*adjTrees;
-			if(tile.getAdjBlockY()-tile.basey<6 || forest && tile.getAdjBlockY()-tile.basey<9) {
+			int blockh = tile.getAdjBlockY()-tile.basey;
+			if(blockh<6 || forest && blockh<9) {
 				int numTrees = !forest ? 1 : random.nextInt(3)+1;
 				for(int i=0; i<numTrees; i++) {
-					Tree tree = (forest ? new ForestTree(numTrees) : (random.nextFloat() < 0.3f) ? new TallTree() : new Tree()).generate(tile, random);
-					if(tree!=null)
+					Tree tree = randomTree(random, forest, numTrees, blockh, wilderness).generate(tile, random);
+					if(tree!=null) {
+						if(tree instanceof PineTree) {
+							hasPine = true;
+							i++;
+						}
 						tile.trees.add(tree);
+					}
 				}
 			}
 		}
 		int numBushes = random.nextInt(6) - 2;
+		if(hasPine)
+			numBushes -= 2;
 		for(int i=0; i<numBushes; i++) {
 			if(random.nextInt(120)<-tile.basey)
 			 	continue;

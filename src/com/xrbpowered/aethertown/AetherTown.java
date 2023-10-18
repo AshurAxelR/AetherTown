@@ -225,10 +225,15 @@ public class AetherTown extends UIClient {
 					updateWalkY();
 				}
 				
-				if(input.isKeyDown(KeyEvent.VK_MINUS))
+				boolean blockUpdatePortals = false;
+				if(input.isKeyDown(KeyEvent.VK_MINUS)) {
 					WorldTime.shiftTimeOfYear(-dt);
-				else if(input.isKeyDown(KeyEvent.VK_EQUALS))
+					blockUpdatePortals = true;
+				}
+				else if(input.isKeyDown(KeyEvent.VK_EQUALS)) {
 					WorldTime.shiftTimeOfYear(dt);
+					blockUpdatePortals = true;
+				}
 				
 				float dtDay = dt;
 				if(input.isKeyDown(KeyEvent.VK_OPEN_BRACKET))
@@ -239,7 +244,8 @@ public class AetherTown extends UIClient {
 				uiTime.repaint();
 				environment.recalc(sky.sun.position);
 				updateEnvironment();
-				regionCache.portals.updateTime();
+				if(!blockUpdatePortals)
+					regionCache.portals.updateTime();
 				
 				super.updateTime(dt);
 			}

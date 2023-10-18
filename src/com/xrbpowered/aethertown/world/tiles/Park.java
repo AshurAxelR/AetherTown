@@ -24,7 +24,7 @@ public class Park extends TileTemplate {
 
 	public static final Park template = new Park();
 	
-	public static TileComponent tree, trunk, bush;
+	public static TileComponent tree, pine, trunk, bush;
 
 	public class ParkTile extends TerrainTile {
 		public boolean flex = false;
@@ -71,6 +71,14 @@ public class Park extends TileTemplate {
 					new Color(0xd3a848),
 					new Color(0xe0eef1)
 				});
+		Texture pineTexture = new SeasonalTexture(new int[] {10, 25, 45, 65, 77},
+				new Color[] {
+					new Color(0x426a18),
+					new Color(0x395e13),
+					new Color(0x485c12),
+					new Color(0x3a5c23),
+					new Color(0xcee1ed)
+				});
 		Texture bushTexture = new SeasonalTexture(new int[] {14, 22, 30, 50, 70, 77},
 				new Color[] {
 					new Color(0x74ad45),
@@ -84,6 +92,9 @@ public class Park extends TileTemplate {
 		tree = new ScaledTileComponent(
 				BasicGeometry.sphere(1f, 8, -1, ObjectShader.vertexInfo),
 				treeTexture);
+		pine = new ScaledTileComponent(
+				BasicGeometry.doubleCone(1f, 8, 0, 1, 0.2f, ObjectShader.vertexInfo),
+				pineTexture);
 		trunk = new ScaledTileComponent(
 				BasicGeometry.cylinder(0.26f, 4, 1f, -1, ObjectShader.vertexInfo),
 				new Texture(new Color(0x615746)));

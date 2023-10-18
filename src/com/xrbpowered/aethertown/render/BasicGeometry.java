@@ -115,7 +115,7 @@ public abstract class BasicGeometry {
 			cos[i] = (float) Math.cos(ai);
 		}
 		
-		FastMeshBuilder mb = new FastMeshBuilder(info, null, (segm+1) * (segm*2+1), segm * segm * 2 * 6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, null, (segm+1)*(segm*2+1), segm*segm*2*6);
 		
 		Vector3f v = new Vector3f();
 		int index = 0;
@@ -127,7 +127,7 @@ public abstract class BasicGeometry {
 				v.x = -r0 * cos[i];
 				v.z = r0 * sin[i];
 				vertex.setPosition(v.x, v.y-pivotYRatio*r, v.z);
-				vertex.setNormal(v.x/r, v.y/r, v.z/r);
+				vertex.setNormal(v.x, v.y, v.z);
 				vertex.setTexCoord(i / (float) segm, j / (float) segm);
 				index++;
 			}
@@ -159,7 +159,7 @@ public abstract class BasicGeometry {
 			cos[i] = (float) Math.cos(ai);
 		}
 		
-		FastMeshBuilder mb = new FastMeshBuilder(info, null, 2 * (segm*2+1), segm * 2 * 6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, null, 2*(segm*2+1), segm*2*6);
 		
 		Vector3f v = new Vector3f();
 		int index = 0;
@@ -178,7 +178,7 @@ public abstract class BasicGeometry {
 			v.x = -r * cos[i];
 			v.z = r * sin[i];
 			vertex.setPosition(v.x, v.y-pivotYRatio*h/2f, v.z);
-			vertex.setNormal(v.x/r, 0, v.z/r);
+			vertex.setNormal(v.x, 0, v.z);
 			vertex.setTexCoord(i / (float) segm, 1);
 			index++;
 		}
@@ -189,6 +189,72 @@ public abstract class BasicGeometry {
 				(i+1) * 2 + 0,
 				(i+0) * 2 + 0,
 				(i+0) * 2 + 1
+			);
+		}
+		
+		return mb.create();
+	}
+	
+	public static StaticMesh doubleCone(float r, int segm, float h0, float h1, float h2, VertexInfo info) {
+		int i;
+		float h01 = h1-h0;
+		float h02 = h2-h0;
+		
+		float[] sin = new float[segm*2+1];
+		float[] cos = new float[segm*2+1];
+		float ai;
+		float da = (float) Math.PI / (float) segm;
+		for(i=0, ai = 0; i<=segm*2; i++, ai += da) {
+			sin[i] = (float) Math.sin(ai);
+			cos[i] = (float) Math.cos(ai);
+		}
+		
+		FastMeshBuilder mb = new FastMeshBuilder(info, null, 2*2*(segm*2+1), 2*segm*2*3);
+		
+		Vector3f v = new Vector3f();
+		int index = 0;
+		for(i=0; i<=segm*2; i++) {
+			Vertex vertex = mb.getVertex(index);
+			vertex.setPosition(0, h1, 0);
+			vertex.setNormal(0, 1, 0);
+			vertex.setTexCoord((i+0.5f) / (float) segm, 0);
+			index++;
+
+			vertex = mb.getVertex(index);
+			v.y = h0;
+			v.x = -r * cos[i];
+			v.z = r * sin[i];
+			vertex.setPosition(v.x, v.y, v.z);
+			vertex.setNormal(-h01*cos[i], 0, h01*sin[i]);
+			vertex.setTexCoord(i / (float) segm, 1);
+			index++;
+			
+			vertex = mb.getVertex(index);
+			vertex.setPosition(0, h2, 0);
+			vertex.setNormal(0, -1, 0);
+			vertex.setTexCoord((i+0.5f) / (float) segm, 0);
+			index++;
+
+			vertex = mb.getVertex(index);
+			v.y = h0;
+			v.x = -r * cos[i];
+			v.z = r * sin[i];
+			vertex.setPosition(v.x, v.y, v.z);
+			vertex.setNormal(h02*cos[i], 0, -h02*sin[i]);
+			vertex.setTexCoord(i / (float) segm, 1);
+			index++;
+		}
+		
+		for(i=0; i<segm*2; i++) {
+			mb.addTriangle(
+				(i+1) * 4 + 1,
+				(i+0) * 4 + 0,
+				(i+0) * 4 + 1
+			);
+			mb.addTriangle(
+				(i+0) * 4 + 3,
+				(i+0) * 4 + 2,
+				(i+1) * 4 + 3
 			);
 		}
 		
