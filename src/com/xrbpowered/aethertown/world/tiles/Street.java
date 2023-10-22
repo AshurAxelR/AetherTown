@@ -245,6 +245,16 @@ public class Street extends TileTemplate {
 		
 		Dir dsrc = tile.d.flip();
 		Tile src = tile.getAdj(dsrc);
+		if(src==null) {
+			for(Dir d : Dir.values()) {
+				Tile adj = tile.getAdj(d);
+				if(adj!=null && Street.isAnyStreet(adj.t) && (adj.d==d.flip() || Math.abs(tile.basey-adj.basey)<=1)) {
+					src = adj;
+					dsrc = d;
+					break;
+				}
+			}
+		}
 		int res = 2;
 		Tile park = null;
 		
@@ -298,9 +308,8 @@ public class Street extends TileTemplate {
 			return 1;
 		
 		if(src!=null && (src.t instanceof StreetSlope)) {
-			int dy = ((StreetSlope)src.t).h;
 			Dir align = src.d; 
-			if(dy==1) {
+			if(((StreetSlope)src.t).h==1) {
 				Tile t = src;
 				final Dir[] dcheck = { align.cw(), align.ccw() };
 				while(t!=null && t.d==align && (t.t instanceof StreetSlope)) {

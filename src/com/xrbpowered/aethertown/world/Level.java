@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetGenerator;
@@ -190,6 +191,12 @@ public class Level {
 			for(int z=0; z<levelSize; z++) {
 				Tile tile = map[x][z];
 				tile.t.decorateTile(tile, random);
+				for(Corner c : Corner.values()) {
+					int fy = tile.t.getFenceY(tile, c);
+					int h = HeightMap.tiley(tile, c);
+					if(fy<h)
+						throw new GeneratorException("Negative wall: [%d, %d] (%s) %d<%d\n", x, z, c.name(), fy, h);
+				}
 			}
 		boolean upd = true;
 		while(upd) {
