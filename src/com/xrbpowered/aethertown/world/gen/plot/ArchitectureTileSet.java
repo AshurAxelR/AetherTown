@@ -10,19 +10,42 @@ import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.tiles.HouseT.HouseTile;
+import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
 public abstract class ArchitectureTileSet {
 
-	public static class DoorInfo {
-		public boolean allowLamp;
+	public enum DoorInfo {
+		residential("ground_wall_door"),
+		office("office/door"),
+		restaurantRed("office/restaurant_red", false),
+		restaurantBlack("office/restaurant_black", false),
+		officeDouble("office/ddoor", false),
+		shop("shop/door"),
+		localShop("shop/local"),
+		fastFood("shop/fastfood"),
+		coffeeShop("shop/coffee"),
+		shopDouble("shop/ddoor", false),
+		supermarket("shop/supermarket", false);
+		
+		private final String texturePath;
+		public final boolean allowLamp;
 		public IllumTileComponent door;
-		public DoorInfo(boolean allowLamp) {
+		
+		private DoorInfo(String path, boolean allowLamp) {
+			this.texturePath = path;
 			this.allowLamp = allowLamp;
 		}
-		public DoorInfo() {
-			this(true);
+		
+		private DoorInfo(String path) {
+			this(path, true);
+		}
+		
+		public void createComponent() {
+			door = new IllumTileComponent(wall,
+					new Texture(String.format("models/house/%s.png", texturePath), false, true, false),
+					new Texture(String.format("models/house/%s_illum.png", texturePath), false, true, false));
 		}
 	}
 	
@@ -68,14 +91,6 @@ public abstract class ArchitectureTileSet {
 	public abstract DoorInfo getDefaultDoor();
 	public abstract void createSetComponents();
 
-	public static StaticMesh wall;
-	
-	public static final DoorInfo baseDoor = new DoorInfo();
-	public static final DoorInfo officeDoor = new DoorInfo();
-	public static final DoorInfo officeDoubleDoor = new DoorInfo(false);
-	public static final DoorInfo shopDoor = new DoorInfo();
-	public static final DoorInfo shopDoubleDoor = new DoorInfo(false);
-	
 	public static ArchitectureTileSet baseSet = new ArchitectureTileSet(3) {
 		public IllumTileComponent topEnd;
 		
@@ -101,14 +116,11 @@ public abstract class ArchitectureTileSet {
 		
 		@Override
 		public DoorInfo getDefaultDoor() {
-			return baseDoor;
+			return DoorInfo.residential;
 		}
 		
 		@Override
 		public void createSetComponents() {
-			baseDoor.door = new IllumTileComponent(wall,
-					new Texture("models/house/ground_wall_door.png", false, true, false),
-					new Texture("models/house/ground_wall_door_illum.png", false, true, false));
 			walls[0] = new IllumTileComponent(wall,
 					new Texture("models/house/ground_wall.png", false, true, false),
 					new Texture("models/house/ground_wall_illum.png", false, true, false));
@@ -156,17 +168,11 @@ public abstract class ArchitectureTileSet {
 		
 		@Override
 		public DoorInfo getDefaultDoor() {
-			return officeDoor;
+			return DoorInfo.office;
 		}
 		
 		@Override
 		public void createSetComponents() {
-			officeDoor.door = new IllumTileComponent(wall,
-					new Texture("models/house/office/door.png", false, true, false),
-					new Texture("models/house/office/door_illum.png", false, true, false));
-			officeDoubleDoor.door = new IllumTileComponent(wall,
-					new Texture("models/house/office/ddoor.png", false, true, false),
-					new Texture("models/house/office/ddoor_illum.png", false, true, false));
 			Texture illum = new Texture("models/house/office/illum.png", false, true, false);
 			walls[0] = new IllumTileComponent(wall,
 					new Texture("models/house/office/ground.png", false, true, false), illum);
@@ -204,17 +210,11 @@ public abstract class ArchitectureTileSet {
 
 		@Override
 		public DoorInfo getDefaultDoor() {
-			return shopDoor;
+			return DoorInfo.shop;
 		}
 
 		@Override
 		public void createSetComponents() {
-			shopDoor.door = new IllumTileComponent(wall,
-					new Texture("models/house/shop/door.png", false, true, false),
-					new Texture("models/house/shop/door_illum.png", false, true, false));
-			shopDoubleDoor.door = new IllumTileComponent(wall,
-					new Texture("models/house/shop/ddoor.png", false, true, false),
-					new Texture("models/house/shop/ddoor_illum.png", false, true, false));
 			walls[0] = new IllumTileComponent(wall,
 					new Texture("models/house/shop/ground.png", false, true, false),
 					new Texture("models/house/shop/ground_illum.png", false, true, false));
@@ -224,8 +224,27 @@ public abstract class ArchitectureTileSet {
 		}
 	};
 	
+	public static StaticMesh wall;
+	public static IllumTileComponent postSign;
+	public static IllumTileComponent hospitalSign;
+	public static IllumTileComponent hotelSign;
+	
 	public static void createComponents() {
 		wall = BasicGeometry.wall(Tile.size, 6*Tile.ysize, ObjectShader.vertexInfo, null);
+		
+		StaticMesh sign = ObjMeshLoader.loadObj("models/house/sign/sign.obj", 0, 1f, ObjectShader.vertexInfo, null);
+		postSign = new IllumTileComponent(sign,
+				new Texture("models/house/sign/post.png", false, true, false),
+				new Texture("models/house/sign/post_illum.png", false, true, false));
+		hospitalSign = new IllumTileComponent(sign,
+				new Texture("models/house/sign/hospital.png", false, true, false),
+				new Texture("models/house/sign/hospital_illum.png", false, true, false));
+		hotelSign = new IllumTileComponent(ObjMeshLoader.loadObj("models/house/sign/sign2.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				new Texture("models/house/sign/hotel.png", false, true, false),
+				new Texture("models/house/sign/hotel_illum.png", false, true, false));
+		
+		for(DoorInfo door : DoorInfo.values())
+			door.createComponent();
 		baseSet.createSetComponents();
 		officeSet.createSetComponents();
 		shopSet.createSetComponents();

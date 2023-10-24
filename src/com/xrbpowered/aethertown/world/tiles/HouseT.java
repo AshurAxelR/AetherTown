@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
+import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
@@ -59,7 +60,10 @@ public class HouseT extends TileTemplate {
 	
 	@Override
 	public String getTileInfo(Tile tile) {
-		return ((HouseGeneratorBase) tile.sub.parent).getInfo();
+		if(tile.sub.i==0 && tile.sub.j==0)
+			return ((HouseGeneratorBase) tile.sub.parent).getInfo();
+		else
+			return super.getTileInfo(tile);
 	}
 	
 	@Override
@@ -158,6 +162,15 @@ public class HouseT extends TileTemplate {
 			if(sub.j==back)
 				arch.getWall(f, Dir.north, tile, yloc).addInstance(r, new IllumTileObjectInfo(tile, 0, arch.getFloorY(f), 0)
 						.illum(illumLayer, illumTrigger).illumMod(illumMod).rotate(tile.d));
+			
+			if(f==0 && sub.i==0 && sub.j==front) {
+				IllumTileComponent sign = house.role.getSign();
+				if(sign!=null) {
+					Dir da = house.right>=house.left ? tile.d.cw() : tile.d.ccw();
+					sign.addInstance(r, new IllumTileObjectInfo(tile, -tile.d.dx*0.5f+da.dx*0.5f, house.role.getSignY(), -tile.d.dz*0.5f+da.dz*0.5f)
+							.illum(illumLayer, illumTrigger).rotate(tile.d.flip()));
+				}
+			}
 		}
 
 		int roofy = arch.getRoofY();
