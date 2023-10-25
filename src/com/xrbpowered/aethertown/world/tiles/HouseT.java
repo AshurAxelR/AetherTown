@@ -84,12 +84,14 @@ public class HouseT extends TileTemplate {
 	
 	@Override
 	public int getFenceY(Tile tile, Corner c) {
-		return tile.basey+11;
+		HouseGenerator house = (HouseGenerator) tile.sub.parent;
+		return tile.basey + house.arch.getRoofY() - 1;
 	}
 	
 	@Override
 	public int getLightBlockY(Tile tile) {
-		return tile.basey+15;
+		HouseGenerator house = (HouseGenerator) tile.sub.parent;
+		return tile.basey + house.arch.getRoofY() + HouseT.roofHeight/2;
 	}
 	
 	@Override
