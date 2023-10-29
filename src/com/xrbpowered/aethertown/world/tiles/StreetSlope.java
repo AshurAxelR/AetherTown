@@ -150,27 +150,9 @@ public class StreetSlope extends TileTemplate {
 		Dir dl = tile.d.ccw();
 		Dir dr = tile.d.cw();
 		int hh = h>1 ? h : 0;
-		tile.setFence(dl, FenceGenerator.needsHandrail(tile, dl, -hh, 0));
-		tile.setFence(dr, FenceGenerator.needsHandrail(tile, dr, 0, -hh));
+		tile.setFence(dl, FenceGenerator.getFenceType(tile, dl, -hh, 0, h));
+		tile.setFence(dr, FenceGenerator.getFenceType(tile, dr, 0, -hh, h));
 	}
-	
-	/*private static boolean postCheckFence(Tile tile, Tile upTile, Dir d) {
-		if(tile.getFence(d)==FenceType.stepsOut && upTile.getFence(d)!=FenceType.stepsOut) {
-			tile.setFence(d, FenceType.none);
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
-	
-	@Override
-	public boolean postDecorateTile(Tile tile, Random random) {
-		Dir dl = tile.d.ccw();
-		Dir dr = tile.d.cw();
-		Tile upTile = tile.getAdj(tile.d.flip());
-		return postCheckFence(tile, upTile, dl) || postCheckFence(tile, upTile, dr);
-	}*/
 	
 	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {
@@ -221,6 +203,12 @@ public class StreetSlope extends TileTemplate {
 			}
 			Street.template.createLamp(atile, r, -0.5f);
 		}
+		
+		if(tile.getFence(dl)==FenceType.retainWall)
+			FenceGenerator.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dl));
+		if(tile.getFence(dr)==FenceType.retainWall)
+			FenceGenerator.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dr));
+		
 		street.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 	}
 	

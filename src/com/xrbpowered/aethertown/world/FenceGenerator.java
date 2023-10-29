@@ -2,6 +2,8 @@ package com.xrbpowered.aethertown.world;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
+import com.xrbpowered.aethertown.render.TerrainBuilder;
+import com.xrbpowered.aethertown.render.TerrainChunkBuilder;
 import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
@@ -9,6 +11,8 @@ import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.tiles.Hill;
+import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
@@ -20,10 +24,11 @@ public abstract class FenceGenerator {
 	public static enum FenceType {
 		none,
 		handrail,
-		stepsOut
+		stepsOut,
+		retainWall
 	}
 	
-	public static TileComponent handrailPole, steps;
+	public static TileComponent handrailPole, steps, retWall;
 	private static TileComponent handrail, stepsCorner;
 
 	public static void createComponents() {
@@ -39,9 +44,12 @@ public abstract class FenceGenerator {
 		stepsCorner = new TileComponent(
 				ObjMeshLoader.loadObj("models/fences/steps_out_c.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(Street.streetColor));
+		retWall = new TileComponent(
+				ObjMeshLoader.loadObj("models/fences/ret_wall.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(TerrainBuilder.wallColor));
 	}
 	
-	public static FenceType needsHandrail(Tile tile, Dir d, int dy0, int dy1) {
+	public static FenceType getFenceType(Tile tile, Dir d, int dy0, int dy1, int h) {
 		Corner cl = d.leftCorner();
 		Corner cr = d.rightCorner();
 		Tile adj = tile.getAdj(d);
@@ -50,6 +58,8 @@ public abstract class FenceGenerator {
 		if(adj.t==Hill.template || (adj instanceof StreetTile && ((StreetTile) adj).bridge && adj.d!=d && adj.d!=d.flip())) {
 			int[] yloc = tile.level.h.yloc(adj.x, adj.z);
 			int miny = MathUtils.min(yloc);
+			if(adj.t==Hill.template && ((HillTile) adj).maxDelta>TerrainChunkBuilder.cliffDelta && tile.basey-h<=miny)
+				return FenceType.retainWall;
 			if(tile.basey>=miny+(adj.t==Hill.template ? 8 : 4))
 				return FenceType.handrail;
 		}
@@ -66,13 +76,13 @@ public abstract class FenceGenerator {
 		return FenceType.none;
 	}
 
-	public static FenceType needsHandrail(Tile tile, Dir d) {
-		return needsHandrail(tile, d, 0, 0);
+	public static FenceType getFenceType(Tile tile, Dir d) {
+		return getFenceType(tile, d, 0, 0, 0);
 	}
 
-	public static void addHandrails(Tile tile) {
+	public static void addFences(Tile tile) {
 		for(Dir d : Dir.values()) {
-			tile.setFence(d, needsHandrail(tile, d));
+			tile.setFence(d, getFenceType(tile, d));
 		}
 	}
 
@@ -99,6 +109,9 @@ public abstract class FenceGenerator {
 					if(tile.getFence(d.cw())==FenceType.stepsOut)
 						stepsCorner.addInstance(r, new TileObjectInfo(tile).rotate(d));
 					break;
+				case retainWall:
+					retWall.addInstance(r, new TileObjectInfo(tile).rotate(d));
+					break;
 				default:
 					break;
 			}
@@ -120,19 +133,36 @@ public abstract class FenceGenerator {
 	private static boolean checkPole(Tile tile, Dir d, Dir ds) {
 		boolean pole = tile.getFence(ds)==FenceType.handrail;
 		if(!pole) {
-			Tile adjl = tile.getAdj(ds);
-			if(adjl!=null) {
-			pole = adjl.basey>=tile.basey && adjl.getFence(d)==FenceType.handrail;
+			Tile adjs = tile.getAdj(ds);
+			if(adjs!=null) {
+				pole = adjs.basey>=tile.basey && (adjs.getFence(d)==FenceType.handrail || adjs.getFence(d)==FenceType.retainWall);
 				if(!pole) {
-					adjl = adjl.getAdj(d);
-					pole = adjl!=null && adjl.basey>=tile.basey && adjl.getFence(ds.flip())==FenceType.handrail;
+					adjs = adjs.getAdj(d);
+					pole = adjs!=null && adjs.basey>=tile.basey && (adjs.getFence(ds.flip())==FenceType.handrail || adjs.getFence(ds.flip())==FenceType.retainWall);
 				}
 			}
 		}
-		// TODO check adj wall, including house
 		return pole;
 	}
-	
+
+	private static boolean checkPole(Tile tile, Corner c) {
+		int y = tile.t.getFenceY(tile, c);
+		int max = y;
+		for(Corner ca : Corner.values()) {
+			int x = tile.x+c.tx+ca.tx+1;
+			int z = tile.z+c.tz+ca.tz+1;
+			if(tile.level.isInside(x, z)) {
+				Tile adj = tile.level.map[x][z];
+				if(adj!=null) {
+					int ay = adj.t.getFenceY(adj, ca.flip());
+					if(ay>max)
+						max = ay;
+				}
+			}
+		}
+		return max>y;
+	}
+
 	public static boolean fillFenceGaps(Tile tile) {
 		boolean upd = false;
 		for(Dir d : Dir.values()) {
@@ -143,6 +173,10 @@ public abstract class FenceGenerator {
 				continue;
 			boolean polel = checkPole(tile, d, d.ccw());
 			boolean poler = checkPole(tile, d, d.cw());
+			if((polel || poler) && adj.t!=HouseT.template && adj.getFence(d.flip())==FenceType.none) {
+				polel |= checkPole(tile, d.rightCorner()); // FIXME dir.corner is wrong?
+				poler |= checkPole(tile, d.leftCorner());
+			}
 			if(polel && poler) {
 				tile.setFence(d, FenceType.handrail);
 				upd = true;

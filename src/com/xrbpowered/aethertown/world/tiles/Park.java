@@ -107,7 +107,7 @@ public class Park extends TileTemplate {
 	public void decorateTile(Tile tile, Random random) {
 		TerrainTile.addTrees((ParkTile) tile, random);
 		if(!isFlex(tile))
-			FenceGenerator.addHandrails(tile);
+			FenceGenerator.addFences(tile);
 	}
 	
 	@Override

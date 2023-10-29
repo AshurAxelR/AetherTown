@@ -94,7 +94,7 @@ public class Street extends TileTemplate {
 	public void createComponents() {
 		street = new TileComponent(
 				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
-				new Texture(streetColor));
+				TexColor.get(streetColor));
 		lamp = new IllumTileComponent(
 				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				new Texture("models/lamp/lamp.png", false, true, false),
@@ -105,10 +105,10 @@ public class Street extends TileTemplate {
 				TexColor.get(0x353433));
 		bridge = new TileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture(TerrainBuilder.wallColor));
+				TexColor.get(TerrainBuilder.wallColor));
 		bridgeSupport = new ScaledTileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture(TerrainBuilder.wallColor));
+				TexColor.get(TerrainBuilder.wallColor));
 		FenceGenerator.createComponents();
 	}
 
@@ -116,7 +116,7 @@ public class Street extends TileTemplate {
 	public void decorateTile(Tile tile, Random random) {
 		addLamp(tile, random);
 		autoAddHillBridge((StreetTile)tile, tile.basey);
-		FenceGenerator.addHandrails(tile);
+		FenceGenerator.addFences(tile);
 	}
 	
 	@Override

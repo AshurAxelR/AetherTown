@@ -67,7 +67,7 @@ public class Bridge extends TileTemplate {
 
 	@Override
 	public void decorateTile(Tile tile, Random random) {
-		FenceGenerator.addHandrails(tile);
+		FenceGenerator.addFences(tile);
 	}
 	
 	@Override
