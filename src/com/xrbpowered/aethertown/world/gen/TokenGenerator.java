@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.gen;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Generator;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TokenProvider;
@@ -32,6 +33,11 @@ public abstract class TokenGenerator implements Generator {
 	
 	public int tokenCount() {
 		return countTokens;
+	}
+	
+	public void addAllAdj(Token t) {
+		for(Dir d : Dir.values())
+			addToken(t.next(d, 0));
 	}
 	
 	protected boolean checkToken(Token t, Random random) {

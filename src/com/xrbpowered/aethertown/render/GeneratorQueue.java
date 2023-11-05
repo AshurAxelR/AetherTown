@@ -35,6 +35,7 @@ public class GeneratorQueue extends Thread {
 					level.generate();
 					c.level = level;
 				}
+				System.out.println("Generator queue empty.");
 			}
 		}
 		catch (InterruptedException e) {

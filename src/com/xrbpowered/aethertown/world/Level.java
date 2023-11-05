@@ -42,8 +42,6 @@ public class Level {
 	public Level(LevelInfo info) {
 		this.info = info;
 		this.levelSize = info.getLevelSize();
-		this.startx = levelSize/2;
-		this.startz = levelSize/2;
 	}
 	
 	@Override
@@ -125,7 +123,9 @@ public class Level {
 	private void generate(Random random) {
 		resetGenerator();
 		
-		Token startToken = new Token(this, getStartX(), info.terrain.starty, getStartZ(), Dir.north);
+		startx = levelSize/2;
+		startz = levelSize/2;
+		Token startToken = new Token(this, startx, info.terrain.starty, startz, Dir.north);
 		boolean genStreets = false;
 		if(info.settlement.maxHouses>0 || !info.conns.isEmpty()) {
 			genStreets = true;

@@ -120,51 +120,45 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 	}
 	
-	private static void connectOut(Level level, Random random, boolean multi) {
+	private static void connectOut(Level level, Random random, boolean multi, StreetLayoutGenerator sides) {
 		for(LevelConnection lc : level.info.conns) {
-			if(!new StreetConnector(level, lc.d, 0).connectOut(lc, random, multi))
+			if(!new StreetConnector(level, lc.d, 0, sides).connectOut(lc, random, multi))
 				throw new GeneratorException("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
 		}
 	}
 	
-	private static void reconnectStreets(Level level, Random random, boolean loop) {
+	private static void reconnectStreets(Level level, Random random, boolean loop, StreetLayoutGenerator sides) {
 		if(level.info.settlement.maxHouses==0)
 			return;
 		boolean upd = true;
 		while(upd && loop) {
 			upd = false;
 			for(Dir d : Dir.shuffle(random)) {
-				upd |= new StreetConnector(level, d).connectAll(random);
+				upd |= new StreetConnector(level, d, sides).connectAll(random);
 			}
 		}
 	}
 	
 	public static void finishLayout(Level level, Random random) {
+		StreetLayoutGenerator sides = new StreetLayoutGenerator(0);
 		if(level.info.terrain.noParks) {
-			connectOut(level, random, false);
+			connectOut(level, random, false, sides);
 			trimStreets(level, random);
 		}
 		else {
-			reconnectStreets(level, random, false);
-			connectOut(level, random, true);
+			reconnectStreets(level, random, false, sides);
+			connectOut(level, random, true, sides);
 			trimStreets(level, random);
 			for(PlotGenerator plot : level.plots)
 				plot.fillStreet(random);
-			reconnectStreets(level, random, true);
+			reconnectStreets(level, random, true, sides);
 		}
 		level.heightLimiter.revalidate();
+		sides.generate(random);
 	}
 	
 	public static void followTerrain(Level level) {
 		ArrayList<FollowTerrain> fts = FollowTerrain.findStreets(level);
-		/*try {
-			PrintStream out = new PrintStream(String.format("fts_%d_%d.txt", level.info.x0, level.info.z0));
-			for(FollowTerrain ft : fts)
-				ft.print(out);
-		}
-		catch(IOException e) {
-			e.printStackTrace();
-		}*/
 		for(FollowTerrain ft : fts)
 			ft.apply(ft.compute(), level);
 		FollowTerrain.levelCorners(level);

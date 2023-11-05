@@ -102,14 +102,15 @@ public class HillsGenerator extends TokenGenerator {
 		
 		int tx = x;
 		int tz = z;
-		int mid = level.levelSize/2;
+		int startx = level.getStartX();
+		int startz = level.getStartZ();
 		int dist = 0;
 		int ty = 0;
 		for(;;) {
-			if(tx!=mid && random.nextBoolean())
-				tx += (tx>mid) ? -1 : 1;
+			if(tx!=startx && random.nextBoolean())
+				tx += (tx>startx) ? -1 : 1;
 			else
-				tz += (tz>mid) ? -1 : 1;
+				tz += (tz>startz) ? -1 : 1;
 			dist++;
 			Tile tile = level.map[tx][tz];
 			if(tile!=null) {

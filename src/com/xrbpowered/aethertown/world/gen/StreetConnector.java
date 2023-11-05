@@ -18,6 +18,7 @@ public class StreetConnector {
 
 	private static final int reconnectMargin = 3;
 	private static final int zMargin = 5;
+	private static final int sidesMargin = 4;
 	private static final float ascFactor = 2.67f;
 	
 	private static int lenForH(int h) {
@@ -122,6 +123,8 @@ public class StreetConnector {
 			if(end!=null) {
 				Tile t = end.tile();
 				if(t!=null && t.t==Street.template) {
+					if(level.isInside(end.x, end.z, sidesMargin))
+						sides.addAllAdj(end);
 					((StreetTile) t).forceExpand = true;
 				}
 			}
@@ -129,6 +132,7 @@ public class StreetConnector {
 	}
 	
 	public final Level level;
+	public final StreetLayoutGenerator sides;
 	public final int levelSize;
 	public final int margin;
 	public final Dir din, dout, dnext;
@@ -137,8 +141,9 @@ public class StreetConnector {
 	private int[] wopen;
 	private ArrayList<ConnPoint> connPoints = new ArrayList<>();
 	
-	public StreetConnector(Level level, Dir d, int margin) {
+	public StreetConnector(Level level, Dir d, int margin, StreetLayoutGenerator sides) {
 		this.level = level;
+		this.sides = sides;
 		this.levelSize = level.levelSize;
 		this.margin = margin;
 		this.din = d.flip();
@@ -149,8 +154,8 @@ public class StreetConnector {
 		this.wopen = new int[levelSize];
 	}
 
-	public StreetConnector(Level level, Dir d) {
-		this(level, d, reconnectMargin);
+	public StreetConnector(Level level, Dir d, StreetLayoutGenerator sides) {
+		this(level, d, reconnectMargin, sides);
 	}
 
 	public static boolean isAnyPath(Tile tile) {
