@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
+import com.xrbpowered.aethertown.world.gen.WalkingDistance;
 import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
@@ -34,6 +35,7 @@ public class Level {
 	public HeightGuide heightGuide = null;
 	public HeightLimiter heightLimiter = null;
 	public ArrayList<PlotGenerator> plots = null;
+	public WalkingDistance walkingDist = null;
 
 	private int startx, startz;
 	
@@ -66,6 +68,7 @@ public class Level {
 		heightGuide = new HeightGuide(info).generate();
 		heightLimiter = new HeightLimiter(this);
 		plots = new ArrayList<>();
+		walkingDist = new WalkingDistance(this);
 		StreetGenerator.defaultStreetMargin = info.settlement.getStreetMargin(levelSize);
 	}
 	
@@ -73,6 +76,7 @@ public class Level {
 		heightLimiter = null;
 		heightGuide = null;
 		plots = null;
+		walkingDist = null;
 	}
 	
 	private boolean finalizeTiles(Random random) {

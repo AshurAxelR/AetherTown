@@ -139,6 +139,42 @@ public class StreetSlope extends TileTemplate {
 					TexColor.get(TerrainBuilder.wallColor));
 		}
 	}
+	
+	@Override
+	public boolean finalizeTile(Tile tile, Random random) {
+		if(h==1) return false;
+		
+		final Dir[] sides = { tile.d.ccw(), tile.d.cw() };
+		int check = 0;
+		for(int i=2; check==0 && i<=4; i++) {
+			for(Dir d : sides) {
+				Tile adj = tile.getAdj(i*d.dx, i*d.dz);
+				if(adj!=null && adj.d==tile.d && adj.t instanceof StreetSlope && ((StreetSlope) adj.t).h>1 && Math.abs(tile.basey-adj.basey)<i*4) {
+					check = i;
+					break;
+				}
+			}
+		}
+		if(check>0) {
+			int maxDist = check*8;
+			tile.level.map[tile.x][tile.z] = null;
+			tile.level.walkingDist.calculate(tile.x+tile.d.dx, tile.z+tile.d.dz, maxDist);
+			if(tile.level.walkingDist.map[tile.x-tile.d.dx][tile.z-tile.d.dz]<=maxDist) {
+				final Dir[] ds = { tile.d, tile.d.flip() };
+				for(Dir d : ds) {
+					Tile t = tile.getAdj(d);
+					while(t!=null && t.t instanceof StreetSlope) {
+						tile.level.map[t.x][t.z] = null;
+						t = t.getAdj(d);
+					}
+				}
+				tile.level.heightLimiter.invalidate();
+				return true;
+			}
+			tile.level.map[tile.x][tile.z] = tile;
+		}
+		return false;
+	}
 
 	@Override
 	public void decorateTile(Tile atile, Random random) {

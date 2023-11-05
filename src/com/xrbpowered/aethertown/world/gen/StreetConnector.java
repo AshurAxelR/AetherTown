@@ -3,7 +3,6 @@ package com.xrbpowered.aethertown.world.gen;
 import static com.xrbpowered.aethertown.world.gen.StreetGenerator.streetGap;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
@@ -129,34 +128,6 @@ public class StreetConnector {
 		}
 	}
 	
-	private class DistToken {
-		public int x, z, dist;
-		public DistToken(int x, int z, int dist) {
-			this.x = x;
-			this.z = z;
-			this.dist = dist;
-		}
-	}
-	
-	public void calcWDist(int x0, int z0, int[][] wmap, int maxDist) {
-		for(int x=0; x<levelSize; x++)
-			for(int z=0; z<levelSize; z++)
-				wmap[x][z] = maxDist+1;
-		LinkedList<DistToken> tokens = new LinkedList<>();
-		tokens.add(new DistToken(x0, z0, 0));
-		while(!tokens.isEmpty()) {
-			DistToken t = tokens.removeFirst();
-			if(!isAnyPath(t.x, t.z))
-				continue;
-			if(t.dist>=wmap[t.x][t.z])
-				continue;
-			wmap[t.x][t.z] = t.dist;
-			for(Dir d : Dir.values()) {
-				tokens.add(new DistToken(t.x+d.dx, t.z+d.dz, t.dist+1));
-			}
-		}
-	}
-	
 	public final Level level;
 	public final int levelSize;
 	public final int margin;
@@ -182,15 +153,19 @@ public class StreetConnector {
 		this(level, d, reconnectMargin);
 	}
 
-	private static boolean isAnyPath(Tile tile) {
+	public static boolean isAnyPath(Tile tile) {
 		return tile==null ? false : Street.isAnyPath(tile.t);
 	}
 
-	private boolean isAnyPath(int x, int z) {
+	public static boolean isAnyPath(Level level, int x, int z) {
 		if(!level.isInside(x, z))
 			return false;
 		else
 			return isAnyPath(level.map[x][z]);
+	}
+
+	private boolean isAnyPath(int x, int z) {
+		return isAnyPath(level, x, z);
 	}
 
 	private int calcx(int i, int j) {
@@ -467,7 +442,6 @@ public class StreetConnector {
 		scanOpen(margin);
 		boolean upd = false;
 		int iblock = 0;
-		int[][] wdistMap = new int[levelSize][levelSize];
 		for(int p=1; p<connPoints.size()-1; p++) {
 			ConnPoint conn = connPoints.get(p);
 			if(conn.i<iblock+streetGap)
@@ -479,9 +453,9 @@ public class StreetConnector {
 			if(mdistL<3 && mdistR<3)
 				continue;
 			int maxWdist = MathUtils.max(mdistL, mdistR, 12);
-			calcWDist(conn.x, conn.z, wdistMap, maxWdist);
-			int wdistL = wdistMap[connL.x][connL.z]; 
-			int wdistR = wdistMap[connR.x][connR.z]; 
+			level.walkingDist.calculate(conn.x, conn.z, maxWdist);
+			int wdistL = level.walkingDist.map[connL.x][connL.z]; 
+			int wdistR = level.walkingDist.map[connR.x][connR.z]; 
 			if(connL.i>=iblock+streetGap && wdistL>10 && wdistL>mdistL && conn.mdist(connL)<20 && wdistL>=wdistR) {
 				if(makeUConnection(connL, conn, random)) {
 					iblock = conn.i;

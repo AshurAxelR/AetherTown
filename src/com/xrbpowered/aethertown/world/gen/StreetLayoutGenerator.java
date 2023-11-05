@@ -57,13 +57,12 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	
 	@Override
 	protected Generator selectGenerator(Token t, Random random) {
-		StreetGenerator street = new StreetGenerator(random, StreetGenerator.getPrevDy(t));
-		boolean fit = (t.level.houseCount>=houseLimit) ? false : street.checkFit(t, random);
-		if(fit && (street.isPerfectMatch() || tokenCount()<2 || random.nextInt(10)>0))
-			return street;
-		else {
-			return StreetGenerator.selectSideGenerator(t.level, (t.level.houseCount>=houseLimit) ? nextwLim : nextw, random, 0);
+		if(t.level.houseCount<houseLimit) {
+			StreetGenerator street = new StreetGenerator(random, StreetGenerator.getPrevDy(t));
+			if(street.checkFit(t, random) && (street.isPerfectMatch() || tokenCount()<2 || random.nextInt(10)>0))
+				return street;
 		}
+		return StreetGenerator.selectSideGenerator(t.level, (t.level.houseCount>=houseLimit) ? nextwLim : nextw, random, 0);
 	}
 
 	public static boolean addPointOfInterest(Token t, Random random) {
