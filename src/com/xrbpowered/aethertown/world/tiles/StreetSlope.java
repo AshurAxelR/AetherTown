@@ -142,7 +142,8 @@ public class StreetSlope extends TileTemplate {
 	
 	@Override
 	public boolean finalizeTile(Tile tile, Random random) {
-		if(h==1) return false;
+		if(h==1 || tile.sub!=null)
+			return false;
 		
 		final Dir[] sides = { tile.d.ccw(), tile.d.cw() };
 		int check = 0;

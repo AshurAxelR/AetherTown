@@ -45,7 +45,7 @@ public class IllumLayer {
 				maskMap[t] = m;
 			}
 		}
-		return maskMap[hour];
+		return maskMap[hour%24];
 	}
 	
 }

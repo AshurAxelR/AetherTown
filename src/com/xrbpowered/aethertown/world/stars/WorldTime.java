@@ -33,7 +33,7 @@ public class WorldTime {
 	}
 	
 	public static int getHourOfDay() {
-		return Math.round(getTimeOfDay()*60*60*24)/3600;
+		return Math.round(getTimeOfDay()*60*60*24)/3600%24;
 	}
 	
 	public static void setTime(float startSeason, int day, float t) {
