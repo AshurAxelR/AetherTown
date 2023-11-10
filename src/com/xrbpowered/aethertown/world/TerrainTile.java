@@ -9,6 +9,9 @@ import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.tiles.Hill;
+import com.xrbpowered.aethertown.world.tiles.Park;
+import com.xrbpowered.aethertown.world.tiles.Plaza;
+import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class TerrainTile extends Tile {
 
@@ -143,9 +146,9 @@ public class TerrainTile extends Tile {
 			px = random.nextFloat();
 			pz = random.nextFloat();
 			sy = 0.6f+random.nextFloat();
-			s = sy+random.nextFloat()*0.4f;
+			s = sy+random.nextFloat()*0.3f;
 			
-			float r = bushRadius*s;
+			float r = bushRadius*s*0.75f;
 			float tx = size*(px - 0.5f);
 			float tz = size*(pz - 0.5f);
 			if(tx<-size/2f+r && tile.getAdjT(-1, 0)!=tile.t)
@@ -202,21 +205,29 @@ public class TerrainTile extends Tile {
 	public static void addTrees(TerrainTile tile, Random random) {
 		if(tile.basey<=-120)
 			return;
+		boolean isHill = (tile.t==Hill.template);
+		
+		boolean adjStreet = false;
+		boolean adjPark = false;
+		int adjTrees = 0;
+		boolean wilderness = false;
+		wilderness = isHill;
+		for(Dir d : Dir.values()) {
+			Tile adj = tile.getAdj(d);
+			if(adj==null || (adj instanceof TerrainTile && !((TerrainTile) adj).trees.isEmpty()))
+				adjTrees++;
+			if(adj!=null && adj.t!=Hill.template) {
+				wilderness = false;
+				if(Street.isAnyPath(adj.t) || (adj.t instanceof Plaza))
+					adjStreet = true;
+				if(adj.t==Park.template)
+					adjPark = true;
+			}
+		}
+		
 		boolean hasPine = false;
 		if(random.nextFloat()<0.7f && random.nextInt(100)>-tile.basey) {
-			int adjTrees = 0;
-			boolean wilderness = false;
-			if(tile.t==Hill.template) {
-				wilderness = true;
-				for(Dir d : Dir.values()) {
-					Tile adj = tile.getAdj(d);
-					if(adj==null || (adj instanceof TerrainTile && !((TerrainTile) adj).trees.isEmpty()))
-						adjTrees++;
-					if(adj!=null && adj.t!=Hill.template)
-						wilderness = false;
-				}
-			}
-			boolean forest = random.nextFloat()<0.3f*adjTrees;
+			boolean forest = isHill && random.nextFloat()<0.3f*adjTrees;
 			int blockh = tile.getAdjBlockY()-tile.basey;
 			if(blockh<6 || forest && blockh<9) {
 				int numTrees = !forest ? 1 : random.nextInt(3)+1;
@@ -232,11 +243,22 @@ public class TerrainTile extends Tile {
 				}
 			}
 		}
+		
 		int numBushes = random.nextInt(6) - 2;
 		if(hasPine)
 			numBushes -= 2;
+		else if(adjStreet) {
+			numBushes += random.nextInt(4);
+			if(isHill && (adjTrees>0 || !tile.trees.isEmpty()))
+				numBushes += 2;
+		}
+		else if(isHill && adjPark) {
+			numBushes += random.nextInt(4);
+		}
+		numBushes = Math.min(numBushes, 4-tile.trees.size());
+		
 		for(int i=0; i<numBushes; i++) {
-			if(random.nextInt(120)<-tile.basey)
+			if(wilderness && random.nextInt(120)<-tile.basey)
 			 	continue;
 			Bush bush = new Bush().generate(tile, random);
 			if(bush!=null)

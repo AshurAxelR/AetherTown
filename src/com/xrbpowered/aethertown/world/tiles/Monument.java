@@ -25,6 +25,11 @@ public class Monument extends Plaza {
 	}
 	
 	@Override
+	public int getBlockY(Tile tile) {
+		return tile.basey+10;
+	}
+	
+	@Override
 	public void createComponents() {
 		pillar = new TileComponent(
 				ObjMeshLoader.loadObj("models/monument/pillar.obj", 0, 1f, ObjectShader.vertexInfo, null),
