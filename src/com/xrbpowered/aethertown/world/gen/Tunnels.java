@@ -6,6 +6,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder;
 import com.xrbpowered.aethertown.render.TerrainMaterial;
+import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
@@ -228,6 +229,11 @@ public abstract class Tunnels {
 			r.terrain.addWall(tile.x, tile.z, d, basey, tunnel.y[d.leftCorner().ordinal()], basey, tunnel.y[d.rightCorner().ordinal()]);
 			d = d.flip();
 			r.terrain.addWall(tile.x, tile.z, d, basey, tunnel.y[d.leftCorner().ordinal()], basey, tunnel.y[d.rightCorner().ordinal()]);
+		}
+
+		if(tunnel.entrance || (tile.x+tile.z)%2==0) {
+			r.pointLights.setLight(tile, 0, basey-tile.basey-2.5f, 0, 4.5f);
+			r.blockLighting.addLight(IllumLayer.alwaysOn, tile, basey-3, Street.lampLightColor, 0.3f, false);
 		}
 	}
 	

@@ -17,6 +17,7 @@ import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
@@ -121,8 +122,12 @@ public class LevelMapView extends UIElement {
 					continue;
 				Color c = new Color(0xfafafa);
 				Color addc = null;
-				if(Street.isAnyPath(tile.t))
-					c = Street.streetColor;
+				if(Street.isAnyPath(tile.t)) {
+					if(tile instanceof StreetTile && ((StreetTile) tile).tunnel!=null)
+						c = colorStreetBorder;
+					else
+						c = Street.streetColor;
+				}
 				else if(tile.t==Park.template)
 					c = new Color(0xddeebb);
 				else if(tile.t instanceof Plaza)

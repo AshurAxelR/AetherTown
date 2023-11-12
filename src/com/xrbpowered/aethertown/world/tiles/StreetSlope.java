@@ -102,6 +102,15 @@ public class StreetSlope extends TileTemplate {
 	public int getFenceY(Tile tile, Corner c) {
 		return getGroundY(tile, c);
 	}
+	
+	@Override
+	public int getLightBlockY(Tile atile) {
+		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null)
+			return tile.tunnel.basey;
+		else
+			return super.getLightBlockY(tile);
+	}
 
 	@Override
 	public boolean canExpandFill(Tile tile) {

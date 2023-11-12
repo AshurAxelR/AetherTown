@@ -81,6 +81,15 @@ public class Street extends TileTemplate {
 	}
 	
 	@Override
+	public int getLightBlockY(Tile atile) {
+		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null)
+			return tile.tunnel.basey;
+		else
+			return super.getLightBlockY(tile);
+	}
+	
+	@Override
 	public float getYIn(Tile atile, float sx, float sz, float prevy) {
 		StreetTile tile = (StreetTile) atile;
 		if(tile.tunnel!=null && Tunnels.isAbove(prevy, tile.tunnel.basey))

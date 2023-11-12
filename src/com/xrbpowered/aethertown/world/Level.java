@@ -16,6 +16,7 @@ import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.HouseAssignment;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class Level {
 
@@ -198,6 +199,8 @@ public class Level {
 			for(int z=0; z<levelSize; z++) {
 				Tile tile = map[x][z];
 				tile.t.decorateTile(tile, random);
+				if(tile.t==HouseT.template)
+					continue;
 				for(Corner c : Corner.values()) {
 					int fy = tile.t.getFenceY(tile, c);
 					int h = HeightMap.tiley(tile, c);

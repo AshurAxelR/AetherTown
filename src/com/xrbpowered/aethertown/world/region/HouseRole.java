@@ -95,10 +95,10 @@ public class HouseRole {
 		}
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			if(house.getFootprint()>=8) {
+			if(house.getFootprint()>=8 || house.getFootprint()>=6 && random.nextInt(3)>0) {
 				if(!isPark(house)) {
 					house.addRole = addCityRole(house, random);
-					return house.addRole==residential ? arch[1] : arch[2];
+					return house.addRole==residential ? arch[2] : arch[3];
 				}
 				else
 					return arch[0];
