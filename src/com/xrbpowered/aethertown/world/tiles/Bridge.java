@@ -6,11 +6,11 @@ import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
-import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
 public class Bridge extends TileTemplate {
@@ -67,7 +67,7 @@ public class Bridge extends TileTemplate {
 
 	@Override
 	public void decorateTile(Tile tile, Random random) {
-		FenceGenerator.addFences(tile);
+		Fences.addFences(tile);
 	}
 	
 	@Override
@@ -75,7 +75,7 @@ public class Bridge extends TileTemplate {
 		BridgeTile tile = (BridgeTile) atile;
 		Street.street.addInstance(r, new TileObjectInfo(tile));
 		Street.template.createBridge(r, tile, tile.basey, tile.basey-tile.h);
-		FenceGenerator.createFences(r, tile);
+		Fences.createFences(r, tile);
 		
 		if(tile.under==Street.template) {
 			// FIXME under bridge create geometry via TileTemplate.createGeometry()

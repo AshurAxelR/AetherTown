@@ -75,7 +75,7 @@ public class HeightMap {
 					if(t==null)
 						continue;
 					fix = t.t.getFixedYStrength();
-					y = t.getGroundY();
+					y = t.getGroundY(c.flip());
 				}
 				else {
 					if(cx<0) cx = 0;

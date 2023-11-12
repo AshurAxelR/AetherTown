@@ -8,10 +8,10 @@ import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.world.FenceGenerator;
-import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
 import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.gen.Fences;
+import com.xrbpowered.aethertown.world.gen.Fences.FenceType;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -100,7 +100,7 @@ public class Bench extends Plaza {
 		else {
 			r.terrain.addWalls(tile);
 			r.terrain.addFlatTile(TerrainMaterial.park, tile);
-			FenceGenerator.createFences(r, tile);
+			Fences.createFences(r, tile);
 			dout = -0.25f;
 		}
 		bench.addInstance(r, new TileObjectInfo(tile, dout, 0));

@@ -5,6 +5,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.gen.Fences;
 
 public abstract class TileTemplate implements Generator {
 
@@ -20,7 +21,7 @@ public abstract class TileTemplate implements Generator {
 		return 2;
 	}
 	
-	public int getGroundY(Tile tile) {
+	public int getGroundY(Tile tile, Corner c) {
 		return tile.basey;
 	}
 	
@@ -39,7 +40,7 @@ public abstract class TileTemplate implements Generator {
 	public float getYOut(Tile tile, Dir d, float sout, float sx, float sz, float prevy) {
 		switch(tile.getFence(d)) {
 			case stepsOut:
-				return FenceGenerator.getFenceYOut(tile.basey, sout);
+				return Fences.getFenceYOut(tile.basey, sout);
 			default:
 				return Float.NEGATIVE_INFINITY;
 		}

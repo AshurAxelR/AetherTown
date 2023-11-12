@@ -2,6 +2,8 @@ package com.xrbpowered.aethertown.render;
 
 import java.awt.Color;
 
+import com.xrbpowered.aethertown.world.tiles.Plaza;
+
 public enum TerrainMaterial {
 
 	park(
@@ -30,6 +32,15 @@ public enum TerrainMaterial {
 		TerrainBuilder.cliffColor,
 		TerrainBuilder.cliffColor,
 		TerrainBuilder.cliffColor
+	),
+	plaza(
+		Plaza.plazaColor,
+		Plaza.plazaColor,
+		Plaza.plazaColor,
+		Plaza.plazaColor,
+		Plaza.plazaColor,
+		Plaza.plazaColor,
+		new Color(0xd5dadc)
 	);
 	
 	public final Color[] colors;

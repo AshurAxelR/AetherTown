@@ -29,7 +29,6 @@ import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
-import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
@@ -539,13 +538,6 @@ public class AetherTown extends UIClient {
 			System.out.printf("%d; ", yloc[i]);
 		System.out.println();
 		
-		if(tile!=null && tile instanceof StreetTile) {
-			StreetTile st = (StreetTile) tile;
-			if(st.debugFT!=null) {
-				System.out.println("FollowTerrain:");
-				st.debugFT.print(System.out);
-			}
-		}
 		if(tile!=null && tile instanceof HillTile) {
 			HillTile ht = (HillTile) tile;
 			System.out.printf("miny=%d, maxDelta=%d\n\n", MathUtils.min(yloc), ht.maxDelta);

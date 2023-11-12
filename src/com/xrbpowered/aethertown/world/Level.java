@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetGenerator;
 import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
+import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.WalkingDistance;
 import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
@@ -171,11 +172,13 @@ public class Level {
 			}
 			StreetLayoutGenerator.trimStreets(this, random); // in case of removed plots
 		}
+
+		Tunnels.placeTunnels(this, random);
+		
 		if(houses==null || !checkNulls())
 			throw new GeneratorException("Level incomplete");
-		
+
 		decorate(random);
-		
 		releaseGenerator();
 	}
 

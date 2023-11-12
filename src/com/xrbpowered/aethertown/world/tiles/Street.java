@@ -17,16 +17,18 @@ import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
 import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
-import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
-import com.xrbpowered.aethertown.world.gen.FollowTerrain;
+import com.xrbpowered.aethertown.world.gen.Fences;
+import com.xrbpowered.aethertown.world.gen.Tunnels;
+import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
 import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
@@ -52,8 +54,7 @@ public class Street extends TileTemplate {
 		public Dir lampd = null;
 		public boolean bridge = false;
 		public boolean forceExpand = false;
-		
-		public FollowTerrain debugFT = null; // FIXME remove debug
+		public TunnelInfo tunnel = null;
 		
 		public StreetTile(TileTemplate t) {
 			super(t);
@@ -66,11 +67,28 @@ public class Street extends TileTemplate {
 	}
 	
 	@Override
-	public float getYIn(Tile tile, float sx, float sz, float y0) {
-		if(((StreetTile)tile).bridge && Bridge.isUnder(y0, tile.basey))
-			return tile.level.h.gety(tile.x, tile.z, sx, sz);
+	public int getGroundY(Tile atile, Corner c) {
+		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null)
+			return tile.tunnel.getGroundY(c);
 		else
-			return super.getYIn(tile, sx, sz, y0);
+			return tile.basey;
+	}
+	
+	@Override
+	public int getFenceY(Tile tile, Corner c) {
+		return getGroundY(tile, c);
+	}
+	
+	@Override
+	public float getYIn(Tile atile, float sx, float sz, float prevy) {
+		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null && Tunnels.isAbove(prevy, tile.tunnel.basey))
+			return Tile.ysize*tile.tunnel.basey;
+		if(tile.bridge && Bridge.isUnder(prevy, tile.basey))
+			return tile.level.h.gety(tile.x, tile.z, sx, sz);
+		
+		return super.getYIn(tile, sx, sz, prevy);
 	}
 	
 	@Override
@@ -109,38 +127,75 @@ public class Street extends TileTemplate {
 		bridgeSupport = new ScaledTileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(TerrainBuilder.wallColor));
-		FenceGenerator.createComponents();
+		Fences.createComponents();
 	}
 
+	public TunnelInfo checkTunnel(StreetTile tile) {
+		if(Tunnels.tunnelWallCondition(tile, tile.d.cw(), 0) && Tunnels.tunnelWallCondition(tile, tile.d.ccw(), 0)) {
+			tile.tunnel = new TunnelInfo(tile);
+			return tile.tunnel;
+		}
+		
+		int countAdjTunnels = 0;
+		for(Dir d : Dir.values()) {
+			boolean tun = Tunnels.isAdjTunnel(tile, d);
+			if(tun)
+				countAdjTunnels++;
+			if(!tun && !Tunnels.tunnelWallCondition(tile, d, 0))
+				return null;
+		}
+		if(countAdjTunnels<2)
+			return null;
+		
+		tile.tunnel = new TunnelInfo(tile);
+		tile.tunnel.junction = true;
+		return tile.tunnel;
+	}
+	
 	@Override
-	public void decorateTile(Tile tile, Random random) {
+	public void decorateTile(Tile atile, Random random) {
+		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null)
+			return;
+
 		addLamp(tile, random);
-		autoAddHillBridge((StreetTile)tile, tile.basey);
-		FenceGenerator.addFences(tile);
+		autoAddHillBridge(tile, tile.basey);
+		Fences.addFences(tile);
 	}
 	
 	@Override
 	public boolean postDecorateTile(Tile tile, Random random) {
-		return FenceGenerator.fillFenceGaps(tile);
+		return Fences.fillFenceGaps(tile);
 	}
 	
 	@Override
-	public void createGeometry(Tile tile, LevelRenderer r) {
+	public void createGeometry(Tile atile, LevelRenderer r) {
+		StreetTile tile = (StreetTile) atile;
 		street.addInstance(r, new TileObjectInfo(tile));
-		if(((StreetTile) tile).bridge)
+		if(tile.bridge)
 			createHillBridge(r, tile, tile.basey);
 		else
 			r.terrain.addWalls(tile);
-		FenceGenerator.createFences(r, tile);
+
+		if(tile.tunnel!=null) {
+			Tunnels.createTunnel(r, tile, tile.tunnel, tile.basey);
+		}
+		else {
+			Fences.createFences(r, tile);
+		}
 		createLamp(tile, r, 0);
 	}
 	
-	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
+	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy, Dir d) {
 		int dy = basey-tile.basey;
 		int sh = basey-6-lowy;
-		bridge.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0));
+		bridge.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0).rotate(d));
 		if(sh>0)
-			bridgeSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
+			bridgeSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize).rotate(d));
+	}
+
+	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
+		createBridge(r, tile, basey, lowy, tile.d);
 	}
 
 	public void createHillBridge(LevelRenderer r, Tile tile, int basey) {
@@ -149,7 +204,7 @@ public class Street extends TileTemplate {
 		createBridge(r, tile, basey, miny);
 		r.terrain.addHillTile(TerrainMaterial.hillGrass, tile);
 	}
-
+	
 	public void autoAddHillBridge(StreetTile tile, int basey) {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);

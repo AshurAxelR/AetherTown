@@ -5,10 +5,10 @@ import java.util.ArrayList;
 
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
 import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.gen.Fences.FenceType;
 import com.xrbpowered.gl.res.shader.ActorShader;
 
 public class TerrainBuilder {

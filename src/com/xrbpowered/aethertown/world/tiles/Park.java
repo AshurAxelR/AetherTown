@@ -13,11 +13,11 @@ import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
-import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
@@ -107,13 +107,13 @@ public class Park extends TileTemplate {
 	public void decorateTile(Tile tile, Random random) {
 		TerrainTile.addTrees((ParkTile) tile, random);
 		if(!isFlex(tile))
-			FenceGenerator.addFences(tile);
+			Fences.addFences(tile);
 	}
 	
 	@Override
 	public boolean postDecorateTile(Tile tile, Random random) {
 		if(!isFlex(tile))
-			return FenceGenerator.fillFenceGaps(tile);
+			return Fences.fillFenceGaps(tile);
 		else
 			return false;
 	}
@@ -128,7 +128,7 @@ public class Park extends TileTemplate {
 			r.terrain.addFlatTile(TerrainMaterial.park, tile);
 		}
 		((ParkTile) tile).createTrees(r);
-		FenceGenerator.createFences(r, tile);
+		Fences.createFences(r, tile);
 	}
 	
 	@Override

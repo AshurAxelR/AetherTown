@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.world;
+package com.xrbpowered.aethertown.world.gen;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
@@ -10,6 +10,7 @@ import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
@@ -19,7 +20,7 @@ import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
-public abstract class FenceGenerator {
+public abstract class Fences {
 
 	public static enum FenceType {
 		none,

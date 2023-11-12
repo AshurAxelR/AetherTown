@@ -18,11 +18,11 @@ import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
-import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
@@ -72,7 +72,7 @@ public class HouseT extends TileTemplate {
 	}
 	
 	@Override
-	public int getGroundY(Tile tile) {
+	public int getGroundY(Tile tile, Corner c) {
 		return ((HouseTile) tile).groundy;
 	}
 	
@@ -97,7 +97,7 @@ public class HouseT extends TileTemplate {
 	@Override
 	public float getYOut(Tile tile, Dir d, float sout, float sx, float sz, float prevy) {
 		if(((HouseTile) tile).steps && d==tile.d.flip())
-			return FenceGenerator.getFenceYOut(tile.basey, sout);
+			return Fences.getFenceYOut(tile.basey, sout);
 		else
 			return Float.NEGATIVE_INFINITY;
 	}
@@ -133,7 +133,7 @@ public class HouseT extends TileTemplate {
 		HouseTile tile = (HouseTile) atile;
 		r.terrain.addWalls(tile);
 		if(tile.steps)
-			FenceGenerator.steps.addInstance(r, new TileObjectInfo(tile).rotate(tile.d.flip()));
+			Fences.steps.addInstance(r, new TileObjectInfo(tile).rotate(tile.d.flip()));
 		
 		SubInfo sub = tile.sub;
 		HouseGenerator house = (HouseGenerator) sub.parent;

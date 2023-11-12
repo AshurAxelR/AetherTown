@@ -12,10 +12,12 @@ import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
-import com.xrbpowered.aethertown.world.FenceGenerator;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
-import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
+import com.xrbpowered.aethertown.world.gen.Fences;
+import com.xrbpowered.aethertown.world.gen.Fences.FenceType;
+import com.xrbpowered.aethertown.world.gen.Tunnels;
+import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -41,8 +43,20 @@ public class StreetSlope extends TileTemplate {
 	}
 	
 	@Override
-	public float getYIn(Tile tile, float sx, float sz, float prevy) {
-		if(((StreetTile)tile).bridge && Bridge.isUnder(prevy, tile.basey-h))
+	public int getGroundY(Tile atile, Corner c) {
+		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null)
+			return tile.tunnel.getGroundY(c);
+		else
+			return c==null ? tile.basey : getNoTunnelGroundY(tile, c);
+	}
+
+	@Override
+	public float getYIn(Tile atile, float sx, float sz, float prevy) {
+		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null && Tunnels.isAbove(prevy, tile.tunnel.basey))
+			return Tile.ysize*tile.tunnel.basey;
+		if(tile.bridge && Bridge.isUnder(prevy, tile.basey-h))
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
 
 		float y0 = Tile.ysize*tile.basey;
@@ -65,7 +79,7 @@ public class StreetSlope extends TileTemplate {
 		if(h==1 && tile.getFence(d)==FenceType.stepsOut) {
 			float y0 = Tile.ysize*tile.basey;
 			float y1 = Tile.ysize*(tile.basey-h);
-			float y = FenceGenerator.getFenceYOut(tile.basey, sout) - y0;
+			float y = Fences.getFenceYOut(tile.basey, sout) - y0;
 
 			float s = sForXZ(sx, sz, tile.d);
 			float ys = MathUtils.lerp(y0, y1, s);
@@ -76,13 +90,17 @@ public class StreetSlope extends TileTemplate {
 		}
 	}
 	
-	@Override
-	public int getFenceY(Tile tile, Corner c) {
+	public int getNoTunnelGroundY(Tile tile, Corner c) {
 		c = c.rotate(tile.d); // wtf, Corner.rotate not working?
 		if(tile.d==Dir.north || tile.d==Dir.south)  
 			return (c==Corner.ne || c==Corner.nw) ? tile.basey-h : tile.basey;
 		else
 			return (c==Corner.ne || c==Corner.nw) ? tile.basey : tile.basey-h;
+	}
+	
+	@Override
+	public int getFenceY(Tile tile, Corner c) {
+		return getGroundY(tile, c);
 	}
 
 	@Override
@@ -141,9 +159,11 @@ public class StreetSlope extends TileTemplate {
 	}
 	
 	@Override
-	public boolean finalizeTile(Tile tile, Random random) {
-		if(h==1 || tile.sub!=null)
+	public boolean finalizeTile(Tile atile, Random random) {
+		StreetTile tile = (StreetTile) atile;
+		if(h==1 || tile.sub!=null || tile.tunnel!=null)
 			return false;
+		
 		
 		final Dir[] sides = { tile.d.ccw(), tile.d.cw() };
 		int check = 0;
@@ -176,10 +196,21 @@ public class StreetSlope extends TileTemplate {
 		}
 		return false;
 	}
+	
+	public TunnelInfo checkTunnel(StreetTile tile) {
+		if(Tunnels.tunnelWallCondition(tile, tile.d.cw(), h) && Tunnels.tunnelWallCondition(tile, tile.d.ccw(), h)) {
+			tile.tunnel = new TunnelInfo(tile);
+			return tile.tunnel;
+		}
+		return null;
+	}
 
 	@Override
 	public void decorateTile(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
+		if(tile.tunnel!=null)
+			return;
+		
 		Street.template.autoAddHillBridge(tile, tile.basey-h);
 		if(h==1)
 			Street.template.addLamp(tile, random);
@@ -187,8 +218,8 @@ public class StreetSlope extends TileTemplate {
 		Dir dl = tile.d.ccw();
 		Dir dr = tile.d.cw();
 		int hh = h>1 ? h : 0;
-		tile.setFence(dl, FenceGenerator.getFenceType(tile, dl, -hh, 0, h));
-		tile.setFence(dr, FenceGenerator.getFenceType(tile, dr, 0, -hh, h));
+		tile.setFence(dl, Fences.getFenceType(tile, dl, -hh, 0, h));
+		tile.setFence(dr, Fences.getFenceType(tile, dr, 0, -hh, h));
 	}
 	
 	@Override
@@ -205,13 +236,13 @@ public class StreetSlope extends TileTemplate {
 			// FIXME when needed slope handrails 
 			if(tile.getFence(dl)==FenceType.handrail) {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
-				FenceGenerator.createHandrailPoles(r, tile, dl, -h, 0);
-				FenceGenerator.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dl.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dl.dz+(0.5f-0.1875f*h)*tile.d.dz));
+				Fences.createHandrailPoles(r, tile, dl, -h, 0);
+				Fences.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dl.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dl.dz+(0.5f-0.1875f*h)*tile.d.dz));
 			}
 			if(tile.getFence(dr)==FenceType.handrail) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
-				FenceGenerator.createHandrailPoles(r, tile, dr, 0, -h);
-				FenceGenerator.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dr.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dr.dz+(0.5f-0.1875f*h)*tile.d.dz));
+				Fences.createHandrailPoles(r, tile, dr, 0, -h);
+				Fences.handrailPole.addInstance(r, new TileObjectInfo(tile, 0.5f*dr.dx+(0.5f-0.1875f*h)*tile.d.dx, 0, 0.5f*dr.dz+(0.5f-0.1875f*h)*tile.d.dz));
 			}
 		}
 		else {
@@ -226,25 +257,30 @@ public class StreetSlope extends TileTemplate {
 			}
 			if(tile.getFence(dl)==FenceType.handrail) {
 				handrailL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
-				FenceGenerator.createHandrailPoles(r, tile, dl, -h, 0);
+				Fences.createHandrailPoles(r, tile, dl, -h, 0);
 			}
 			else if(tile.getFence(dl)==FenceType.stepsOut) {
 				stepsL.addInstance(r, new TileObjectInfo(tile).rotate(dl));
 			}
 			if(tile.getFence(dr)==FenceType.handrail) {
 				handrailR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
-				FenceGenerator.createHandrailPoles(r, tile, dr, 0, -h);
+				Fences.createHandrailPoles(r, tile, dr, 0, -h);
 			}
 			else if(tile.getFence(dr)==FenceType.stepsOut) {
 				stepsR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
 			}
 			Street.template.createLamp(atile, r, -0.5f);
 		}
-		
-		if(tile.getFence(dl)==FenceType.retainWall)
-			FenceGenerator.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dl));
-		if(tile.getFence(dr)==FenceType.retainWall)
-			FenceGenerator.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dr));
+
+		if(tile.tunnel!=null) {
+			Tunnels.createTunnel(r, tile, tile.tunnel, tile.basey-h);
+		}
+		else {
+			if(tile.getFence(dl)==FenceType.retainWall)
+				Fences.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dl));
+			if(tile.getFence(dr)==FenceType.retainWall)
+				Fences.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dr));
+		}
 		
 		street.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 	}

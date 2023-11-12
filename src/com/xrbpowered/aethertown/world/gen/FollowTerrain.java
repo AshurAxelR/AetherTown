@@ -14,7 +14,6 @@ import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Street;
-import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
 
 public class FollowTerrain {
@@ -23,8 +22,6 @@ public class FollowTerrain {
 	private static final boolean sortOpts = true;
 	private static final boolean useYDir = true;
 
-	private static final boolean storeDebugInfo = false;
-	
 	public class Result {
 		public final int x;
 		public final int length;
@@ -406,9 +403,7 @@ public class FollowTerrain {
 			t = t.next(d, dy);
 			
 			TileTemplate temp = StreetSlope.getTemplate(abs(dy));
-			StreetTile st = (StreetTile) temp.forceGenerate(ts);
-			if(storeDebugInfo)
-				st.debugFT = this;
+			temp.forceGenerate(ts);
 		}
 	}
 	

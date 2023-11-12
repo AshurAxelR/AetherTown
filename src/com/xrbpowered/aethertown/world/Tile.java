@@ -1,8 +1,9 @@
 package com.xrbpowered.aethertown.world;
 
+import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
-import com.xrbpowered.aethertown.world.FenceGenerator.FenceType;
+import com.xrbpowered.aethertown.world.gen.Fences.FenceType;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 
 public class Tile {
@@ -51,9 +52,13 @@ public class Tile {
 	}
 
 	public int getGroundY() {
-		return t.getGroundY(this);
+		return t.getGroundY(this, null);
 	}
-	
+
+	public int getGroundY(Corner c) {
+		return t.getGroundY(this, c);
+	}
+
 	public boolean hasFence(Dir d) {
 		return fences[d.ordinal()]!=FenceType.none;
 	}
