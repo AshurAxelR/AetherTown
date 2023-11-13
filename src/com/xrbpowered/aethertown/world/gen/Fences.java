@@ -59,7 +59,7 @@ public abstract class Fences {
 		if(adj.t==Hill.template || (adj instanceof StreetTile && ((StreetTile) adj).bridge && adj.d!=d && adj.d!=d.flip())) {
 			int[] yloc = tile.level.h.yloc(adj.x, adj.z);
 			int miny = MathUtils.min(yloc);
-			if(adj.t==Hill.template && ((HillTile) adj).maxDelta>TerrainChunkBuilder.cliffDelta && tile.basey-h<=miny)
+			if(adj.t==Hill.template && ((HillTile) adj).maxDelta>=TerrainChunkBuilder.cliffDelta && tile.basey-h<=miny)
 				return FenceType.retainWall;
 			if(tile.basey>=miny+(adj.t==Hill.template ? 8 : 4))
 				return FenceType.handrail;

@@ -79,7 +79,7 @@ public abstract class TunnelTileTemplate extends TileTemplate {
 			int[] yloc = tile.level.h.yloc(adj.x, adj.z);
 			int miny = MathUtils.min(yloc);
 			int maxDelta = MathUtils.maxDelta(yloc);
-			if(maxDelta>TerrainChunkBuilder.cliffDelta && tile.basey-h<=miny)
+			if(maxDelta>=TerrainChunkBuilder.cliffDelta && tile.basey-h<=miny)
 				return true;
 		}
 		return false;
