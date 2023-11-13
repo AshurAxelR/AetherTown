@@ -14,15 +14,16 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.Fences.FenceType;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
-import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
+import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
-public class StreetSlope extends TileTemplate {
+public class StreetSlope extends TunnelTileTemplate {
 
 	public static final StreetSlope template1 = new StreetSlope(1);
 	public static final StreetSlope template2 = new StreetSlope(2);
@@ -43,19 +44,17 @@ public class StreetSlope extends TileTemplate {
 	}
 	
 	@Override
-	public int getGroundY(Tile atile, Corner c) {
-		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null)
-			return tile.tunnel.getGroundY(c);
+	public int getNoTunnelGroundY(Tile tile, Corner c) {
+		c = c.rotate(tile.d); // wtf, Corner.rotate not working?
+		if(tile.d==Dir.north || tile.d==Dir.south)  
+			return (c==Corner.ne || c==Corner.nw) ? tile.basey-h : tile.basey;
 		else
-			return c==null ? tile.basey : getNoTunnelGroundY(tile, c);
+			return (c==Corner.ne || c==Corner.nw) ? tile.basey : tile.basey-h;
 	}
 
 	@Override
-	public float getYIn(Tile atile, float sx, float sz, float prevy) {
+	public float getNoTunnelYIn(Tile atile, float sx, float sz, float prevy) {
 		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null && Tunnels.isAbove(prevy, tile.tunnel.basey))
-			return Tile.ysize*tile.tunnel.basey;
 		if(tile.bridge && Bridge.isUnder(prevy, tile.basey-h))
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
 
@@ -88,28 +87,6 @@ public class StreetSlope extends TileTemplate {
 		else {
 			return super.getYOut(tile, d, sout, sx, sz, prevy);
 		}
-	}
-	
-	public int getNoTunnelGroundY(Tile tile, Corner c) {
-		c = c.rotate(tile.d); // wtf, Corner.rotate not working?
-		if(tile.d==Dir.north || tile.d==Dir.south)  
-			return (c==Corner.ne || c==Corner.nw) ? tile.basey-h : tile.basey;
-		else
-			return (c==Corner.ne || c==Corner.nw) ? tile.basey : tile.basey-h;
-	}
-	
-	@Override
-	public int getFenceY(Tile tile, Corner c) {
-		return getGroundY(tile, c);
-	}
-	
-	@Override
-	public int getLightBlockY(Tile atile) {
-		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null)
-			return tile.tunnel.basey;
-		else
-			return super.getLightBlockY(tile);
 	}
 
 	@Override
@@ -170,7 +147,7 @@ public class StreetSlope extends TileTemplate {
 	@Override
 	public boolean finalizeTile(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
-		if(h==1 || tile.sub!=null || tile.tunnel!=null)
+		if(h==1 || tile.sub!=null)
 			return false;
 		
 		
@@ -206,14 +183,12 @@ public class StreetSlope extends TileTemplate {
 		return false;
 	}
 	
-	public TunnelInfo checkTunnel(StreetTile tile) {
-		if(Tunnels.tunnelWallCondition(tile, tile.d.cw(), h) && Tunnels.tunnelWallCondition(tile, tile.d.ccw(), h)) {
-			tile.tunnel = new TunnelInfo(tile);
-			return tile.tunnel;
-		}
-		return null;
+	@Override
+	public void maybeAddTunnel(TunnelTile tile) {
+		if(straightTunnelCondition(tile, h))
+			tile.addTunnel(TunnelType.straight);
 	}
-
+	
 	@Override
 	public void decorateTile(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
@@ -282,7 +257,7 @@ public class StreetSlope extends TileTemplate {
 		}
 
 		if(tile.tunnel!=null) {
-			Tunnels.createTunnel(r, tile, tile.tunnel, tile.basey-h);
+			Tunnels.createTunnel(r, tile.tunnel, tile.basey-h);
 		}
 		else {
 			if(tile.getFence(dl)==FenceType.retainWall)

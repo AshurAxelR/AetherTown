@@ -10,10 +10,11 @@ import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
-public class Bridge extends TileTemplate {
+public class Bridge extends TunnelTileTemplate {
 
 	public static final Bridge template = new Bridge();
 	
@@ -31,11 +32,15 @@ public class Bridge extends TileTemplate {
 		return new BridgeTile();
 	}
 	
-	public float getYIn(Tile tile, float sx, float sz, float y0) {
-		if(isUnder(y0, tile.basey))
+	public float getNoTunnelYIn(Tile tile, float sx, float sz, float prevy) {
+		if(isUnder(prevy, tile.basey))
 			return Tile.ysize*(tile.basey-((BridgeTile) tile).h);
 		else
-			return super.getYIn(tile, sx, sz, y0);
+			return super.getNoTunnelYIn(tile, sx, sz, prevy);
+	}
+	
+	@Override
+	public void maybeAddTunnel(TunnelTile tile) {
 	}
 	
 	protected boolean canGenerate(Token t) {

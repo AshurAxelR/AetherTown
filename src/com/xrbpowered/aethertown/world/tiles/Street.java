@@ -17,7 +17,6 @@ import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
 import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
-import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
@@ -26,15 +25,16 @@ import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
-import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
+import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
 import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
-public class Street extends TileTemplate {
+public class Street extends TunnelTileTemplate {
 
 	public static final Color streetColor = new Color(0xb5b5aa);
 	public static final Color lampLightColor = new Color(0xfff0b4); // new Color(0xfffae5);
@@ -49,14 +49,13 @@ public class Street extends TileTemplate {
 	private static SpriteComponent coronaSprite;
 	private static TileComponent bridge, bridgeSupport;
 
-	public static class StreetTile extends Tile {
+	public static class StreetTile extends TunnelTile {
 		public boolean lamp = false;
 		public Dir lampd = null;
 		public boolean bridge = false;
 		public boolean forceExpand = false;
-		public TunnelInfo tunnel = null;
 		
-		public StreetTile(TileTemplate t) {
+		public StreetTile(TunnelTileTemplate t) {
 			super(t);
 		}
 	}
@@ -67,37 +66,12 @@ public class Street extends TileTemplate {
 	}
 	
 	@Override
-	public int getGroundY(Tile atile, Corner c) {
+	public float getNoTunnelYIn(Tile atile, float sx, float sz, float prevy) {
 		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null)
-			return tile.tunnel.getGroundY(c);
-		else
-			return tile.basey;
-	}
-	
-	@Override
-	public int getFenceY(Tile tile, Corner c) {
-		return getGroundY(tile, c);
-	}
-	
-	@Override
-	public int getLightBlockY(Tile atile) {
-		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null)
-			return tile.tunnel.basey;
-		else
-			return super.getLightBlockY(tile);
-	}
-	
-	@Override
-	public float getYIn(Tile atile, float sx, float sz, float prevy) {
-		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null && Tunnels.isAbove(prevy, tile.tunnel.basey))
-			return Tile.ysize*tile.tunnel.basey;
 		if(tile.bridge && Bridge.isUnder(prevy, tile.basey))
 			return tile.level.h.gety(tile.x, tile.z, sx, sz);
-		
-		return super.getYIn(tile, sx, sz, prevy);
+		else
+			return super.getNoTunnelYIn(tile, sx, sz, prevy);
 	}
 	
 	@Override
@@ -138,27 +112,26 @@ public class Street extends TileTemplate {
 				TexColor.get(TerrainBuilder.wallColor));
 		Fences.createComponents();
 	}
-
-	public TunnelInfo checkTunnel(StreetTile tile) {
-		if(Tunnels.tunnelWallCondition(tile, tile.d.cw(), 0) && Tunnels.tunnelWallCondition(tile, tile.d.ccw(), 0)) {
-			tile.tunnel = new TunnelInfo(tile);
-			return tile.tunnel;
+	
+	@Override
+	public void maybeAddTunnel(TunnelTile tile) {
+		if(straightTunnelCondition(tile)) {
+			tile.addTunnel(TunnelType.straight);
+			return;
 		}
 		
 		int countAdjTunnels = 0;
 		for(Dir d : Dir.values()) {
-			boolean tun = Tunnels.isAdjTunnel(tile, d);
+			boolean tun = Tunnels.hasTunnel(tile.getAdj(d));
 			if(tun)
 				countAdjTunnels++;
-			if(!tun && !Tunnels.tunnelWallCondition(tile, d, 0))
-				return null;
+			if(!tun && !tunnelWallCondition(tile, d, 0))
+				return;
 		}
 		if(countAdjTunnels<2)
-			return null;
+			return;
 		
-		tile.tunnel = new TunnelInfo(tile);
-		tile.tunnel.junction = true;
-		return tile.tunnel;
+		tile.addTunnel(TunnelType.junction);
 	}
 	
 	@Override
@@ -187,7 +160,7 @@ public class Street extends TileTemplate {
 			r.terrain.addWalls(tile);
 
 		if(tile.tunnel!=null) {
-			Tunnels.createTunnel(r, tile, tile.tunnel, tile.basey);
+			Tunnels.createTunnel(r, tile.tunnel, tile.basey);
 		}
 		else {
 			Fences.createFences(r, tile);

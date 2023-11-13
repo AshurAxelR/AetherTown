@@ -174,7 +174,7 @@ public class Level {
 			StreetLayoutGenerator.trimStreets(this, random); // in case of removed plots
 		}
 
-		Tunnels.placeTunnels(this, random);
+		new Tunnels(this).placeTunnels();
 		
 		if(houses==null || !checkNulls())
 			throw new GeneratorException("Level incomplete");
