@@ -130,7 +130,7 @@ public class Tunnels {
 					return 0;
 			}
 		}
-		return 0;
+		return maxSides;
 	}
 
 	private void placeSide(Tile t, Dir d, int len, int topy) {
