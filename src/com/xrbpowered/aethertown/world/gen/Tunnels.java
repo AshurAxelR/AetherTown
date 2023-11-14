@@ -63,8 +63,8 @@ public class Tunnels {
 		while(upd) {
 			level.h.calculate(true);
 			upd = false;
-			for(int x=0; x<level.levelSize; x++)
-				for(int z=0; z<level.levelSize; z++) {
+			for(int x=1; x<level.levelSize-1; x++)
+				for(int z=1; z<level.levelSize-1; z++) {
 					Tile tile = level.map[x][z];
 					if(tile!=null && tile instanceof TunnelTile) {
 						TunnelTile t = (TunnelTile) tile;
