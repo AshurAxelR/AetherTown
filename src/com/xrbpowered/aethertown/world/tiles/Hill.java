@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.HeightMap;
+import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
@@ -143,6 +144,16 @@ public class Hill extends TileTemplate {
 		}
 		else
 			return res;
+	}
+	
+	public static void recalcMaxDelta(Level level) {
+		for(int x=0; x<level.levelSize; x++)
+			for(int z=0; z<level.levelSize; z++) {
+				Tile tile = level.map[x][z];
+				if(tile!=null && tile.t==template) {
+					((HillTile) tile).maxDelta = MathUtils.maxDelta(level.h.yloc(x, z));
+				}
+			}
 	}
 	
 }

@@ -239,6 +239,7 @@ public class Tunnels {
 			calcRanks(); // FIXME recalc top y?
 		
 		level.h.calculate(true);
+		Hill.recalcMaxDelta(level);
 		
 		for(TunnelInfo tunnel : tunnels) {
 			checkTerrain(tunnel);
