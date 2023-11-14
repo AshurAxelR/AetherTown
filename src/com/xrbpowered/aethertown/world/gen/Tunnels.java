@@ -1,13 +1,13 @@
 package com.xrbpowered.aethertown.world.gen;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
 import com.xrbpowered.aethertown.world.tiles.Hill;
+import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
@@ -106,30 +107,77 @@ public class Tunnels {
 		}
 	}
 	
+	private int testAddSide(Tile t, Dir d, int topy) {
+		int i;
+		for(i=1; i<=maxSides; i++) {
+			t = t.getAdj(d);
+			if(t==null)
+				return 0;
+			int y = Math.min(t.t.getFenceY(t, d.leftCorner()), t.t.getFenceY(t, d.rightCorner()));
+			if(t.t!=Hill.template) {
+				return y>=topy ? i : 0;
+			}
+			// int miny = MathUtils.min(level.h.yloc(t.x, t.z));
+			// System.out.printf("* %s[%d] y=%d, miny=%d, topy=%d\n", d.name(), i, y, miny, topy);
+			if(y>=topy)
+				return i;
+			for(Dir da : Dir.values()) {
+				if(da==d.flip())
+					continue;
+				Tile adj = t.getAdj(da);
+				if(adj==null || adj.t!=Hill.template
+						&& !(i==1 && (adj.t instanceof Plaza || adj.t==Park.template)))
+					return 0;
+			}
+		}
+		return 0;
+	}
+
+	private void placeSide(Tile t, Dir d, int len, int topy) {
+		for(int i=1; i<=len; i++) {
+			t = t.getAdj(d);
+			Plaza.tunnelSideTemplate.forceGenerate(new Token(level, t.x, topy, t.z, d));
+			/* if(i==maxSides) {
+				for(Dir da : Dir.values()) {
+					Tile adj = t.getAdj(da);
+					adj.basey = topy;
+				}
+			} */
+		}
+	}
+
 	private boolean adjustSides() {
-		// TODO separate adjust hills vs add sides; adjust hills after calcTopY
+		LinkedList<TunnelInfo> removed = new LinkedList<>();
+		
 		for(TunnelInfo tunnel : tunnels) {
-			for(Dir d : Dir.values()) {
-				Tile adj = tunnel.below.getAdj(d);
-				if(adj!=null && adj.t==Hill.template) {
-					if(tunnel.rank==1 || tunnel.rank==2) {
-						Tile t = adj;
-						for(int i=1; i<=maxSides; i++) {
-							int[] yloc = level.h.yloc(t.x, t.z);
-							if(t==null || t.t!=Hill.template || MathUtils.min(yloc)>=tunnel.topy)
-								break;
-							// FIXME check all adj hills; if not, remove the tunnel and return true
-							Plaza.tunnelSideTemplate.forceGenerate(new Token(level, t.x, tunnel.topy, t.z, d));
-							t = t.getAdj(d);
-						}
-					}
-					else if(adj.basey<tunnel.topy) {
+			if((tunnel.rank==1 || tunnel.rank==2) && tunnel.type==TunnelType.straight) {
+				// System.out.printf("[%d, %d] adjustSides rank=%d\n", tunnel.below.x, tunnel.below.z, tunnel.rank);
+				int ir = testAddSide(tunnel.below, tunnel.below.d.cw(), tunnel.topy);
+				int il = testAddSide(tunnel.below, tunnel.below.d.ccw(), tunnel.topy);
+				if(ir==0 || il==0) {
+					tunnel.below.tunnel = null;
+					removed.add(tunnel);
+				}
+				else {
+					placeSide(tunnel.below, tunnel.below.d.cw(), ir, tunnel.topy);
+					placeSide(tunnel.below, tunnel.below.d.ccw(), il, tunnel.topy);
+				}
+			}
+			else {
+				for(Dir d : Dir.values()) {
+					Tile adj = tunnel.below.getAdj(d);
+					if(adj!=null && adj.t==Hill.template && adj.basey<tunnel.topy)
 						adj.basey = tunnel.topy;
-					}
 				}
 			}
 		}
-		return false;
+		
+		if(removed.isEmpty())
+			return false;
+		else {
+			tunnels.removeAll(removed);
+			return true;
+		}
 	}
 	
 	private int calcYFromAdj(TunnelInfo tunnel, Dir d) {
