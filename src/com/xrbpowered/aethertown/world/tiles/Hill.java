@@ -86,25 +86,7 @@ public class Hill extends TileTemplate {
 	@Override
 	public boolean finalizeTile(Tile atile, Random random) {
 		HillTile tile = (HillTile) atile;
-		boolean res = false;
-		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-		int miny = MathUtils.min(yloc);
-		int maxy = MathUtils.max(yloc);
-		int basey = miny;
-		if(tile.level.isInside(tile.x, tile.z, 1)) {
-			for(Dir d : Dir.values()) {
-				Tile adj = tile.getAdj(d);
-				if(adj==null)
-					continue;
-				if(Street.isAnyStreet(adj.t) && maxy>adj.basey && basey<adj.basey-1)
-					basey = adj.basey-1;
-			}
-		}
-		if(basey!=tile.basey) {
-			tile.basey = basey;
-			res = true;
-		}
-		tile.maxDelta = MathUtils.maxDelta(yloc);
+		boolean res = recalcBase(tile);
 		if(tile.maxDelta>1 || !tile.level.isInside(tile.x, tile.z, 2) || tile.level.info.terrain.noParks)
 			return res;
 		
@@ -146,12 +128,36 @@ public class Hill extends TileTemplate {
 			return res;
 	}
 	
+	private static boolean recalcBase(HillTile tile) {
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		int miny = MathUtils.min(yloc);
+		int maxy = MathUtils.max(yloc);
+		int basey = miny;
+		if(tile.level.isInside(tile.x, tile.z, 1)) {
+			for(Dir d : Dir.values()) {
+				Tile adj = tile.getAdj(d);
+				if(adj==null)
+					continue;
+				if(Street.isAnyStreet(adj.t) && maxy>adj.basey && basey<adj.basey-1)
+					basey = adj.basey-1;
+			}
+		}
+		tile.maxDelta = MathUtils.maxDelta(yloc);
+		if(basey!=tile.basey) {
+			tile.basey = basey;
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
 	public static void recalcMaxDelta(Level level) {
 		for(int x=0; x<level.levelSize; x++)
 			for(int z=0; z<level.levelSize; z++) {
 				Tile tile = level.map[x][z];
 				if(tile!=null && tile.t==template) {
-					((HillTile) tile).maxDelta = MathUtils.maxDelta(level.h.yloc(x, z));
+					recalcBase((HillTile) tile);
 				}
 			}
 	}

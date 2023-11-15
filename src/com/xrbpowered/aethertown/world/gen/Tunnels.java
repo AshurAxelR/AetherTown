@@ -22,7 +22,6 @@ import com.xrbpowered.aethertown.world.tiles.Street;
 public class Tunnels {
 
 	public static final int tunnelHeight = 8;
-	public static final int maxSides = 2;
 	
 	public static enum TunnelType {
 		straight, junction, object
@@ -107,16 +106,15 @@ public class Tunnels {
 		}
 	}
 	
-	private int testAddSide(Tile t, Dir d, int topy) {
+	private int testAddSide(Tile t, Dir d, int topy, int maxSides) {
 		int i;
 		for(i=1; i<=maxSides; i++) {
 			t = t.getAdj(d);
 			if(t==null)
 				return 0;
 			int y = Math.min(t.t.getFenceY(t, d.leftCorner()), t.t.getFenceY(t, d.rightCorner()));
-			if(t.t!=Hill.template) {
+			if(t.t!=Hill.template)
 				return y>=topy ? i : 0;
-			}
 			// int miny = MathUtils.min(level.h.yloc(t.x, t.z));
 			// System.out.printf("* %s[%d] y=%d, miny=%d, topy=%d\n", d.name(), i, y, miny, topy);
 			if(y>=topy)
@@ -130,19 +128,19 @@ public class Tunnels {
 					return 0;
 			}
 		}
-		return maxSides;
+		return maxSides+1;
 	}
 
-	private void placeSide(Tile t, Dir d, int len, int topy) {
+	private void placeSide(Tile t, Dir d, int len, int topy, int maxSides) {
 		for(int i=1; i<=len; i++) {
 			t = t.getAdj(d);
 			Plaza.tunnelSideTemplate.forceGenerate(new Token(level, t.x, topy, t.z, d));
-			/* if(i==maxSides) {
-				for(Dir da : Dir.values()) {
-					Tile adj = t.getAdj(da);
+			if(i==maxSides) {
+				Tile adj = t.getAdj(d);
+				if(adj.t==Hill.template && adj.basey<topy)
 					adj.basey = topy;
-				}
-			} */
+				break;
+			}
 		}
 	}
 
@@ -152,15 +150,16 @@ public class Tunnels {
 		for(TunnelInfo tunnel : tunnels) {
 			if((tunnel.rank==1 || tunnel.rank==2) && tunnel.type==TunnelType.straight) {
 				// System.out.printf("[%d, %d] adjustSides rank=%d\n", tunnel.below.x, tunnel.below.z, tunnel.rank);
-				int ir = testAddSide(tunnel.below, tunnel.below.d.cw(), tunnel.topy);
-				int il = testAddSide(tunnel.below, tunnel.below.d.ccw(), tunnel.topy);
+				int maxSides = tunnel.rank==2 ? 1 : 2;
+				int ir = testAddSide(tunnel.below, tunnel.below.d.cw(), tunnel.topy, maxSides);
+				int il = testAddSide(tunnel.below, tunnel.below.d.ccw(), tunnel.topy, maxSides);
 				if(ir==0 || il==0) {
 					tunnel.below.tunnel = null;
 					removed.add(tunnel);
 				}
 				else {
-					placeSide(tunnel.below, tunnel.below.d.cw(), ir, tunnel.topy);
-					placeSide(tunnel.below, tunnel.below.d.ccw(), il, tunnel.topy);
+					placeSide(tunnel.below, tunnel.below.d.cw(), ir, tunnel.topy, maxSides);
+					placeSide(tunnel.below, tunnel.below.d.ccw(), il, tunnel.topy, maxSides);
 				}
 			}
 			else {
