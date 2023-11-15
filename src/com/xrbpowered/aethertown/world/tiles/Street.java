@@ -247,14 +247,20 @@ public class Street extends TunnelTileTemplate {
 					return;
 				}
 			}
+			tile.lampd = null;
 			for(Dir d : Dir.shuffle(random)) {
 				Tile adj = tile.getAdj(d);
-				TileTemplate adjt = adj.t;
-				if(adjt!=null && !Street.isAnyPath(adjt) && !(adjt instanceof Plaza) && HouseT.allowLamp(adj)) {
+				if(adj==null)
+					continue;
+				if(!Street.isAnyPath(adj.t) && !(adj.t instanceof Plaza) && HouseT.allowLamp(adj) && adj.t!=Alcove.template) {
 					tile.lampd = d;
 					tile.lamp = true;
 					break;
 				}
+			}
+			if(tile.lamp && tile.lampd==null) {
+				// tile.lamp = false;
+				System.err.printf("Missing lamp at [%d, %d]\n", tile.x, tile.z);
 			}
 		}
 	}
@@ -339,7 +345,7 @@ public class Street extends TunnelTileTemplate {
 			if(root!=null && root.sub.parent==tile.sub.parent)
 				return 0;
 			else
-				throw new GeneratorException("Orphan %s sub street at [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.x, tile.z);
+				GeneratorException.raise("Orphan %s sub street at [%d, %d]\n", tile.sub.parent.getClass().getSimpleName(), tile.x, tile.z);
 		}
 		if((tile.x==tile.level.getStartX() && tile.z==tile.level.getStartZ()))
 			return 1;

@@ -89,7 +89,7 @@ public class Bridge extends TunnelTileTemplate {
 			r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey-tile.h+5, Street.lampLightColor, 0.5f, false);
 		}
 		else {
-			throw new GeneratorException("Not supported yet.");
+			GeneratorException.raise("Not supported yet.");
 		}
 	}
 	

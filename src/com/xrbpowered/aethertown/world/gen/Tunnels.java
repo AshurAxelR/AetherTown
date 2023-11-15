@@ -58,6 +58,16 @@ public class Tunnels {
 	
 	private void addTunnels() {
 		tunnels.clear();
+		for(int x=1; x<level.levelSize-1; x++)
+			for(int z=1; z<level.levelSize-1; z++) {
+				Tile tile = level.map[x][z];
+				if(tile!=null && tile instanceof TunnelTile) {
+					TunnelTile t = (TunnelTile) tile;
+					if(t.tunnel!=null)
+						tunnels.add(t.tunnel);
+				}
+			}
+		
 		boolean upd = true;
 		while(upd) {
 			level.h.calculate(true);
@@ -82,7 +92,10 @@ public class Tunnels {
 	private void calcRanks() {
 		for(TunnelInfo tunnel : tunnels) {
 			tunnel.rank = 0;
-			for(Dir d : Dir.values()) {
+			Dir[] dirs = (tunnel.type==TunnelType.object)
+					? new Dir[] { tunnel.below.d.flip() }
+					: Dir.values();
+			for(Dir d : dirs) {
 				Tile adj = tunnel.below.getAdj(d);
 				if(adj!=null && adj.t!=Hill.template && !hasTunnel(adj)) {
 					tunnel.rank = 1;
@@ -242,7 +255,7 @@ public class Tunnels {
 		
 		for(TunnelInfo tunnel : tunnels) {
 			checkTerrain(tunnel);
-			System.out.printf("  -- tunnel@[%d, %d]\n", tunnel.below.x, tunnel.below.z); // FIXME remove printf
+			System.out.printf("  -- tunnel@[%d, %d] : %s\n", tunnel.below.x, tunnel.below.z, tunnel.type.name()); // FIXME remove printf
 		}
 	}
 	
@@ -255,7 +268,7 @@ public class Tunnels {
 			int ty = tunnel.getGroundY(c);
 			int hy = tunnel.below.level.h.y[x+c.tx+1][z+c.tz+1];
 			if(ty!=hy)
-				throw new GeneratorException("Broken tunnel geometry [%d, %d].%s: %d!=%d\n", x, z, c.name(), ty, hy);
+				GeneratorException.warning("Broken tunnel geometry [%d, %d].%s: %d!=%d\n", x, z, c.name(), ty, hy);
 		}
 	}
 
@@ -273,7 +286,7 @@ public class Tunnels {
 		else
 			r.terrain.addHillTile(TerrainMaterial.hillGrass, tile.x, tile.z);
 		
-		if(tunnel.rank>2) {
+		if(tunnel.rank>2 || tunnel.type==TunnelType.object) {
 			r.terrain.addWall(tile.x, tile.z, dr, topy, topy);
 			r.terrain.addWall(tile.x, tile.z, dr.flip(), topy, topy);
 		}
@@ -286,7 +299,7 @@ public class Tunnels {
 				}
 				break;
 			case object:
-				// TODO tunnel object geometry
+				r.terrain.addWall(tile.x+tile.d.dx, tile.z+tile.d.dz, tile.d.flip(), lowy, basey, lowy, basey);
 				break;
 			default:
 				Dir d = tile.d;

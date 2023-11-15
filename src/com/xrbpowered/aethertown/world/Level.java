@@ -118,7 +118,7 @@ public class Level {
 
 	private void checkHouseCount() {
 		if(houseCount<info.settlement.minHouses)
-			throw new GeneratorException("Settlement is too small: %d vs %d min for %s",
+			GeneratorException.raise("Settlement is too small: %d vs %d min for %s",
 					houseCount, info.settlement.minHouses, info.settlement.title);
 	}
 	
@@ -177,7 +177,7 @@ public class Level {
 		new Tunnels(this).placeTunnels();
 		
 		if(houses==null || !checkNulls())
-			throw new GeneratorException("Level incomplete");
+			GeneratorException.raise("Level incomplete");
 
 		decorate(random);
 		releaseGenerator();
@@ -205,7 +205,7 @@ public class Level {
 					int fy = tile.t.getFenceY(tile, c);
 					int h = HeightMap.tiley(tile, c);
 					if(fy<h)
-						throw new GeneratorException("Negative wall: [%d, %d] (%s) %d<%d\n", x, z, c.name(), fy, h);
+						GeneratorException.raise("Negative wall: [%d, %d] (%s) %d<%d\n", x, z, c.name(), fy, h);
 				}
 			}
 		boolean upd = true;

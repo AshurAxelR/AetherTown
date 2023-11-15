@@ -62,7 +62,7 @@ public abstract class RegionMode {
 			for(int index=0; index<getNumPortals(); index++) {
 				Dir d = region.cache.portals.getPortalDir(region.seed, index);
 				if(!new PortalRegionPaths(region, d.flip()).scanAndPlace(index, 56, random))
-					throw new GeneratorException("Can't connect portal %d (%s)", index, d.name());
+					GeneratorException.raise("Can't connect portal %d (%s)", index, d.name());
 			}
 		}
 		@Override

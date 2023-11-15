@@ -47,7 +47,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		Crossroads start = new Crossroads();
 		start.ignoreHeightLimit = true;
 		if(!start.generate(this.startToken, random))
-			throw new GeneratorException("StreetLayoutGenerator: initial placement failed");
+			GeneratorException.raise("StreetLayoutGenerator: initial placement failed");
 		start.collectTokens(this, random);
 		return generate(random);
 	}
@@ -123,7 +123,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	private static void connectOut(Level level, Random random, boolean multi, StreetLayoutGenerator sides) {
 		for(LevelConnection lc : level.info.conns) {
 			if(!new StreetConnector(level, lc.d, 0, sides).connectOut(lc, random, multi))
-				throw new GeneratorException("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
+				GeneratorException.raise("Failed to connect %s[%d]\n", lc.d.name(), lc.i);
 		}
 	}
 	

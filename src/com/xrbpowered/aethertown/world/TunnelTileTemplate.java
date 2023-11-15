@@ -73,7 +73,7 @@ public abstract class TunnelTileTemplate extends TileTemplate {
 			return getNoTunnelLightBlockY(tile);
 	}
 	
-	public static boolean tunnelWallCondition(TunnelTile tile, Dir d, int h) {
+	public static boolean tunnelWallCondition(Tile tile, Dir d, int h) {
 		Tile adj = tile.getAdj(d);
 		if(adj!=null && adj.t==Hill.template) {
 			int[] yloc = tile.level.h.yloc(adj.x, adj.z);

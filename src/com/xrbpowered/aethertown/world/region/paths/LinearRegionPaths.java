@@ -98,7 +98,7 @@ public class LinearRegionPaths {
 		PathToken nt = new PathToken(level.x0+dx, level.z0+dz, d);
 		if(!region.isInside(nt.x, nt.z)) {
 			if(att>10)
-				throw new GeneratorException("Path out of region bounds");
+				GeneratorException.raise("Path out of region bounds");
 			return nextToken(level, d, att+1);
 		}
 		else

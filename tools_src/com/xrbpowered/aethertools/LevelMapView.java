@@ -7,6 +7,7 @@ import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
 import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
@@ -17,7 +18,6 @@ import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
-import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
@@ -122,12 +122,10 @@ public class LevelMapView extends UIElement {
 					continue;
 				Color c = new Color(0xfafafa);
 				Color addc = null;
-				if(Street.isAnyPath(tile.t)) {
-					if(tile instanceof StreetTile && ((StreetTile) tile).tunnel!=null)
-						c = colorStreetBorder;
-					else
-						c = Street.streetColor;
-				}
+				if(tile instanceof TunnelTile && ((TunnelTile) tile).tunnel!=null)
+					c = colorStreetBorder;
+				else if(Street.isAnyPath(tile.t))
+					c = Street.streetColor;
 				else if(tile.t==Park.template)
 					c = new Color(0xddeebb);
 				else if(tile.t instanceof Plaza)

@@ -49,6 +49,11 @@ public class Bench extends Plaza {
 	}
 	
 	@Override
+	public boolean finalizeTile(Tile tile, Random random) {
+		return Alcove.maybeConvert(tile);
+	}
+	
+	@Override
 	public boolean postDecorateTile(Tile atile, Random random) {
 		BenchTile tile = (BenchTile) atile;
 		boolean res = super.postDecorateTile(tile, random);

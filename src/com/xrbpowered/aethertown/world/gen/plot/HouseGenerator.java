@@ -138,7 +138,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 		
 		int err = findUnlistedHouses(level);
 		if(err>0)
-			throw new GeneratorException(String.format("%d unlisted house tiles", err));
+			GeneratorException.raise("%d unlisted house tiles", err);
 		
 		return houses;
 	}
