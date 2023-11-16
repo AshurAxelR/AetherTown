@@ -260,7 +260,7 @@ public class Street extends TunnelTileTemplate {
 			}
 			if(tile.lamp && tile.lampd==null) {
 				// tile.lamp = false;
-				System.err.printf("Missing lamp at [%d, %d]\n", tile.x, tile.z);
+				// System.err.printf("Missing lamp at [%d, %d]\n", tile.x, tile.z);
 			}
 		}
 	}

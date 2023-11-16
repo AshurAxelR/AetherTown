@@ -47,6 +47,10 @@ public class Tunnels {
 		public int getGroundY(Corner c) {
 			return c==null || y==null ? topy : y[c.ordinal()];
 		}
+		
+		public float getTopY(float sx, float sz) {
+			return (y==null) ? Tile.ysize*topy : below.level.h.gety(below.x, below.z, sx, sz);
+		}
 	}
 
 	public final Level level;
@@ -204,14 +208,40 @@ public class Tunnels {
 		return y;
 	}
 	
+	private Integer topYFromAdjHill(Tile below, Dir d) {
+		Tile t = below.getAdj(d);
+		if(t==null || t.t!=Hill.template)
+			return null;
+		return (t.t.getFenceY(t, d.leftCorner()) + t.t.getFenceY(t, d.rightCorner())) / 2;
+	}
+
+	private Integer topYFromAdjHills(Tile below, Dir[] ds) {
+		int sum = 0;
+		int n = 0;
+		for(Dir d : ds) {
+			Integer y = topYFromAdjHill(below, d);
+			if(y!=null) {
+				sum += y;
+				n++;
+			}
+		}
+		return n==0 ? null : sum/n;
+	}
+
 	private void calcTopY() {
 		boolean upd = true;
 		while(upd) {
 			upd = false;
 			for(TunnelInfo tunnel : tunnels) {
 				int topy = tunnel.basey;
-				if(tunnel.type==TunnelType.straight) {
-					// TODO from adj hills
+				if(tunnel.rank==0) {
+					Integer y = null;
+					if(tunnel.type==TunnelType.straight)
+						y = topYFromAdjHills(tunnel.below, new Dir[] {tunnel.below.d.cw(), tunnel.below.d.ccw()});
+					else if(tunnel.type==TunnelType.object)
+						y = topYFromAdjHills(tunnel.below, new Dir[] {tunnel.below.d, tunnel.below.d.cw(), tunnel.below.d.ccw()});
+					if(y!=null && y>topy)
+						topy = y;
 				}
 				if(tunnel.rank>1 || tunnel.type!=TunnelType.straight) {
 					for(Dir d : Dir.values()) {
@@ -230,7 +260,6 @@ public class Tunnels {
 		for(TunnelInfo tunnel : tunnels) {
 			tunnel.maxTopY = tunnel.topy;
 			if(tunnel.type==TunnelType.straight && tunnel.rank==0) {
-				tunnel.topy = tunnel.basey;
 				tunnel.y = new int[4];
 				tunnel.maxTopY = Math.max(
 					calcYFromAdj(tunnel, tunnel.below.d),
@@ -255,7 +284,7 @@ public class Tunnels {
 		
 		for(TunnelInfo tunnel : tunnels) {
 			checkTerrain(tunnel);
-			System.out.printf("  -- tunnel@[%d, %d] : %s\n", tunnel.below.x, tunnel.below.z, tunnel.type.name()); // FIXME remove printf
+			System.err.printf("  -- tunnel@[%d, %d] : %s\n", tunnel.below.x, tunnel.below.z, tunnel.type.name()); // FIXME remove printf
 		}
 	}
 	
@@ -302,6 +331,7 @@ public class Tunnels {
 				r.terrain.addWall(tile.x+tile.d.dx, tile.z+tile.d.dz, tile.d.flip(), lowy, basey, lowy, basey);
 				break;
 			default:
+				// TODO basey-to-adj.basey?
 				Dir d = tile.d;
 				r.terrain.addWall(tile.x, tile.z, d, basey, tunnel.getGroundY(d.leftCorner()), basey, tunnel.getGroundY(d.rightCorner()));
 				d = d.flip();

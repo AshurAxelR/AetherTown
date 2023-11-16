@@ -50,7 +50,7 @@ public abstract class TunnelTileTemplate extends TileTemplate {
 	public float getYIn(Tile atile, float sx, float sz, float prevy) {
 		TunnelTile tile = (TunnelTile) atile;
 		if(tile.tunnel!=null && Tunnels.isAbove(prevy, tile.tunnel.basey))
-			return Tile.ysize*tile.tunnel.basey; // FIXME tunnel getY
+			return tile.tunnel.getTopY(sx, sz);
 		else
 			return getNoTunnelYIn(tile, sx, sz, prevy);
 	}
