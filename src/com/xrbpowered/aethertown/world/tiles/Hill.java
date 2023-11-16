@@ -128,7 +128,7 @@ public class Hill extends TileTemplate {
 			return res;
 	}
 	
-	private static boolean recalcBase(HillTile tile) {
+	public static boolean recalcBase(HillTile tile) {
 		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
 		int miny = MathUtils.min(yloc);
 		int maxy = MathUtils.max(yloc);

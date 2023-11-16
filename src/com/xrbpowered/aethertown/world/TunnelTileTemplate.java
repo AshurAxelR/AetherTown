@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.world;
 
+import java.util.Random;
+
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -71,6 +73,11 @@ public abstract class TunnelTileTemplate extends TileTemplate {
 			return tile.tunnel.maxTopY;
 		else
 			return getNoTunnelLightBlockY(tile);
+	}
+	
+	public void decorateTunnelTop(TunnelTile tile, Random random) {
+		if(tile.tunnel!=null && tile.tunnel.top!=null)
+			Hill.template.decorateTile(tile.tunnel.top, random);
 	}
 	
 	public static boolean tunnelWallCondition(Tile tile, Dir d, int h) {

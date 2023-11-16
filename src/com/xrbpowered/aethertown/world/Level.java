@@ -242,7 +242,7 @@ public class Level {
 			return 0;
 		Tile tile = map[x][z];
 		if(tile!=null)
-			return tile.t.getYAt(tile, sx, sz, tile.basey);
+			return tile.t.getYAt(tile, sx, sz, tile.basey+100); // ensure top
 		else
 			return h.gety(x, z, sx, sz);
 	}

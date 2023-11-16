@@ -137,8 +137,10 @@ public class Street extends TunnelTileTemplate {
 	@Override
 	public void decorateTile(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null)
+		if(tile.tunnel!=null) {
+			decorateTunnelTop(tile, random);
 			return;
+		}
 
 		addLamp(tile, random);
 		autoAddHillBridge(tile, tile.basey);

@@ -18,6 +18,7 @@ import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
+import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
 
 public class Tunnels {
 
@@ -30,12 +31,13 @@ public class Tunnels {
 	public static class TunnelInfo {
 		public final TunnelTile below;
 		
+		public int rank = 1; // 0 not entrance, 1 tile tunnel, 2 tile tunnel, 3 longer tunnel
+		public TunnelType type;
+		
 		public int basey;
 		public int topy, maxTopY;
 		public int[] y = null;
-		
-		public int rank = 1; // 0 not entrance, 1 tile tunnel, 2 tile tunnel, 3 longer tunnel
-		public TunnelType type;
+		public HillTile top = null;
 		
 		public TunnelInfo(TunnelTile below, TunnelType type) {
 			this.type = type;
@@ -269,6 +271,18 @@ public class Tunnels {
 		}
 	}
 	
+	private void addTop(TunnelTile tile) {
+		TunnelInfo tunnel = tile.tunnel;
+		HillTile top = (HillTile) Hill.template.createTile();
+		top.level = tile.level;
+		top.x = tile.x;
+		top.basey = tunnel.topy;
+		top.z = tile.z;
+		top.d = tile.d;
+		Hill.recalcBase(top);
+		tunnel.top = top;
+	}
+	
 	public void placeTunnels() {
 		addTunnels();
 		if(tunnels.isEmpty())
@@ -284,6 +298,8 @@ public class Tunnels {
 		
 		for(TunnelInfo tunnel : tunnels) {
 			checkTerrain(tunnel);
+			if(tunnel.rank==0 && tunnel.topy>tunnel.basey+2)
+				addTop(tunnel.below);
 			System.err.printf("  -- tunnel@[%d, %d] : %s\n", tunnel.below.x, tunnel.below.z, tunnel.type.name()); // FIXME remove printf
 		}
 	}
@@ -342,6 +358,9 @@ public class Tunnels {
 			r.pointLights.setLight(tile, 0, basey-tile.basey-2.5f, 0, 4.5f);
 			r.blockLighting.addLight(IllumLayer.alwaysOn, tile, basey-3, Street.lampLightColor, 0.3f, false);
 		}
+		
+		if(tunnel.top!=null)
+			tunnel.top.createTrees(r);
 	}
 	
 	public static boolean isAbove(float y0, int basey) {

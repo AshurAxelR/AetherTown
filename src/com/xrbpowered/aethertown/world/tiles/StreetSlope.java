@@ -192,8 +192,10 @@ public class StreetSlope extends TunnelTileTemplate {
 	@Override
 	public void decorateTile(Tile atile, Random random) {
 		StreetTile tile = (StreetTile) atile;
-		if(tile.tunnel!=null)
+		if(tile.tunnel!=null) {
+			decorateTunnelTop(tile, random);
 			return;
+		}
 		
 		Street.template.autoAddHillBridge(tile, tile.basey-h);
 		if(h==1)

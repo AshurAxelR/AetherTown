@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.world.tiles;
 
+import java.util.Random;
+
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.world.Tile;
@@ -23,6 +25,11 @@ public class Alcove extends TunnelTileTemplate {
 	
 	@Override
 	public void maybeAddTunnel(TunnelTile tile) {
+	}
+	
+	@Override
+	public void decorateTile(Tile tile, Random random) {
+		decorateTunnelTop((TunnelTile) tile, random);
 	}
 
 	@Override
