@@ -62,6 +62,15 @@ public abstract class TunnelTileTemplate extends TileTemplate {
 		return getGroundY(tile, c);
 	}
 
+	@Override
+	public int getBlockY(Tile atile) {
+		TunnelTile tile = (TunnelTile) atile;
+		if(tile.tunnel!=null)
+			return tile.tunnel.maxTopY;
+		else
+			return tile.basey;
+	}
+	
 	public int getNoTunnelLightBlockY(Tile tile) {
 		return super.getLightBlockY(tile);
 	}

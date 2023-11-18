@@ -48,6 +48,7 @@ public class Street extends TunnelTileTemplate {
 	private static IllumTileComponent lamp;
 	private static SpriteComponent coronaSprite;
 	private static TileComponent bridge, bridgeSupport;
+	private static TileComponent tunnelj, tunneljSupport;
 
 	public static class StreetTile extends TunnelTile {
 		public boolean lamp = false;
@@ -109,6 +110,12 @@ public class Street extends TunnelTileTemplate {
 				TexColor.get(TerrainBuilder.wallColor));
 		bridgeSupport = new ScaledTileComponent(
 				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(TerrainBuilder.wallColor));
+		tunnelj = new TileComponent(
+				ObjMeshLoader.loadObj("models/bridge/tunnelj.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(TerrainBuilder.wallColor));
+		tunneljSupport = new ScaledTileComponent(
+				ObjMeshLoader.loadObj("models/bridge/tunnelj_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(TerrainBuilder.wallColor));
 		Fences.createComponents();
 	}
@@ -180,6 +187,14 @@ public class Street extends TunnelTileTemplate {
 
 	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
 		createBridge(r, tile, basey, lowy, tile.d);
+	}
+
+	public void createTunnelJunction(LevelRenderer r, Tile tile, int basey, int lowy) {
+		int dy = basey-tile.basey;
+		int sh = basey-6-lowy;
+		tunnelj.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0));
+		if(sh>0)
+			tunneljSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
 	}
 
 	public void createHillBridge(LevelRenderer r, Tile tile, int basey) {

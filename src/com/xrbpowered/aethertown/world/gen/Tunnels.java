@@ -25,7 +25,7 @@ public class Tunnels {
 	public static final int tunnelHeight = 8;
 	
 	public static enum TunnelType {
-		straight, junction, object
+		straight, junction, object, fixed
 	}
 	
 	public static class TunnelInfo {
@@ -39,13 +39,17 @@ public class Tunnels {
 		public int[] y = null;
 		public HillTile top = null;
 		
-		public TunnelInfo(TunnelTile below, TunnelType type) {
+		public TunnelInfo(TunnelTile below, TunnelType type, int basey) {
 			this.type = type;
 			this.below = below;
-			this.basey = below.basey+tunnelHeight;
+			this.basey = basey;
 			this.topy = basey;
 		}
-		
+
+		public TunnelInfo(TunnelTile below, TunnelType type) {
+			this(below, type, below.basey+tunnelHeight);
+		}
+
 		public int getGroundY(Corner c) {
 			return c==null || y==null ? topy : y[c.ordinal()];
 		}
@@ -133,9 +137,7 @@ public class Tunnels {
 				return 0;
 			int y = Math.min(t.t.getFenceY(t, d.leftCorner()), t.t.getFenceY(t, d.rightCorner()));
 			if(t.t!=Hill.template)
-				return y>=topy ? i : 0;
-			// int miny = MathUtils.min(level.h.yloc(t.x, t.z));
-			// System.out.printf("* %s[%d] y=%d, miny=%d, topy=%d\n", d.name(), i, y, miny, topy);
+				return y>=topy ? i-1 : 0;
 			if(y>=topy)
 				return i;
 			for(Dir da : Dir.values()) {
@@ -168,7 +170,6 @@ public class Tunnels {
 		
 		for(TunnelInfo tunnel : tunnels) {
 			if((tunnel.rank==1 || tunnel.rank==2) && tunnel.type==TunnelType.straight) {
-				// System.out.printf("[%d, %d] adjustSides rank=%d\n", tunnel.below.x, tunnel.below.z, tunnel.rank);
 				int maxSides = tunnel.rank==2 ? 1 : 2;
 				int ir = testAddSide(tunnel.below, tunnel.below.d.cw(), tunnel.topy, maxSides);
 				int il = testAddSide(tunnel.below, tunnel.below.d.ccw(), tunnel.topy, maxSides);
@@ -204,7 +205,7 @@ public class Tunnels {
 			System.err.println("Missing connecting tunnel");
 			return tunnel.topy;
 		}
-		int y = Math.max(tunnel.topy, adjTunnel.topy);
+		int y = adjTunnel.type==TunnelType.fixed ? adjTunnel.topy : Math.max(tunnel.topy, adjTunnel.topy);
 		tunnel.y[d.leftCorner().ordinal()] = y;
 		tunnel.y[d.rightCorner().ordinal()] = y;
 		return y;
@@ -235,6 +236,9 @@ public class Tunnels {
 		while(upd) {
 			upd = false;
 			for(TunnelInfo tunnel : tunnels) {
+				if(tunnel.type==TunnelType.fixed)
+					continue;
+				
 				int topy = tunnel.basey;
 				if(tunnel.rank==0) {
 					Integer y = null;
@@ -291,16 +295,16 @@ public class Tunnels {
 		calcRanks();
 		calcTopY();
 		if(adjustSides())
-			calcRanks(); // FIXME recalc top y?
+			calcRanks();
 		
 		level.h.calculate(true);
 		Hill.recalcMaxDelta(level);
 		
 		for(TunnelInfo tunnel : tunnels) {
 			checkTerrain(tunnel);
-			if(tunnel.rank==0 && tunnel.topy>tunnel.basey+2)
+			if(tunnel.rank==0 && tunnel.topy>tunnel.basey+1)
 				addTop(tunnel.below);
-			System.err.printf("  -- tunnel@[%d, %d] : %s\n", tunnel.below.x, tunnel.below.z, tunnel.type.name()); // FIXME remove printf
+			// System.err.printf("  -- tunnel@[%d, %d] : %s\n", tunnel.below.x, tunnel.below.z, tunnel.type.name());
 		}
 	}
 	
@@ -317,6 +321,15 @@ public class Tunnels {
 		}
 	}
 
+	private static void createInterTunnelWall(LevelRenderer r, TunnelTile tile, Dir d) {
+		int basey = tile.tunnel.basey;
+		TunnelInfo adjTunnel = adjTunnel(tile, d);
+		if(adjTunnel!=null)
+			r.terrain.addWall(tile.x, tile.z, d, basey, adjTunnel.basey, basey, adjTunnel.basey);
+		else if(tile.tunnel.rank>0)
+			r.terrain.addWall(tile.x, tile.z, d, basey, tile.tunnel.getGroundY(d.leftCorner()), basey, tile.tunnel.getGroundY(d.rightCorner()));
+	}
+	
 	public static void createTunnel(LevelRenderer r, TunnelInfo tunnel, int lowy) {
 		TunnelTile tile = tunnel.below;
 		int basey = tunnel.basey;
@@ -325,6 +338,8 @@ public class Tunnels {
 		
 		if(tunnel.type!=TunnelType.junction)
 			Street.template.createBridge(r, tile, basey, lowy, dr);
+		else
+			Street.template.createTunnelJunction(r, tile, basey, lowy);
 		
 		if(tunnel.y==null)
 			r.terrain.addFlatTile(tunnel.rank>0 ? TerrainMaterial.plaza : TerrainMaterial.hillGrass, tile.x, topy, tile.z);
@@ -339,6 +354,7 @@ public class Tunnels {
 		switch(tunnel.type) {
 			case junction:
 				for(Dir d : Dir.values()) {
+					createInterTunnelWall(r, tile, d);
 					if(!hasTunnel(tunnel.below.getAdj(d)))
 						r.terrain.addWall(tile.x+d.dx, tile.z+d.dz, d.flip(), lowy, basey, lowy, basey);
 				}
@@ -347,11 +363,9 @@ public class Tunnels {
 				r.terrain.addWall(tile.x+tile.d.dx, tile.z+tile.d.dz, tile.d.flip(), lowy, basey, lowy, basey);
 				break;
 			default:
-				// TODO basey-to-adj.basey?
-				Dir d = tile.d;
-				r.terrain.addWall(tile.x, tile.z, d, basey, tunnel.getGroundY(d.leftCorner()), basey, tunnel.getGroundY(d.rightCorner()));
-				d = d.flip();
-				r.terrain.addWall(tile.x, tile.z, d, basey, tunnel.getGroundY(d.leftCorner()), basey, tunnel.getGroundY(d.rightCorner()));
+				createInterTunnelWall(r, tile, tile.d);
+				createInterTunnelWall(r, tile, tile.d.flip());
+				break;
 		}
 
 		if(tunnel.rank>0 || tunnel.type!=TunnelType.straight || (tile.x+tile.z)%2==0) {

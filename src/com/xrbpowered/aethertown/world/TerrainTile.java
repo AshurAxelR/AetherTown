@@ -8,6 +8,8 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
+import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
@@ -202,6 +204,17 @@ public class TerrainTile extends Tile {
 		return new Tree();
 	}
 	
+	public static TerrainTile getTerrain(Tile tile) {
+		if(tile==null)
+			return null;
+		else if(tile instanceof TerrainTile)
+			return (TerrainTile) tile;
+		else if(Tunnels.hasTunnel(tile))
+			return ((TunnelTile) tile).tunnel.top;
+		else
+			return null;
+	}
+	
 	public static void addTrees(TerrainTile tile, Random random) {
 		if(tile.basey<=-120)
 			return;
@@ -210,13 +223,13 @@ public class TerrainTile extends Tile {
 		boolean adjStreet = false;
 		boolean adjPark = false;
 		int adjTrees = 0;
-		boolean wilderness = false;
-		wilderness = isHill;
+		boolean wilderness = isHill;
 		for(Dir d : Dir.values()) {
 			Tile adj = tile.getAdj(d);
-			if(adj==null || (adj instanceof TerrainTile && !((TerrainTile) adj).trees.isEmpty()))
+			TerrainTile terrain = getTerrain(adj);
+			if(terrain==null || !terrain.trees.isEmpty())
 				adjTrees++;
-			if(adj!=null && adj.t!=Hill.template) {
+			if(adj!=null && adj.t!=Hill.template && !Tunnels.hasTunnel(adj)) {
 				wilderness = false;
 				if(Street.isAnyPath(adj.t) || (adj.t instanceof Plaza))
 					adjStreet = true;
