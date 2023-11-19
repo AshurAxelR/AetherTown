@@ -5,21 +5,10 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
-import com.xrbpowered.aethertown.render.TerrainBuilder;
-import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.render.TexColor;
-import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
-import com.xrbpowered.aethertown.render.sprites.SpriteInfo;
-import com.xrbpowered.aethertown.render.tiles.IllumLayer;
-import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
-import com.xrbpowered.aethertown.render.tiles.IllumTileObjectInfo;
-import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
-import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.utils.Dir8;
-import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Tile;
@@ -27,37 +16,35 @@ import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
+import com.xrbpowered.aethertown.world.gen.Lamps;
+import com.xrbpowered.aethertown.world.gen.Lamps.LampInfo;
+import com.xrbpowered.aethertown.world.gen.Lamps.LampTile;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
 import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
-import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
-import com.xrbpowered.gl.res.texture.Texture;
 
 public class Street extends TunnelTileTemplate {
 
 	public static final Color streetColor = new Color(0xb5b5aa);
-	public static final Color lampLightColor = new Color(0xfff0b4); // new Color(0xfffae5);
 	
 	public static final Street template = new Street();
 	public static final Street subTemplate = new Street();
 	
 	public static TileComponent street;
 	
-	private static TileComponent lampPost;
-	private static IllumTileComponent lamp;
-	private static SpriteComponent coronaSprite;
-	private static TileComponent bridge, bridgeSupport;
-	private static TileComponent tunnelj, tunneljSupport;
-
-	public static class StreetTile extends TunnelTile {
-		public boolean lamp = false;
-		public Dir lampd = null;
+	public static class StreetTile extends TunnelTile implements LampTile {
+		public final LampInfo lamp = new LampInfo();
 		public boolean bridge = false;
 		public boolean forceExpand = false;
 		
 		public StreetTile(TunnelTileTemplate t) {
 			super(t);
+		}
+		
+		@Override
+		public LampInfo getLamp() {
+			return lamp;
 		}
 	}
 
@@ -97,27 +84,9 @@ public class Street extends TunnelTileTemplate {
 		street = new TileComponent(
 				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
 				TexColor.get(streetColor));
-		lamp = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture("models/lamp/lamp.png", false, true, false),
-				new Texture("models/lamp/lamp_illum.png", false, true, false));
-		coronaSprite = new SpriteComponent(new Texture("models/lamp/corona.png"));
-		lampPost = new TileComponent(
-				ObjMeshLoader.loadObj("models/lamp/lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(0x353433));
-		bridge = new TileComponent(
-				ObjMeshLoader.loadObj("models/bridge/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(TerrainBuilder.wallColor));
-		bridgeSupport = new ScaledTileComponent(
-				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(TerrainBuilder.wallColor));
-		tunnelj = new TileComponent(
-				ObjMeshLoader.loadObj("models/bridge/tunnelj.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(TerrainBuilder.wallColor));
-		tunneljSupport = new ScaledTileComponent(
-				ObjMeshLoader.loadObj("models/bridge/tunnelj_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(TerrainBuilder.wallColor));
+		Lamps.createComponents();
 		Fences.createComponents();
+		Tunnels.createComponents();
 	}
 	
 	@Override
@@ -149,8 +118,8 @@ public class Street extends TunnelTileTemplate {
 			return;
 		}
 
-		addLamp(tile, random);
-		autoAddHillBridge(tile, tile.basey);
+		Lamps.addStreetLamp(tile, tile.lamp, random);
+		Tunnels.autoAddHillBridge(tile, tile.basey);
 		Fences.addFences(tile);
 	}
 	
@@ -164,7 +133,7 @@ public class Street extends TunnelTileTemplate {
 		StreetTile tile = (StreetTile) atile;
 		street.addInstance(r, new TileObjectInfo(tile));
 		if(tile.bridge)
-			createHillBridge(r, tile, tile.basey);
+			Tunnels.createHillBridge(r, tile, tile.basey);
 		else
 			r.terrain.addWalls(tile);
 
@@ -174,126 +143,7 @@ public class Street extends TunnelTileTemplate {
 		else {
 			Fences.createFences(r, tile);
 		}
-		createLamp(tile, r, 0);
-	}
-	
-	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy, Dir d) {
-		int dy = basey-tile.basey;
-		int sh = basey-6-lowy;
-		bridge.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0).rotate(d));
-		if(sh>0)
-			bridgeSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize).rotate(d));
-	}
-
-	public void createBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
-		createBridge(r, tile, basey, lowy, tile.d);
-	}
-
-	public void createTunnelJunction(LevelRenderer r, Tile tile, int basey, int lowy) {
-		int dy = basey-tile.basey;
-		int sh = basey-6-lowy;
-		tunnelj.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0));
-		if(sh>0)
-			tunneljSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
-	}
-
-	public void createHillBridge(LevelRenderer r, Tile tile, int basey) {
-		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-		int miny = MathUtils.min(yloc);
-		createBridge(r, tile, basey, miny);
-		r.terrain.addHillTile(TerrainMaterial.hillGrass, tile);
-	}
-	
-	public void autoAddHillBridge(StreetTile tile, int basey) {
-		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
-		int miny = MathUtils.min(yloc);
-		int maxy = MathUtils.max(yloc);
-		if(maxy>basey-3 || basey-miny>=24)
-			return;
-		TileTemplate adjt = tile.getAdjT(tile.d);
-		if(adjt==null || !(Street.isAnyPath(adjt) || (adjt instanceof Plaza)))
-			return;
-		Tile adjcw = tile.getAdj(tile.d.cw());
-		if(adjcw==null || adjcw.getGroundY()>=basey)
-			return;
-		Tile adjccw = tile.getAdj(tile.d.ccw());
-		if(adjccw==null || adjccw.getGroundY()>=basey)
-			return;
-		tile.bridge = true;
-	}
-	
-	public void addLamp(Tile atile, Random random) {
-		StreetTile tile = (StreetTile) atile;
-		if(!tile.level.isInside(tile.x, tile.z, 4) || tile.level.info.isPortal()) {
-			tile.lamp = false;
-			if(tile.x==1) {
-				tile.lampd = Dir.north;
-				tile.lamp = true;
-			}
-			else if(tile.x==tile.level.levelSize-2) {
-				tile.lampd = Dir.south;
-				tile.lamp = true;
-			}
-			else if(tile.z==1) {
-				tile.lampd = Dir.east;
-				tile.lamp = true;
-			}
-			else if(tile.z==tile.level.levelSize-2) {
-				tile.lampd = Dir.west;
-				tile.lamp = true;
-			}
-			return;
-		}
-		boolean hasLamp = tile.lamp || (tile.x+tile.z)%5==0;
-		if(!hasLamp) {
-			for(Dir d : Dir.values()) {
-				TileTemplate adjt = tile.getAdjT(d);
-				if(adjt==HouseT.template)
-					hasLamp = random.nextInt(4)>0;
-				else if(adjt instanceof StreetSlope && ((StreetSlope) adjt).h>1)
-					hasLamp = true;
-				if(hasLamp)
-					break;
-			}
-		}
-		if(hasLamp) {
-			for(Dir8 d : Dir8.values()) {
-				Tile adj = tile.getAdj(d.dx, d.dz);
-				if(adj!=null && (adj instanceof StreetTile) && ((StreetTile) adj).lamp) {
-					tile.lamp = false;
-					return;
-				}
-			}
-			tile.lampd = null;
-			for(Dir d : Dir.shuffle(random)) {
-				Tile adj = tile.getAdj(d);
-				if(adj==null)
-					continue;
-				if(!Street.isAnyPath(adj.t) && !(adj.t instanceof Plaza) && HouseT.allowLamp(adj) && adj.t!=Alcove.template) {
-					tile.lampd = d;
-					tile.lamp = true;
-					break;
-				}
-			}
-			if(tile.lamp && tile.lampd==null) {
-				// tile.lamp = false;
-				// System.err.printf("Missing lamp at [%d, %d]\n", tile.x, tile.z);
-			}
-		}
-	}
-	
-	public void createLamp(Tile atile, LevelRenderer r, float dy) {
-		StreetTile tile = (StreetTile) atile;
-		Dir d = tile.lampd;
-		if(!tile.lamp || d==null)
-			return;
-		float dx = d.dx*0.45f;
-		float dz = d.dz*0.45f;
-		lamp.addInstance(r, new IllumTileObjectInfo(tile, dx, dy, dz));
-		lampPost.addInstance(r, new TileObjectInfo(tile, dx, dy, dz));
-		coronaSprite.addInstance(r, new SpriteInfo(tile, dx, dy+5.75f, dz).size(Tile.size*0.75f));
-		r.pointLights.setLight(tile, dx, dy+5.5f, dz, 4.5f);
-		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+5, lampLightColor, 0.5f, false);
+		Lamps.createLamp(tile, tile.lamp, r, 0);
 	}
 	
 	/**

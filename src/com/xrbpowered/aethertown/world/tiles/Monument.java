@@ -10,6 +10,7 @@ import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
+import com.xrbpowered.aethertown.world.gen.Lamps;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 
 public class Monument extends Plaza {
@@ -46,7 +47,7 @@ public class Monument extends Plaza {
 		pillar.addInstance(r, info);
 		statue.addInstance(r, new TileObjectInfo(tile, 0, 10.3f, 0));
 		r.pointLights.setLight(tile, -0.35f*tile.d.dx, 9f, -0.35f*tile.d.dz, 5f);
-		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+9, Street.lampLightColor, 0.4f, false);
+		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+9, Lamps.lampLightColor, 0.4f, false);
 	}
 	
 }

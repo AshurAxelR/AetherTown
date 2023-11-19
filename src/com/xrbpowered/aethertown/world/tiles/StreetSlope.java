@@ -17,6 +17,7 @@ import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.Fences.FenceType;
+import com.xrbpowered.aethertown.world.gen.Lamps;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
@@ -197,9 +198,9 @@ public class StreetSlope extends TunnelTileTemplate {
 			return;
 		}
 		
-		Street.template.autoAddHillBridge(tile, tile.basey-h);
+		Tunnels.autoAddHillBridge(tile, tile.basey-h);
 		if(h==1)
-			Street.template.addLamp(tile, random);
+			Lamps.addStreetLamp(tile, tile.lamp, random);
 		
 		Dir dl = tile.d.ccw();
 		Dir dr = tile.d.cw();
@@ -216,7 +217,7 @@ public class StreetSlope extends TunnelTileTemplate {
 		if(h>1) {
 			side.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 			if(tile.bridge)
-				Street.template.createHillBridge(r, tile, tile.basey-h);
+				Tunnels.createHillBridge(r, tile, tile.basey-h);
 			else
 				r.terrain.addWalls(tile.x, tile.z, tile.basey-h);
 			// FIXME when needed slope handrails 
@@ -233,7 +234,7 @@ public class StreetSlope extends TunnelTileTemplate {
 		}
 		else {
 			if(tile.bridge) {
-				Street.template.createHillBridge(r, tile, tile.basey-h);
+				Tunnels.createHillBridge(r, tile, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dr, tile.basey-h, tile.basey, tile.basey-h, tile.basey-h);
 				r.terrain.addWall(tile.x, tile.z, dl, tile.basey-h, tile.basey-h, tile.basey-h, tile.basey);
 			}
@@ -255,7 +256,7 @@ public class StreetSlope extends TunnelTileTemplate {
 			else if(tile.getFence(dr)==FenceType.stepsOut) {
 				stepsR.addInstance(r, new TileObjectInfo(tile).rotate(dr));
 			}
-			Street.template.createLamp(atile, r, -0.5f);
+			Lamps.createLamp(tile, tile.lamp, r, -0.5f);
 		}
 
 		if(tile.tunnel!=null) {

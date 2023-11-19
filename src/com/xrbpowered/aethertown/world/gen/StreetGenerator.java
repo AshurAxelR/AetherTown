@@ -323,7 +323,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 		}
 		if(endToken.isFree()) {
 			StreetTile tile = (StreetTile) Street.template.forceGenerate(endToken);
-			tile.lamp = true;
+			tile.lamp.req = true;
 		}
 		return tlist;
 	}

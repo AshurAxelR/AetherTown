@@ -12,24 +12,35 @@ import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.Fences.FenceType;
+import com.xrbpowered.aethertown.world.gen.Lamps;
+import com.xrbpowered.aethertown.world.gen.Lamps.LampInfo;
+import com.xrbpowered.aethertown.world.gen.Lamps.LampTile;
+import com.xrbpowered.aethertown.world.gen.Lamps.RequestLamp;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
-public class Bench extends Plaza {
+public class Bench extends Plaza implements RequestLamp {
 
 	public static final Bench templatePlaza = new Bench(true);
 	public static final Bench templatePark = new Bench(false);
 	
 	public static TileComponent bench;
 
-	public class BenchTile extends TerrainTile {
+	public class BenchTile extends TerrainTile implements LampTile {
+		public final LampInfo lamp = new LampInfo();
 		public boolean plaza;
 		
 		public BenchTile() {
 			super(Bench.this);
 			this.plaza = Bench.this.plaza;
 		}
+		
+		@Override
+		public LampInfo getLamp() {
+			return lamp;
+		}
 	}
+	
 	public final boolean plaza;
 	
 	public Bench(boolean plaza) {
@@ -54,9 +65,19 @@ public class Bench extends Plaza {
 	}
 	
 	@Override
+	public boolean requestLamp(Tile tile) {
+		((BenchTile) tile).lamp.req = true;
+		return true;
+	}
+	
+	@Override
 	public boolean postDecorateTile(Tile atile, Random random) {
 		BenchTile tile = (BenchTile) atile;
 		boolean res = super.postDecorateTile(tile, random);
+		
+		if(tile.lamp.req && tile.lamp.d==null)
+			return Lamps.addLamp(tile, tile.lamp, new Dir[] {tile.d.cw(), tile.d.ccw()});
+		
 		if(!tile.plaza) {
 			boolean convert = false;
 			int countFence = 0; 
@@ -97,17 +118,20 @@ public class Bench extends Plaza {
 	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		BenchTile tile = (BenchTile) atile;
-		float dout;
+		float dout, doutLamp;
 		if(tile.plaza) {
 			super.createGeometry(tile, r);
 			dout = 0.25f;
+			doutLamp = 0f;
 		}
 		else {
 			r.terrain.addWalls(tile);
 			r.terrain.addFlatTile(TerrainMaterial.park, tile);
 			Fences.createFences(r, tile);
 			dout = -0.25f;
+			doutLamp = -0.25f;
 		}
 		bench.addInstance(r, new TileObjectInfo(tile, dout, 0));
+		Lamps.createLamp(tile, tile.lamp, r, 0, doutLamp);
 	}
 }

@@ -10,6 +10,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
+import com.xrbpowered.aethertown.world.gen.Lamps;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
@@ -62,12 +63,12 @@ public class Bridge extends TunnelTileTemplate {
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		BridgeTile tile = (BridgeTile) atile;
 		Street.street.addInstance(r, new TileObjectInfo(tile));
-		Street.template.createBridge(r, tile, tile.basey, tile.basey-height);
+		Tunnels.createBridge(r, tile, tile.basey, tile.basey-height);
 		Fences.createFences(r, tile);
 		
 		Street.street.addInstance(r, new TileObjectInfo(tile, 0, -height, 0));
 		r.pointLights.setLight(tile, 0, -height+5.5f, 0, 4.5f);
-		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey-height+5, Street.lampLightColor, 0.5f, false);
+		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey-height+5, Lamps.lampLightColor, 0.5f, false);
 	}
 	
 	public static boolean isUnder(float y0, int basey) {

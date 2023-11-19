@@ -16,6 +16,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.gen.Lamps;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -120,7 +121,7 @@ public class ChurchT extends TileTemplate {
 			midRoof.addInstance(r, roofInfo);
 		}
 		if(sub.j==1)
-			r.blockLighting.addLight(illumLayer, tile, tile.basey+8, Street.lampLightColor, 0.4f, false);
+			r.blockLighting.addLight(illumLayer, tile, tile.basey+8, Lamps.lampLightColor, 0.4f, false);
 		else if(sub.j==sub.parent.fwd-2)
 			r.blockLighting.addLight(illumLayer, tile, tile.basey+10, blockLightColor, 0.7f, true);
 		else

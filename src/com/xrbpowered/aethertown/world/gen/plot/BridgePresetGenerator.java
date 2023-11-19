@@ -178,7 +178,7 @@ public class BridgePresetGenerator extends StreetPresetGenerator {
 		int ti = ti(i, j);
 		int tj = tj(i, j);
 		if(((ti+tj)%2==1) && (tile.t==Street.subTemplate || tile.t==Street.template)) {
-			((StreetTile) tile).lamp = true;
+			((StreetTile) tile).lamp.req = true;
 		}
 		return tile;
 	}

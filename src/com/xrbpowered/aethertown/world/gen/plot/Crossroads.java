@@ -71,7 +71,7 @@ public class Crossroads extends StreetPresetGenerator {
 	protected Tile placeAt(Token t, int i, int j, Random random) {
 		Tile tile = super.placeAt(t, i, j, random);
 		if(tile.t==Street.subTemplate) {
-			((StreetTile) tile).lamp = true;
+			((StreetTile) tile).lamp.req = true;
 		}
 		return tile;
 	}

@@ -4,13 +4,22 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
+import com.xrbpowered.aethertown.render.ObjectShader;
+import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.TerrainMaterial;
+import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
+import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
+import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.TileComponent;
+import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
@@ -19,11 +28,13 @@ import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
+import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
+import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 
 public class Tunnels {
 
 	public static final int tunnelHeight = 8;
-	
+
 	public static enum TunnelType {
 		straight, junction, object, fixed
 	}
@@ -59,6 +70,24 @@ public class Tunnels {
 		}
 	}
 
+	private static TileComponent bridge, bridgeSupport;
+	private static TileComponent tunnelj, tunneljSupport;
+	
+	public static void createComponents() {
+		bridge = new TileComponent(
+				ObjMeshLoader.loadObj("models/bridge/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(TerrainBuilder.wallColor));
+		bridgeSupport = new ScaledTileComponent(
+				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(TerrainBuilder.wallColor));
+		tunnelj = new TileComponent(
+				ObjMeshLoader.loadObj("models/bridge/tunnelj.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(TerrainBuilder.wallColor));
+		tunneljSupport = new ScaledTileComponent(
+				ObjMeshLoader.loadObj("models/bridge/tunnelj_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				TexColor.get(TerrainBuilder.wallColor));
+	}
+	
 	public final Level level;
 	public final ArrayList<TunnelInfo> tunnels = new ArrayList<>();
 	
@@ -321,6 +350,51 @@ public class Tunnels {
 		}
 	}
 
+	public static void createBridge(LevelRenderer r, Tile tile, int basey, int lowy, Dir d) {
+		int dy = basey-tile.basey;
+		int sh = basey-6-lowy;
+		bridge.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0).rotate(d));
+		if(sh>0)
+			bridgeSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize).rotate(d));
+	}
+
+	public static void createBridge(LevelRenderer r, Tile tile, int basey, int lowy) {
+		createBridge(r, tile, basey, lowy, tile.d);
+	}
+
+	public static void createTunnelJunction(LevelRenderer r, Tile tile, int basey, int lowy) {
+		int dy = basey-tile.basey;
+		int sh = basey-6-lowy;
+		tunnelj.addInstance(r, new TileObjectInfo(tile, 0, dy-6, 0));
+		if(sh>0)
+			tunneljSupport.addInstance(r, new ScaledTileObjectInfo(tile, 0, dy-6, 0).scale(1, sh*Tile.ysize));
+	}
+
+	public static void createHillBridge(LevelRenderer r, Tile tile, int basey) {
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		int miny = MathUtils.min(yloc);
+		createBridge(r, tile, basey, miny);
+		r.terrain.addHillTile(TerrainMaterial.hillGrass, tile);
+	}
+	
+	public static void autoAddHillBridge(StreetTile tile, int basey) {
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		int miny = MathUtils.min(yloc);
+		int maxy = MathUtils.max(yloc);
+		if(maxy>basey-3 || basey-miny>=24)
+			return;
+		TileTemplate adjt = tile.getAdjT(tile.d);
+		if(adjt==null || !(Street.isAnyPath(adjt) || (adjt instanceof Plaza)))
+			return;
+		Tile adjcw = tile.getAdj(tile.d.cw());
+		if(adjcw==null || adjcw.getGroundY()>=basey)
+			return;
+		Tile adjccw = tile.getAdj(tile.d.ccw());
+		if(adjccw==null || adjccw.getGroundY()>=basey)
+			return;
+		tile.bridge = true;
+	}
+
 	private static void createInterTunnelWall(LevelRenderer r, TunnelTile tile, Dir d) {
 		int basey = tile.tunnel.basey;
 		TunnelInfo adjTunnel = adjTunnel(tile, d);
@@ -337,9 +411,9 @@ public class Tunnels {
 		Dir dr = tile.d.cw();
 		
 		if(tunnel.type!=TunnelType.junction)
-			Street.template.createBridge(r, tile, basey, lowy, dr);
+			createBridge(r, tile, basey, lowy, dr);
 		else
-			Street.template.createTunnelJunction(r, tile, basey, lowy);
+			createTunnelJunction(r, tile, basey, lowy);
 		
 		if(tunnel.y==null)
 			r.terrain.addFlatTile(tunnel.rank>0 ? TerrainMaterial.plaza : TerrainMaterial.hillGrass, tile.x, topy, tile.z);
@@ -370,7 +444,7 @@ public class Tunnels {
 
 		if(tunnel.rank>0 || tunnel.type!=TunnelType.straight || (tile.x+tile.z)%2==0) {
 			r.pointLights.setLight(tile, 0, basey-tile.basey-2.5f, 0, 4.5f);
-			r.blockLighting.addLight(IllumLayer.alwaysOn, tile, basey-3, Street.lampLightColor, 0.3f, false);
+			r.blockLighting.addLight(IllumLayer.alwaysOn, tile, basey-3, Lamps.lampLightColor, 0.3f, false);
 		}
 		
 		if(tunnel.top!=null)
