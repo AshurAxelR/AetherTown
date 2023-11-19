@@ -158,6 +158,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	}
 	
 	public static void followTerrain(Level level) {
+		if(level.info.isPortal())
+			return;
 		ArrayList<FollowTerrain> fts = FollowTerrain.findStreets(level);
 		for(FollowTerrain ft : fts)
 			ft.apply(ft.compute(), level);
