@@ -12,6 +12,7 @@ import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
+import com.xrbpowered.aethertown.world.region.PortalSystem;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
 import com.xrbpowered.gl.scene.CameraActor;
@@ -81,10 +82,20 @@ public class LevelCache {
 	}
 	
 	public void addAllAdj(LevelInfo info, boolean markVisited, boolean followPortals) {
+		if(info==null) {
+			System.err.println("Warning: unexpected null level");
+			return;
+		}
+		
 		// prioritise origin:
 		add(info, markVisited);
-		if(followPortals && info.isPortal())
-			addAllAdj(info.region.cache.portals.otherLevel, markVisited, false);
+		if(followPortals && info.isPortal()) {
+			PortalSystem portals = info.region.cache.portals;
+			if(portals.otherLevel==null)
+				portals.updateOtherRegion();
+			else
+				addAllAdj(portals.otherLevel, false, false);
+		}
 		
 		for(int x=info.x0-1; x<info.x0+info.size+1; x++)
 			for(int z=info.z0-1; z<info.z0+info.size+1; z++) {

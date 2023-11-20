@@ -78,7 +78,7 @@ public class PortalSystem {
 		otherLevel = otherRegion.portals[portal.portal.otherIndex];
 		portalPrimed = false;
 		
-		AetherTown.levelCache.addAllAdj(AetherTown.levelInfo, false);
+		AetherTown.levelCache.addAllAdj(AetherTown.levelInfo, false, false);
 	}
 	
 	public void updateTime() {
