@@ -133,6 +133,9 @@ public class Park extends TileTemplate {
 	
 	@Override
 	public boolean finalizeTile(Tile atile, Random random) {
+		if(Alcove.maybeConvert(atile))
+			return true;
+		
 		ParkTile tile = (ParkTile) atile;
 		boolean remove = true;
 		for(Dir d : Dir.values()) {

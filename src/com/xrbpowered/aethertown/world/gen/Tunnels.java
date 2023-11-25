@@ -75,16 +75,16 @@ public class Tunnels {
 	
 	public static void createComponents() {
 		bridge = new TileComponent(
-				ObjMeshLoader.loadObj("models/bridge/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(TerrainBuilder.wallColor));
 		bridgeSupport = new ScaledTileComponent(
-				ObjMeshLoader.loadObj("models/bridge/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(TerrainBuilder.wallColor));
 		tunnelj = new TileComponent(
-				ObjMeshLoader.loadObj("models/bridge/tunnelj.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/tunnelj.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(TerrainBuilder.wallColor));
 		tunneljSupport = new ScaledTileComponent(
-				ObjMeshLoader.loadObj("models/bridge/tunnelj_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/tunnelj_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(TerrainBuilder.wallColor));
 	}
 	
@@ -228,6 +228,31 @@ public class Tunnels {
 		}
 	}
 	
+	private void checkAddCornerSide(Tile tile) {
+		if(tile==null || tile.t!=Hill.template)
+			return;
+		int topy = tile.basey;
+		Dir dt = null;
+		int count = 0;
+		for(Dir d : Dir.values()) {
+			Tile adj = tile.getAdj(d);
+			if(adj==null)
+				return;
+			if(hasTunnel(adj)) {
+				dt = d.flip();
+				count++;
+				int y = ((TunnelTile) adj).tunnel.topy;
+				if(y>topy)
+					topy = y;
+				continue;
+			}
+			if(adj.t!=Hill.template)
+				return;
+		}
+		if(count>1)
+			Plaza.tunnelSideTemplate.forceGenerate(new Token(level, tile.x, topy, tile.z, dt));
+	}
+	
 	private int calcYFromAdj(TunnelInfo tunnel, Dir d) {
 		TunnelInfo adjTunnel = adjTunnel(tunnel.below, d);
 		if(adjTunnel==null) {
@@ -326,6 +351,11 @@ public class Tunnels {
 		if(adjustSides())
 			calcRanks();
 		
+		for(TunnelInfo tunnel : tunnels) {
+			checkAddCornerSide(tunnel.below.getAdj(tunnel.below.d.cw()));
+			checkAddCornerSide(tunnel.below.getAdj(tunnel.below.d.ccw()));
+		}
+		
 		level.h.calculate(true);
 		Hill.recalcMaxDelta(level);
 		
@@ -404,7 +434,7 @@ public class Tunnels {
 			r.terrain.addWall(tile.x, tile.z, d, basey, tile.tunnel.getGroundY(d.leftCorner()), basey, tile.tunnel.getGroundY(d.rightCorner()));
 	}
 	
-	public static void createTunnel(LevelRenderer r, TunnelInfo tunnel, int lowy) {
+	public static void createTunnel(LevelRenderer r, TunnelInfo tunnel, int lowy, boolean light) {
 		TunnelTile tile = tunnel.below;
 		int basey = tunnel.basey;
 		int topy = tunnel.topy;
@@ -433,16 +463,15 @@ public class Tunnels {
 						r.terrain.addWall(tile.x+d.dx, tile.z+d.dz, d.flip(), lowy, basey, lowy, basey);
 				}
 				break;
-			case object:
-				r.terrain.addWall(tile.x+tile.d.dx, tile.z+tile.d.dz, tile.d.flip(), lowy, basey, lowy, basey);
-				break;
-			default:
+			case straight:
 				createInterTunnelWall(r, tile, tile.d);
 				createInterTunnelWall(r, tile, tile.d.flip());
 				break;
+			default:
+				break;
 		}
 
-		if(tunnel.rank>0 || tunnel.type!=TunnelType.straight || (tile.x+tile.z)%2==0) {
+		if(light && (tunnel.rank>0 || tunnel.type!=TunnelType.straight || (tile.x+tile.z)%2==0)) {
 			r.pointLights.setLight(tile, 0, basey-tile.basey-2.5f, 0, 4.5f);
 			r.blockLighting.addLight(IllumLayer.alwaysOn, tile, basey-3, Lamps.lampLightColor, 0.3f, false);
 		}
@@ -450,7 +479,11 @@ public class Tunnels {
 		if(tunnel.top!=null)
 			tunnel.top.createTrees(r);
 	}
-	
+
+	public static void createTunnel(LevelRenderer r, TunnelInfo tunnel, int lowy) {
+		createTunnel(r, tunnel, lowy, true);
+	}
+
 	public static boolean isAbove(float y0, int basey) {
 		return y0>Tile.ysize*(basey-1);
 	}

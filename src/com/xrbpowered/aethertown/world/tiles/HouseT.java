@@ -27,10 +27,10 @@ import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
-import com.xrbpowered.gl.res.texture.Texture;
 
 public class HouseT extends TileTemplate {
 
+	public static final Color upperWallColor = new Color(0xd5ceba);
 	public static final int roofHeight = 6;
 	
 	public static final HouseT template = new HouseT();
@@ -108,13 +108,12 @@ public class HouseT extends TileTemplate {
 		roof = new TileComponent(
 				BasicGeometry.slope(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo, null),
 				ChurchT.roofTexture);
-		Texture upperWallColor = TexColor.get(new Color(0xd5ceba));
 		roofEndLeft = new TileComponent(
 				BasicGeometry.slopeSideLeft(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo, null),
-				upperWallColor);
+				TexColor.get(upperWallColor));
 		roofEndRight = new TileComponent(
 				BasicGeometry.slopeSideRight(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo, null),
-				upperWallColor);
+				TexColor.get(upperWallColor));
 	}
 
 	@Override

@@ -262,11 +262,9 @@ public class HouseRole {
 		new RestaurantRole("Pizza Restaurant", DoorInfo.restaurantRed),
 		new RestaurantRole("Asian Restaurant", DoorInfo.restaurantRed),
 		new RestaurantRole("Chinese Buffet", DoorInfo.restaurantRed),
-		new RestaurantRole("Thai Restaurant", DoorInfo.restaurantRed),
 		new RestaurantRole("Mexican Restaurant", DoorInfo.restaurantRed),
 		new RestaurantRole("Indian Restaurant", DoorInfo.restaurantRed),
 		new RestaurantRole("European Restaurant", DoorInfo.restaurantBlack),
-		new RestaurantRole("French Restaurant", DoorInfo.restaurantBlack),
 		new RestaurantRole("Mediterranean Restaurant", DoorInfo.restaurantRed)
 	);
 
@@ -281,8 +279,6 @@ public class HouseRole {
 			new LocalShopRole("Pizza Bar", colorFoodSmall, true),
 			new LocalShopRole("Coffee Shop", DoorInfo.coffeeShop, colorFoodSmall, true),
 			new LocalShopRole("Chinese Takeaway", colorFoodSmall, true),
-			new LocalShopRole("Fish and Chips", colorFoodSmall, true),
-			new LocalShopRole("Sushi Bar", colorFoodSmall, true),
 			new LocalShopRole("Chicken Grill Bar", colorFoodSmall, true)
 	);
 

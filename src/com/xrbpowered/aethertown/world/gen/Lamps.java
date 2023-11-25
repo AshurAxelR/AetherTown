@@ -28,6 +28,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 public class Lamps {
 
 	public static final Color lampLightColor = new Color(0xfff0b4); // new Color(0xfffae5);
+	public static final Color lampPostColor = new Color(0x353433);
 
 	public static class LampInfo {
 		public boolean req = false;
@@ -54,7 +55,7 @@ public class Lamps {
 		coronaSprite = new SpriteComponent(new Texture("models/lamp/corona.png"));
 		lampPost = new TileComponent(
 				ObjMeshLoader.loadObj("models/lamp/lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(0x353433));
+				TexColor.get(lampPostColor));
 	}
 	
 	public static boolean hasAdjLamp(Tile tile) {

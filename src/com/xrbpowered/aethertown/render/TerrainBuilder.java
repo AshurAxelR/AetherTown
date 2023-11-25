@@ -17,6 +17,7 @@ public class TerrainBuilder {
 	
 	public static final Color cliffColor = new Color(0x7d7f6e);
 	public static final Color wallColor = new Color(0x8f8b7e); // new Color(0x949187); // new Color(0x85857a);
+	public static final Color snowColor = new Color(0xf4fcfd);
 
 	public final Level level;
 	public final int csize;

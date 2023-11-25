@@ -13,7 +13,7 @@ public enum TerrainMaterial {
 		new Color(0x6a9c40),
 		new Color(0x729d47),
 		new Color(0x729d47),
-		new Color(0xf4fcfd)
+		TerrainBuilder.snowColor
 	),
 	hillGrass(
 		new Color(0x5e8c47),
@@ -22,7 +22,7 @@ public enum TerrainMaterial {
 		new Color(0x7da547),
 		new Color(0x8eaa55),
 		new Color(0xa3b167),
-		new Color(0xf4fcfd)
+		TerrainBuilder.snowColor
 	),
 	rock(
 		TerrainBuilder.cliffColor,

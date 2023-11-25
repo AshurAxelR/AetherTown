@@ -15,7 +15,7 @@ import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 
 public class Monument extends Plaza {
 
-	private static final Color statueColor = new Color(0xf2f4ea); // new Color(0x75abae); // new Color(0x353433);
+	public static final Color statueColor = new Color(0xf2f4ea); // new Color(0x75abae); // new Color(0x353433);
 	
 	public static final Monument template = new Monument();
 	
@@ -34,7 +34,7 @@ public class Monument extends Plaza {
 	public void createComponents() {
 		pillar = new TileComponent(
 				ObjMeshLoader.loadObj("models/monument/pillar.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(0xd5ceba));
+				TexColor.get(plazaColor));
 		statue = new TileComponent(
 				ObjMeshLoader.loadObj("models/monument/angel.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(statueColor));

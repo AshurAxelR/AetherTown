@@ -14,6 +14,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
+import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.aethertown.world.tiles.StreetSlope;
@@ -38,7 +39,7 @@ public abstract class Fences {
 				new Texture("models/fences/handrail.png", false, true, false));
 		handrailPole = new TileComponent(
 				ObjMeshLoader.loadObj("models/fences/handrail_pole.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				TexColor.get(0xd5ceba));
+				TexColor.get(Plaza.plazaColor));
 		steps = new TileComponent(
 				ObjMeshLoader.loadObj("models/fences/steps_out.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.get(Street.streetColor));
