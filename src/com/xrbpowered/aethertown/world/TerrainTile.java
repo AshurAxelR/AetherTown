@@ -21,12 +21,28 @@ public class TerrainTile extends Tile {
 	public static final float pineRadius = 1.4f;
 	public static final float bushRadius = 1.2f;
 	
+	private static boolean checkStreet(Tile adj, int basey) {
+		return adj!=null && (Street.isAnyPath(adj.t) || adj.t instanceof Plaza) && adj.basey>=basey-1 && adj.basey<=basey+1;
+	}
+	
+	private static boolean isBetweenStreetsX(Tile tile) {
+		return checkStreet(tile.getAdj(-1, 0), tile.basey) && checkStreet(tile.getAdj(1, 0), tile.basey);
+	}
+
+	private static boolean isBetweenStreetsZ(Tile tile) {
+		return checkStreet(tile.getAdj(0, -1), tile.basey) && checkStreet(tile.getAdj(0, 1), tile.basey);
+	}
+
+	private static float pos(Random random, float margin) {
+		return random.nextFloat()*(1f-margin*2f) + margin;
+	}
+	
 	public static class Tree {
 		public float px, pz, ty, s, sy;
 		
 		public Tree generate(TerrainTile tile, Random random) {
-			px = random.nextFloat()*0.5f + 0.25f;
-			pz = random.nextFloat()*0.5f + 0.25f;
+			px = pos(random, isBetweenStreetsX(tile) ? 0.46f : 0.25f);
+			pz = pos(random, isBetweenStreetsZ(tile) ? 0.46f : 0.25f);
 			ty = 1.4f+random.nextFloat()*1.8f;
 			s = 0.8f+random.nextFloat()*0.5f;
 			sy = s*(0.9f+random.nextFloat()*0.4f);
@@ -52,8 +68,8 @@ public class TerrainTile extends Tile {
 		}
 		
 		public Tree generate(TerrainTile tile, Random random) {
-			px = random.nextFloat()*0.8f + 0.1f;
-			pz = random.nextFloat()*0.8f + 0.1f;
+			px = pos(random, 0.1f);
+			pz = pos(random, 0.1f);
 			ty = 1.6f+0.3f*n+random.nextFloat()*(2f+0.5f*n);
 			s = 0.8f-0.1f*n+random.nextFloat()*0.5f;
 			sy = s*(1.1f+random.nextFloat()*0.8f);
@@ -63,8 +79,8 @@ public class TerrainTile extends Tile {
 	
 	public static class PineTree extends Tree {
 		public Tree generate(TerrainTile tile, Random random) {
-			px = random.nextFloat()*0.4f + 0.3f;
-			pz = random.nextFloat()*0.4f + 0.3f;
+			px = pos(random, isBetweenStreetsX(tile) ? 0.48f : 0.3f);
+			pz = pos(random, isBetweenStreetsZ(tile) ? 0.48f : 0.3f);
 			ty = 0.3f+random.nextFloat()*0.7f;
 			s = 0.8f+random.nextFloat()*1.0f;
 			sy = s*(2.8f+random.nextFloat()*2.2f);
@@ -90,8 +106,8 @@ public class TerrainTile extends Tile {
 		}
 		
 		public Tree generate(TerrainTile tile, Random random) {
-			px = random.nextFloat()*0.8f + 0.1f;
-			pz = random.nextFloat()*0.8f + 0.1f;
+			px = pos(random, 0.1f);
+			pz = pos(random, 0.1f);
 			ty = 1.3f+0.8f*(n-1)+random.nextFloat()*(1.8f+0.5f*n);
 			s = 1f-0.05f*n+random.nextFloat()*0.6f;
 			sy = s*(3f+random.nextFloat()*1.6f);

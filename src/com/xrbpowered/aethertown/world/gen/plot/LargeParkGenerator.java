@@ -37,7 +37,7 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 		}),
 		new PresetData(new TileTemplate[][] { // large plaza
 			{Plaza.template, Bench.templatePlaza, Plaza.template},
-			{Bench.templatePlaza, Park.template, Bench.templatePlaza},
+			{Bench.templatePlazaLamp, Park.template, Bench.templatePlazaLamp},
 			{Plaza.template, Street.template, Plaza.template},
 		})
 	};

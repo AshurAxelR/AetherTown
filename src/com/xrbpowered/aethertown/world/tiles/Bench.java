@@ -21,8 +21,16 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Bench extends Plaza implements RequestLamp {
 
-	public static final Bench templatePlaza = new Bench(true);
 	public static final Bench templatePark = new Bench(false);
+	public static final Bench templatePlaza = new Bench(true);
+	public static final Bench templatePlazaLamp = new Bench(true) {
+		@Override
+		public Tile createTile() {
+			BenchTile tile = new BenchTile();
+			tile.lamp.req = true;
+			return tile;
+		}
+	};
 	
 	public static TileComponent bench;
 
@@ -118,20 +126,18 @@ public class Bench extends Plaza implements RequestLamp {
 	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		BenchTile tile = (BenchTile) atile;
-		float dout, doutLamp;
+		float dout;
 		if(tile.plaza) {
 			super.createGeometry(tile, r);
 			dout = 0.25f;
-			doutLamp = 0f;
 		}
 		else {
 			r.terrain.addWalls(tile);
 			r.terrain.addFlatTile(TerrainMaterial.park, tile);
 			Fences.createFences(r, tile);
 			dout = -0.25f;
-			doutLamp = -0.25f;
 		}
 		bench.addInstance(r, new TileObjectInfo(tile, dout, 0));
-		Lamps.createLamp(tile, tile.lamp, r, 0, doutLamp);
+		Lamps.createLamp(tile, tile.lamp, r, 0, dout);
 	}
 }

@@ -12,6 +12,8 @@ import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.HouseRole;
+import com.xrbpowered.aethertown.world.tiles.Bench;
+import com.xrbpowered.aethertown.world.tiles.Bench.BenchTile;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
@@ -31,6 +33,10 @@ public class LevelMapView extends UIElement {
 	public static final Color colorStreetBorder = new Color(0x999999);
 	public static final Color colorTextBg = new Color(0xbbffffff, true);
 	public static final Color colorText = new Color(0x777777);
+	
+	
+	public static final Color colorPark = new Color(0xddeebb);
+	public static final Color colorDefault = new Color(0xfafafa);
 
 	public static Level level;
 	
@@ -120,16 +126,22 @@ public class LevelMapView extends UIElement {
 				Tile tile = level.map[x][z];
 				if(tile==null)
 					continue;
-				Color c = new Color(0xfafafa);
+				Color c = colorDefault;
 				Color addc = null;
 				if(tile instanceof TunnelTile && ((TunnelTile) tile).tunnel!=null)
 					c = colorStreetBorder;
 				else if(Street.isAnyPath(tile.t))
 					c = Street.streetColor;
 				else if(tile.t==Park.template)
-					c = new Color(0xddeebb);
-				else if(tile.t instanceof Plaza)
-					c = Plaza.plazaColor;
+					c = colorPark;
+				else if(tile.t instanceof Plaza) {
+					if(tile.t==Plaza.tunnelSideTemplate)
+						c = colorDefault;
+					else if(tile.t instanceof Bench)
+						c = ((BenchTile) tile).plaza ? Plaza.plazaColor : colorPark;
+					else
+						c = Plaza.plazaColor;
+				}
 				else if(tile.sub!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
 					if(tile.sub.parent instanceof HouseGenerator) {
 						HouseGenerator house = (HouseGenerator) tile.sub.parent;

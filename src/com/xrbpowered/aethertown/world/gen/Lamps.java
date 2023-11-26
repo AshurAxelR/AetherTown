@@ -77,7 +77,7 @@ public class Lamps {
 			Tile adj = tile.getAdj(d);
 			if(adj==null || !HouseT.allowLamp(adj) || adj.t==Alcove.template || Tunnels.hasTunnel(adj))
 				continue;
-			if((Street.isAnyPath(adj.t) || adj.t instanceof Plaza) &&
+			if((Street.isAnyPath(adj.t) || (adj.t instanceof Plaza && adj.d==d)) &&
 					(Math.abs(tile.getGroundY(d.leftCorner())-adj.getGroundY(d.flip().rightCorner()))<2 ||
 					Math.abs(tile.getGroundY(d.rightCorner())-adj.getGroundY(d.flip().leftCorner()))<2))
 				continue;

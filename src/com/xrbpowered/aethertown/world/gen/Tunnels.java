@@ -240,11 +240,14 @@ public class Tunnels {
 			if(adj==null)
 				return;
 			if(hasTunnel(adj)) {
-				dt = d.flip();
-				count++;
-				int y = ((TunnelTile) adj).tunnel.topy;
-				if(y>topy)
-					topy = y;
+				TunnelInfo tunnel = ((TunnelTile) adj).tunnel;
+				if(tunnel.rank>0) {
+					dt = d.flip();
+					count++;
+					int y = tunnel.topy;
+					if(y>topy)
+						topy = y;
+				}
 				continue;
 			}
 			if(adj.t!=Hill.template) {
@@ -381,7 +384,7 @@ public class Tunnels {
 			int ty = tunnel.getGroundY(c);
 			int hy = tunnel.below.level.h.y[x+c.tx+1][z+c.tz+1];
 			if(ty!=hy)
-				GeneratorException.warning("Broken tunnel geometry [%d, %d].%s: %d!=%d\n", x, z, c.name(), ty, hy);
+				GeneratorException.raise("Broken tunnel geometry [%d, %d].%s: %d!=%d\n", x, z, c.name(), ty, hy);
 		}
 	}
 
