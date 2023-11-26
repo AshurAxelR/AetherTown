@@ -2,64 +2,80 @@ package com.xrbpowered.aethertown.world.gen.plot;
 
 import java.util.Random;
 
+import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
-import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
-import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
-public class LargeParkGenerator extends PlotGenerator {
+public class LargeParkGenerator extends PresetPlotGenerator {
 
-	public enum ParkType {
-		largePark, monumentPark, monumentPlaza, largePlaza
-	}
+	private static final Dir[][] setd = {
+		{Dir.west, Dir.north, Dir.east},
+		{Dir.west, Dir.north, Dir.east},
+		{Dir.west, Dir.north, Dir.east}
+	};
+
+	private static final PresetData[] presets = {
+		new PresetData(new TileTemplate[][] { // large park
+			{Park.template, Park.template, Park.template},
+			{Park.template, Park.template, Park.template},
+			{Park.template, Park.template, Park.template},
+		}),
+		new PresetData(new TileTemplate[][] { // monument park
+			{Park.template, Park.template, Park.template},
+			{Park.template, Monument.template, Park.template},
+			{Park.template, Street.template, Park.template},
+		}),
+		new PresetData(new TileTemplate[][] { // monument plaza
+			{Plaza.template, Plaza.template, Plaza.template},
+			{Plaza.template, Monument.template, Plaza.template},
+			{Plaza.template, Street.template, Plaza.template},
+		}),
+		new PresetData(new TileTemplate[][] { // large plaza
+			{Plaza.template, Bench.templatePlaza, Plaza.template},
+			{Bench.templatePlaza, Park.template, Bench.templatePlaza},
+			{Plaza.template, Street.template, Plaza.template},
+		})
+	};
+	
+	private static final EntryPoint[] setent = { new EntryPoint(3, 1) };
 	
 	private static final WRandom typew = new WRandom(3.5, 1, 0.5, 1);
 	private static final WRandom typeUpw = new WRandom(0, 1, 0.5, 0.5);
 	
-	public ParkType type = ParkType.largePark;
-	private WRandom w;
+	protected PresetData preset;
 	
-	public LargeParkGenerator(boolean pointOfInterest) {
-		w = pointOfInterest ? typeUpw : typew;
+	public LargeParkGenerator(boolean pointOfInterest, Random random) {
+		preset = presets[(pointOfInterest ? typeUpw : typew).next(random)];
 	}
 	
 	@Override
-	protected boolean findSize(Random random) {
-		setSize(1, 1, 2);
-		return true;
+	public int tisize() {
+		return 3;
 	}
 
 	@Override
-	protected Tile placeAt(Token t, int i, int j, Random random) {
-		TileTemplate temp;
-		if(i==0 && j<2) {
-			if(type==ParkType.largePark)
-				temp = Park.template;
-			else if(j==0)
-				temp = Street.template;
-			else if(type==ParkType.largePlaza)
-				temp = Park.template;
-			else
-				temp = Monument.template;
-		}
-		else if(type==ParkType.largePark || type==ParkType.monumentPark)
-			temp = Park.template;
-		else if(type==ParkType.largePlaza && (j==1 || i==0))
-			temp = Bench.templatePlaza;
-		else
-			temp = Plaza.template;
-		return temp.forceGenerate(t).makeSub(this, i, j);
+	public int tjsize() {
+		return 3;
 	}
-	
+
 	@Override
-	public boolean generate(Token startToken, Random random) {
-		type = ParkType.values()[w.next(random)];
-		return super.generate(startToken, random);
+	public TileTemplate sett(int ti, int tj) {
+		return preset.sett[ti][tj];
+	}
+
+	@Override
+	public Dir setd(int ti, int tj) {
+		return setd[ti][tj];
+	}
+
+	@Override
+	public EntryPoint[] setent() {
+		return setent;
 	}
 
 	@Override
@@ -67,9 +83,9 @@ public class LargeParkGenerator extends PlotGenerator {
 	}
 	
 	public void promote(Random random) {
-		if(type==ParkType.largePark) {
+		if(preset==presets[0]) {
 			remove();
-			type = ParkType.values()[typeUpw.next(random)];
+			preset = presets[typeUpw.next(random)];
 			place(random);
 		}
 	}

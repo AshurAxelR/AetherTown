@@ -6,8 +6,8 @@ import com.xrbpowered.aethertown.world.TileTemplate;
 public class PresetData {
 
 	public TileTemplate[][] sett;
-	public Dir[][] setd;
-	public int[][] sety;
+	public Dir[][] setd = null;
+	public int[][] sety = null;
 
 	public PresetData(TileTemplate[][] t) {
 		this.sett = t;

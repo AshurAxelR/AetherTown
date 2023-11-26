@@ -19,6 +19,7 @@ import com.xrbpowered.aethertown.world.gen.plot.StreetPresetGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Bench;
+import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class StreetLayoutGenerator extends TokenGenerator {
@@ -44,7 +45,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 		clearTokens();
 		this.startToken = Crossroads.centerAt(startToken);
-		Crossroads start = new Crossroads();
+		Crossroads start = new Crossroads(Monument.template);
 		start.ignoreHeightLimit = true;
 		if(!start.generate(this.startToken, random))
 			GeneratorException.raise("StreetLayoutGenerator: initial placement failed");
@@ -68,7 +69,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	public static boolean addPointOfInterest(Token t, Random random) {
 		if(t.level.info.settlement.maxHouses>0 && new HouseGenerator().generate(t, random))
 			return true;
-		else if(new LargeParkGenerator(true).generate(t, random))
+		else if(new LargeParkGenerator(true, random).generate(t, random))
 			return true;
 		else if(Bench.templatePlaza.generate(t, random))
 			return true;

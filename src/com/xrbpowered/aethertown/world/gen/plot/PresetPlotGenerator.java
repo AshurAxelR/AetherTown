@@ -21,6 +21,10 @@ public abstract class PresetPlotGenerator extends PlotGenerator {
 			this.align = d;
 			this.basey = basey;
 		}
+		
+		public EntryPoint(int ti, int tj) {
+			this(ti, tj, Dir.north, 0);
+		}
 	}
 
 	protected EntryPoint entry = null;

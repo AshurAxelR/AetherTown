@@ -3,18 +3,24 @@ package com.xrbpowered.aethertown.world.gen.plot;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.Park;
+import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
 public class Crossroads extends StreetPresetGenerator {
 
+	private static final TileTemplate[] mids = { Monument.template, Park.template, Plaza.template }; 
+	private static final WRandom midsw = new WRandom(0.2, 0.7, 0.1); 
+	
 	private static final TileTemplate[][] sett = {
 		{Street.subTemplate, Street.template, Street.subTemplate},
-		{Street.template, Monument.template, Street.template},
+		{Street.template, null, Street.template},
 		{Street.subTemplate, Street.template, Street.subTemplate}
 	};
 	
@@ -33,10 +39,17 @@ public class Crossroads extends StreetPresetGenerator {
 	
 	private static final EntryPoint[] setent = { setout[0] };
 	
-	public Crossroads() {
-		super(15);
-	}
+	public final TileTemplate mid;
 	
+	public Crossroads(TileTemplate mid) {
+		super(15);
+		this.mid = mid;
+	}
+
+	public Crossroads(Random random) {
+		this(mids[midsw.next(random)]);
+	}
+
 	@Override
 	public int tisize() {
 		return 3;
@@ -49,7 +62,7 @@ public class Crossroads extends StreetPresetGenerator {
 	
 	@Override
 	public TileTemplate sett(int ti, int tj) {
-		return sett[ti][tj]; 
+		return (ti==1 && tj==1) ? mid : sett[ti][tj]; 
 	}
 	
 	@Override

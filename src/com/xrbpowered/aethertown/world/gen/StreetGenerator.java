@@ -49,9 +49,9 @@ public class StreetGenerator implements Generator, TokenProvider {
 			case 1:
 				return Park.template;
 			case 2:
-				return (h==0) ? new LargeParkGenerator(false) : null;
+				return (h==0) ? new LargeParkGenerator(false, random) : null;
 			case 3:
-				return (h==0) ? new LargeParkGenerator(true) : null;
+				return (h==0) ? new LargeParkGenerator(true, random) : null;
 			case 4:
 				if(level.info.settlement.maxHouses>0)
 					return HouseGenerator.select(level, h);
@@ -338,14 +338,14 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
-	private static final WRandom wcross = new WRandom(0.2, 0.4, 0.4);
+	private static final WRandom wcross = new WRandom(0.25, 0.4, 0.35);
 	
 	@Override
 	public void collectTokens(TokenGenerator out, Random random) {
 		if(dylist[len-1]==0 && (len<2 || dylist[len-2]==0)) {
 			switch(wcross.next(random)) {
 				case 0:
-					out.addToken(endToken.next(endToken.d, 0).setGenerator(new Crossroads()));
+					out.addToken(endToken.next(endToken.d, 0).setGenerator(new Crossroads(random)));
 					return;
 				case 1:
 					out.addToken(endToken.next(endToken.d, 0).setGenerator(new BridgePresetGenerator()));

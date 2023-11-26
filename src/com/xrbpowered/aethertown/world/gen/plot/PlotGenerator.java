@@ -26,15 +26,7 @@ public abstract class PlotGenerator implements Generator {
 	}
 	
 	protected abstract boolean findSize(Random random);
-	
-	protected Dir alignToken(int i, int j) {
-		if(i==0)
-			return d;
-		else if(i>0)
-			return dr;
-		else
-			return dr.flip();
-	}
+	protected abstract Dir alignToken(int i, int j);
 	
 	public boolean ignoreToken(int i, int j) {
 		return false;

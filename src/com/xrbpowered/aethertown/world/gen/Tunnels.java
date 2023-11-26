@@ -232,6 +232,7 @@ public class Tunnels {
 		if(tile==null || tile.t!=Hill.template)
 			return;
 		int topy = tile.basey;
+		int groundY = tile.basey;
 		Dir dt = null;
 		int count = 0;
 		for(Dir d : Dir.values()) {
@@ -246,10 +247,14 @@ public class Tunnels {
 					topy = y;
 				continue;
 			}
-			if(adj.t!=Hill.template)
-				return;
+			if(adj.t!=Hill.template) {
+				count++;
+				int y = adj.getGroundY();
+				if(y<groundY)
+					groundY = y;
+			}
 		}
-		if(count>1)
+		if(count>1 && groundY>=topy)
 			Plaza.tunnelSideTemplate.forceGenerate(new Token(level, tile.x, topy, tile.z, dt));
 	}
 	
