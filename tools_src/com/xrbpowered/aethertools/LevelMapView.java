@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.world.region.HouseRole;
 import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Bench.BenchTile;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
+import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
@@ -36,6 +37,7 @@ public class LevelMapView extends UIElement {
 	
 	
 	public static final Color colorPark = new Color(0xddeebb);
+	public static final Color colorWater = new Color(0x5294a5);
 	public static final Color colorDefault = new Color(0xfafafa);
 
 	public static Level level;
@@ -137,6 +139,8 @@ public class LevelMapView extends UIElement {
 				else if(tile.t instanceof Plaza) {
 					if(tile.t==Plaza.tunnelSideTemplate)
 						c = colorDefault;
+					else if(tile.t==Fountain.template)
+						c = colorWater;
 					else if(tile.t instanceof Bench)
 						c = ((BenchTile) tile).plaza ? Plaza.plazaColor : colorPark;
 					else

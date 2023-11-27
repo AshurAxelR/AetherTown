@@ -67,7 +67,7 @@ public class Lamps {
 		return false;
 	}
 	
-	public static boolean addLamp(Tile tile, LampInfo lamp, Dir[] dirs) {
+	public static boolean addLamp(Tile tile, LampInfo lamp, Dir[] dirs, boolean allowPlaza) {
 		if(hasAdjLamp(tile)) {
 			lamp.req = false;
 			return true;
@@ -77,7 +77,7 @@ public class Lamps {
 			Tile adj = tile.getAdj(d);
 			if(adj==null || !HouseT.allowLamp(adj) || adj.t==Alcove.template || Tunnels.hasTunnel(adj))
 				continue;
-			if((Street.isAnyPath(adj.t) || (adj.t instanceof Plaza && adj.d==d)) &&
+			if((Street.isAnyPath(adj.t) || (!allowPlaza && adj.t instanceof Plaza)) &&
 					(Math.abs(tile.getGroundY(d.leftCorner())-adj.getGroundY(d.flip().rightCorner()))<2 ||
 					Math.abs(tile.getGroundY(d.rightCorner())-adj.getGroundY(d.flip().leftCorner()))<2))
 				continue;
@@ -94,7 +94,7 @@ public class Lamps {
 	}
 
 	public static boolean addLamp(Tile tile, LampInfo lamp, Random random) {
-		return addLamp(tile, lamp, Dir.shuffle(random));
+		return addLamp(tile, lamp, Dir.shuffle(random), false);
 	}
 
 	private static void requestAdjLamp(Tile tile, Random random) {

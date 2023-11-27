@@ -19,7 +19,7 @@ public class Monument extends Plaza {
 	
 	public static final Monument template = new Monument();
 	
-	public static TileComponent pillar, statue;
+	private static TileComponent pillar, statue;
 
 	protected boolean canGenerate(Token t) {
 		return t.level.isInside(t.x, t.z) && t.isFree() && t.level.overlapsHeight(t.x, t.y, t.z, 4);

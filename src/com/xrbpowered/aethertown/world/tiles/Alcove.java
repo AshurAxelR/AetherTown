@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
+import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
@@ -14,7 +15,6 @@ import com.xrbpowered.aethertown.world.gen.Lamps;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
-import com.xrbpowered.gl.res.texture.Texture;
 
 public class Alcove extends TunnelTileTemplate {
 
@@ -31,7 +31,7 @@ public class Alcove extends TunnelTileTemplate {
 	public void createComponents() {
 		spring = new TileComponent(
 				ObjMeshLoader.loadObj("models/tunnel/poi_spring.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture("models/palette.png", false, true, false));
+				TexColor.getPalette());
 	}
 	
 	@Override

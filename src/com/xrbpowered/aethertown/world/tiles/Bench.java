@@ -21,16 +21,10 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Bench extends Plaza implements RequestLamp {
 
-	public static final Bench templatePark = new Bench(false);
-	public static final Bench templatePlaza = new Bench(true);
-	public static final Bench templatePlazaLamp = new Bench(true) {
-		@Override
-		public Tile createTile() {
-			BenchTile tile = new BenchTile();
-			tile.lamp.req = true;
-			return tile;
-		}
-	};
+	public static final Bench templatePark = new Bench(false, 0);
+	public static final Bench templatePlaza = new Bench(true, 0);
+	public static final Bench templatePlazaLampL = new Bench(true, -1);
+	public static final Bench templatePlazaLampR = new Bench(true, 1);
 	
 	public static TileComponent bench;
 
@@ -41,6 +35,8 @@ public class Bench extends Plaza implements RequestLamp {
 		public BenchTile() {
 			super(Bench.this);
 			this.plaza = Bench.this.plaza;
+			if(lampReq!=0)
+				this.lamp.req = true;
 		}
 		
 		@Override
@@ -50,9 +46,11 @@ public class Bench extends Plaza implements RequestLamp {
 	}
 	
 	public final boolean plaza;
+	public final int lampReq;
 	
-	public Bench(boolean plaza) {
+	public Bench(boolean plaza, int lampReq) {
 		this.plaza = plaza;
+		this.lampReq = lampReq;
 	}
 	
 	@Override
@@ -84,7 +82,7 @@ public class Bench extends Plaza implements RequestLamp {
 		boolean res = super.postDecorateTile(tile, random);
 		
 		if(tile.lamp.req && tile.lamp.d==null)
-			return Lamps.addLamp(tile, tile.lamp, new Dir[] {tile.d.cw(), tile.d.ccw()});
+			return Lamps.addLamp(tile, tile.lamp, lampReq<0 ? new Dir[] {tile.d.ccw(), tile.d.cw()} : new Dir[] {tile.d.cw(), tile.d.ccw()}, true);
 		
 		if(!tile.plaza) {
 			boolean convert = false;

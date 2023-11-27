@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.tiles.Bench;
+import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
@@ -30,22 +31,32 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 			{Park.template, Monument.template, Park.template},
 			{Park.template, Street.template, Park.template},
 		}),
+		new PresetData(new TileTemplate[][] { // fountain park
+			{Park.template, Park.template, Park.template},
+			{Park.template, Fountain.template, Park.template},
+			{Park.template, Street.template, Park.template},
+		}),
 		new PresetData(new TileTemplate[][] { // monument plaza
 			{Plaza.template, Plaza.template, Plaza.template},
 			{Plaza.template, Monument.template, Plaza.template},
 			{Plaza.template, Street.template, Plaza.template},
 		}),
+		new PresetData(new TileTemplate[][] { // fountain plaza
+			{Plaza.template, Bench.templatePlaza, Plaza.template},
+			{Bench.templatePlazaLampR, Fountain.template, Bench.templatePlazaLampL},
+			{Plaza.template, Street.template, Plaza.template},
+		}),
 		new PresetData(new TileTemplate[][] { // large plaza
 			{Plaza.template, Bench.templatePlaza, Plaza.template},
-			{Bench.templatePlazaLamp, Park.template, Bench.templatePlazaLamp},
+			{Bench.templatePlazaLampR, Park.template, Bench.templatePlazaLampL},
 			{Plaza.template, Street.template, Plaza.template},
 		})
 	};
 	
 	private static final EntryPoint[] setent = { new EntryPoint(3, 1) };
 	
-	private static final WRandom typew = new WRandom(3.5, 1, 0.5, 1);
-	private static final WRandom typeUpw = new WRandom(0, 1, 0.5, 0.5);
+	private static final WRandom typew = new WRandom(2.5, 0.5, 0.7, 0.2, 0.1, 1.0);
+	private static final WRandom typeUpw = new WRandom(0, 0.5, 0.7, 0.2, 0.1, 0.5);
 	
 	protected PresetData preset;
 	

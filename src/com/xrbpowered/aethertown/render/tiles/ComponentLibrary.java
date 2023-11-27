@@ -4,6 +4,7 @@ import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.tiles.Alcove;
 import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
+import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
@@ -18,6 +19,7 @@ public class ComponentLibrary {
 		Alcove.template,
 		Bench.templatePlaza,
 		ChurchT.template,
+		Fountain.template,
 		Hill.template,
 		HouseT.template,
 		Monument.template,
