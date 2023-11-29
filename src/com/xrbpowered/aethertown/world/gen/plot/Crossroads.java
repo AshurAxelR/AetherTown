@@ -10,13 +10,14 @@ import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
+import com.xrbpowered.aethertown.world.tiles.Pavillion;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
 public class Crossroads extends StreetPresetGenerator {
 
-	private static final TileTemplate[] mids = { Monument.template, Park.template, Fountain.template }; 
-	private static final WRandom midsw = new WRandom(0.2, 0.65, 0.15); 
+	private static final TileTemplate[] mids = { Monument.template, Park.template, Fountain.template, Pavillion.template }; 
+	private static final WRandom midsw = new WRandom(0.2, 0.65, 0.1, 0.05); 
 	
 	private static final TileTemplate[][] sett = {
 		{Street.subTemplate, Street.template, Street.subTemplate},

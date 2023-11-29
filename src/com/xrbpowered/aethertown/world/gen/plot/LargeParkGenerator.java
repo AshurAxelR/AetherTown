@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
+import com.xrbpowered.aethertown.world.tiles.Pavillion;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
@@ -50,13 +51,23 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 			{Plaza.template, Bench.templatePlaza, Plaza.template},
 			{Bench.templatePlazaLampR, Park.template, Bench.templatePlazaLampL},
 			{Plaza.template, Street.template, Plaza.template},
+		}),
+		new PresetData(new TileTemplate[][] { // pavillion park
+			{Park.template, Park.template, Park.template},
+			{Park.template, Pavillion.template, Park.template},
+			{Park.template, Street.template, Park.template},
+		}),
+		new PresetData(new TileTemplate[][] { // pavillion plaza
+			{Plaza.template, Plaza.template, Plaza.template},
+			{Plaza.template, Pavillion.template, Plaza.template},
+			{Plaza.template, Street.template, Plaza.template},
 		})
 	};
 	
 	private static final EntryPoint[] setent = { new EntryPoint(3, 1) };
 	
-	private static final WRandom typew = new WRandom(2.5, 0.5, 0.7, 0.2, 0.1, 1.0);
-	private static final WRandom typeUpw = new WRandom(0, 0.5, 0.7, 0.2, 0.1, 0.5);
+	private static final WRandom typew = new WRandom(2.5, 0.5, 0.7, 0.2, 0.1, 1.0, 0.8, 0.2);
+	private static final WRandom typeUpw = new WRandom(0, 0.5, 0.7, 0.2, 0.1, 0.5, 0.8, 0.2);
 	
 	protected PresetData preset;
 	
