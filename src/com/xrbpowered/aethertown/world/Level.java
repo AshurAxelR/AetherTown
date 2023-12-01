@@ -82,6 +82,7 @@ public class Level {
 	private boolean finalizeTiles(Random random) {
 		boolean upd = true;
 		boolean refill = false;
+		int attLeft = levelSize*levelSize/256;
 		while(upd) {
 			h.calculate(true);
 			upd = false;
@@ -93,6 +94,9 @@ public class Level {
 					else
 						refill = true;
 				}
+			attLeft--;
+			if(attLeft==0)
+				GeneratorException.raise("Stuck at finalizing tiles");
 		}
 		return !refill;
 	}

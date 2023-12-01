@@ -163,7 +163,7 @@ public class TerrainTile extends Tile {
 		public Bush generate(TerrainTile tile, Random random) {
 			px = random.nextFloat();
 			pz = random.nextFloat();
-			sy = 0.6f+random.nextFloat();
+			sy = (tile.t instanceof Park) ? 0.5f+random.nextFloat()*0.5f : 0.6f+random.nextFloat();
 			s = sy+random.nextFloat()*0.3f;
 			
 			float r = bushRadius*s*0.75f;
@@ -249,7 +249,7 @@ public class TerrainTile extends Tile {
 				wilderness = false;
 				if(Street.isAnyPath(adj.t) || (adj.t instanceof Plaza))
 					adjStreet = true;
-				if(adj.t==Park.template)
+				if(adj.t instanceof Park)
 					adjPark = true;
 			}
 		}
@@ -281,9 +281,8 @@ public class TerrainTile extends Tile {
 			if(isHill && (adjTrees>0 || !tile.trees.isEmpty()))
 				numBushes += 2;
 		}
-		else if(isHill && adjPark) {
+		else if(isHill && adjPark)
 			numBushes += random.nextInt(4);
-		}
 		numBushes = Math.min(numBushes, 4-tile.trees.size());
 		
 		for(int i=0; i<numBushes; i++) {

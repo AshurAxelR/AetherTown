@@ -16,8 +16,8 @@ import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 
 public class Crossroads extends StreetPresetGenerator {
 
-	private static final TileTemplate[] mids = { Monument.template, Park.template, Fountain.template, Pavillion.template }; 
-	private static final WRandom midsw = new WRandom(0.2, 0.65, 0.1, 0.05); 
+	private static final TileTemplate[] mids = { Monument.template, Park.template, Park.templateLawn, Fountain.template, Pavillion.template }; 
+	private static final WRandom midsw = new WRandom(0.1, 0.6, 0.2, 0.05, 0.05); 
 	
 	private static final TileTemplate[][] sett = {
 		{Street.subTemplate, Street.template, Street.subTemplate},

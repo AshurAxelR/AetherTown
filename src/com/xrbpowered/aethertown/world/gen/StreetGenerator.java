@@ -42,22 +42,24 @@ public class StreetGenerator implements Generator, TokenProvider {
 	public boolean generateSides = true;
 	public boolean ignoreHeightLimiter = false;
 	
-	private static final WRandom sidew = new WRandom(1.2, 0.2, 0.2, 0.1, 1, 0.3);
+	private static final WRandom sidew = new WRandom(1.0, 0.2, 0.1, 0.4, 0.1, 1, 0.2);
 
 	public static Generator selectSideGenerator(Level level, WRandom w, Random random, int h) {
 		switch(w.next(random)) {
 			case 1:
 				return Park.template;
 			case 2:
-				return (h==0) ? new LargeParkGenerator(false, random) : null;
+				return Park.templateLawn;
 			case 3:
-				return (h==0) ? new LargeParkGenerator(true, random) : null;
+				return (h==0) ? new LargeParkGenerator(false, random) : null;
 			case 4:
+				return (h==0) ? new LargeParkGenerator(true, random) : null;
+			case 5:
 				if(level.info.settlement.maxHouses>0)
 					return HouseGenerator.select(level, h);
 				else
 					return null;
-			case 5:
+			case 6:
 				return (h==0) ? Bench.templatePark : null;
 			default:
 				return null;

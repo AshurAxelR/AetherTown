@@ -174,7 +174,7 @@ public class Tunnels {
 					continue;
 				Tile adj = t.getAdj(da);
 				if(adj==null || adj.t!=Hill.template
-						&& !(i==1 && (adj.t instanceof Plaza || adj.t==Park.template)))
+						&& !(i==1 && (adj.t instanceof Plaza || adj.t instanceof Park)))
 					return 0;
 			}
 		}

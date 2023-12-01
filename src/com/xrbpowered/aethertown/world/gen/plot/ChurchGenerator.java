@@ -35,8 +35,10 @@ public class ChurchGenerator extends HouseGeneratorBase {
 	@Override
 	protected Tile placeAt(Token t, int i, int j, Random random) {
 		TileTemplate temp;
-		if(i==-left || i==right || j>fwd-marginBack)
+		if(j>fwd-marginBack)
 			temp = Park.template;
+		else if(i==-left || i==right)
+			temp = Park.templateLawn;
 		else if(j==0)
 			temp = Plaza.template;
 		else {

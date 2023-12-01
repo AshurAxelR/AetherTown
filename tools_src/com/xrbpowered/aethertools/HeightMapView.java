@@ -115,7 +115,7 @@ public class HeightMapView extends UIElement {
 					c = heightColor.get(level.heightGuide.gety(x, z));
 				else
 					c = heightColor.get(tile.basey);
-				if(!(tile.t==Hill.template || tile.t==Park.template)) {
+				if(!(tile.t==Hill.template || tile.t instanceof Park)) {
 					float b = 0.3f*c.getRed()/255f + 0.59f*c.getGreen()/255f + 0.11f*c.getBlue()/255f;
 					c = new Color(b, b, b);
 				}

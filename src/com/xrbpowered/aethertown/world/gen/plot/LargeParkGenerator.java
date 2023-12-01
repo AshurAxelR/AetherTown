@@ -21,16 +21,39 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 		{Dir.west, Dir.north, Dir.east}
 	};
 
+	private static int poiIndex = 5;
+	
 	private static final PresetData[] presets = {
-		new PresetData(new TileTemplate[][] { // large park
+		new PresetData(new TileTemplate[][] { // large park, random
 			{Park.template, Park.template, Park.template},
 			{Park.template, Park.template, Park.template},
 			{Park.template, Park.template, Park.template},
 		}),
+		new PresetData(new TileTemplate[][] { // large lawn
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+		}),
+		new PresetData(new TileTemplate[][] { // large lawn front
+			{Park.template, Park.template, Park.template},
+			{Park.template, Park.template, Park.template},
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+		}),
+		new PresetData(new TileTemplate[][] { // large lawn back
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+			{Park.template, Park.template, Park.template},
+		}),
+		new PresetData(new TileTemplate[][] { // large lawn with tree
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+			{Park.templateLawn, Park.template, Park.templateLawn},
+			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
+		}),
+		
 		new PresetData(new TileTemplate[][] { // monument park
 			{Park.template, Park.template, Park.template},
 			{Park.template, Monument.template, Park.template},
-			{Park.template, Street.template, Park.template},
+			{Park.templateLawn, Street.template, Park.templateLawn},
 		}),
 		new PresetData(new TileTemplate[][] { // fountain park
 			{Park.template, Park.template, Park.template},
@@ -53,8 +76,8 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 			{Plaza.template, Street.template, Plaza.template},
 		}),
 		new PresetData(new TileTemplate[][] { // pavillion park
-			{Park.template, Park.template, Park.template},
-			{Park.template, Pavillion.template, Park.template},
+			{Park.template, Park.templateLawn, Park.template},
+			{Park.templateLawn, Pavillion.template, Park.templateLawn},
 			{Park.template, Street.template, Park.template},
 		}),
 		new PresetData(new TileTemplate[][] { // pavillion plaza
@@ -66,13 +89,19 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 	
 	private static final EntryPoint[] setent = { new EntryPoint(3, 1) };
 	
-	private static final WRandom typew = new WRandom(2.5, 0.5, 0.7, 0.2, 0.1, 1.0, 0.8, 0.2);
-	private static final WRandom typeUpw = new WRandom(0, 0.5, 0.7, 0.2, 0.1, 0.5, 0.8, 0.2);
+	private static final WRandom typew = new WRandom(
+		0.5, 1.0, 0.2, 0.5, 0.3,
+		0.5, 0.8, 0.1, 0.2, 0.9, 0.4, 0.1
+	);
+	private static final WRandom typeUpw = new WRandom(
+		0, 0, 0, 0, 0,
+		0.5, 0.7, 0.1, 0.2, 0.5, 0.8, 0.2
+	);
 	
-	protected PresetData preset;
+	protected int presetIndex;
 	
 	public LargeParkGenerator(boolean pointOfInterest, Random random) {
-		preset = presets[(pointOfInterest ? typeUpw : typew).next(random)];
+		presetIndex =(pointOfInterest ? typeUpw : typew).next(random);
 	}
 	
 	@Override
@@ -87,7 +116,7 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 
 	@Override
 	public TileTemplate sett(int ti, int tj) {
-		return preset.sett[ti][tj];
+		return presets[presetIndex].sett[ti][tj];
 	}
 
 	@Override
@@ -105,9 +134,9 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 	}
 	
 	public void promote(Random random) {
-		if(preset==presets[0]) {
+		if(presetIndex<poiIndex) {
 			remove();
-			preset = presets[typeUpw.next(random)];
+			presetIndex = typeUpw.next(random);
 			place(random);
 		}
 	}

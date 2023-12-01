@@ -105,7 +105,7 @@ public class LinearRegionPaths {
 			return nt;
 	}
 
-	private static final WRandom wsize = new WRandom(0.5, 1, 0.05);
+	private static final WRandom wsize = new WRandom(0.5, 0.8);
 
 	public void generatePaths() {
 		token = new PathToken(region.sizez/2, region.sizez/2, null);

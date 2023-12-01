@@ -7,6 +7,7 @@ import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
+import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.Level;
@@ -83,6 +84,9 @@ public class Hill extends TileTemplate {
 		return tile.maxDelta;
 	}
 	
+	private static final TileTemplate[] streetAdj = {Park.template, Park.templateLawn, Bench.templatePark};
+	private static final WRandom streetAdjw = new WRandom(0.5, 0.3, 0.2);
+	
 	@Override
 	public boolean finalizeTile(Tile atile, Random random) {
 		HillTile tile = (HillTile) atile;
@@ -103,14 +107,14 @@ public class Hill extends TileTemplate {
 				adjDir = null;
 				break;
 			}
-			if(adj.t==Park.template || adj.t==Street.template || (adj.t instanceof Plaza)) {
+			if((adj.t instanceof Park) || adj.t==Street.template || (adj.t instanceof Plaza)) {
 				if(Math.abs(adj.basey-tile.basey)<=1) {
 					if(adjDir==null || adj.t==Street.template) {
 						adjDir = d;
 						y = adj.basey;
 					}
-					if(adj.t==Street.template && random.nextInt(5)==0)
-						gen = Bench.templatePark;
+					if(adj.t==Street.template)
+						gen = streetAdj[streetAdjw.next(random)];
 				}
 			}
 			if(adj.t instanceof Bench)

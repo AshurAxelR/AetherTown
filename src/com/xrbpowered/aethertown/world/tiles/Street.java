@@ -177,7 +177,7 @@ public class Street extends TunnelTileTemplate {
 			if(adj.d==d) {
 				if(adj.t==Hill.template)
 					continue;
-				if(adj.t!=Park.template && adj.t!=Bench.templatePark)
+				if(!(adj.t instanceof Park) && adj.t!=Bench.templatePark)
 					return 0;
 				res = 1;
 				park = adj;

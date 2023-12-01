@@ -22,7 +22,8 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
 
-	public static final Park template = new Park();
+	public static final Park template = new Park(false);
+	public static final Park templateLawn = new Park(true);
 	
 	public static TileComponent tree, pine, trunk, bush;
 
@@ -32,6 +33,12 @@ public class Park extends TileTemplate {
 		public ParkTile() {
 			super(Park.this);
 		}
+	}
+	
+	public final boolean lawn;
+	
+	public Park(boolean lawn) {
+		this.lawn = lawn;
 	}
 	
 	@Override
@@ -105,7 +112,8 @@ public class Park extends TileTemplate {
 
 	@Override
 	public void decorateTile(Tile tile, Random random) {
-		TerrainTile.addTrees((ParkTile) tile, random);
+		if(!lawn)
+			TerrainTile.addTrees((ParkTile) tile, random);
 		if(!isFlex(tile))
 			Fences.addFences(tile);
 	}
@@ -164,12 +172,18 @@ public class Park extends TileTemplate {
 				Tile adj = tile.getAdj(d);
 				if(adj!=null && adj.t instanceof StreetSlope && ((StreetSlope) adj.t).h==1
 						&& Math.abs(adj.basey-tile.basey)<=1 && Math.abs(adj.basey-miny)<=1) {
-					tile.basey = adj.basey;
 					tile.flex = true;
 					return true;
 				}
 			}
 			tile.flex = (miny==tile.basey-1);
+		}
+		else {
+			int maxy = MathUtils.max(yloc);
+			if(maxy>miny+2) {
+				tile.flex = false;
+				return true;
+			}
 		}
 		return false;
 	}

@@ -19,6 +19,7 @@ import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Park;
+import com.xrbpowered.aethertown.world.tiles.Pavillion;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -38,6 +39,7 @@ public class LevelMapView extends UIElement {
 	
 	public static final Color colorPark = new Color(0xddeebb);
 	public static final Color colorWater = new Color(0x5294a5);
+	public static final Color colorPavillion = new Color(0xc4c1b8);
 	public static final Color colorDefault = new Color(0xfafafa);
 
 	public static Level level;
@@ -134,13 +136,17 @@ public class LevelMapView extends UIElement {
 					c = colorStreetBorder;
 				else if(Street.isAnyPath(tile.t))
 					c = Street.streetColor;
-				else if(tile.t==Park.template)
+				else if(tile.t instanceof Park)
 					c = colorPark;
 				else if(tile.t instanceof Plaza) {
 					if(tile.t==Plaza.tunnelSideTemplate)
 						c = colorDefault;
+					else if(tile.t==Monument.template)
+						c = Monument.statueColor;
 					else if(tile.t==Fountain.template)
 						c = colorWater;
+					else if(tile.t==Pavillion.template)
+						c = colorPavillion;
 					else if(tile.t instanceof Bench)
 						c = ((BenchTile) tile).plaza ? Plaza.plazaColor : colorPark;
 					else
@@ -186,8 +192,8 @@ public class LevelMapView extends UIElement {
 							drawBorder(g, x, z, d);
 					}
 				}
-				else if(tile.t==Monument.template) {
-					g.setColor(Plaza.plazaColor);
+				else if(tile.t==Pavillion.template) {
+					g.setColor(colorText);
 					g.drawRect(x*tileSize, z*tileSize, tileSize-1, tileSize-1);
 				}
 			}

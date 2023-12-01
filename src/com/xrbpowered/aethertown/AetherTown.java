@@ -622,7 +622,7 @@ public class AetherTown extends UIClient {
 				requestExit();
 				break;
 			case KeyEvent.VK_BACK_SPACE:
-				activatePortal();
+				camera.rotation.y += Math.PI;
 				break;
 			case KeyEvent.VK_TAB:
 				autoWalk = false;

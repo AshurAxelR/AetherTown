@@ -12,6 +12,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.region.HouseRole;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
@@ -40,10 +41,13 @@ public class HouseGenerator extends HouseGeneratorBase {
 	}
 	
 	public String getRoleTitle() {
+		String title = role.title;
+		if(role!=HouseRole.residential && !arch.getIllumLayer(0).isActive(WorldTime.getHourOfDay()))
+			title += " [closed]";
 		if(addRole!=null)
-			return String.format("%s + %s", role.title, addRole.title);
+			return String.format("%s + %s", title, addRole.title);
 		else
-			return role.title;
+			return title;
 	}
 	
 	@Override
