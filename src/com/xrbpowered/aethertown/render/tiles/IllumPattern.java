@@ -9,7 +9,8 @@ import org.joml.Vector3f;
 public class IllumPattern {
 
 	public static final IllumPattern legacy = new IllumPattern(living, new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(1, 1, 1), false).setDim(0.35f, 0.1f);
-	
+	public static final IllumPattern residential = new IllumPattern(living, new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(0.8f, 0.9f, 1f), false).setDim(0.85f, 0f);
+
 	public static final IllumPattern shop = new IllumPattern(alwaysOn, new Vector3f(1.0f, 0.9f, 0.8f), new Vector3f(1.0f, 1.0f, 0.9f), true).setTrigger(1.85f, 2.05f);
 	public static final IllumPattern officeLobby = new IllumPattern(officeHours, new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setTrigger(1.7f, 1.8f);
 	public static final IllumPattern office = new IllumPattern(officeHours, new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setDim(0.65f, 0.3f).setTrigger(1.7f, 1.8f);

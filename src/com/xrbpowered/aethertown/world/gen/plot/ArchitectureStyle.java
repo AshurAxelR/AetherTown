@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.world.gen.plot;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
@@ -85,7 +86,10 @@ public class ArchitectureStyle {
 	}
 	
 	public IllumPattern getIllum(int floor) {
-		return floor==0 ? groundIllum : illum;
+		IllumPattern illum = floor==0 ? this.groundIllum : this.illum;
+		if(illum==null && AetherTown.settings.residentialLighting)
+			illum = IllumPattern.residential;
+		return illum;
 	}
 
 	public IllumLayer getIllumLayer(int floor) {
