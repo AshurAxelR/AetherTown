@@ -113,6 +113,9 @@ public class Tunnels {
 			upd = false;
 			for(int x=1; x<level.levelSize-1; x++)
 				for(int z=1; z<level.levelSize-1; z++) {
+					if(level.info.isPortal() && level.isInside(x, z, 16))
+						continue;
+					
 					Tile tile = level.map[x][z];
 					if(tile!=null && tile instanceof TunnelTile) {
 						TunnelTile t = (TunnelTile) tile;

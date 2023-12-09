@@ -123,7 +123,7 @@ public class StreetConnector {
 			if(end!=null) {
 				Tile t = end.tile();
 				if(t!=null && t.t==Street.template) {
-					if(level.isInside(end.x, end.z, sidesMargin))
+					if(sides!=null && level.isInside(end.x, end.z, sidesMargin))
 						sides.addAllAdj(end);
 					((StreetTile) t).forceExpand = true;
 				}

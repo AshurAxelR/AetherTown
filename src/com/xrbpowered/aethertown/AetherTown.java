@@ -652,6 +652,14 @@ public class AetherTown extends UIClient {
 				showPointer = !showPointer;
 				System.out.println("Pointer "+(showPointer ? "on" : "off"));
 				break;
+			case KeyEvent.VK_F3:
+				if(activeController==flyController) {
+					if(flyController.moveSpeed==settings.flySpeed)
+						flyController.moveSpeed = settings.flySpeed * 5f;
+					else
+						flyController.moveSpeed = settings.flySpeed;
+				}
+				break;
 			case KeyEvent.VK_F10:
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
 				break;

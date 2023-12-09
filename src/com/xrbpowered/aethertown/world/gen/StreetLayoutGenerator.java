@@ -141,12 +141,13 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	}
 	
 	public static void finishLayout(Level level, Random random) {
-		StreetLayoutGenerator sides = new StreetLayoutGenerator(0);
+		StreetLayoutGenerator sides = null;
 		if(level.info.terrain.noParks) {
 			connectOut(level, random, false, sides);
 			trimStreets(level, random);
 		}
 		else {
+			sides = new StreetLayoutGenerator(0);
 			reconnectStreets(level, random, false, sides);
 			connectOut(level, random, true, sides);
 			trimStreets(level, random);
@@ -155,7 +156,8 @@ public class StreetLayoutGenerator extends TokenGenerator {
 			reconnectStreets(level, random, true, sides);
 		}
 		level.heightLimiter.revalidate();
-		sides.generate(random);
+		if(sides!=null)
+			sides.generate(random);
 	}
 	
 	public static void followTerrain(Level level) {
