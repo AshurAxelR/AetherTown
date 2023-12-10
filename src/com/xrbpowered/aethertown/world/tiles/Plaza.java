@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
+import com.xrbpowered.aethertown.world.tiles.Bench.BenchType;
 
 public class Plaza extends TileTemplate {
 
@@ -15,7 +16,8 @@ public class Plaza extends TileTemplate {
 	
 	public static final Plaza template = new Plaza();
 	public static final Plaza tunnelSideTemplate = new Plaza(false);
-	
+	public static final Bench templateLamp = new Bench(BenchType.none, true, null);
+
 	public final boolean fences;
 	
 	public Plaza(boolean fences) {

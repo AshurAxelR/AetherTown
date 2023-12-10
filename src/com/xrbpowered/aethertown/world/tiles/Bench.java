@@ -22,10 +22,24 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Bench extends Plaza implements RequestLamp {
 
-	public static final Bench templatePark = new Bench(false, null);
-	public static final Bench templatePlaza = new Bench(true, null);
-	public static final Bench templatePlazaLampL = new Bench(true, new Dir[] {Dir.west, Dir.east});
-	public static final Bench templatePlazaLampR = new Bench(true, new Dir[] {Dir.east, Dir.west});
+	public enum BenchType {
+		bench(new Dir[] {Dir.east, Dir.west}),
+		table(new Dir[] {Dir.north}),
+		none(new Dir[] {Dir.north});
+		
+		public final Dir[] lampDirs;
+		
+		private BenchType(Dir[] lampDirs) {
+			this.lampDirs = lampDirs;
+		}
+	}
+	
+	public static final Bench templatePark = new Bench(BenchType.bench, false);
+	public static final Bench templatePlaza = new Bench(BenchType.bench, true);
+	public static final Bench templatePlazaLampL = new Bench(BenchType.bench, true, new Dir[] {Dir.west, Dir.east});
+	public static final Bench templatePlazaLampR = new Bench(BenchType.bench, true, null);
+	public static final Bench templateParkTable = new Bench(BenchType.table, false);
+	public static final Bench templatePlazaTable = new Bench(BenchType.table, true, null);
 	
 	public static Texture benchTexture;
 	private static TileComponent bench, parkTable;
@@ -37,7 +51,7 @@ public class Bench extends Plaza implements RequestLamp {
 		public BenchTile() {
 			super(Bench.this);
 			this.plaza = Bench.this.plaza;
-			if(lampReq!=null)
+			if(lampReq)
 				this.lamp.req = true;
 		}
 		
@@ -48,11 +62,23 @@ public class Bench extends Plaza implements RequestLamp {
 	}
 	
 	public final boolean plaza;
-	public final Dir[] lampReq;
-	
-	public Bench(boolean plaza, Dir[] lampReq) {
+	public final boolean lampReq;
+
+	private final BenchType type;
+	private final Dir[] lampDirs;
+
+	public Bench(BenchType type, boolean plaza) {
+		this.type = type;
 		this.plaza = plaza;
-		this.lampReq = lampReq;
+		this.lampReq = false;
+		this.lampDirs = type.lampDirs;
+	}
+
+	public Bench(BenchType type, boolean plaza, Dir[] lampReq) {
+		this.type = type;
+		this.plaza = plaza;
+		this.lampReq = true;
+		this.lampDirs = (lampReq==null) ? type.lampDirs : lampReq;
 	}
 	
 	@Override
@@ -85,10 +111,8 @@ public class Bench extends Plaza implements RequestLamp {
 		BenchTile tile = (BenchTile) atile;
 		boolean res = super.postDecorateTile(tile, random);
 		
-		if(tile.lamp.req && tile.lamp.d==null) {
-			Dir[] dirs = (lampReq==null) ? Dir.shuffle(random) : lampReq;
-			return Lamps.addLamp(tile, tile.lamp, dirs, true);
-		}
+		if(tile.lamp.req && tile.lamp.d==null)
+			return Lamps.addLamp(tile, tile.lamp, lampDirs, true);
 		
 		if(!tile.plaza) {
 			boolean convert = false;
@@ -130,19 +154,29 @@ public class Bench extends Plaza implements RequestLamp {
 	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		BenchTile tile = (BenchTile) atile;
-		float dout;
 		if(tile.plaza) {
 			super.createGeometry(tile, r);
-			dout = 0.25f;
 		}
 		else {
 			r.terrain.addWalls(tile);
 			r.terrain.addFlatTile(TerrainMaterial.park, tile);
 			Fences.createFences(r, tile);
-			dout = -0.25f;
 		}
-		bench.addInstance(r, new TileObjectInfo(tile, dout, 0));
-		// parkTable.addInstance(r, new TileObjectInfo(tile));
-		Lamps.createLamp(tile, tile.lamp, r, 0, dout);
+		switch(type) {
+			case bench: {
+				float dout = tile.plaza ? 0.25f : -0.25f;
+				bench.addInstance(r, new TileObjectInfo(tile, dout, 0));
+				Lamps.createLamp(tile, tile.lamp, r, 0, dout);
+				break;
+			}
+			case table: {
+				parkTable.addInstance(r, new TileObjectInfo(tile));
+				Lamps.createLamp(tile, tile.lamp, r, 0);
+				break;
+			}
+			case none:
+				Lamps.createLamp(tile, tile.lamp, r, 0);
+				break;
+		}
 	}
 }

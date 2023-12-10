@@ -44,9 +44,14 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
 			{Park.template, Park.template, Park.template},
 		}),
-		new PresetData(new TileTemplate[][] { // large lawn with tree
+		new PresetData(new TileTemplate[][] { // large park with table
+			{Park.template, Park.template, Park.template},
+			{Park.template, Bench.templateParkTable, Park.template},
+			{Park.template, Park.templateLawn, Park.template},
+		}),
+		new PresetData(new TileTemplate[][] { // large lawn with table
 			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
-			{Park.templateLawn, Park.template, Park.templateLawn},
+			{Park.templateLawn, Bench.templateParkTable, Park.templateLawn},
 			{Park.templateLawn, Park.templateLawn, Park.templateLawn},
 		}),
 		
@@ -66,8 +71,8 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 			{Plaza.template, Street.template, Plaza.template},
 		}),
 		new PresetData(new TileTemplate[][] { // fountain plaza
-			{Plaza.template, Bench.templatePlaza, Plaza.template},
-			{Bench.templatePlazaLampR, Fountain.template, Bench.templatePlazaLampL},
+			{Plaza.template, Plaza.template, Plaza.template},
+			{Plaza.templateLamp, Fountain.template, Plaza.templateLamp},
 			{Plaza.template, Street.template, Plaza.template},
 		}),
 		new PresetData(new TileTemplate[][] { // large plaza
@@ -84,18 +89,23 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 			{Plaza.template, Plaza.template, Plaza.template},
 			{Plaza.template, Pavillion.template, Plaza.template},
 			{Plaza.template, Street.template, Plaza.template},
+		}),
+		new PresetData(new TileTemplate[][] { // large park with table poi
+			{Park.template, Park.template, Park.template},
+			{Park.template, Bench.templatePlazaTable, Park.template},
+			{Park.template, Street.template, Park.template},
 		})
 	};
 	
 	private static final EntryPoint[] setent = { new EntryPoint(3, 1) };
 	
 	private static final WRandom typew = new WRandom(
-		0.5, 1.0, 0.2, 0.5, 0.3,
-		0.5, 0.8, 0.1, 0.2, 0.9, 0.4, 0.1
+		0.4, 0.8, 0.2, 0.5, 0.8, 0.3,
+		0.3, 0.7, 0.2, 0.1, 0.9, 0.4, 0.1, 0.3
 	);
 	private static final WRandom typeUpw = new WRandom(
-		0, 0, 0, 0, 0,
-		0.5, 0.7, 0.1, 0.2, 0.5, 0.8, 0.2
+		0, 0, 0, 0, 0, 0,
+		0.2, 0.6, 0.2, 0.1, 0.5, 0.7, 0.2, 0.5
 	);
 	
 	protected int presetIndex;

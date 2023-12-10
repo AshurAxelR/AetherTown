@@ -18,7 +18,6 @@ import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.StreetPresetGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
-import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Monument;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
@@ -66,15 +65,14 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		return StreetGenerator.selectSideGenerator(t.level, (t.level.houseCount>=houseLimit) ? nextwLim : nextw, random, 0);
 	}
 
+
 	public static boolean addPointOfInterest(Token t, Random random) {
 		if(t.level.info.settlement.maxHouses>0 && new HouseGenerator().generate(t, random))
 			return true;
 		else if(new LargeParkGenerator(true, random).generate(t, random))
 			return true;
-		else if(Bench.templatePlaza.generate(t, random))
-			return true;
 		else
-			return false;
+			return StreetGenerator.selectSmallPoi(random).generate(t, random);
 	}
 
 	public static boolean addPointOfInterest(Tile tile, Random random) {

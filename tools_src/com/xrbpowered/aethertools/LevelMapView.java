@@ -30,6 +30,7 @@ import com.xrbpowered.zoomui.base.UIPanView;
 public class LevelMapView extends UIElement {
 
 	public static final int tileSize = 16;
+	private static final int benchMarkerSize = 6;
 	
 	public static final Color colorBg = new Color(0xeeeeee);
 	public static final Color colorStreetBorder = new Color(0x999999);
@@ -195,6 +196,11 @@ public class LevelMapView extends UIElement {
 				else if(tile.t==Pavillion.template) {
 					g.setColor(colorText);
 					g.drawRect(x*tileSize, z*tileSize, tileSize-1, tileSize-1);
+				}
+				else if(tile.t instanceof Bench) {
+					g.setColor(colorText);
+					g.fillRect(x*tileSize+tileSize/2-benchMarkerSize/2, z*tileSize+tileSize/2-benchMarkerSize/2,
+							benchMarkerSize, benchMarkerSize);
 				}
 			}
 

@@ -44,6 +44,13 @@ public class StreetGenerator implements Generator, TokenProvider {
 	
 	private static final WRandom sidew = new WRandom(1.0, 0.2, 0.1, 0.4, 0.1, 1, 0.2);
 
+	private static final Generator[] smallPoi = {Bench.templatePlaza, Bench.templatePlazaTable};
+	private static final WRandom smallPoiw = new WRandom(0.75, 0.25);
+
+	public static final Generator selectSmallPoi(Random random) {
+		return smallPoi[smallPoiw.next(random)];
+	}
+	
 	public static Generator selectSideGenerator(Level level, WRandom w, Random random, int h) {
 		switch(w.next(random)) {
 			case 1:
@@ -60,7 +67,7 @@ public class StreetGenerator implements Generator, TokenProvider {
 				else
 					return null;
 			case 6:
-				return (h==0) ? Bench.templatePark : null;
+				return (h==0) ? selectSmallPoi(random) : null;
 			default:
 				return null;
 		}
