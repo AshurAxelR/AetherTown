@@ -73,7 +73,8 @@ public class Lamps {
 			return true;
 		}
 		lamp.d = null;
-		for(Dir d : dirs) {
+		for(Dir di : dirs) {
+			Dir d = tile.d.apply(di);
 			Tile adj = tile.getAdj(d);
 			if(adj==null || !HouseT.allowLamp(adj) || adj.t==Alcove.template || Tunnels.hasTunnel(adj))
 				continue;

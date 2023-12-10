@@ -14,7 +14,7 @@ public class Pavillion extends Plaza {
 
 	public static final Pavillion template = new Pavillion();
 	
-	private static TileComponent pavillion;
+	private static TileComponent pavillion, pavBenches;
 	
 	@Override
 	public int getBlockY(Tile tile) {
@@ -24,8 +24,11 @@ public class Pavillion extends Plaza {
 	@Override
 	public void createComponents() {
 		pavillion = new TileComponent(
-				ObjMeshLoader.loadObj("models/monument/pavillion.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/pavillion/pavillion.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.getPalette());
+		pavBenches = new TileComponent(
+				ObjMeshLoader.loadObj("models/pavillion/pav_benches.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				Bench.benchTexture);
 	}
 
 	@Override
@@ -33,6 +36,7 @@ public class Pavillion extends Plaza {
 		TileObjectInfo info = new TileObjectInfo(tile);
 		Street.street.addInstance(r, info);
 		pavillion.addInstance(r, info);
+		pavBenches.addInstance(r, info);
 		r.pointLights.setLight(tile, 0, 4, 0, 4f);
 		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+4, Lamps.lampLightColor, 0.3f, true);
 	}

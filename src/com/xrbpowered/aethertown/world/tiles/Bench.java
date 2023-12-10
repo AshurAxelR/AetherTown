@@ -5,6 +5,7 @@ import java.util.Random;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainMaterial;
+import com.xrbpowered.aethertown.render.env.SeasonalTexture;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -21,12 +22,13 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Bench extends Plaza implements RequestLamp {
 
-	public static final Bench templatePark = new Bench(false, 0);
-	public static final Bench templatePlaza = new Bench(true, 0);
-	public static final Bench templatePlazaLampL = new Bench(true, -1);
-	public static final Bench templatePlazaLampR = new Bench(true, 1);
+	public static final Bench templatePark = new Bench(false, null);
+	public static final Bench templatePlaza = new Bench(true, null);
+	public static final Bench templatePlazaLampL = new Bench(true, new Dir[] {Dir.west, Dir.east});
+	public static final Bench templatePlazaLampR = new Bench(true, new Dir[] {Dir.east, Dir.west});
 	
-	public static TileComponent bench;
+	public static Texture benchTexture;
+	private static TileComponent bench, parkTable;
 
 	public class BenchTile extends TerrainTile implements LampTile {
 		public final LampInfo lamp = new LampInfo();
@@ -35,7 +37,7 @@ public class Bench extends Plaza implements RequestLamp {
 		public BenchTile() {
 			super(Bench.this);
 			this.plaza = Bench.this.plaza;
-			if(lampReq!=0)
+			if(lampReq!=null)
 				this.lamp.req = true;
 		}
 		
@@ -46,9 +48,9 @@ public class Bench extends Plaza implements RequestLamp {
 	}
 	
 	public final boolean plaza;
-	public final int lampReq;
+	public final Dir[] lampReq;
 	
-	public Bench(boolean plaza, int lampReq) {
+	public Bench(boolean plaza, Dir[] lampReq) {
 		this.plaza = plaza;
 		this.lampReq = lampReq;
 	}
@@ -60,9 +62,11 @@ public class Bench extends Plaza implements RequestLamp {
 	
 	@Override
 	public void createComponents() {
-		bench = new TileComponent(
-				ObjMeshLoader.loadObj("models/bench/bench.obj", 0, 1f, ObjectShader.vertexInfo, null),
-				new Texture("models/bench/bench.png", false, true, false)).setCulling(false);
+		benchTexture = new SeasonalTexture(new int[] {10, 77},
+				new Texture("models/bench/bench.png", true, true, false),
+				new Texture("models/bench/bench_winter.png", true, true, false)); 
+		bench = new TileComponent(ObjMeshLoader.loadObj("models/bench/bench.obj", 0, 1f, ObjectShader.vertexInfo, null), benchTexture);
+		parkTable = new TileComponent(ObjMeshLoader.loadObj("models/bench/park_table.obj", 0, 1f, ObjectShader.vertexInfo, null), benchTexture);
 	}
 	
 	@Override
@@ -81,8 +85,10 @@ public class Bench extends Plaza implements RequestLamp {
 		BenchTile tile = (BenchTile) atile;
 		boolean res = super.postDecorateTile(tile, random);
 		
-		if(tile.lamp.req && tile.lamp.d==null)
-			return Lamps.addLamp(tile, tile.lamp, lampReq<0 ? new Dir[] {tile.d.ccw(), tile.d.cw()} : new Dir[] {tile.d.cw(), tile.d.ccw()}, true);
+		if(tile.lamp.req && tile.lamp.d==null) {
+			Dir[] dirs = (lampReq==null) ? Dir.shuffle(random) : lampReq;
+			return Lamps.addLamp(tile, tile.lamp, dirs, true);
+		}
 		
 		if(!tile.plaza) {
 			boolean convert = false;
@@ -136,6 +142,7 @@ public class Bench extends Plaza implements RequestLamp {
 			dout = -0.25f;
 		}
 		bench.addInstance(r, new TileObjectInfo(tile, dout, 0));
+		// parkTable.addInstance(r, new TileObjectInfo(tile));
 		Lamps.createLamp(tile, tile.lamp, r, 0, dout);
 	}
 }
