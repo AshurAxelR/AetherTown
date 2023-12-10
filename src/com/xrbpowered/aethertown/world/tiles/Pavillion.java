@@ -6,7 +6,9 @@ import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.Lamps;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 
@@ -16,9 +18,23 @@ public class Pavillion extends Plaza {
 	
 	private static TileComponent pavillion, pavBenches;
 	
+	public Pavillion() {
+		super(false);
+	}
+	
 	@Override
 	public int getBlockY(Tile tile) {
 		return tile.basey+8;
+	}
+	
+	@Override
+	public float getYIn(Tile tile, float sx, float sz, float prevy) {
+		return Tile.ysize*(tile.basey+1);
+	}
+	
+	@Override
+	public float getYOut(Tile tile, Dir d, float sout, float sx, float sz, float prevy) {
+		return Fences.getFenceYOut(tile.basey+1, sout);
 	}
 	
 	@Override
