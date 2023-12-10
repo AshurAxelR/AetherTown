@@ -58,9 +58,9 @@ public class StreetGenerator implements Generator, TokenProvider {
 			case 2:
 				return Park.templateLawn;
 			case 3:
-				return (h==0) ? new LargeParkGenerator(false, random) : null;
+				return (h==0) ? new LargeParkGenerator(level, false, random) : null;
 			case 4:
-				return (h==0) ? new LargeParkGenerator(true, random) : null;
+				return (h==0) ? new LargeParkGenerator(level, true, random) : null;
 			case 5:
 				if(level.info.settlement.maxHouses>0)
 					return HouseGenerator.select(level, h);

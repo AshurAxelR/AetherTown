@@ -69,7 +69,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	public static boolean addPointOfInterest(Token t, Random random) {
 		if(t.level.info.settlement.maxHouses>0 && new HouseGenerator().generate(t, random))
 			return true;
-		else if(new LargeParkGenerator(true, random).generate(t, random))
+		else if(new LargeParkGenerator(t.level, true, random).generate(t, random))
 			return true;
 		else
 			return StreetGenerator.selectSmallPoi(random).generate(t, random);

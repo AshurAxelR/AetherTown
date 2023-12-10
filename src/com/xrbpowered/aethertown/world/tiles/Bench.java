@@ -61,10 +61,10 @@ public class Bench extends Plaza implements RequestLamp {
 		}
 	}
 	
+	public final BenchType type;
 	public final boolean plaza;
 	public final boolean lampReq;
 
-	private final BenchType type;
 	private final Dir[] lampDirs;
 
 	public Bench(BenchType type, boolean plaza) {

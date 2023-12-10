@@ -38,6 +38,7 @@ public class Level {
 	public HeightLimiter heightLimiter = null;
 	public ArrayList<PlotGenerator> plots = null;
 	public WalkingDistance walkingDist = null;
+	public boolean hasXmasTree = false;
 
 	private int startx, startz;
 	
@@ -69,6 +70,7 @@ public class Level {
 		heightLimiter = new HeightLimiter(this);
 		plots = new ArrayList<>();
 		walkingDist = new WalkingDistance(this);
+		hasXmasTree = false;
 		StreetGenerator.defaultStreetMargin = info.settlement.getStreetMargin(levelSize);
 	}
 	

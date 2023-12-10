@@ -10,6 +10,7 @@ import com.xrbpowered.aethertown.render.TerrainMaterial;
 import com.xrbpowered.aethertown.render.env.SeasonalTexture;
 import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
+import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
@@ -22,10 +23,15 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
 
-	public static final Park template = new Park(false);
-	public static final Park templateLawn = new Park(true);
+	private enum ParkType {
+		common, lawn, xmas
+	}
 	
-	public static TileComponent tree, pine, trunk, bush;
+	public static final Park template = new Park(ParkType.common);
+	public static final Park templateLawn = new Park(ParkType.lawn);
+	public static final Park templateXmas = new Park(ParkType.xmas);
+	
+	public static TileComponent tree, pine, xmasTree, trunk, bush;
 
 	public class ParkTile extends TerrainTile {
 		public boolean flex = false;
@@ -35,10 +41,10 @@ public class Park extends TileTemplate {
 		}
 	}
 	
-	public final boolean lawn;
+	public final ParkType type;
 	
-	public Park(boolean lawn) {
-		this.lawn = lawn;
+	public Park(ParkType type) {
+		this.type = type;
 	}
 	
 	@Override
@@ -68,7 +74,7 @@ public class Park extends TileTemplate {
 	
 	@Override
 	public void createComponents() {
-		Texture treeTexture = new SeasonalTexture(new int[] {14, 25, 35, 48, 56, 65, 77},
+		SeasonalTexture treeTexture = new SeasonalTexture(new int[] {14, 25, 35, 48, 56, 65, 77},
 				new Color[] {
 					new Color(0x81bf45),
 					new Color(0x4b7a00),
@@ -78,7 +84,7 @@ public class Park extends TileTemplate {
 					new Color(0xd3a848),
 					new Color(0xe0eef1)
 				});
-		Texture pineTexture = new SeasonalTexture(new int[] {10, 25, 45, 65, 77},
+		SeasonalTexture pineTexture = new SeasonalTexture(new int[] {10, 25, 45, 65, 77},
 				new Color[] {
 					new Color(0x426a18),
 					new Color(0x395e13),
@@ -86,7 +92,7 @@ public class Park extends TileTemplate {
 					new Color(0x3a5c23),
 					new Color(0xcee1ed)
 				});
-		Texture bushTexture = new SeasonalTexture(new int[] {14, 22, 30, 50, 70, 77},
+		SeasonalTexture bushTexture = new SeasonalTexture(new int[] {14, 22, 30, 50, 70, 77},
 				new Color[] {
 					new Color(0x74ad45),
 					new Color(0x56862d),
@@ -99,20 +105,22 @@ public class Park extends TileTemplate {
 		tree = new ScaledTileComponent(
 				BasicGeometry.sphere(1f, 8, -1, ObjectShader.vertexInfo),
 				treeTexture);
-		pine = new ScaledTileComponent(
-				BasicGeometry.doubleCone(1f, 8, 0, 1, 0.2f, ObjectShader.vertexInfo),
-				pineTexture);
 		trunk = new ScaledTileComponent(
 				BasicGeometry.cylinder(0.26f, 4, 1f, -1, ObjectShader.vertexInfo),
 				new Texture(new Color(0x615746)));
 		bush = new ScaledTileComponent(
 				BasicGeometry.sphere(1f, 8, -0.5f, ObjectShader.vertexInfo),
 				bushTexture);
+		
+		pine = new ScaledTileComponent(BasicGeometry.doubleCone(1f, 8, 0, 1, 0.2f, ObjectShader.vertexInfo), pineTexture);
+		xmasTree = new TileComponent(
+				BasicGeometry.doubleCone(1.6f, 8, 0.3f, 8f, 0.5f, ObjectShader.vertexInfo),
+				pineTexture); // .copy().replace(77, 1, new Texture("checker.png")));
 	}
 
 	@Override
 	public void decorateTile(Tile tile, Random random) {
-		if(!lawn)
+		if(type==ParkType.common)
 			TerrainTile.addTrees((ParkTile) tile, random);
 		if(!isFlex(tile))
 			Fences.addFences(tile);
@@ -137,6 +145,12 @@ public class Park extends TileTemplate {
 		}
 		((ParkTile) tile).createTrees(r);
 		Fences.createFences(r, tile);
+		
+		if(type==ParkType.xmas) {
+			TileObjectInfo info = new TileObjectInfo(tile);
+			xmasTree.addInstance(r, info);
+			trunk.addInstance(r, info);
+		}
 	}
 	
 	@Override

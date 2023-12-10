@@ -8,28 +8,23 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class SeasonalTexture extends Texture {
 
-	protected final Texture[] ts;
 	protected final Texture[] array = new Texture[WorldTime.daysInYear];
 	
-	protected SeasonalTexture(int numDays) {
-		ts = new Texture[numDays];
+	protected SeasonalTexture() {
 	}
 	
 	public SeasonalTexture(int[] days, Color[] colors) {
-		this(days.length);
+		Texture[] ts = new Texture[days.length];
 		for(int i=0; i<ts.length; i++)
 			ts[i] = TexColor.get(colors[i]);
-		fillArray(days);
+		fillArray(days, ts);
 	}
 
 	public SeasonalTexture(int[] days, Texture... ts) {
-		this(days.length);
-		for(int i=0; i<ts.length; i++)
-			this.ts[i] = ts[i];
-		fillArray(days);
+		fillArray(days, ts);
 	}
 
-	protected void fillArray(int[] days) {
+	protected void fillArray(int[] days, Texture[] ts) {
 		Texture last = ts[ts.length-1];
 		Texture t = last;
 		int si = 0;
@@ -40,6 +35,21 @@ public class SeasonalTexture extends Texture {
 			}
 			array[d] = t;
 		}
+	}
+	
+	public SeasonalTexture copy() {
+		SeasonalTexture tex = new SeasonalTexture();
+		for(int d=0; d<array.length; d++)
+			tex.array[d] = array[d];
+		return tex;
+	}
+	
+	public SeasonalTexture replace(int begin, int end, Texture t) {
+		if(begin>end)
+			end += WorldTime.daysInYear;
+		for(int d=begin; d<end; d++)
+			array[d % WorldTime.daysInYear] = t;
+		return this;
 	}
 	
 	public void release() {

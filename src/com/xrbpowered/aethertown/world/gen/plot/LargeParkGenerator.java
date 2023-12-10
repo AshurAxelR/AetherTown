@@ -4,6 +4,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
+import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Fountain;
@@ -21,7 +22,7 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 		{Dir.west, Dir.north, Dir.east}
 	};
 
-	private static int poiIndex = 5;
+	private static int poiIndex = 6;
 	
 	private static final PresetData[] presets = {
 		new PresetData(new TileTemplate[][] { // large park, random
@@ -97,6 +98,12 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 		})
 	};
 	
+	private static final PresetData xmasPreset = new PresetData(new TileTemplate[][] {
+		{Plaza.templateLamp, Plaza.templateLamp, Plaza.templateLamp},
+		{Plaza.template, Park.templateXmas, Plaza.template},
+		{Plaza.templateLamp, Plaza.template, Plaza.templateLamp},
+	});
+	
 	private static final EntryPoint[] setent = { new EntryPoint(3, 1) };
 	
 	private static final WRandom typew = new WRandom(
@@ -108,10 +115,19 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 		0.2, 0.6, 0.2, 0.1, 0.5, 0.7, 0.2, 0.5
 	);
 	
-	protected int presetIndex;
+	protected PresetData preset;
+	protected boolean poi;
 	
-	public LargeParkGenerator(boolean pointOfInterest, Random random) {
-		presetIndex =(pointOfInterest ? typeUpw : typew).next(random);
+	public LargeParkGenerator(Level level, boolean pointOfInterest, Random random) {
+		if(!level.hasXmasTree && level.info.settlement.maxHouses>10) {
+			preset = xmasPreset;
+			poi = true;
+		}
+		else {
+			int i =(pointOfInterest ? typeUpw : typew).next(random);
+			preset = presets[i];
+			poi = (i>=poiIndex);
+		}
 	}
 	
 	@Override
@@ -126,7 +142,7 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 
 	@Override
 	public TileTemplate sett(int ti, int tj) {
-		return presets[presetIndex].sett[ti][tj];
+		return preset.sett[ti][tj];
 	}
 
 	@Override
@@ -143,10 +159,18 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 	public void fillStreet(Random random) {
 	}
 	
+	@Override
+	protected void registerPlot() {
+		super.registerPlot();
+		if(preset==xmasPreset)
+			startToken.level.hasXmasTree = true;
+	}
+	
 	public void promote(Random random) {
-		if(presetIndex<poiIndex) {
+		if(!poi) {
 			remove();
-			presetIndex = typeUpw.next(random);
+			preset = presets[typeUpw.next(random)];
+			poi = true;
 			place(random);
 		}
 	}

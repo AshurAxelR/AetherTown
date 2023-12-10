@@ -14,6 +14,7 @@ import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.HouseRole;
 import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Bench.BenchTile;
+import com.xrbpowered.aethertown.world.tiles.Bench.BenchType;
 import com.xrbpowered.aethertown.world.tiles.ChurchT;
 import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
@@ -197,7 +198,7 @@ public class LevelMapView extends UIElement {
 					g.setColor(colorText);
 					g.drawRect(x*tileSize, z*tileSize, tileSize-1, tileSize-1);
 				}
-				else if(tile.t instanceof Bench) {
+				else if(tile.t instanceof Bench && ((Bench) tile.t).type!=BenchType.none) {
 					g.setColor(colorText);
 					g.fillRect(x*tileSize+tileSize/2-benchMarkerSize/2, z*tileSize+tileSize/2-benchMarkerSize/2,
 							benchMarkerSize, benchMarkerSize);

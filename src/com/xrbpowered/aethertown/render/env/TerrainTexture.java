@@ -14,10 +14,10 @@ public class TerrainTexture extends SeasonalTexture {
 	
 	private static final TerrainMaterial defaultTerrain = TerrainMaterial.rock;
 	
+	private Texture[] ts = null;
 	private TerrainMaterial[][] map;
 	
 	public TerrainTexture(int xsize, int zsize) {
-		super(days.length);
 		this.width = xsize;
 		this.height = zsize;
 		this.map = new TerrainMaterial[xsize][zsize];
@@ -28,6 +28,7 @@ public class TerrainTexture extends SeasonalTexture {
 	}
 	
 	public TerrainTexture create() {
+		ts = new Texture[days.length];
 		for(int i=0; i<ts.length; i++) {
 			BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 			int[] data = new int[width * height * 4];
@@ -47,12 +48,14 @@ public class TerrainTexture extends SeasonalTexture {
 			img.getRaster().setPixels(0, 0, width, height, data);
 			ts[i] = new Texture(img, true, false);
 		}
-		fillArray(days);
+		fillArray(days, ts);
 		return this;
 	}
 
 	public void release() {
-		for(Texture t : ts)
-			GL11.glDeleteTextures(t.getId());
+		if(ts!=null) {
+			for(Texture t : ts)
+				GL11.glDeleteTextures(t.getId());
+		}
 	}
 }
