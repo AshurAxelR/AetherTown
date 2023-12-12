@@ -99,7 +99,7 @@ public class LargeParkGenerator extends PresetPlotGenerator {
 	};
 	
 	private static final PresetData xmasPreset = new PresetData(new TileTemplate[][] {
-		{Plaza.templateLamp, Plaza.templateLamp, Plaza.templateLamp},
+		{Plaza.templateLamp, Plaza.template, Plaza.templateLamp},
 		{Plaza.template, Park.templateXmas, Plaza.template},
 		{Plaza.templateLamp, Plaza.template, Plaza.templateLamp},
 	});

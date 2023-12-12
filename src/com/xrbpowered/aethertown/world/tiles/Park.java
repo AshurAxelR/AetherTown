@@ -7,7 +7,9 @@ import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainMaterial;
+import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.env.SeasonalTexture;
+import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.render.tiles.ScaledTileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
@@ -113,9 +115,10 @@ public class Park extends TileTemplate {
 				bushTexture);
 		
 		pine = new ScaledTileComponent(BasicGeometry.doubleCone(1f, 8, 0, 1, 0.2f, ObjectShader.vertexInfo), pineTexture);
-		xmasTree = new TileComponent(
+		xmasTree = new IllumTileComponent(
 				BasicGeometry.doubleCone(1.6f, 8, 0.3f, 8f, 0.5f, ObjectShader.vertexInfo),
-				pineTexture); // .copy().replace(77, 1, new Texture("checker.png")));
+				pineTexture.copy().replace(77, 1, new Texture("models/xmas/xmas_tree.png", true, true, false)),
+				new SeasonalTexture(new int[] {1, 77}, TexColor.get(Color.BLACK), new Texture("models/xmas/xmas_tree_illum.png", true, true, false)));
 	}
 
 	@Override
