@@ -79,29 +79,27 @@ void main(void) {
 	float viewDist = length(pass_Position.xyz);
 	vec3 viewDir = normalize(-pass_Position.xyz);
 	
-	float illum = lightColor.x+lightColor.y+lightColor.z;
+	float brightness = lightColor.x+lightColor.y+lightColor.z;
 	vec3 lightDir = normalize(-lightDirection);
 	float diffuse = dot(normal, lightDir);
 	vec4 diffuseLight = diffuse>=0 ? mix(midColor, lightColor, diffuse) : mix(midColor, shadowColor, -diffuse);
 	// float spec = pow(max(dot(viewDir, normalize(reflect(-lightDir, normal))), 0), specPower);
 	
 	vec4 blockLight = vec4(0);
-	if(illum<illumTrigger) {
+	if(brightness<illumTrigger) {
 		diffuseLight += calcPointLights(normal);
-		blockLight = texture(dataBlockLighting, (pass_LevelPosition.xz/4+0.5+0.5*normal.xz)/levelSize)*(1-illum/illumTrigger);
+		blockLight = texture(dataBlockLighting, (pass_LevelPosition.xz/4+0.5+0.5*normal.xz)/levelSize)*(1-brightness/illumTrigger);
 		diffuseLight += 0.4*blockLight;
 	}
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	#ifdef ILLUM_TILE
 		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
-		float illumPower = (illumColor.x + illumColor.y + illumColor.z) / 3.0;
-		float colorPower = (out_Color.x + out_Color.y + out_Color.z) / 3.0;
-		float illumFactor = illumPower>0 ? max(0, (illumPower - colorPower)) / illumPower : 0;
+		float illumBrigtness = (illumColor.x + illumColor.y + illumColor.z) / 3.0;
+		float colorBrightness = (out_Color.x + out_Color.y + out_Color.z) / 3.0;
+		float illumFactor = illumBrigtness>0 ? max(0, (illumBrigtness - colorBrightness)) / illumBrigtness : 0;
 		out_Color = out_Color + illumColor * illumFactor;
-		// out_Color = max(out_Color, illumColor);
-		// float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
-		float lightDist = viewDist * (1 - 0.5 * illumPower);
+		float lightDist = viewDist * (1 - 0.5 * illumBrigtness);
 		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
 	#endif
 	

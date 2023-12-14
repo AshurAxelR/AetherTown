@@ -164,7 +164,7 @@ public class StreetSlope extends TunnelTileTemplate {
 			}
 		}
 		if(check>0) {
-			int maxDist = check*8;
+			int maxDist = (5-check)*12;
 			tile.level.map[tile.x][tile.z] = null;
 			tile.level.walkingDist.calculate(tile.x+tile.d.dx, tile.z+tile.d.dz, maxDist);
 			if(tile.level.walkingDist.map[tile.x-tile.d.dx][tile.z-tile.d.dz]<=maxDist) {
