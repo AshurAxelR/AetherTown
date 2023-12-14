@@ -11,21 +11,22 @@ public class IllumPattern {
 	public static final IllumPattern legacy = new IllumPattern(living, new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(1, 1, 1), false).setDim(0.35f, 0.1f);
 	public static final IllumPattern residential = new IllumPattern(living, new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(0.8f, 0.9f, 1f), false).setDim(0.85f, 0f);
 
-	public static final IllumPattern shop = new IllumPattern(alwaysOn, new Vector3f(1.0f, 0.9f, 0.8f), new Vector3f(1.0f, 1.0f, 0.9f), true).setTrigger(1.85f, 2.05f);
-	public static final IllumPattern officeLobby = new IllumPattern(officeHours, new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setTrigger(1.7f, 1.8f);
-	public static final IllumPattern office = new IllumPattern(officeHours, new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setDim(0.65f, 0.3f).setTrigger(1.7f, 1.8f);
-	public static final IllumPattern restaurant = new IllumPattern(leisure, new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(0.9f, 0.85f, 0.9f), false).setTrigger(1.65f, 1.95f);
-	public static final IllumPattern hotel = new IllumPattern(alwaysOn, new Vector3f(0.6f, 0.9f, 0.85f), new Vector3f(0.75f, 0.9f, 0.9f), false).setTrigger(1.75f, 1.85f);
-	public static final IllumPattern hotelRooms = new IllumPattern(living, new Vector3f(0.35f, 0.8f, 0.8f), new Vector3f(0.6f, 0.85f, 0.9f), false).setTrigger(1.25f, 1.75f).setDim(0.65f, 0.15f);
-	public static final IllumPattern hospital = new IllumPattern(alwaysOn, new Vector3f(0.9f, 0.9f, 0.8f), new Vector3f(0.95f, 0.95f, 1.0f), true).setTrigger(1.9f);
-	public static final IllumPattern hospitalWards = new IllumPattern(living, new Vector3f(0.9f, 0.9f, 0.5f), new Vector3f(0.95f, 0.95f, 0.9f), true).setTrigger(1.9f).setDim(0.65f, 0.4f);
+	public static final IllumPattern shop = new IllumPattern(alwaysOn, new Vector3f(1.0f, 0.9f, 0.8f), new Vector3f(1.0f, 1.0f, 0.9f), true).setTrigger(2.25f, 2.75f);
+	public static final IllumPattern officeLobby = new IllumPattern(officeHours, new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setTrigger(1.9f, 2.35f);
+	public static final IllumPattern office = new IllumPattern(officeHours, new Vector3f(1.0f, 0.9f, 0.6f), new Vector3f(1.0f, 1.0f, 0.8f), true).setDim(0.65f, 0.3f).setTrigger(1.9f, 2.35f);
+	public static final IllumPattern restaurant = new IllumPattern(leisure, new Vector3f(0.5f, 0.8f, 0.8f), new Vector3f(0.9f, 0.85f, 0.9f), false).setTrigger(1.95f, 2.5f);
+	public static final IllumPattern hotel = new IllumPattern(alwaysOn, new Vector3f(0.6f, 0.9f, 0.85f), new Vector3f(0.75f, 0.9f, 0.9f), false).setTrigger(1.85f, 2.2f);
+	public static final IllumPattern hotelRooms = new IllumPattern(living, new Vector3f(0.35f, 0.8f, 0.8f), new Vector3f(0.6f, 0.85f, 0.9f), false).setTrigger(1.5f, 2f).setDim(0.65f, 0.15f);
+	public static final IllumPattern hospital = new IllumPattern(alwaysOn, new Vector3f(0.9f, 0.9f, 0.8f), new Vector3f(0.95f, 0.95f, 1.0f), true).setTrigger(2f);
+	public static final IllumPattern hospitalWards = new IllumPattern(living, new Vector3f(0.9f, 0.9f, 0.5f), new Vector3f(0.95f, 0.95f, 0.9f), true).setTrigger(2f).setDim(0.65f, 0.4f);
+	public static final IllumPattern library = new IllumPattern(education, new Vector3f(0.7f, 0.9f, 0.85f), new Vector3f(0.8f, 0.9f, 0.9f), false).setTrigger(2.5f, 2.65f);
 	
 	public IllumLayer layer;
 	public Vector3f low, high;
 	public boolean cool = false;
 	public float dimRate = 0;
 	public float dim = 0.05f;
-	public float minTrigger = 1.7f;
+	public float minTrigger = 1.6f;
 	public float maxTrigger = 2f;
 
 	public IllumPattern(IllumLayer layer, Vector3f low, Vector3f high, boolean cool) {

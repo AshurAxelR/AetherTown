@@ -28,7 +28,7 @@ public class ChurchT extends TileTemplate {
 	private static final Color blockLightColor = new Color(0x5e4123);
 	private static final Color backLightColor = new Color(0x694c2d);
 	private static final IllumLayer illumLayer = IllumLayer.alwaysOn;
-	private static final float illumTrigger = 1.25f;
+	private static final float illumTrigger = 2f;
 	
 	private static IllumTileComponent mid, front1, front2, front3, front4, back1, back2;
 	private static TileComponent midRoof, chapelRoof;

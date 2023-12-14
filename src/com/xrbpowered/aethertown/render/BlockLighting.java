@@ -16,7 +16,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class BlockLighting {
 
-	public static final float illumTrigger = 2f;
+	public static final float illumTrigger = 2.1f;
 	
 	private static final float deltav = 0.08f;
 	private static final float deltavy = deltav/12f;

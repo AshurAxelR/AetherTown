@@ -10,6 +10,7 @@ public class IllumLayer {
 	public static final IllumLayer officeHours = new IllumLayer(8, 18);
 	public static final IllumLayer leisure = new IllumLayer(9, 22);
 	public static final IllumLayer shopping = new IllumLayer(9, 20);
+	public static final IllumLayer education = new IllumLayer(7, 21);
 
 	public final int index;
 	

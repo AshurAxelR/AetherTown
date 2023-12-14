@@ -204,10 +204,10 @@ public class HouseRole {
 	);
 	
 	public static final HouseRole museum = new HouseRole("Museum", colorCulture,
-		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel, IllumLayer.officeHours)
+		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.library)
 	);
 	public static final HouseRole library = new HouseRole("Library", colorCulture,
-		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.hotel, IllumLayer.officeHours)
+		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.library)
 	);
 	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture,
 		new ArchitectureStyle.BlankNotFront(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant, IllumLayer.leisure)

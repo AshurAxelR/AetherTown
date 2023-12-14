@@ -95,8 +95,13 @@ void main(void) {
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	#ifdef ILLUM_TILE
 		vec4 illumColor = texture(texIllum, pass_TexCoord) * vec4(pass_illumMod, 0);
-		out_Color = max(out_Color, illumColor);
-		float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
+		float illumPower = (illumColor.x + illumColor.y + illumColor.z) / 3.0;
+		float colorPower = (out_Color.x + out_Color.y + out_Color.z) / 3.0;
+		float illumFactor = illumPower>0 ? max(0, (illumPower - colorPower)) / illumPower : 0;
+		out_Color = out_Color + illumColor * illumFactor;
+		// out_Color = max(out_Color, illumColor);
+		// float lightDist = viewDist * (1 - 0.5 * (length(illumColor.xyz) / sqrt(3.0)));
+		float lightDist = viewDist * (1 - 0.5 * illumPower);
 		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
 	#endif
 	

@@ -282,10 +282,16 @@ public class AetherTown extends UIClient {
 					g.setColor(Color.WHITE);
 					g.setFont(Fonts.small);
 					float y = 10;
-					y = g.drawString(String.format("%.1f fps", getFps()), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+					
+					String s = String.format("%.1f fps", getFps());
+					Color c = environment.lightColor;
+					float illum = c.getRed()/255f + c.getGreen()/255f + c.getBlue()/255f;
+					s += String.format(" illum:%.2f", illum);
+					y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+					
 					// float a = 90f - (float)Math.toDegrees(Math.acos(sky.sun.position.dot(0, 1, 0, 0)));
 					// y = g.drawString(String.format("Sun angle: %.1f\u00b0", a), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
-					String s = String.format("[%d, %d] %s", hoverx, hoverz, Dir8.values()[compass].name().toUpperCase());
+					s = String.format("[%d, %d] %s", hoverx, hoverz, Dir8.values()[compass].name().toUpperCase());
 					if(level!=null && level.isInside(hoverx, hoverz) && level.map[hoverx][hoverz]!=null)
 						s += String.format(" y:%d", level.map[hoverx][hoverz].basey);
 					y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
