@@ -42,7 +42,7 @@ public class SkyRenderer {
 		buffer.render(target, level);
 		if(renderStars)
 			stars.render();
-		sun.render();
+		sun.render(level);
 	}
 
 }

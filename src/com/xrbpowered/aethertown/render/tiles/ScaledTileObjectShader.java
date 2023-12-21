@@ -14,9 +14,13 @@ public class ScaledTileObjectShader extends TileObjectShader {
 	
 	public static final String[] samplerNames = {"texSky", "dataPointLights", "dataBlockLighting", "texDiffuse"};
 	public static final String[] shaderDefs = {"SCALED_TILE"};
-	
+
+	protected ScaledTileObjectShader(String[] defs) {
+		super(instanceInfo, "shaders/tiles/tileobj_v.glsl", "shaders/tiles/obj_f.glsl", defs);
+	}
+
 	public ScaledTileObjectShader() {
-		super(instanceInfo, "shaders/tiles/tileobj_v.glsl", "shaders/tiles/obj_f.glsl", shaderDefs);
+		this(shaderDefs);
 	}
 
 	protected String[] getSamplerNames() {

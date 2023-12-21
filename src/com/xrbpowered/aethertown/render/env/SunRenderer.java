@@ -6,6 +6,7 @@ import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.sprites.SpriteComponent;
 import com.xrbpowered.aethertown.render.sprites.SpriteShader;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
@@ -65,9 +66,10 @@ public class SunRenderer {
 		return shader;
 	}
 	
-	public void render() {
+	public void render(LevelRenderer level) {
 		if(position.y<-0.3f)
 			return;
+		shader.level = level;
 		shader.use();
 		quad.draw();
 		shader.unuse();

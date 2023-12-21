@@ -27,8 +27,11 @@ public class SpriteShader extends CameraShader implements ObjectInfoUser {
 	
 	public static final String[] samplerNames = {"texColor"};
 	
+	public LevelRenderer level;
+
 	private int invAspectRatioLocation;
 	private int fovFactorLocation;
+	private int levelOffsetLocation;
 	
 	protected SpriteShader(VertexInfo info, String pathVS, String pathFS) {
 		super(info, pathVS, pathFS);
@@ -47,6 +50,7 @@ public class SpriteShader extends CameraShader implements ObjectInfoUser {
 		super.storeUniformLocations();
 		invAspectRatioLocation = GL20.glGetUniformLocation(pId, "invAspectRatio");
 		fovFactorLocation = GL20.glGetUniformLocation(pId, "fovFactor");
+		levelOffsetLocation = GL20.glGetUniformLocation(pId, "levelOffset");
 		initSamplers(getSamplerNames());
 	}
 	
@@ -61,6 +65,7 @@ public class SpriteShader extends CameraShader implements ObjectInfoUser {
 		GL20.glUniform1f(invAspectRatioLocation, 1f/camera.getAspectRatio());
 		float ff = 1f/(float)Math.tan(Math.toRadians(((CameraActor.Perspective)camera).getFov()) / 2.0);
 		GL20.glUniform1f(fovFactorLocation, ff);
+		uniform(levelOffsetLocation, level.levelOffset);
 	}
 	
 	@Override
@@ -92,11 +97,5 @@ public class SpriteShader extends CameraShader implements ObjectInfoUser {
 		data[offs+1] = obj.position.y;
 		data[offs+2] = obj.position.z;
 		data[offs+3] = obj.size;
-	}
-	
-	public void setLevel(LevelRenderer level) {
-		int pId = getProgramId();
-		GL20.glUseProgram(pId);
-		uniform(GL20.glGetUniformLocation(pId, "levelOffset"), level.levelOffset);
 	}
 }

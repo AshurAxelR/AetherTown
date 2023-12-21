@@ -43,6 +43,7 @@ public class Tunnels {
 		public final TunnelTile below;
 		
 		public int rank = 1; // 0 not entrance, 1 tile tunnel, 2 tile tunnel, 3 longer tunnel
+		public int depth = 0;
 		public TunnelType type;
 		
 		public int basey;
@@ -440,9 +441,9 @@ public class Tunnels {
 		int basey = tile.tunnel.basey;
 		TunnelInfo adjTunnel = adjTunnel(tile, d);
 		if(adjTunnel!=null)
-			r.terrain.addWall(tile.x, tile.z, d, basey, adjTunnel.basey, basey, adjTunnel.basey);
+			r.terrain.addWall(tile.x, tile.z, d, basey, adjTunnel.basey, basey, adjTunnel.basey); // internal
 		else if(tile.tunnel.rank>0)
-			r.terrain.addWall(tile.x, tile.z, d, basey, tile.tunnel.getGroundY(d.leftCorner()), basey, tile.tunnel.getGroundY(d.rightCorner()));
+			r.terrain.addWall(tile.x, tile.z, d, basey, tile.tunnel.getGroundY(d.leftCorner()), basey, tile.tunnel.getGroundY(d.rightCorner())); // entrance front, external
 	}
 	
 	public static void createTunnel(LevelRenderer r, TunnelInfo tunnel, int lowy, boolean light) {
@@ -462,6 +463,7 @@ public class Tunnels {
 			r.terrain.addHillTile(TerrainMaterial.hillGrass, tile.x, tile.z);
 		
 		if(tunnel.rank>2 || tunnel.type==TunnelType.object) {
+			// entrance sides, external
 			r.terrain.addWall(tile.x, tile.z, dr, topy, topy);
 			r.terrain.addWall(tile.x, tile.z, dr.flip(), topy, topy);
 		}
@@ -471,7 +473,7 @@ public class Tunnels {
 				for(Dir d : Dir.values()) {
 					createInterTunnelWall(r, tile, d);
 					if(!hasTunnel(tunnel.below.getAdj(d)))
-						r.terrain.addWall(tile.x+d.dx, tile.z+d.dz, d.flip(), lowy, basey, lowy, basey);
+						r.terrain.addWall(tile.x+d.dx, tile.z+d.dz, d.flip(), lowy, basey, lowy, basey); // end wall, internal
 				}
 				break;
 			case straight:

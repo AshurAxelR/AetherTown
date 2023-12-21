@@ -259,7 +259,7 @@ public class AetherTown extends UIClient {
 				levelCache.renderAll(target, (Perspective)camera, region);
 				
 				if(showPointer) {
-					tiles.objShader.setLevel(levelCache.activeLevelRenderer());
+					tiles.objShader.level = levelCache.activeLevelRenderer();
 					pointActor.draw();
 				}
 			}
@@ -641,6 +641,7 @@ public class AetherTown extends UIClient {
 				}
 				else {
 					activeController = flyController;
+					flyController.moveSpeed = settings.flySpeed;
 				}
 				if(controllerEnabled)
 					activeController.setMouseLook(true);

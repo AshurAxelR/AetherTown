@@ -13,6 +13,7 @@ public class TileRenderer {
 	public final TileObjectShader shader;
 	public final ScaledTileObjectShader scaleShader;
 	public final IllumTileObjectShader lightShader;
+	public final TunnelTileObjectShader tunnelShader;
 	public final SpriteShader spriteShader;
 	public final ObjectShader objShader;
 
@@ -22,6 +23,7 @@ public class TileRenderer {
 		shader = new TileObjectShader();
 		scaleShader = new ScaledTileObjectShader();
 		lightShader = new IllumTileObjectShader();
+		tunnelShader = new TunnelTileObjectShader();
 		spriteShader = new SpriteShader();
 		objShader = new ObjectShader();
 	}
@@ -30,6 +32,7 @@ public class TileRenderer {
 		shader.setCamera(camera);
 		scaleShader.setCamera(camera);
 		lightShader.setCamera(camera);
+		tunnelShader.setCamera(camera);
 		spriteShader.setCamera(camera);
 		objShader.setCamera(camera);
 		return this;
@@ -39,23 +42,26 @@ public class TileRenderer {
 		environment.updateShader(shader);
 		environment.updateShader(scaleShader);
 		environment.updateShader(lightShader);
+		environment.updateShader(tunnelShader);
 		environment.updateShader(spriteShader);
 		environment.updateShader(objShader);
 		illumMask = environment.illumMask;
 	}
 	
 	public void setLevel(LevelRenderer r) {
-		shader.setLevel(r);
-		scaleShader.setLevel(r);
-		lightShader.setLevel(r);
-		spriteShader.setLevel(r);
-		objShader.setLevel(r); // FIXME setLevel on shader.use()
+		shader.level = r;
+		scaleShader.level = r;
+		lightShader.level = r;
+		tunnelShader.level = r;
+		spriteShader.level = r;
+		objShader.level = r;
 	}
 	
 	public LevelComponentRenderer[] createRenderers(LevelRenderer r) {
 		return new LevelComponentRenderer[] {
 			TileComponent.createRenderer(r, shader),
 			ScaledTileComponent.createRenderer(r, scaleShader),
+			// TODO tunnel component
 			IllumTileComponent.createRenderer(r, lightShader),
 			SpriteComponent.createRenderer(r, spriteShader)
 		};
@@ -64,6 +70,7 @@ public class TileRenderer {
 	public void releaseRenderers(LevelRenderer r) {
 		TileComponent.releaseRenderer(r);
 		ScaledTileComponent.releaseRenderer(r);
+		// TODO tunnel component
 		IllumTileComponent.releaseRenderer(r);
 		SpriteComponent.releaseRenderer(r);
 	}

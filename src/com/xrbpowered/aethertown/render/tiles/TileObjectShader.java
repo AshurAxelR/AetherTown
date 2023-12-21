@@ -18,8 +18,12 @@ public class TileObjectShader extends CameraShader implements ObjectInfoUser {
 	public static final String[] samplerNames = {"texSky", "dataPointLights", "dataBlockLighting", "texDiffuse"};
 	public static final int numGlobalSamplers = 3;
 	
+	public LevelRenderer level;
+
 	private int viewYLocation;
-	
+	private int levelSizeLocation;
+	private int levelOffsetLocation;
+
 	protected TileObjectShader(InstanceInfo info, String pathVS, String pathFS, String[] defs) {
 		super(info, pathVS, pathFS, defs);
 	} 
@@ -35,6 +39,9 @@ public class TileObjectShader extends CameraShader implements ObjectInfoUser {
 	@Override
 	protected void storeUniformLocations() {
 		super.storeUniformLocations();
+		viewYLocation = GL20.glGetUniformLocation(pId, "viewY");
+		levelSizeLocation = GL20.glGetUniformLocation(pId, "levelSize");
+		levelOffsetLocation = GL20.glGetUniformLocation(pId, "levelOffset");
 		initSamplers(getSamplerNames());
 	}
 	
@@ -42,6 +49,11 @@ public class TileObjectShader extends CameraShader implements ObjectInfoUser {
 	public void updateUniforms() {
 		super.updateUniforms();
 		GL20.glUniform1f(viewYLocation, camera.position.y);
+		GL20.glUniform1f(levelSizeLocation, level.level.levelSize);
+		uniform(levelOffsetLocation, level.levelOffset);
+		level.sky.bindTexture(0);
+		level.pointLights.bind(1);
+		level.blockLighting.bind(level.tiles.illumMask, 2);
 	}
 
 	@Override
@@ -68,14 +80,4 @@ public class TileObjectShader extends CameraShader implements ObjectInfoUser {
 		data[offs+3] = obj.rotation;
 	}
 	
-	public void setLevel(LevelRenderer level) {
-		int pId = getProgramId();
-		GL20.glUseProgram(pId);
-		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level.level.levelSize);
-		uniform(GL20.glGetUniformLocation(pId, "levelOffset"), level.levelOffset);
-		level.sky.bindTexture(0);
-		level.pointLights.bind(1);
-		level.blockLighting.bind(level.tiles.illumMask, 2);
-	}
-
 }

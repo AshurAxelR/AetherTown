@@ -11,7 +11,6 @@ import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.res.buffer.RenderTarget;
-import com.xrbpowered.gl.scene.StaticMeshActor;
 
 public class LevelRenderer {
 
@@ -29,6 +28,7 @@ public class LevelRenderer {
 	public TerrainBuilder terrain = null;
 	public PointLightArray pointLights = null;
 	public BlockLighting blockLighting = null;
+	public TunnelDepthMap tunnelDepthMap = null;
 	
 	private ArrayList<TerrainMeshActor> terrainActors = null;
 
@@ -49,6 +49,7 @@ public class LevelRenderer {
 	public void createLevelGeometry() {
 		pointLights = new PointLightArray(level.levelSize);
 		blockLighting = new BlockLighting(level);
+		tunnelDepthMap = new TunnelDepthMap(level);
 		tiles.startCreateInstances(this);
 		terrain = new TerrainBuilder(level);
 		level.createGeometry(this);
@@ -58,24 +59,24 @@ public class LevelRenderer {
 		
 		pointLights.finish();
 		blockLighting.finish();
+		tunnelDepthMap.finish();
 	}
 	
 	public void render(RenderTarget target, int renderPass) {
 		tiles.setLevel(this);
-		tiles.drawInstances(this, renderPass);
-
 		if(renderPass==solidRenderPass) {
 			GL11.glEnable(GL11.GL_CULL_FACE);
-			tiles.objShader.setLevel(this);
-			for(StaticMeshActor actor : terrainActors)
+			for(TerrainMeshActor actor : terrainActors)
 				actor.draw();
 		}
+		tiles.drawInstances(this, renderPass);
 	}
 	
 	public void release() {
 		tiles.releaseRenderers(this);
 		pointLights.release();
 		blockLighting.release();
+		tunnelDepthMap.release();
 		for(TerrainMeshActor actor : terrainActors) {
 			actor.release();
 		}
