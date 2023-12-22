@@ -16,7 +16,7 @@ public class TunnelDepthMap extends FloatDataTexture {
 	public float[][] map;
 	
 	public TunnelDepthMap(Level level) {
-		super(level.levelSize, level.levelSize, false);
+		super(level.levelSize, level.levelSize, false, true, true);
 		this.level = level;
 		this.map = new float[level.levelSize][level.levelSize];
 	}

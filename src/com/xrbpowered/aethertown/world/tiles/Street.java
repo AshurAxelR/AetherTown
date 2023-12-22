@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.TunnelTileComponent;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightLimiter;
@@ -23,6 +24,7 @@ import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
 import com.xrbpowered.aethertown.world.gen.plot.LargeParkGenerator;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
+import com.xrbpowered.gl.res.mesh.StaticMesh;
 
 public class Street extends TunnelTileTemplate {
 
@@ -32,6 +34,7 @@ public class Street extends TunnelTileTemplate {
 	public static final Street subTemplate = new Street();
 	
 	public static TileComponent street;
+	public static TileComponent tunnelStreet;
 	
 	public static class StreetTile extends TunnelTile implements LampTile {
 		public final LampInfo lamp = new LampInfo();
@@ -81,9 +84,9 @@ public class Street extends TunnelTileTemplate {
 	
 	@Override
 	public void createComponents() {
-		street = new TileComponent(
-				FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null),
-				TexColor.get(streetColor));
+		StaticMesh mesh = FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null); 
+		street = new TileComponent(mesh, TexColor.get(streetColor));
+		tunnelStreet = new TunnelTileComponent(mesh, TexColor.get(streetColor));
 		Lamps.createComponents();
 		Fences.createComponents();
 		Tunnels.createComponents();
@@ -131,16 +134,17 @@ public class Street extends TunnelTileTemplate {
 	@Override
 	public void createGeometry(Tile atile, LevelRenderer r) {
 		StreetTile tile = (StreetTile) atile;
-		street.addInstance(r, new TileObjectInfo(tile));
 		if(tile.bridge)
 			Tunnels.createHillBridge(r, tile, tile.basey);
 		else
 			r.terrain.addWalls(tile);
 
 		if(tile.tunnel!=null) {
+			tunnelStreet.addInstance(r, new TileObjectInfo(tile));
 			Tunnels.createTunnel(r, tile.tunnel, tile.basey);
 		}
 		else {
+			street.addInstance(r, new TileObjectInfo(tile));
 			Fences.createFences(r, tile);
 		}
 		Lamps.createLamp(tile, tile.lamp, r, 0);

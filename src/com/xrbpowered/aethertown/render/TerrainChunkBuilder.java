@@ -9,7 +9,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import com.xrbpowered.aethertown.render.env.TerrainTexture;
-import com.xrbpowered.aethertown.render.tiles.TileObjectShader;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
@@ -37,7 +36,7 @@ public class TerrainChunkBuilder {
 	public static class TerrainMeshActor extends StaticMeshActor {
 		@Override
 		protected void bindTextures() {
-			Texture.bindAll(TileObjectShader.numGlobalSamplers, textures);
+			Texture.bindAll(ObjectShader.numGlobalSamplers, textures);
 		}
 		
 		public void release() {

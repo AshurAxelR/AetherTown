@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.render.TerrainBuilder;
 import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.TunnelTileComponent;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
@@ -22,6 +23,7 @@ import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelType;
 import com.xrbpowered.aethertown.world.tiles.Street.StreetTile;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
+import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
 public class StreetSlope extends TunnelTileTemplate {
@@ -33,7 +35,7 @@ public class StreetSlope extends TunnelTileTemplate {
 	private static TileComponent stepsL, stepsR;
 	
 	public final int h;
-	private TileComponent street, side, handrailL, handrailR;
+	private TileComponent street, tunnelStreet, side, handrailL, handrailR;
 	
 	public StreetSlope(int h) {
 		this.h = h;
@@ -98,10 +100,9 @@ public class StreetSlope extends TunnelTileTemplate {
 	@Override
 	public void createComponents() {
 		Texture handrailTex = new Texture("models/fences/handrail.png", false, true, false);
+		StaticMesh mesh;
 		if(h==4) {
-			street = new TileComponent(
-					ObjMeshLoader.loadObj("models/stairs/stairs4.obj", 0, 1f, ObjectShader.vertexInfo, null),
-					TexColor.get(Street.streetColor));
+			mesh = ObjMeshLoader.loadObj("models/stairs/stairs4.obj", 0, 1f, ObjectShader.vertexInfo, null); 
 			side = new TileComponent(
 					ObjMeshLoader.loadObj("models/stairs/stairs4side.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					TexColor.get(TerrainBuilder.wallColor));
@@ -113,6 +114,7 @@ public class StreetSlope extends TunnelTileTemplate {
 					handrailTex);
 		}
 		else if(h==2) {
+			mesh = ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null); 
 			street = new TileComponent(
 					ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					TexColor.get(Street.streetColor));
@@ -127,9 +129,7 @@ public class StreetSlope extends TunnelTileTemplate {
 					handrailTex);
 		}
 		else {
-			street = new TileComponent(
-					BasicGeometry.slope(Tile.size, Tile.ysize*h, ObjectShader.vertexInfo, null),
-					TexColor.get(Street.streetColor));
+			mesh = BasicGeometry.slope(Tile.size, Tile.ysize*h, ObjectShader.vertexInfo, null);
 			handrailL = new TileComponent(
 					ObjMeshLoader.loadObj("models/fences/handrail_s1l.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					handrailTex);
@@ -143,6 +143,8 @@ public class StreetSlope extends TunnelTileTemplate {
 					ObjMeshLoader.loadObj("models/fences/steps_out_s1r.obj", 0, 1f, ObjectShader.vertexInfo, null),
 					TexColor.get(TerrainBuilder.wallColor));
 		}
+		street = new TileComponent(mesh, TexColor.get(Street.streetColor));
+		tunnelStreet = new TunnelTileComponent(mesh, TexColor.get(Street.streetColor));
 	}
 	
 	@Override
@@ -260,16 +262,16 @@ public class StreetSlope extends TunnelTileTemplate {
 		}
 
 		if(tile.tunnel!=null) {
+			tunnelStreet.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 			Tunnels.createTunnel(r, tile.tunnel, tile.basey-h);
 		}
 		else {
+			street.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 			if(tile.getFence(dl)==FenceType.retainWall)
 				Fences.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dl));
 			if(tile.getFence(dr)==FenceType.retainWall)
 				Fences.retWall.addInstance(r, new TileObjectInfo(tile, 0, -h, 0).rotate(dr));
 		}
-		
-		street.addInstance(r, new TileObjectInfo(tile, 0, -h, 0));
 	}
 	
 	public static TileTemplate getTemplate(int h) {

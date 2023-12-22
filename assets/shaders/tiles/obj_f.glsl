@@ -4,11 +4,19 @@
 #define POINT_LIGHT_R 1
 #define EPSILON 0.001
 
+#ifdef TUNNEL_TILE
+	#define LIGHT_FALLOFF 3.0
+#endif
+
 uniform vec3 cameraPosition;
 
 uniform sampler2D texSky;
 uniform sampler2D dataPointLights;
 uniform sampler2D dataBlockLighting;
+#ifdef TUNNEL_TILE
+	uniform sampler2D dataTunnelDepth;
+#endif
+
 uniform sampler2D texDiffuse;
 #ifdef ILLUM_TILE
 	uniform sampler2D texIllum;
@@ -75,6 +83,7 @@ void main(void) {
 	// vec4 specColor = mix(diffuseColor, vec4(1, 1, 1, 1), specMask.b) * specMask.g;
 	
 	vec3 normal = gl_FrontFacing ? pass_Normal : -pass_Normal;
+	vec2 blockTexCoord = (pass_LevelPosition.xz/4+0.5+0.5*normal.xz)/levelSize;
 	
 	float viewDist = length(pass_Position.xyz);
 	vec3 viewDir = normalize(-pass_Position.xyz);
@@ -82,13 +91,20 @@ void main(void) {
 	float brightness = lightColor.x+lightColor.y+lightColor.z;
 	vec3 lightDir = normalize(-lightDirection);
 	float diffuse = dot(normal, lightDir);
+	#ifdef TUNNEL_TILE
+		float tunnelFactor = LIGHT_FALLOFF / (LIGHT_FALLOFF + texture(dataTunnelDepth, blockTexCoord).x);
+		diffuse = (diffuse+1) * tunnelFactor - 1;
+	#endif
 	vec4 diffuseLight = diffuse>=0 ? mix(midColor, lightColor, diffuse) : mix(midColor, shadowColor, -diffuse);
+	#ifdef TUNNEL_TILE
+		diffuseLight *= tunnelFactor;
+	#endif
 	// float spec = pow(max(dot(viewDir, normalize(reflect(-lightDir, normal))), 0), specPower);
 	
 	vec4 blockLight = vec4(0);
 	if(brightness<illumTrigger) {
 		diffuseLight += calcPointLights(normal);
-		blockLight = texture(dataBlockLighting, (pass_LevelPosition.xz/4+0.5+0.5*normal.xz)/levelSize)*(1-brightness/illumTrigger);
+		blockLight = texture(dataBlockLighting, blockTexCoord)*(1-brightness/illumTrigger);
 		diffuseLight += 0.4*blockLight;
 	}
 	

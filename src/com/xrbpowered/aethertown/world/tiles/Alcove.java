@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.render.TexColor;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.render.tiles.TileObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.TunnelTileComponent;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate;
@@ -29,7 +30,7 @@ public class Alcove extends TunnelTileTemplate {
 	
 	@Override
 	public void createComponents() {
-		spring = new TileComponent(
+		spring = new TunnelTileComponent(
 				ObjMeshLoader.loadObj("models/tunnel/poi_spring.obj", 0, 1f, ObjectShader.vertexInfo, null),
 				TexColor.getPalette());
 	}

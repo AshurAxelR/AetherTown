@@ -61,7 +61,7 @@ public class TileRenderer {
 		return new LevelComponentRenderer[] {
 			TileComponent.createRenderer(r, shader),
 			ScaledTileComponent.createRenderer(r, scaleShader),
-			// TODO tunnel component
+			TunnelTileComponent.createRenderer(r, tunnelShader),
 			IllumTileComponent.createRenderer(r, lightShader),
 			SpriteComponent.createRenderer(r, spriteShader)
 		};
@@ -70,7 +70,7 @@ public class TileRenderer {
 	public void releaseRenderers(LevelRenderer r) {
 		TileComponent.releaseRenderer(r);
 		ScaledTileComponent.releaseRenderer(r);
-		// TODO tunnel component
+		TunnelTileComponent.releaseRenderer(r);
 		IllumTileComponent.releaseRenderer(r);
 		SpriteComponent.releaseRenderer(r);
 	}
