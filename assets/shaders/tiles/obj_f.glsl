@@ -6,6 +6,7 @@
 
 #ifdef TUNNEL_TILE
 	#define LIGHT_FALLOFF 3.0
+	#define LIGHT_TRIGGER_FALLOFF 6.0
 #endif
 
 uniform vec3 cameraPosition;
@@ -63,12 +64,18 @@ float calcPointLight(ivec2 index, vec3 normal) {
 	return angle*falloff;
 }
 
-vec4 calcPointLights(vec3 normal) {
+vec4 calcPointLights(vec3 normal, float brightness) {
 	ivec2 center = ivec2(floor(pass_LevelPosition.x/4+(0.5+EPSILON)), floor(pass_LevelPosition.z/4+(0.5+EPSILON)));
+	vec2 centerf = vec2(center) + vec2(0.5, 0.5);
 	float light = 0;
 	for(int dx=-POINT_LIGHT_R; dx<=POINT_LIGHT_R; dx++)
 		for(int dz=-POINT_LIGHT_R; dz<=POINT_LIGHT_R; dz++) {
-			light += calcPointLight(center+ivec2(dx, dz), normal);
+			float value = calcPointLight(center+ivec2(dx, dz), normal);
+			#ifdef TUNNEL_TILE
+				float tunnelFactor = LIGHT_TRIGGER_FALLOFF / (LIGHT_TRIGGER_FALLOFF + texture(dataTunnelDepth, (centerf+vec2(dx,dz))/levelSize).x);
+				value *= (brightness*tunnelFactor < illumTrigger) ? 1 : 0;
+			#endif
+			light += value;
 		}
 	return pointLightColor*light;
 }
@@ -94,19 +101,27 @@ void main(void) {
 	#ifdef TUNNEL_TILE
 		float tunnelFactor = LIGHT_FALLOFF / (LIGHT_FALLOFF + texture(dataTunnelDepth, blockTexCoord).x);
 		diffuse = (diffuse+1) * tunnelFactor - 1;
-	#endif
-	vec4 diffuseLight = diffuse>=0 ? mix(midColor, lightColor, diffuse) : mix(midColor, shadowColor, -diffuse);
-	#ifdef TUNNEL_TILE
+		vec4 diffuseLight = diffuse>=0 ? mix(midColor, lightColor, diffuse) : mix(midColor, shadowColor, -diffuse);
 		diffuseLight *= tunnelFactor;
+	#else
+		vec4 diffuseLight = diffuse>=0 ? mix(midColor, lightColor, diffuse) : mix(midColor, shadowColor, -diffuse);
 	#endif
 	// float spec = pow(max(dot(viewDir, normalize(reflect(-lightDir, normal))), 0), specPower);
 	
 	vec4 blockLight = vec4(0);
-	if(brightness<illumTrigger) {
-		diffuseLight += calcPointLights(normal);
-		blockLight = texture(dataBlockLighting, blockTexCoord)*(1-brightness/illumTrigger);
-		diffuseLight += 0.4*blockLight;
-	}
+	#ifdef TUNNEL_TILE
+		diffuseLight += calcPointLights(normal, brightness);
+		if(brightness<illumTrigger) {
+			blockLight = texture(dataBlockLighting, blockTexCoord)*(1-brightness/illumTrigger);
+			diffuseLight += 0.4*blockLight * tunnelFactor;
+		}
+	#else
+		if(brightness<illumTrigger) {
+			diffuseLight += calcPointLights(normal, brightness);
+			blockLight = texture(dataBlockLighting, blockTexCoord)*(1-brightness/illumTrigger);
+			diffuseLight += 0.4*blockLight;
+		}
+	#endif
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	#ifdef ILLUM_TILE

@@ -173,8 +173,10 @@ public class Region {
 	}
 
 	public void connectLevels(int x, int z, Dir d) {
-		map[x][z].addConn(x, z, d);
 		LevelInfo level = map[x+d.dx][z+d.dz];
+		if(map[x][z]==level)
+			return;
+		map[x][z].addConn(x, z, d);
 		level.addConn(x+d.dx, z+d.dz, d.flip());
 	}
 

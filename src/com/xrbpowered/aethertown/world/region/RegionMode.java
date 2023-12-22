@@ -30,6 +30,14 @@ public abstract class RegionMode {
 	private static LevelSettlementType settlementParam(String[] vs, int i, LevelSettlementType def) {
 		return vs.length>i ? LevelSettlementType.valueOf(vs[i]) : def;
 	}
+	
+	private static LevelTerrainModel terrainParam(String[] vs, int i, LevelTerrainModel def) {
+		try {
+			return vs.length>i ? (LevelTerrainModel) LevelTerrainModel.class.getField(vs[i]).get(null) : def;
+		} catch (Exception e) {
+			return def;
+		}
+	}
 
 	public static RegionMode parseValue(String value) {
 		String[] vs = value.split(",\\s*", 10);
@@ -38,6 +46,8 @@ public abstract class RegionMode {
 				return new Linear(intParam(vs, 1, 64));
 			case "oneLevel":
 				return new OneLevel(intParam(vs, 1, 2), settlementParam(vs, 2, LevelSettlementType.village));
+			case "fewLevels":
+				return new FewLevels(settlementParam(vs, 1, LevelSettlementType.village), terrainParam(vs, 2, LevelTerrainModel.hill));
 			case "smallPeak":
 				return new SmallPeak(settlementParam(vs, 1, LevelSettlementType.village), settlementParam(vs, 2, LevelSettlementType.outpost));
 			case "twoPortals":
@@ -90,6 +100,37 @@ public abstract class RegionMode {
 		@Override
 		public String formatValue() {
 			return String.format("oneLevel,%d,%s", size, settlement.name());
+		}
+	}
+	
+	public static class FewLevels extends RegionMode {
+		public final LevelSettlementType settlement;
+		public final LevelTerrainModel terrain;
+		public FewLevels(LevelSettlementType settlement, LevelTerrainModel terrain) {
+			super(16, 16);
+			this.settlement = settlement;
+			this.terrain = terrain;
+		}
+		private LevelInfo makeLevel(Region region, int x, int z, Random random) {
+			LevelInfo level = new LevelInfo(region, x, z, 2, random.nextLong());
+			level.setTerrain(terrain);
+			level.setSettlement(settlement);
+			level.place();
+			return level;
+		}
+		@Override
+		public void coreGenerate(Region region, Random random) {
+			int x0 = sizex/2;
+			int z0 = sizez/2;
+			region.startLevel = makeLevel(region, x0, z0, random);
+			for(Dir d : Dir.values()) {
+				makeLevel(region, x0+d.dx*2, z0+d.dz*2, random);
+				region.connectLevels(x0+(1+d.dx)/2, z0+(1+d.dz)/2, d);
+			}
+		}
+		@Override
+		public String formatValue() {
+			return String.format("oneLevel,%s,%s", settlement.name(), terrain.name);
 		}
 	}
 	
