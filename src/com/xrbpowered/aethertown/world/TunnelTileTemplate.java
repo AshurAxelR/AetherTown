@@ -91,12 +91,17 @@ public abstract class TunnelTileTemplate extends TileTemplate {
 	
 	public static boolean tunnelWallCondition(Tile tile, Dir d, int h) {
 		Tile adj = tile.getAdj(d);
-		if(adj!=null && adj.t==Hill.template) {
+		if(adj==null)
+			return false;
+		if(adj.t==Hill.template) {
 			int[] yloc = tile.level.h.yloc(adj.x, adj.z);
 			int miny = MathUtils.min(yloc);
 			int maxDelta = MathUtils.maxDelta(yloc);
-			if(maxDelta>=TerrainChunkBuilder.cliffDelta && tile.basey-h<=miny)
+			if(maxDelta>=TerrainChunkBuilder.cliffDelta && tile.basey-h*2<=miny)
 				return true;
+		}
+		else if(adj.t.getFixedYStrength()>0) {
+			return adj.basey>tile.basey+Tunnels.tunnelHeight;
 		}
 		return false;
 	}

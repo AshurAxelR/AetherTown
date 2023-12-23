@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.gen.HillsGenerator;
+import com.xrbpowered.aethertown.world.gen.StreetGenOptions;
 
 public class LevelTerrainModel {
 
@@ -17,7 +18,7 @@ public class LevelTerrainModel {
 			HillsGenerator.expand(level, random, 1, 0, -4, 2);
 		}
 	};
-	public static final LevelTerrainModel low = new LevelTerrainModel("low", -100, -50, -30);
+	public static final LevelTerrainModel low = new LevelTerrainModel("low", -100, -50, -30).streets(StreetGenOptions.low);
 	public static final LevelTerrainModel flat = new LevelTerrainModel("flat", -40, 0, 20).pathToBottom(low);
 	public static final LevelTerrainModel hill = new LevelTerrainModel("hill", -80, -20, 20) {
 		@Override
@@ -28,7 +29,7 @@ public class LevelTerrainModel {
 			HillsGenerator.expand(level, random, 5, 5, -2, 4);
 			HillsGenerator.expand(level, random, 1, 0, -8, 2);
 		}
-	}.pathToBottom(low);
+	}.pathToBottom(low).streets(StreetGenOptions.hill);
 	public static final LevelTerrainModel peak = new LevelTerrainModel("peak", -60, 10, 60) {
 		@Override
 		public void fillTerrain(Level level, Random random) {
@@ -38,7 +39,7 @@ public class LevelTerrainModel {
 			HillsGenerator.makeHills(level, random, 3, 10, 0f);
 			HillsGenerator.expand(level, random, 1, 0, -6, 2);
 		}
-	}.pathToBottom(hill);
+	}.pathToBottom(hill).streets(StreetGenOptions.peak);
 
 	public static LevelTerrainModel nullTerrain = bottom;
 	
@@ -48,6 +49,7 @@ public class LevelTerrainModel {
 	public final boolean noParks;
 	
 	public LevelTerrainModel pathToBottom = null;
+	public StreetGenOptions streets = StreetGenOptions.flat;
 	
 	private LevelTerrainModel(String name, boolean noParks, int edgey, int conny, int starty) {
 		this.name = name;
@@ -66,6 +68,11 @@ public class LevelTerrainModel {
 		return this;
 	}
 
+	protected LevelTerrainModel streets(StreetGenOptions streets) {
+		this.streets = streets;
+		return this;
+	}
+	
 	public void startTerrain(Token startToken, Random random) {
 		new HillsGenerator(20).setAmp(-2, 2).generate(startToken, random);
 	}

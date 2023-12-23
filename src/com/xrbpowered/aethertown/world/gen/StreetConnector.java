@@ -56,7 +56,11 @@ public class StreetConnector {
 		public int mdisty(ConnPoint conn) {
 			return MathUtils.mdist(x, z, conn.x, conn.z) + lenForH(Math.abs(basey-conn.basey));
 		}
-		
+
+		public int mdisty4(ConnPoint conn) {
+			return MathUtils.mdist(x, z, conn.x, conn.z) + Math.abs(basey-conn.basey)/4;
+		}
+
 		@Override
 		public String toString() {
 			return String.format("[%d,%d]:%d", x, z, basey);
@@ -112,7 +116,7 @@ public class StreetConnector {
 			if(len<1)
 				return false;
 			street = new StreetGenerator().setMargin(margin).setGenerateSides(false);
-			street.ignoreHeightLimiter = true; // FIXME remove ignoreHeightLimiter
+			street.ignoreHeightLimiter = true;
 			startToken = new Token(level, x, yS, z, d);
 			return street.checkFit(startToken, random, len, yD);
 		}
@@ -496,7 +500,7 @@ public class StreetConnector {
 				int dj = Math.abs(conn.j - connOut.j);
 				if(dj<3)
 					continue;
-				int cost = conn.mdisty(connOut); // * Math.abs(conn.i - connOut.i) / dj;
+				int cost = conn.mdisty4(connOut); // * Math.abs(conn.i - connOut.i) / dj;
 				if(conn.i==connOut.i+1 || conn.i==connOut.i-1)
 					continue;
 				if(cost<minCost) {

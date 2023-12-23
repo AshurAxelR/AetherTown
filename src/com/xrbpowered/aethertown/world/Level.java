@@ -184,6 +184,7 @@ public class Level {
 		
 		if(houses==null || !checkNulls())
 			GeneratorException.raise("Level incomplete");
+		HeightGuide.checkTerrainBorders(this);
 
 		decorate(random);
 		releaseGenerator();
@@ -200,6 +201,7 @@ public class Level {
 		return true;
 	}
 	
+	
 	private void decorate(Random random) {
 		for(int x=0; x<levelSize; x++)
 			for(int z=0; z<levelSize; z++) {
@@ -212,8 +214,11 @@ public class Level {
 					int h = HeightMap.tiley(tile, c);
 					if(fy<h)
 						GeneratorException.raise("Negative wall: [%d, %d] (%s) %d<%d\n", x, z, c.name(), fy, h);
+					if(fy>h+TileTemplate.wallHeightLimit)
+						GeneratorException.warning("Wall height over limit(%d): [%d, %d] (%s) = %d\n", TileTemplate.wallHeightLimit, x, z, c.name(), fy-h);
 				}
 			}
+		
 		boolean upd = true;
 		while(upd) {
 			upd = false;

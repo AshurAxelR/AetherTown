@@ -22,6 +22,8 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.utils.ParseParams;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
+import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.PortalSystem;
@@ -529,7 +531,7 @@ public class AetherTown extends UIClient {
 		System.out.printf("Rendering %d levels\n", levelCache.renderedLevels);
 		System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
 		if(level.heightGuide!=null)
-			System.out.printf("\theightGuide: %d\n", level.heightGuide.gety(hoverx, hoverz));
+			System.out.printf("\theightGuide: %d (h=%d)\n", level.heightGuide.gety(hoverx, hoverz), level.h.y[hoverx][hoverz]);
 		if(level.heightLimiter!=null)
 			System.out.printf("\theightLimiter: %d, %d\n", level.heightLimiter.miny[hoverx][hoverz], level.heightLimiter.maxy[hoverx][hoverz]);
 		if(tile!=null) {
@@ -540,6 +542,13 @@ public class AetherTown extends UIClient {
 			for(Corner c : Corner.values())
 				System.out.printf("(%s)%d; ", c.name(), tile.t.getFenceY(tile, c));
 			System.out.println();
+			if(tile instanceof TunnelTile) {
+				TunnelInfo tunnel = ((TunnelTile) tile).tunnel;
+				if(tunnel==null)
+					System.out.println("\tno tunnel");
+				else
+					System.out.printf("\ttunnel(%s) rank=%d, depth=%d, basey=%d, topy=%d\n", tunnel.type.name(), tunnel.rank, tunnel.depth, tunnel.basey, tunnel.topy);
+			}
 		}
 		else
 			System.out.println("\tnull");

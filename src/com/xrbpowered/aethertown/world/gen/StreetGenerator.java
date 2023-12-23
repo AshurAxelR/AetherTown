@@ -27,6 +27,8 @@ public class StreetGenerator implements Generator, TokenProvider {
 
 	public static int defaultStreetMargin = 20;
 
+	private final StreetGenOptions genOpt;
+	
 	private int dy, absdy;
 	private Integer targetHeight = null;
 	private boolean perfectMatch = false;
@@ -88,18 +90,17 @@ public class StreetGenerator implements Generator, TokenProvider {
 			return 0;
 	}
 	
-	private static final int[] dyopt = {0, -1, 1, -2, 2, -4, 4};
-	private static final WRandom dyoptw = new WRandom(0.1, 0.4, 0.4, 0.3, 0.3, 0.2, 0.2);
-	
 	public StreetGenerator() {
+		this.genOpt = StreetGenOptions.defaultOpt;
 		margin = defaultStreetMargin;
 		dy = 0;
 		absdy = 0;
 	}
 	
-	public StreetGenerator(Random random, int prevdy) {
+	public StreetGenerator(StreetGenOptions genOpt, Random random, int prevdy) {
+		this.genOpt = genOpt;
 		margin = defaultStreetMargin;
-		dy = dyopt[dyoptw.next(random)];
+		dy = genOpt.getDy(random);
 		absdy = Math.abs(dy);
 		if(dy*prevdy<0)
 			dy = -dy;
@@ -128,13 +129,16 @@ public class StreetGenerator implements Generator, TokenProvider {
 	}
 	
 	private boolean fitLength(Random random, Integer targetLength) {
-		int maxLen = (absdy>1) ? 2+random.nextInt(4) : 3+random.nextInt(5);
-		int minLen = (absdy>1) ? streetGap : 3;
-		int checkLen = maxLen+2;
+		int minLen, maxLen, checkLen;
 		if(targetLength!=null) {
 			maxLen = targetLength+1;
 			minLen = targetLength;
 			checkLen = maxLen;
+		}
+		else {
+			maxLen = genOpt.getMaxLen(absdy, random);
+			minLen = genOpt.getMinLen(absdy);
+			checkLen = maxLen+2;
 		}
 		final Dir[] checkDirs = {dleft, dright};
 		
@@ -347,12 +351,10 @@ public class StreetGenerator implements Generator, TokenProvider {
 		return true;
 	}
 	
-	private static final WRandom wcross = new WRandom(0.25, 0.4, 0.35);
-	
 	@Override
 	public void collectTokens(TokenGenerator out, Random random) {
 		if(dylist[len-1]==0 && (len<2 || dylist[len-2]==0)) {
-			switch(wcross.next(random)) {
+			switch(genOpt.wcross.next(random)) {
 				case 0:
 					out.addToken(endToken.next(endToken.d, 0).setGenerator(new Crossroads(random)));
 					return;

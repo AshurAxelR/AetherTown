@@ -58,7 +58,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 	@Override
 	protected Generator selectGenerator(Token t, Random random) {
 		if(t.level.houseCount<houseLimit) {
-			StreetGenerator street = new StreetGenerator(random, StreetGenerator.getPrevDy(t));
+			StreetGenerator street = new StreetGenerator(t.level.info.terrain.streets, random, StreetGenerator.getPrevDy(t));
 			if(street.checkFit(t, random) && (street.isPerfectMatch() || tokenCount()<2 || random.nextInt(10)>0))
 				return street;
 		}

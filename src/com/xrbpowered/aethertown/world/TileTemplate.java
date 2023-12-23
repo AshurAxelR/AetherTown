@@ -9,6 +9,8 @@ import com.xrbpowered.aethertown.world.gen.Fences;
 
 public abstract class TileTemplate implements Generator {
 
+	public static final int wallHeightLimit = 36;
+
 	public Tile createTile() {
 		return new Tile(this);
 	}

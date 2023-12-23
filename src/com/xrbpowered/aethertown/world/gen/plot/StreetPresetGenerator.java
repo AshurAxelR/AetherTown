@@ -85,7 +85,7 @@ public abstract class StreetPresetGenerator extends PresetPlotGenerator implemen
 			Token t = createExitToken(e);
 			if(t==null)
 				continue;
-			t.setGenerator(new StreetGenerator(random, e.streetDy));
+			t.setGenerator(new StreetGenerator(t.level.info.terrain.streets, random, e.streetDy));
 			out.addToken(t);
 		}
 	}

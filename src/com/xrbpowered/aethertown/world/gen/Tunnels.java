@@ -35,7 +35,7 @@ import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 public class Tunnels {
 
 	public static final int tunnelHeight = 8;
-
+	
 	public static enum TunnelType {
 		straight, junction, object, fixed
 	}
@@ -145,7 +145,7 @@ public class Tunnels {
 					: Dir.values();
 			for(Dir d : dirs) {
 				Tile adj = tunnel.below.getAdj(d);
-				if(adj!=null && adj.t!=Hill.template && !hasTunnel(adj)) {
+				if(adj!=null && adj.t!=Hill.template && !hasTunnel(adj) && adj.basey<=tunnel.topy) {
 					tunnel.rank = 1;
 					break;
 				}
@@ -301,18 +301,21 @@ public class Tunnels {
 		return y;
 	}
 	
-	private Integer topYFromAdjHill(Tile below, Dir d) {
+	private Integer topYFromAdjHill(int topy, Tile below, Dir d) {
 		Tile t = below.getAdj(d);
-		if(t==null || t.t!=Hill.template)
+		if(t==null)
 			return null;
-		return (t.t.getFenceY(t, d.leftCorner()) + t.t.getFenceY(t, d.rightCorner())) / 2;
+		else if(t.t!=Hill.template)
+			return (t.basey>topy) ? t.basey : null;
+		else
+			return (t.t.getFenceY(t, d.leftCorner()) + t.t.getFenceY(t, d.rightCorner())) / 2;
 	}
 
-	private Integer topYFromAdjHills(Tile below, Dir[] ds) {
+	private Integer topYFromAdjHills(int topy, Tile below, Dir[] ds) {
 		int sum = 0;
 		int n = 0;
 		for(Dir d : ds) {
-			Integer y = topYFromAdjHill(below, d);
+			Integer y = topYFromAdjHill(topy, below, d);
 			if(y!=null) {
 				sum += y;
 				n++;
@@ -333,9 +336,9 @@ public class Tunnels {
 				if(tunnel.rank==0) {
 					Integer y = null;
 					if(tunnel.type==TunnelType.straight)
-						y = topYFromAdjHills(tunnel.below, new Dir[] {tunnel.below.d.cw(), tunnel.below.d.ccw()});
+						y = topYFromAdjHills(topy, tunnel.below, new Dir[] {tunnel.below.d.cw(), tunnel.below.d.ccw()});
 					else if(tunnel.type==TunnelType.object)
-						y = topYFromAdjHills(tunnel.below, new Dir[] {tunnel.below.d, tunnel.below.d.cw(), tunnel.below.d.ccw()});
+						y = topYFromAdjHills(topy, tunnel.below, new Dir[] {tunnel.below.d, tunnel.below.d.cw(), tunnel.below.d.ccw()});
 					if(y!=null && y>topy)
 						topy = y;
 				}
