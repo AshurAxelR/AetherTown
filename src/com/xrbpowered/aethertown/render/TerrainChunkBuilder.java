@@ -263,7 +263,7 @@ public class TerrainChunkBuilder {
 	}
 
 	public static TerrainMeshActor makeActor(final StaticMesh mesh, final ActorShader shader, final Texture diffuse) {
-		TerrainMeshActor actor =  new TerrainMeshActor();
+		TerrainMeshActor actor = new TerrainMeshActor();
 		actor.setMesh(mesh);
 		actor.setShader(shader);
 		actor.setTextures(new Texture[] {diffuse});

@@ -426,14 +426,21 @@ public class StreetConnector {
 						 dy += (random.nextInt(5)-2)*4;
 					ConnPoint conn = new ConnPoint(i, j, connS.basey + dy * hsign);
 					
-					ConnPiece[] pieces = prepareZConnection(connS, conn, 0, random);
-					if(pieces!=null && makeMultiZConnection(conn, connD, random)) {
-						makeConnection(pieces, random);
-						return true;
+					if(level.isInside(conn.x, conn.z)) {
+						int miny = level.heightLimiter.miny[conn.x][conn.z];
+						int maxy = level.heightLimiter.maxy[conn.x][conn.z];
+						if(miny<maxy) {
+							if(conn.basey<miny) conn.basey = miny;
+							if(conn.basey>maxy) conn.basey = maxy;
+						}
+						
+						ConnPiece[] pieces = prepareZConnection(connS, conn, 0, random);
+						if(pieces!=null && makeMultiZConnection(conn, connD, random)) {
+							makeConnection(pieces, random);
+							return true;
+						}
 					}
-					else {
-						att++;
-					}
+					att++;
 				}
 			}
 			return false;

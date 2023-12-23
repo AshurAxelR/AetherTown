@@ -7,6 +7,7 @@ import com.xrbpowered.aethertools.LevelMapView;
 import com.xrbpowered.aethertools.RegionMapView;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
+import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
@@ -199,7 +200,10 @@ public class AetherTown extends UIClient {
 				System.out.println("Creating components...");
 				ComponentLibrary.createAllComponents();
 				
-				pointActor = StaticMeshActor.make(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null), tiles.objShader, new Texture(Color.RED));
+				pointActor = new TerrainMeshActor();
+				pointActor.setMesh(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null));
+				pointActor.setShader(tiles.objShader);
+				pointActor.setTextures(new Texture[] {new Texture(Color.RED)});
 
 				changeRegion(save);
 				super.setupResources();
