@@ -215,7 +215,7 @@ public class Level {
 					if(fy<h)
 						GeneratorException.raise("Negative wall: [%d, %d] (%s) %d<%d\n", x, z, c.name(), fy, h);
 					if(fy>h+TileTemplate.wallHeightLimit)
-						GeneratorException.warning("Wall height over limit(%d): [%d, %d] (%s) = %d\n", TileTemplate.wallHeightLimit, x, z, c.name(), fy-h);
+						GeneratorException.raise("Wall height over limit(%d): [%d, %d] (%s) = %d\n", TileTemplate.wallHeightLimit, x, z, c.name(), fy-h);
 				}
 			}
 		
