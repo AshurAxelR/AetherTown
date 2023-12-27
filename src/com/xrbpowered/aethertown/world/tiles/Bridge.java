@@ -66,7 +66,7 @@ public class Bridge extends TunnelTileTemplate {
 		Tunnels.createBridge(r, tile, tile.basey, tile.basey-height);
 		Fences.createFences(r, tile);
 		
-		Street.street.addInstance(r, new TileObjectInfo(tile, 0, -height, 0));
+		Street.tunnelStreet.addInstance(r, new TileObjectInfo(tile, 0, -height, 0));
 		r.pointLights.setLight(tile, 0, -height+5.5f, 0, 4.5f);
 		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey-height+5, Lamps.lampLightColor, 0.5f, false);
 	}

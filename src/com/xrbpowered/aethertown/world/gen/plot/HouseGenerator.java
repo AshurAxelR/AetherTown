@@ -40,9 +40,9 @@ public class HouseGenerator extends HouseGeneratorBase {
 			return new HouseGenerator();
 	}
 	
-	public String getRoleTitle() {
+	public String getRoleTitle(boolean simple) {
 		String title = role.title;
-		if(role!=HouseRole.residential && !arch.getIllumLayer(0).isActive(WorldTime.getHourOfDay()))
+		if(!simple && role!=HouseRole.residential && !arch.getIllumLayer(0).isActive(WorldTime.getHourOfDay()))
 			title += " [closed]";
 		if(addRole!=null)
 			return String.format("%s + %s", title, addRole.title);
@@ -52,7 +52,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 	
 	@Override
 	public String getInfo() {
-		return String.format("%d, %s: %s", index+1, startToken.level.info.name, getRoleTitle());
+		return String.format("%d, %s: %s", index+1, startToken.level.info.name, getRoleTitle(false));
 	}
 	
 	@Override

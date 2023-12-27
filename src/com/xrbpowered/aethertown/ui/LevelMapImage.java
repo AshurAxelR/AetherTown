@@ -1,9 +1,8 @@
-package com.xrbpowered.aethertools;
+package com.xrbpowered.aethertown.ui;
 
 import java.awt.Color;
-import java.awt.Rectangle;
+import java.awt.FontMetrics;
 
-import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -12,6 +11,7 @@ import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.region.HouseRole;
+import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Bench.BenchTile;
 import com.xrbpowered.aethertown.world.tiles.Bench.BenchType;
@@ -24,49 +24,88 @@ import com.xrbpowered.aethertown.world.tiles.Pavillion;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.zoomui.GraphAssist;
-import com.xrbpowered.zoomui.UIContainer;
-import com.xrbpowered.zoomui.UIElement;
-import com.xrbpowered.zoomui.base.UIPanView;
 
-public class LevelMapView extends UIElement {
+public class LevelMapImage extends GeneratedImage {
 
 	public static final int tileSize = 16;
 	private static final int benchMarkerSize = 6;
+	private static final int gridStep = 16;
+	private static final int margin = 16;
+	private static final int marginTop = 64;
+	private static final int lineSize = 24;
 	
-	public static final Color colorBg = new Color(0xeeeeee);
-	public static final Color colorStreetBorder = new Color(0x999999);
-	public static final Color colorTextBg = new Color(0xbbffffff, true);
-	public static final Color colorText = new Color(0x777777);
+	private static final Color colorMargin = new Color(0x555555);
+	private static final Color colorBg = new Color(0xfaf5ee);
+	private static final Color colorGrid = new Color(0xeee5dd);
+	private static final Color colorStreetBorder = new Color(0x999999);
+	private static final Color colorTextBg = new Color(0xbbffffff, true);
+	private static final Color colorText = new Color(0x777777);
+	private static final Color colorTextDim = new Color(0x999999);
 	
-	
-	public static final Color colorPark = new Color(0xddeebb);
-	public static final Color colorWater = new Color(0x5294a5);
-	public static final Color colorPavillion = new Color(0xc4c1b8);
-	public static final Color colorDefault = new Color(0xfafafa);
+	private static final Color colorPark = new Color(0xddeebb);
+	private static final Color colorWater = new Color(0x5294a5);
+	private static final Color colorPavillion = new Color(0xc4c1b8);
 
-	public static Level level;
+	public final Level level;
 	
-	private static int hoverx, hoverz;
-	
-	public LevelMapView(UIContainer parent) {
-		super(new UIPanView(parent) {
-			@Override
-			protected void paintSelf(GraphAssist g) {
-				g.fill(this, colorBg);
-			}
-			@Override
-			protected void paintChildren(GraphAssist g) {
-				super.paintChildren(g);
-				paintInfo(g);
-			}
-		});
-		UIPanView view = (UIPanView) getParent();
-		view.setSize(getBase().getWindow().getClientWidth(), getBase().getWindow().getClientHeight());
-		if(level!=null)
-			centerAt(level.getStartX(), level.getStartZ());
+	public LevelMapImage(Level level) {
+		super(
+			level.levelSize*tileSize + margin*2,
+			level.levelSize*tileSize + margin*2 + marginTop + lineSize*countHouseInfoLines(level)
+		);
+		this.level = level;
+		paint();
+	}
+
+	@Override
+	protected void paint(GraphAssist g) {
+		g.fillRect(0, 0, getWidth(), getHeight(), colorMargin);
+		g.setColor(Color.WHITE);
+		g.setFont(Fonts.large);
+		float y = (margin+marginTop)/2;
+		g.drawString(level.info.name, getWidth()/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
+		
+		g.translate(margin, marginTop);
+		paintMap(g, level);
+		
+		g.translate(0, level.levelSize*tileSize+margin);
+		paintHouseList(g, level);
+	}
+
+	private static int countHouseInfoLines(Level level) {
+		int cols = level.levelSize/32;
+		return (level.houseCount+cols-1)/cols;
 	}
 	
-	private static void paintInfo(GraphAssist g) {
+	private static String getXBinName(int bin) {
+		return Character.toString((char)(bin+'A'));
+	}
+	
+	private static void paintHouseList(GraphAssist g, Level level) {
+		int lines = countHouseInfoLines(level);
+		float y = lineSize/2;
+		float x = 0;
+		int row = 0;
+		g.setFont(Fonts.small);
+		for(HouseGenerator house : level.houses) {
+			g.setColor(Color.WHITE);
+			g.drawString(Integer.toString(house.index+1), x+24, y, GraphAssist.RIGHT, GraphAssist.CENTER);
+			g.drawString(house.getRoleTitle(true), x+56, y, GraphAssist.LEFT, GraphAssist.CENTER);
+			g.setColor(colorTextDim);
+			g.drawString(String.format("%s%d", getXBinName(house.startToken.x/gridStep), house.startToken.z/gridStep+1),
+					x+40, y, GraphAssist.CENTER, GraphAssist.CENTER);
+			
+			y += lineSize;
+			row++;
+			if(row==lines) {
+				row = 0;
+				y = lineSize/2;
+				x += tileSize*32;
+			}
+		}
+	}
+	
+	public static void paintInfo(GraphAssist g, Level level, int hoverx, int hoverz) {
 		if(!level.isInside(hoverx, hoverz))
 			return;
 		g.fillRect(10, 10, 350, 55, colorTextBg);
@@ -80,7 +119,7 @@ public class LevelMapView extends UIElement {
 		if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
 			String info = null;
 			if(tile.sub.parent instanceof HouseGenerator)
-				info = ((HouseGenerator) tile.sub.parent).getRoleTitle();
+				info = ((HouseGenerator) tile.sub.parent).getRoleTitle(true);
 			else if(tile.sub.parent instanceof ChurchGenerator)
 				info = tile.t.getTileInfo(tile);
 			g.setFont(Fonts.smallBold);
@@ -89,24 +128,7 @@ public class LevelMapView extends UIElement {
 		}
 	}
 	
-	public void centerAt(int x, int z) {
-		UIPanView view = (UIPanView) getParent();
-		view.setPan(
-				x*tileSize-view.getWidth()/2,
-				z*tileSize-view.getHeight()/2);
-	}
-	
-	@Override
-	public boolean isVisible(Rectangle clip) {
-		return super.isVisible();
-	}
-
-	@Override
-	public boolean isInside(float x, float y) {
-		return true;
-	}
-	
-	private void drawBorder(GraphAssist g, int x, int z, Dir d) {
+	private static void drawBorder(GraphAssist g, int x, int z, Dir d) {
 		switch(d) {
 			case north:
 				g.line(x*tileSize, z*tileSize, x*tileSize+tileSize-1, z*tileSize);
@@ -122,17 +144,33 @@ public class LevelMapView extends UIElement {
 				break;
 		}
 	}
-	
-	@Override
-	public void paint(GraphAssist g) {
+
+	private static void paintMap(GraphAssist g, Level level) {
 		g.pushAntialiasing(false);
+		
+		g.fillRect(0, 0, level.levelSize*tileSize, level.levelSize*tileSize, colorBg);
+		g.resetStroke();
+		g.setColor(colorGrid);
+		g.setFont(Fonts.large);
+		for(int x=0; x<level.levelSize; x+=gridStep) {
+			g.line(x*tileSize, 0, x*tileSize, level.levelSize*tileSize);
+			g.line(0, x*tileSize, level.levelSize*tileSize, x*tileSize);
+			
+			float tx = x*tileSize+gridStep*tileSize/2;
+			String s = getXBinName(x/gridStep);
+			g.drawString(s, tx, 24, GraphAssist.CENTER, GraphAssist.CENTER);
+			g.drawString(s, tx, level.levelSize*tileSize-24, GraphAssist.CENTER, GraphAssist.CENTER);
+			s = Integer.toString(x/gridStep+1);
+			g.drawString(s, 24, tx, GraphAssist.CENTER, GraphAssist.CENTER);
+			g.drawString(s, level.levelSize*tileSize-24, tx, GraphAssist.CENTER, GraphAssist.CENTER);
+		}
 		
 		for(int x=0; x<level.levelSize; x++)
 			for(int z=0; z<level.levelSize; z++) {
 				Tile tile = level.map[x][z];
 				if(tile==null)
 					continue;
-				Color c = colorDefault;
+				Color c = null;
 				Color addc = null;
 				if(tile instanceof TunnelTile && ((TunnelTile) tile).tunnel!=null)
 					c = colorStreetBorder;
@@ -142,7 +180,7 @@ public class LevelMapView extends UIElement {
 					c = colorPark;
 				else if(tile.t instanceof Plaza) {
 					if(tile.t==Plaza.tunnelSideTemplate)
-						c = colorDefault;
+						c = Plaza.plazaColor;
 					else if(tile.t==Monument.template)
 						c = Monument.statueColor;
 					else if(tile.t==Fountain.template)
@@ -165,8 +203,10 @@ public class LevelMapView extends UIElement {
 						c = HouseRole.colorChurch;
 				}
 				
-				g.setColor(c);
-				g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
+				if(c!=null) {
+					g.setColor(c);
+					g.fillRect(x*tileSize, z*tileSize, tileSize, tileSize);
+				}
 				if(addc!=null && x==tile.sub.parent.maxx() && z==tile.sub.parent.maxz()) {
 					g.setColor(addc);
 					g.graph.fillPolygon(
@@ -220,13 +260,22 @@ public class LevelMapView extends UIElement {
 			}
 
 		g.popAntialiasing();
-	}
-	
-	@Override
-	public void onMouseMoved(float x, float y, int mods) {
-		hoverx = (int)(x/tileSize);
-		hoverz = (int)(y/tileSize);
-		repaint();
+		
+		float[] dx = {0.8f, 0.2f, 0.8f, -0.2f};
+		float[] dz = {0.2f, -1.1f, -0.2f, -1.1f};
+		for(LevelConnection lc : level.info.conns) {
+			float x = (lc.getLevelX() + dx[lc.d.ordinal()])*tileSize+tileSize/2;
+			float z = (lc.getLevelZ() + dz[lc.d.ordinal()])*tileSize+tileSize/2;
+			String name = lc.getAdj().name;
+			FontMetrics fm = g.getFontMetrics();
+			float w = fm.stringWidth(name);
+			if(lc.d==Dir.east) x -= w;
+			float h = fm.getAscent() - fm.getDescent() + 8;
+			g.fillRect(x-2, z-h/2, w+4, h, colorTextBg);
+			g.setColor(Color.BLACK);
+			g.drawString(name, x, z, GraphAssist.LEFT, GraphAssist.CENTER);
+		}
+
 	}
 
 }

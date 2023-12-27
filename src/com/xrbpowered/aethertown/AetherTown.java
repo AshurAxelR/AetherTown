@@ -3,7 +3,6 @@ package com.xrbpowered.aethertown;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
-import com.xrbpowered.aethertools.LevelMapView;
 import com.xrbpowered.aethertools.RegionMapView;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
@@ -14,6 +13,8 @@ import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
+import com.xrbpowered.aethertown.ui.ImageBrowserPane;
+import com.xrbpowered.aethertown.ui.LevelMapImage;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -137,8 +138,7 @@ public class AetherTown extends UIClient {
 	private UIPane uiTime, uiLookInfo, uiDebugInfo;
 	private BookmarkPane uiBookmarks;
 	
-	private UIPane uiLevelMap;
-	private LevelMapView uiLevelMapView;
+	private ImageBrowserPane uiLevelMap;
 	private UIPane uiRegionMap;
 	private RegionMapView uiRegionMapView;
 
@@ -280,6 +280,7 @@ public class AetherTown extends UIClient {
 				super.layout();
 			}
 		};
+		
 		if(settings.showFps) {
 			uiDebugInfo = new UIPane(uiRoot, false) {
 				@Override
@@ -340,17 +341,7 @@ public class AetherTown extends UIClient {
 		uiBookmarks.restoreBookmarks(save, regionCache);
 		uiBookmarks.setVisible(false);
 		
-		uiLevelMap = new UIPane(getContainer(), true) {
-			@Override
-			public void layout() {
-				for(UIElement c : children) {
-					c.setLocation(0, 0);
-					c.setSize(getWidth(), getHeight());
-					c.layout();
-				}
-			}
-		};
-		uiLevelMapView = new LevelMapView(uiLevelMap);
+		uiLevelMap = new ImageBrowserPane(getContainer());
 		uiLevelMap.setVisible(false);
 		
 		uiRegionMap = new UIPane(getContainer(), true) {
@@ -452,7 +443,6 @@ public class AetherTown extends UIClient {
 		regionCache.portals.updateLevel();
 		// levelCache.createRenderers(sky.buffer, tiles);
 		
-		LevelMapView.level = level;
 		RegionMapView.active = info;
 		info.visited = true;
 		
@@ -480,7 +470,6 @@ public class AetherTown extends UIClient {
 		regionCache.portals.updateLevel();
 		RegionMapView.region = region;
 		
-		LevelMapView.level = level;
 		RegionMapView.active = info;
 		info.visited = true;
 
@@ -574,9 +563,9 @@ public class AetherTown extends UIClient {
 	
 	private void showLevelMap(boolean show) {
 		uiLevelMap.setVisible(show);
-		if(show)
-			uiLevelMapView.centerAt(level.getStartX(), level.getStartZ());
-		uiRender.setVisible(!show);
+		if(show) {
+			uiLevelMap.setImage(new LevelMapImage(level));
+		}
 		getContainer().repaint();
 	}
 	
