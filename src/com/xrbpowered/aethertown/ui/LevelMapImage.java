@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.ui;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
+import java.awt.image.BufferedImage;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Level;
@@ -25,45 +26,39 @@ import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
 import com.xrbpowered.zoomui.GraphAssist;
 
-public class LevelMapImage extends GeneratedImage {
+public class LevelMapImage extends ImageGenerator {
 
 	public static final int tileSize = 16;
 	private static final int benchMarkerSize = 6;
 	private static final int gridStep = 16;
-	private static final int margin = 16;
-	private static final int marginTop = 64;
-	private static final int lineSize = 24;
 	
-	private static final Color colorMargin = new Color(0x555555);
-	private static final Color colorBg = new Color(0xfaf5ee);
-	private static final Color colorGrid = new Color(0xeee5dd);
 	private static final Color colorStreetBorder = new Color(0x999999);
-	private static final Color colorTextBg = new Color(0xbbffffff, true);
-	private static final Color colorText = new Color(0x777777);
-	private static final Color colorTextDim = new Color(0x999999);
-	
 	private static final Color colorPark = new Color(0xddeebb);
 	private static final Color colorWater = new Color(0x5294a5);
 	private static final Color colorPavillion = new Color(0xc4c1b8);
+	private static final Color colorPavillionBorder = new Color(0x777777);
 
 	public final Level level;
 	
 	public LevelMapImage(Level level) {
-		super(
+		this.level = level;
+	}
+	
+	@Override
+	public BufferedImage create() {
+		return create(
 			level.levelSize*tileSize + margin*2,
 			level.levelSize*tileSize + margin*2 + marginTop + lineSize*countHouseInfoLines(level)
 		);
-		this.level = level;
-		paint();
 	}
 
 	@Override
-	protected void paint(GraphAssist g) {
-		g.fillRect(0, 0, getWidth(), getHeight(), colorMargin);
-		g.setColor(Color.WHITE);
+	protected void paint(GraphAssist g, int w, int h) {
+		g.fillRect(0, 0, w, h, colorMargin);
+		g.setColor(colorMarginText);
 		g.setFont(Fonts.large);
 		float y = (margin+marginTop)/2;
-		g.drawString(level.info.name, getWidth()/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
+		g.drawString(level.info.name, w/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
 		
 		g.translate(margin, marginTop);
 		paintMap(g, level);
@@ -88,12 +83,14 @@ public class LevelMapImage extends GeneratedImage {
 		int row = 0;
 		g.setFont(Fonts.small);
 		for(HouseGenerator house : level.houses) {
-			g.setColor(Color.WHITE);
+			g.setColor(colorMarginText);
 			g.drawString(Integer.toString(house.index+1), x+24, y, GraphAssist.RIGHT, GraphAssist.CENTER);
-			g.drawString(house.getRoleTitle(true), x+56, y, GraphAssist.LEFT, GraphAssist.CENTER);
-			g.setColor(colorTextDim);
+			g.drawString(house.getRoleTitle(true), x+64, y, GraphAssist.LEFT, GraphAssist.CENTER);
+			g.setColor(colorMarginTextDim);
 			g.drawString(String.format("%s%d", getXBinName(house.startToken.x/gridStep), house.startToken.z/gridStep+1),
 					x+40, y, GraphAssist.CENTER, GraphAssist.CENTER);
+			
+			g.fillRect(x+56, y-lineSize/2, 2, lineSize, house.role.previewColor);
 			
 			y += lineSize;
 			row++;
@@ -108,12 +105,12 @@ public class LevelMapImage extends GeneratedImage {
 	public static void paintInfo(GraphAssist g, Level level, int hoverx, int hoverz) {
 		if(!level.isInside(hoverx, hoverz))
 			return;
-		g.fillRect(10, 10, 350, 55, colorTextBg);
+		g.fillRect(10, 10, 350, 55, colorInfoBg);
 		int x = 20;
 		int y = 35;
 		int h = 18;
 		g.setFont(Fonts.small);
-		g.setColor(colorText);
+		g.setColor(colorInfoText);
 		g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, level.info.name), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		Tile tile = level.map[hoverx][hoverz];
 		if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
@@ -153,16 +150,18 @@ public class LevelMapImage extends GeneratedImage {
 		g.setColor(colorGrid);
 		g.setFont(Fonts.large);
 		for(int x=0; x<level.levelSize; x+=gridStep) {
-			g.line(x*tileSize, 0, x*tileSize, level.levelSize*tileSize);
-			g.line(0, x*tileSize, level.levelSize*tileSize, x*tileSize);
-			
+			g.line(x*tileSize, 0, x*tileSize, level.levelSize*tileSize-1);
 			float tx = x*tileSize+gridStep*tileSize/2;
 			String s = getXBinName(x/gridStep);
 			g.drawString(s, tx, 24, GraphAssist.CENTER, GraphAssist.CENTER);
 			g.drawString(s, tx, level.levelSize*tileSize-24, GraphAssist.CENTER, GraphAssist.CENTER);
-			s = Integer.toString(x/gridStep+1);
-			g.drawString(s, 24, tx, GraphAssist.CENTER, GraphAssist.CENTER);
-			g.drawString(s, level.levelSize*tileSize-24, tx, GraphAssist.CENTER, GraphAssist.CENTER);
+		}
+		for(int z=0; z<level.levelSize; z+=gridStep) {
+			g.line(0, z*tileSize, level.levelSize*tileSize-1, z*tileSize);
+			float tz = z*tileSize+gridStep*tileSize/2;
+			String s = Integer.toString(z/gridStep+1);
+			g.drawString(s, 24, tz, GraphAssist.CENTER, GraphAssist.CENTER);
+			g.drawString(s, level.levelSize*tileSize-24, tz, GraphAssist.CENTER, GraphAssist.CENTER);
 		}
 		
 		for(int x=0; x<level.levelSize; x++)
@@ -221,7 +220,7 @@ public class LevelMapImage extends GeneratedImage {
 					g.setColor(colorStreetBorder);
 					for(Dir d : Dir.values()) {
 						Tile adj = tile.getAdj(d);
-						if(adj==null || !Street.isAnyPath(adj.t))
+						if(adj==null || !Street.isAnyPath(adj.t) || tile.hasFence(d) || adj.hasFence(d.flip()))
 							drawBorder(g, x, z, d);
 					}
 				}
@@ -235,11 +234,11 @@ public class LevelMapImage extends GeneratedImage {
 					}
 				}
 				else if(tile.t==Pavillion.template) {
-					g.setColor(colorText);
+					g.setColor(colorPavillionBorder);
 					g.drawRect(x*tileSize, z*tileSize, tileSize-1, tileSize-1);
 				}
 				else if(tile.t instanceof Bench && ((Bench) tile.t).type!=BenchType.none) {
-					g.setColor(colorText);
+					g.setColor(colorInfoText);
 					g.fillRect(x*tileSize+tileSize/2-benchMarkerSize/2, z*tileSize+tileSize/2-benchMarkerSize/2,
 							benchMarkerSize, benchMarkerSize);
 				}
@@ -249,13 +248,24 @@ public class LevelMapImage extends GeneratedImage {
 		for(int x=0; x<level.levelSize; x++)
 			for(int z=0; z<level.levelSize; z++) {
 				Tile tile = level.map[x][z];
-				if(tile!=null && tile.sub!=null && (tile.sub.parent instanceof HouseGenerator) && tile.sub.i==0 && tile.sub.j==0) {
-					HouseGenerator house = (HouseGenerator) tile.sub.parent;
-					g.setColor(Color.WHITE);
-					g.drawString(Integer.toString(house.index+1),
-							(x + house.d.dx*house.fwd/2f + house.dr.dx*(house.right-house.left)/2f)*tileSize+tileSize/2,
-							(z + house.d.dz*house.fwd/2f + house.dr.dz*(house.right-house.left)/2f)*tileSize+tileSize/2,
-							GraphAssist.CENTER, GraphAssist.CENTER);
+				if(tile!=null && tile.sub!=null && tile.sub.i==0 && tile.sub.j==0) {
+					String s = null;
+					if(tile.sub.parent instanceof HouseGenerator) {
+						HouseGenerator house = (HouseGenerator) tile.sub.parent;
+						s = Integer.toString(house.index+1);
+						g.setColor(Color.WHITE);
+					}
+					else if(tile.sub.parent instanceof ChurchGenerator) {
+						ChurchGenerator church = (ChurchGenerator) tile.sub.parent;
+						s = String.format("St. %s", church.name);
+						g.setColor(Color.BLACK);
+					}
+					if(s!=null) {
+						PlotGenerator plot = tile.sub.parent;
+						float tx = (x + plot.d.dx*plot.fwd/2f + plot.dr.dx*(plot.right-plot.left)/2f)*tileSize+tileSize/2;
+						float tz = (z + plot.d.dz*plot.fwd/2f + plot.dr.dz*(plot.right-plot.left)/2f)*tileSize+tileSize/2;
+						g.drawString(s, tx, tz, GraphAssist.CENTER, GraphAssist.CENTER);
+					}
 				}
 			}
 
@@ -271,7 +281,7 @@ public class LevelMapImage extends GeneratedImage {
 			float w = fm.stringWidth(name);
 			if(lc.d==Dir.east) x -= w;
 			float h = fm.getAscent() - fm.getDescent() + 8;
-			g.fillRect(x-2, z-h/2, w+4, h, colorTextBg);
+			g.fillRect(x-2, z-h/2, w+4, h, colorInfoBg);
 			g.setColor(Color.BLACK);
 			g.drawString(name, x, z, GraphAssist.LEFT, GraphAssist.CENTER);
 		}

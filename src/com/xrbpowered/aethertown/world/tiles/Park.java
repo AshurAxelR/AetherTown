@@ -20,6 +20,7 @@ import com.xrbpowered.aethertown.world.HeightMap;
 import com.xrbpowered.aethertown.world.TerrainTile;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.gl.res.texture.Texture;
 
@@ -158,8 +159,15 @@ public class Park extends TileTemplate {
 	
 	@Override
 	public boolean finalizeTile(Tile atile, Random random) {
-		if(Alcove.maybeConvert(atile))
-			return true;
+		if(Alcove.maybeConvert(atile)) {
+			for(;;) {
+				atile = atile.getAdj(atile.d.flip());
+				if(atile!=null && atile.t instanceof Park && ((Park) atile.t).type!=ParkType.lawn)
+					templateLawn.forceGenerate(Token.forTile(atile));
+				else
+					return true;
+			}
+		}
 		
 		ParkTile tile = (ParkTile) atile;
 		boolean remove = true;

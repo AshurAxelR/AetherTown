@@ -17,7 +17,7 @@ public class Token {
 		this.z = z;
 		this.d = d;
 	}
-	
+
 	public Token setGenerator(Generator gen) {
 		this.gen = gen;
 		return this;

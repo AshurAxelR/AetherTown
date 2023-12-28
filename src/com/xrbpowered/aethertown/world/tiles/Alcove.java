@@ -56,7 +56,7 @@ public class Alcove extends TunnelTileTemplate {
 	}
 	
 	public static Tile convert(Tile src) {
-		TunnelTile tile = (TunnelTile) template.forceGenerate(new Token(src.level, src.x, src.basey, src.z, src.d));
+		TunnelTile tile = (TunnelTile) template.forceGenerate(Token.forTile(src));
 		tile.addTunnel(TunnelType.object);
 		return tile;
 	}

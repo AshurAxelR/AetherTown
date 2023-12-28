@@ -137,7 +137,7 @@ public class LevelInfo {
 	public void place() {
 		for(int x=0; x<size; x++)
 			for(int z=0; z<size; z++)
-				region.map[x0+x][z0+z] = this;
+				region.placeAt(x0+x, z0+z, this);
 	}
 	
 	public void addConn(Dir d, int i) {

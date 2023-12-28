@@ -1,18 +1,15 @@
 package com.xrbpowered.aethertools;
 
-import java.awt.Color;
+import static com.xrbpowered.aethertown.ui.RegionMapImage.*;
+
 import java.awt.Rectangle;
-import java.util.HashSet;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.SaveState;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
-import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelNames;
-import com.xrbpowered.aethertown.world.region.LevelSettlementType;
-import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.gl.res.asset.AssetManager;
@@ -26,20 +23,6 @@ import com.xrbpowered.zoomui.swing.SwingWindowFactory;
 
 public class RegionMapView extends UIElement {
 
-	public static final int tileSize = 20;
-	
-	public static final Color colorBg = new Color(0xf5f5f5);
-	public static final Color colorTextBg = new Color(0xbbffffff, true);
-	public static final Color colorText = new Color(0x777777);
-	public static final Color colorNotVisited = new Color(0xfafafa);
-	public static final Color colorActive = new Color(0xdd0000);
-	public static final Color colorPortal = new Color(0x00aaff);
-	
-	public static final Color[] colorLevel = { new Color(0xecf4db), new Color(0xddeebb), new Color(0xccdd88) };
-	public static final Color colorLevelBorder = new Color(0xdddddd);
-	public static final Color colorPaths = new Color(0x777777);
-	public static final Color colorTown = new Color(0x000000);
-	
 	public static Region region;
 	public static LevelInfo active = null;
 	public static boolean showVisited = true;
@@ -52,41 +35,18 @@ public class RegionMapView extends UIElement {
 		super(new UIPanView(parent) {
 			@Override
 			protected void paintSelf(GraphAssist g) {
-				g.fill(this, colorBg);
+				g.fill(this, colorMargin);
 			}
 			@Override
 			protected void paintChildren(GraphAssist g) {
 				super.paintChildren(g);
-				paintInfo(g);
+				paintInfo(g, region, hoverx, hoverz, showVisited);
 			}
 		});
 		UIPanView view = (UIPanView) getParent();
 		view.setSize(getBase().getWindow().getClientWidth(), getBase().getWindow().getClientHeight());
 		if(region!=null)
 			centerAt(region.sizez/2, region.sizez/2);
-	}
-	
-	private static void paintInfo(GraphAssist g) {
-		if(!region.isInside(hoverx, hoverz))
-			return;
-		g.fillRect(10, 10, 350, 55, colorTextBg);
-		int x = 20;
-		int y = 35;
-		int h = 18;
-		g.setFont(Fonts.small);
-		g.setColor(colorText);
-		LevelInfo level = region.map[hoverx][hoverz];
-		String terrain = "-";
-		if(level!=null)
-			terrain = level.terrain.name;
-		g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, terrain), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
-		if(level!=null) {
-			boolean visited = !showVisited || level.visited;
-			if(visited)
-				g.setFont(Fonts.smallBold);
-			g.setColor(Color.BLACK);
-			g.drawString(visited ? level.name : "(not visited)", x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
-		}
 	}
 	
 	public void centerAt(int x, int z) {
@@ -106,93 +66,9 @@ public class RegionMapView extends UIElement {
 		return true;
 	}
 	
-	private static Color getLevelColor(LevelTerrainModel terrain) {
-		if(terrain==LevelTerrainModel.low)
-			return colorLevel[0];
-		else if(terrain==LevelTerrainModel.hill || terrain==LevelTerrainModel.flat)
-			return colorLevel[1];
-		else if(terrain==LevelTerrainModel.peak)
-			return colorLevel[2];
-		else
-			return Color.WHITE;
-	}
-	
-	private static int getSettlementRectSize(LevelSettlementType settlement) {
-		return settlement.ordinal()+1;
-	}
-	
 	@Override
 	public void paint(GraphAssist g) {
-		g.pushAntialiasing(false);
-		
-		HashSet<LevelInfo> bookmarks = new HashSet<>();
-		if(this.bookmarks!=null) {
-			for(LevelInfo level : this.bookmarks.bookmarks)
-				bookmarks.add(level);
-		}
-		
-		for(int x=0; x<region.sizex; x++)
-			for(int z=0; z<region.sizez; z++) {
-				LevelInfo level = region.map[x][z];
-				if(level==null)
-					continue;
-				if(level.x0!=x || level.z0!=z)
-					continue;
-				
-				if(!showVisited || level.visited) {
-					g.setColor(getLevelColor(level.terrain));
-					g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
-					g.setColor(colorLevelBorder);
-					g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
-					g.pushAntialiasing(true);
-					g.setColor(colorPaths);
-					int mx = x*tileSize+level.size*tileSize/2;
-					int mz = z*tileSize+level.size*tileSize/2;
-					for(LevelConnection c : level.conns) {
-						int cx = (c.d.dx==0) ? x*tileSize+c.i*tileSize+tileSize/2 : mx + c.d.dx*level.size*tileSize/2;
-						int cz = (c.d.dz==0) ? z*tileSize+c.i*tileSize+tileSize/2 : mz + c.d.dz*level.size*tileSize/2;
-						g.line(mx, mz, cx, cz);
-					}
-					g.popAntialiasing();
-					
-					if(level.settlement!=LevelSettlementType.none) {
-						int s = getSettlementRectSize(level.settlement);
-						g.setColor(bookmarks.contains(level) ? colorActive : colorTown);
-						g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
-					}
-					else if(bookmarks.contains(level)) {
-						g.setColor(colorActive);
-						g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
-					}
-				}
-				else {
-					g.setColor(colorNotVisited);
-					g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
-				}
-				
-				if(level.isPortal()) {
-					g.pushAntialiasing(true);
-					g.pushPureStroke(true);
-					g.setColor(colorPortal);
-					g.setStroke(2f);
-					g.graph.drawOval(level.x0*tileSize+3, level.z0*tileSize+3, tileSize-6, tileSize-6);
-					g.popAntialiasing();
-					g.resetStroke();
-					g.popPureStroke();
-				}
-			}
-
-		if(active!=null) {
-			g.pushAntialiasing(true);
-			g.pushPureStroke(true);
-			g.setColor(colorActive);
-			g.setStroke(3f);
-			g.graph.drawOval(active.x0*tileSize-3, active.z0*tileSize-3, active.size*tileSize+6, active.size*tileSize+6);
-			g.popAntialiasing();
-			g.resetStroke();
-			g.popPureStroke();
-		}
-		g.popAntialiasing();
+		paintMap(g, region, active, showVisited, bookmarks);
 	}
 	
 	@Override

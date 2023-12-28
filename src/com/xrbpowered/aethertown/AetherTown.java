@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.ImageBrowserPane;
 import com.xrbpowered.aethertown.ui.LevelMapImage;
+import com.xrbpowered.aethertown.ui.RegionMapImage;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -139,8 +140,7 @@ public class AetherTown extends UIClient {
 	private BookmarkPane uiBookmarks;
 	
 	private ImageBrowserPane uiLevelMap;
-	private UIPane uiRegionMap;
-	private RegionMapView uiRegionMapView;
+	private ImageBrowserPane uiRegionMap;
 
 	public AetherTown(final SaveState save) {
 		super("Aether Town", settings.uiScaling);
@@ -271,6 +271,12 @@ public class AetherTown extends UIClient {
 			}
 		};
 		
+		uiLevelMap = new ImageBrowserPane(getContainer());
+		uiLevelMap.setVisible(false);
+		
+		uiRegionMap = new ImageBrowserPane(getContainer());
+		uiRegionMap.setVisible(false);
+
 		uiRoot = new UINode(getContainer()) {
 			@Override
 			public void layout() {
@@ -340,24 +346,6 @@ public class AetherTown extends UIClient {
 		uiBookmarks = new BookmarkPane(uiRoot);
 		uiBookmarks.restoreBookmarks(save, regionCache);
 		uiBookmarks.setVisible(false);
-		
-		uiLevelMap = new ImageBrowserPane(getContainer());
-		uiLevelMap.setVisible(false);
-		
-		uiRegionMap = new UIPane(getContainer(), true) {
-			@Override
-			public void layout() {
-				for(UIElement c : children) {
-					c.setLocation(0, 0);
-					c.setSize(getWidth(), getHeight());
-					c.layout();
-				}
-			}
-		};
-		RegionMapView.showVisited = !settings.revealRegion;
-		uiRegionMapView = new RegionMapView(uiRegionMap);
-		uiRegionMapView.bookmarks = uiBookmarks;
-		uiRegionMap.setVisible(false);
 	}
 	
 	private int compass = -1;
@@ -555,16 +543,16 @@ public class AetherTown extends UIClient {
 	
 	private void showRegionMap(boolean show) {
 		uiRegionMap.setVisible(show);
-		if(show)
-			uiRegionMapView.centerAt(level.info.x0, level.info.z0);
-		uiRender.setVisible(!show);
+		if(show) {
+			uiRegionMap.setImage(new RegionMapImage(region, levelInfo, uiBookmarks).create());
+		}
 		getContainer().repaint();
 	}
 	
 	private void showLevelMap(boolean show) {
 		uiLevelMap.setVisible(show);
 		if(show) {
-			uiLevelMap.setImage(new LevelMapImage(level));
+			uiLevelMap.setImage(new LevelMapImage(level).create());
 		}
 		getContainer().repaint();
 	}

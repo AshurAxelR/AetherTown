@@ -27,6 +27,9 @@ public class Region {
 	
 	public boolean bookmark = false;
 	
+	private boolean empty = true;
+	private int minx, minz, maxx, maxz;
+	
 	public Region(RegionCache cache, long seed) {
 		this.cache = cache;
 		this.sizex = cache.mode.sizex;
@@ -70,8 +73,34 @@ public class Region {
 		return false;
 	}
 	
+	public void placeAt(int x, int z, LevelInfo level) {
+		map[x][z] = level;
+		if(empty || x<minx) minx = x;
+		if(empty || x>maxx) maxx = x;
+		if(empty || z<minz) minz = z;
+		if(empty || z>maxz) maxz = z;
+		empty = false;
+	}
+	
+	public int getMinX() {
+		return minx;
+	}
+
+	public int getMaxX() {
+		return maxx;
+	}
+
+	public int getMinZ() {
+		return minz;
+	}
+
+	public int getMaxZ() {
+		return maxz;
+	}
+
 	private void resetGenerator() {
 		map = new LevelInfo[sizex][sizez];
+		empty = true;
 		portals = cache.portals.numPortals==0 ? null : new LevelInfo[cache.portals.numPortals];
 		startLevel = null;
 	}
@@ -83,6 +112,7 @@ public class Region {
 				System.out.printf("Retrying...\nAttempt #%d\n", att+1);
 			try {
 				generate(random);
+				System.out.printf("Region bounds: [%d, %d] - [%d, %d]\n", minx, minz, maxx, maxz);
 				return;
 			}
 			catch (GeneratorException e) {
@@ -93,9 +123,14 @@ public class Region {
 	}
 
 	private boolean expand(Random random, int minAdj, boolean all) {
+		int minx = Math.max(this.minx-2, 1);
+		int maxx = Math.min(this.maxx+2, sizex-1);
+		int minz = Math.max(this.minz-2, 1);
+		int maxz = Math.min(this.maxz+2, sizez-1);
+		
 		LinkedList<LevelInfo> add = new LinkedList<>();
-		for(int x=1; x<sizex-1; x++)
-			for(int z=1; z<sizez-1; z++) {
+		for(int x=minx; x<=maxx; x++)
+			for(int z=minz; z<=maxz; z++) {
 				if(map[x][z]!=null)
 					continue;
 				int countAdj = 0;
@@ -135,8 +170,8 @@ public class Region {
 	
 	private void checkPeaks() {
 		// hack: fixing low-to-peak by lowering size 1 peaks
-		for(int x=1; x<sizex-1; x++)
-			for(int z=1; z<sizez-1; z++) {
+		for(int x=minx; x<=maxx; x++)
+			for(int z=minz; z<=maxz; z++) {
 				LevelInfo level = map[x][z];
 				if(level==null || level.size>1)
 					continue;
