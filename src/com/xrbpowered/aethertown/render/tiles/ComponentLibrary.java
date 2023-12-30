@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.world.tiles.Fountain;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.NavBox;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Pavillion;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
@@ -24,6 +25,7 @@ public class ComponentLibrary {
 		Hill.template,
 		HouseT.template,
 		Monument.template,
+		NavBox.template,
 		Park.template,
 		Pavillion.template,
 		Plaza.template,

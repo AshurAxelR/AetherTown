@@ -112,7 +112,6 @@ public class Region {
 				System.out.printf("Retrying...\nAttempt #%d\n", att+1);
 			try {
 				generate(random);
-				System.out.printf("Region bounds: [%d, %d] - [%d, %d]\n", minx, minz, maxx, maxz);
 				return;
 			}
 			catch (GeneratorException e) {
@@ -124,9 +123,9 @@ public class Region {
 
 	private boolean expand(Random random, int minAdj, boolean all) {
 		int minx = Math.max(this.minx-2, 1);
-		int maxx = Math.min(this.maxx+2, sizex-1);
+		int maxx = Math.min(this.maxx+2, sizex-2);
 		int minz = Math.max(this.minz-2, 1);
-		int maxz = Math.min(this.maxz+2, sizez-1);
+		int maxz = Math.min(this.maxz+2, sizez-2);
 		
 		LinkedList<LevelInfo> add = new LinkedList<>();
 		for(int x=minx; x<=maxx; x++)

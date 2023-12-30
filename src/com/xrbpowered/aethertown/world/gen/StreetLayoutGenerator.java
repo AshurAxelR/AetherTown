@@ -19,6 +19,7 @@ import com.xrbpowered.aethertown.world.gen.plot.StreetPresetGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.tiles.Monument;
+import com.xrbpowered.aethertown.world.tiles.NavBox;
 import com.xrbpowered.aethertown.world.tiles.Street;
 
 public class StreetLayoutGenerator extends TokenGenerator {
@@ -152,6 +153,7 @@ public class StreetLayoutGenerator extends TokenGenerator {
 			for(PlotGenerator plot : level.plots)
 				plot.fillStreet(random);
 			reconnectStreets(level, random, true, sides);
+			NavBox.createNavBoxes(level, random);
 		}
 		level.heightLimiter.revalidate();
 		if(sides!=null)

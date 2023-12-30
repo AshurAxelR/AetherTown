@@ -63,41 +63,42 @@ public abstract class BasicGeometry {
 	public static StaticMesh box(float size, float h, float pivotYRatio, VertexInfo info, Options options) {
 		float d = size / 2f;
 		Vector3f norm = new Vector3f();
-		Vector3f tan = new Vector3f();
-		FastMeshBuilder mb = new FastMeshBuilder(info, options, 4*4, 4*6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, options, 5*4, 5*6);
 		
 		float y0 = -h/2f-pivotYRatio*h/2f;
 		float y1 = h/2f-pivotYRatio*h/2f;
 		
 		norm.set(0, 0, -1);
-		tan.set(-1, 0, 0);
 		mb.getVertex(0).setPosition(-d, y0, -d).setTexCoord(1, 1).setNormal(norm);
 		mb.getVertex(1).setPosition(-d, y1, -d).setTexCoord(1, 0).setNormal(norm);
 		mb.getVertex(2).setPosition(d, y1, -d).setTexCoord(0, 0).setNormal(norm);
 		mb.getVertex(3).setPosition(d, y0, -d).setTexCoord(0, 1).setNormal(norm);
 
 		norm.set(0, 0, 1);
-		tan.set(1, 0, 0);
 		mb.getVertex(4).setPosition(d, y0, d).setTexCoord(1, 1).setNormal(norm);
 		mb.getVertex(5).setPosition(d, y1, d).setTexCoord(1, 0).setNormal(norm);
 		mb.getVertex(6).setPosition(-d, y1, d).setTexCoord(0, 0).setNormal(norm);
 		mb.getVertex(7).setPosition(-d, y0, d).setTexCoord(0, 1).setNormal(norm);
 
 		norm.set(-1, 0, 0);
-		tan.set(0, 1, 0);
 		mb.getVertex(8).setPosition(-d, y0, d).setTexCoord(1, 1).setNormal(norm);
 		mb.getVertex(9).setPosition(-d, y1, d).setTexCoord(1, 0).setNormal(norm);
 		mb.getVertex(10).setPosition(-d, y1, -d).setTexCoord(0, 0).setNormal(norm);
 		mb.getVertex(11).setPosition(-d, y0, -d).setTexCoord(0, 1).setNormal(norm);
 
 		norm.set(1, 0, 0);
-		tan.set(0, 1, 0);
 		mb.getVertex(12).setPosition(d, y0, -d).setTexCoord(1, 1).setNormal(norm);
 		mb.getVertex(13).setPosition(d, y1, -d).setTexCoord(1, 0).setNormal(norm);
 		mb.getVertex(14).setPosition(d, y1, d).setTexCoord(0, 0).setNormal(norm);
 		mb.getVertex(15).setPosition(d, y0, d).setTexCoord(0, 1).setNormal(norm);
 		
-		for(int i=0; i<4*4; i+=4)
+		norm.set(0, 1, 0);
+		mb.getVertex(16).setPosition(-d, y1, -d).setTexCoord(0, 0).setNormal(norm);
+		mb.getVertex(17).setPosition(-d, y1, d).setTexCoord(0, 1).setNormal(norm);
+		mb.getVertex(18).setPosition(d, y1, d).setTexCoord(1, 1).setNormal(norm);
+		mb.getVertex(19).setPosition(d, y1, -d).setTexCoord(1, 0).setNormal(norm);
+
+		for(int i=0; i<5*4; i+=4)
 			mb.addQuad(i+0, i+1, i+2, i+3);
 		
 		return mb.create();

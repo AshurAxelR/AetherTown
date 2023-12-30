@@ -340,7 +340,7 @@ public class AetherTown extends UIClient {
 				g.drawString(lookAtInfo, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
 		};
-		uiLookInfo.setSize(400, 32);
+		uiLookInfo.setSize(480, 32);
 		uiLookInfo.setVisible(false);
 		
 		uiBookmarks = new BookmarkPane(uiRoot);
@@ -543,6 +543,7 @@ public class AetherTown extends UIClient {
 	
 	private void showRegionMap(boolean show) {
 		uiRegionMap.setVisible(show);
+		uiLookInfo.setVisible(!show && !lookAtInfo.isEmpty());
 		if(show) {
 			uiRegionMap.setImage(new RegionMapImage(region, levelInfo, uiBookmarks).create());
 		}
@@ -551,6 +552,7 @@ public class AetherTown extends UIClient {
 	
 	private void showLevelMap(boolean show) {
 		uiLevelMap.setVisible(show);
+		uiLookInfo.setVisible(!show && !lookAtInfo.isEmpty());
 		if(show) {
 			uiLevelMap.setImage(new LevelMapImage(level).create());
 		}

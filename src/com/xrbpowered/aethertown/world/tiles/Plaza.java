@@ -16,7 +16,7 @@ public class Plaza extends TileTemplate {
 	
 	public static final Plaza template = new Plaza();
 	public static final Plaza tunnelSideTemplate = new Plaza(false);
-	public static final Bench templateLamp = new Bench(BenchType.none, true, null);
+	public static final Bench templateLamp = new Bench(BenchType.empty, true, null);
 
 	public final boolean fences;
 	

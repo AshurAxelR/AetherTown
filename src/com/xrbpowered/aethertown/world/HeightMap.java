@@ -7,8 +7,6 @@ import com.xrbpowered.aethertown.utils.MathUtils;
 
 public class HeightMap {
 
-	public static final int[] yloc = new int[4];
-	
 	public final Level level;
 	public final int levelSize;
 	
@@ -47,6 +45,7 @@ public class HeightMap {
 	}
 
 	public int[] yloc(int x, int z) {
+		int[] yloc = new int[4];
 		yloc[0] = y[x][z];
 		yloc[1] = y[x+1][z];
 		yloc[2] = y[x+1][z+1];

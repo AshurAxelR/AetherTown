@@ -25,7 +25,8 @@ public class Bench extends Plaza implements RequestLamp {
 	public enum BenchType {
 		bench(new Dir[] {Dir.east, Dir.west}),
 		table(new Dir[] {Dir.north}),
-		none(new Dir[] {Dir.north});
+		empty(new Dir[] {Dir.north}),
+		noLamp(null);
 		
 		public final Dir[] lampDirs;
 		
@@ -111,8 +112,12 @@ public class Bench extends Plaza implements RequestLamp {
 		BenchTile tile = (BenchTile) atile;
 		boolean res = super.postDecorateTile(tile, random);
 		
-		if(tile.lamp.req && tile.lamp.d==null)
-			return Lamps.addLamp(tile, tile.lamp, lampDirs, true);
+		if(tile.lamp.req && tile.lamp.d==null) {
+			if(lampDirs==null)
+				tile.lamp.d = Dir.north;
+			else
+				return Lamps.addLamp(tile, tile.lamp, lampDirs, true);
+		}
 		
 		if(!tile.plaza) {
 			boolean convert = false;
@@ -174,8 +179,10 @@ public class Bench extends Plaza implements RequestLamp {
 				Lamps.createLamp(tile, tile.lamp, r, 0);
 				break;
 			}
-			case none:
+			case empty:
 				Lamps.createLamp(tile, tile.lamp, r, 0);
+				break;
+			case noLamp:
 				break;
 		}
 	}
