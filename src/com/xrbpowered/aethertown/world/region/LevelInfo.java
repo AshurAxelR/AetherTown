@@ -15,6 +15,9 @@ public class LevelInfo {
 		public int i;
 		public int offs = 0;
 		
+		private LevelInfo navTarget = null;
+		private int navTargetDist = 0; // in half-tiles
+		
 		public LevelConnection(Dir d, int i) {
 			this.d = d;
 			this.i = i;
@@ -69,6 +72,37 @@ public class LevelInfo {
 		
 		public int getY() {
 			return (terrain.conny+getAdj().terrain.conny)/2;
+		}
+		
+		public LevelInfo getNavTarget() {
+			if(navTarget==null) {
+				LevelInfo adj = getAdj();
+				int dist = size + adj.size;
+				if(adj.settlement.minHouses>0 || adj.isPortal() || adj.conns.size()!=2) {
+					navTarget = adj;
+					navTargetDist = dist;
+				}
+				else {
+					LevelConnection next = null;
+					for(LevelConnection lc : adj.conns) {
+						if(getRegionX()!=lc.getRegionX()+lc.d.dx || getRegionZ()!=lc.getRegionZ()+lc.d.dz) {
+							next = lc;
+							break;
+						}
+					}
+					navTarget = LevelInfo.this; // to prevent infinite loop
+					navTargetDist = dist*2;
+					navTarget = next.getNavTarget();
+					navTargetDist = dist + next.navTargetDist;
+				}
+			}
+			return navTarget;
+		}
+		
+		public int getNavTargetDist() {
+			if(navTarget==null)
+				getNavTarget();
+			return navTargetDist;
 		}
 	}
 	

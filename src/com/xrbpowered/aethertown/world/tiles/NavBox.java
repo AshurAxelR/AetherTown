@@ -13,6 +13,7 @@ import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.gen.Lamps;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
@@ -42,10 +43,21 @@ public class NavBox extends Bench {
 	@Override
 	public String getTileInfo(Tile tile) {
 		LevelConnection pointer = ((NavBoxTile) tile).pointer;
-		if(pointer!=null)
-			return String.format("%s \u2013 %s to %s", tile.level.info.name, pointer.d.name(), pointer.getAdj().name);
+		if(pointer!=null) {
+			LevelInfo target = pointer.getNavTarget();
+			float dist = pointer.getNavTargetDist() * (LevelInfo.baseSize/2) * Tile.size / 1000f;
+			String name;
+			if(target==tile.level.info)
+				name = "loop back";
+			else {
+				name = "to " + (target.isPortal() ? target.portal.getName() : target.name);
+				if(target.conns.size()<2)
+					name += " (end)";
+			}
+			return String.format("%s \u2013 %.1f km %s %s", tile.level.info.name, dist, pointer.d.name(), name);
+		}
 		else
-			return "";
+			return tile.level.info.name;
 	}
 	
 	@Override

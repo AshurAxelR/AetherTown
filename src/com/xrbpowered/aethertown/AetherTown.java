@@ -340,7 +340,7 @@ public class AetherTown extends UIClient {
 				g.drawString(lookAtInfo, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
 		};
-		uiLookInfo.setSize(480, 32);
+		uiLookInfo.setSize(600, 32);
 		uiLookInfo.setVisible(false);
 		
 		uiBookmarks = new BookmarkPane(uiRoot);

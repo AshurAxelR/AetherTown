@@ -20,6 +20,10 @@ public class PortalSystem {
 		public int index;
 		public Dir d;
 		public int otherIndex;
+		
+		public String getName() {
+			return String.format("Portal %s.", WorldTime.romanNumeral(index+1));
+		}
 	}
 	
 	public final RegionCache regions;
