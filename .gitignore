@@ -4,6 +4,7 @@
 /lib/
 /lib_src/
 *.cfg
+md_*.css
 
 # Compiled class file
 *.class

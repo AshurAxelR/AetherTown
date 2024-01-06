@@ -159,12 +159,20 @@ public class HouseRole {
 		}
 	};
 	public static final HouseRole civicCentre = new HouseRole("Civic Centre", colorCivic,
+			new ArchitectureStyle(1, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(DoorInfo.officeDouble),
 			new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(DoorInfo.officeDouble),
 			new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumLayer.living, IllumPattern.office, IllumLayer.living).setDoorInfo(DoorInfo.officeDouble)
 		) {
 		@Override
 		public ArchitectureStyle arch(HouseGenerator house, Random random) {
-			return house.getFootprint()<8 && isCityHouse(house, random) ? arch[1] : arch[0];
+			if(house.startToken.level.info.settlement==LevelSettlementType.outpost)
+				return house.getFootprint()<6 ? arch[1] : arch[0];
+			else
+				return house.getFootprint()<8 && isCityHouse(house, random) ? arch[2] : arch[1];
+		}
+		@Override
+		public IllumTileComponent getSign() {
+			return ArchitectureTileSet.postSign;
 		}
 	};
 	public static final HouseRole hospital = new HouseRole("Hospital", colorHospital,
@@ -199,6 +207,7 @@ public class HouseRole {
 		}
 	};
 	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", IllumPattern.shop);
+	public static final HouseRole homeShop = new ShopRole("Home Goods", IllumPattern.shop);
 	public static final HouseRole giftShop = new HouseRole("Gift Shop + Cafeteria", colorShop,
 		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop, IllumLayer.living).setDoorInfo(DoorInfo.coffeeShop)
 	);
@@ -289,15 +298,19 @@ public class HouseRole {
 	private static final Shuffle.List<HouseRole> shopShuffle = new Shuffle.List<>(
 			clothesShop,
 			giftShop,
-			new ShopRole("Home Store", IllumPattern.shop),
+			homeShop,
 			new ShopRole("Tech Store", IllumPattern.shop),
 			new ShopRole("Book Shop", IllumPattern.hotel),
 			new ShopRole("Art Shop", IllumPattern.hotel),
 			new ShopRole("Music Shop", IllumPattern.restaurant)
 	);
 	
-	public static HouseRole randomShop(Random random) {
-		return shopShuffle.nextItem(random);
+	public static HouseRole randomShop(Random random, int countRes) {
+		HouseRole shop = shopShuffle.nextItem(random);
+		if(shop==homeShop && countRes==0)
+			return randomShop(random, countRes);
+		else
+			return shop;
 	}
 	
 	public static void resetShuffle() {

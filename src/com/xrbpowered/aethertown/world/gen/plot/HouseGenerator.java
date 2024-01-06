@@ -138,7 +138,6 @@ public class HouseGenerator extends HouseGeneratorBase {
 		ArrayList<HouseGenerator> houses = new ArrayList<>();
 		boolean[][] visited = new boolean[level.levelSize][level.levelSize];
 		listHousesRec(level, random, level.getStartX(), level.getStartZ(), visited, houses);
-		System.out.printf("%d houses\n", houses.size());
 		
 		int err = findUnlistedHouses(level);
 		if(err>0)
