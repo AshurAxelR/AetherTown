@@ -244,7 +244,7 @@ public abstract class HouseAssignment {
 		private int countHub = 0;
 		private int hubStart = -1;
 		private Shuffle shHub = new Shuffle(4);
-		private WRandom wHub = new WRandom(0.5, 1, 1.5, 0.5, 1, 0.5, 0.5);
+		private WRandom wHub = new WRandom(0.5, 1, 1.5, 0.5, 1, 0.5, 0.2);
 		private boolean hasLibrary = false;
 		private boolean hasMuseum = false;
 		private boolean hasHospital = false;

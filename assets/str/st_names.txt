@@ -57,7 +57,7 @@
 0.3 Alexander
 0.2 Angela
 0.1 Antoninus
-0.5 Augustine
+0.5 Augustin
 0.2 Barbara
 0.1 Bede
 0.5 Benedict

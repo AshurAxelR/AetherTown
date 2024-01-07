@@ -7,10 +7,12 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.tiles.ScaledTileObjectInfo;
+import com.xrbpowered.aethertown.render.tiles.TileComponent;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.tiles.Hill;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.aethertown.world.tiles.Plaza;
 import com.xrbpowered.aethertown.world.tiles.Street;
@@ -49,14 +51,25 @@ public class TerrainTile extends Tile {
 			return this;
 		}
 		
+		protected TileComponent treeComp() {
+			return tree;
+		}
+		
 		public void addInstance(TerrainTile tile, LevelRenderer r) {
 			float x = tile.x*size;
 			float z = tile.z*size;
 			float tx = size*(px-0.5f);
 			float tz = size*(pz-0.5f);
 			float y0 = tile.level.gety(tile.x, tile.z, px, pz);
-			tree.addInstance(r, new ScaledTileObjectInfo(x+tx, y0+ty, z+tz).scale(treeRadius*s, treeRadius*sy));
+			treeComp().addInstance(r, new ScaledTileObjectInfo(x+tx, y0+ty, z+tz).scale(treeRadius*s, treeRadius*sy));
 			trunk.addInstance(r, new ScaledTileObjectInfo(x+tx, y0-0.2f, z+tz).scale(s*1f, 0.8f+ty));
+		}
+	}
+	
+	public static class Cherry extends Tree {
+		@Override
+		protected TileComponent treeComp() {
+			return cherryTree;
 		}
 	}
 
@@ -204,7 +217,7 @@ public class TerrainTile extends Tile {
 			bush.addInstance(this, r);
 	}
 	
-	private static Tree randomTree(Random random, boolean forest, int numTrees, int blockh, boolean wilderness) {
+	private static Tree randomTree(Random random, boolean forest, int numTrees, int blockh, boolean wilderness, boolean garden) {
 		if(forest) {
 			if(wilderness && random.nextFloat() < 0.75f)
 				return new ForestPineTree(numTrees);
@@ -213,10 +226,12 @@ public class TerrainTile extends Tile {
 		}
 		if(wilderness && random.nextFloat() < 0.85f)
 			return new PineTree();
+		if(random.nextFloat() < 0.25f)
+			return new TallTree();
+		if(random.nextFloat() < (garden ? 0.7f : 0.1f))
+			return new Cherry();
 		if(!wilderness && blockh<3 && random.nextFloat() < 0.2f)
 			return new PineTree();
-		if(random.nextFloat() < 0.3f)
-			return new TallTree();
 		return new Tree();
 	}
 	
@@ -238,6 +253,7 @@ public class TerrainTile extends Tile {
 		
 		boolean adjStreet = false;
 		boolean adjPark = false;
+		boolean adjHouse = false;
 		int adjTrees = 0;
 		boolean wilderness = isHill;
 		for(Dir d : Dir.values()) {
@@ -251,22 +267,28 @@ public class TerrainTile extends Tile {
 					adjStreet = true;
 				if(adj.t instanceof Park)
 					adjPark = true;
+				if(adj.t==HouseT.template)
+					adjHouse = true;
 			}
 		}
+		boolean garden = adjPark || adjStreet || adjHouse || !isHill;
 		
 		boolean hasPine = false;
+		boolean hasCherry = false;
 		if(random.nextFloat()<0.7f && random.nextInt(100)>-tile.basey) {
 			boolean forest = isHill && random.nextFloat()<0.3f*adjTrees;
 			int blockh = tile.getAdjBlockY()-tile.basey;
 			if(blockh<6 || forest && blockh<9) {
 				int numTrees = !forest ? 1 : random.nextInt(3)+1;
 				for(int i=0; i<numTrees; i++) {
-					Tree tree = randomTree(random, forest, numTrees, blockh, wilderness).generate(tile, random);
+					Tree tree = randomTree(random, forest, numTrees, blockh, wilderness, garden).generate(tile, random);
 					if(tree!=null) {
 						if(tree instanceof PineTree) {
 							hasPine = true;
 							i++;
 						}
+						else if(tree instanceof Cherry)
+							hasCherry = true;
 						tile.trees.add(tree);
 					}
 				}
@@ -283,6 +305,8 @@ public class TerrainTile extends Tile {
 		}
 		else if(isHill && adjPark)
 			numBushes += random.nextInt(4);
+		if(hasCherry)
+			numBushes -= 2;
 		numBushes = Math.min(numBushes, 4-tile.trees.size());
 		
 		for(int i=0; i<numBushes; i++) {

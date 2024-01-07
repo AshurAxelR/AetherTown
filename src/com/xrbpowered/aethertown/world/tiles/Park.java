@@ -22,6 +22,7 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.gen.Fences;
+import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
@@ -34,7 +35,7 @@ public class Park extends TileTemplate {
 	public static final Park templateLawn = new Park(ParkType.lawn);
 	public static final Park templateXmas = new Park(ParkType.xmas);
 	
-	public static TileComponent tree, pine, xmasTree, trunk, bush;
+	public static TileComponent tree, cherryTree, pine, xmasTree, trunk, bush;
 
 	public class ParkTile extends TerrainTile {
 		public boolean flex = false;
@@ -87,6 +88,16 @@ public class Park extends TileTemplate {
 					new Color(0xd3a848),
 					new Color(0xe0eef1)
 				});
+		SeasonalTexture cherryTexture = new SeasonalTexture(new int[] {14, 35, 45, 54, 58, 65, 77},
+				new Color[] {
+					new Color(0xe9c5ce),
+					new Color(0x426905),
+					new Color(0x4b600b),
+					new Color(0x64670f),
+					new Color(0xcf9731),
+					new Color(0xb25c32),
+					new Color(0xe0eef1)
+				});
 		SeasonalTexture pineTexture = new SeasonalTexture(new int[] {10, 25, 45, 65, 77},
 				new Color[] {
 					new Color(0x426a18),
@@ -105,9 +116,10 @@ public class Park extends TileTemplate {
 					new Color(0xe9f2f4)
 				});
 		
-		tree = new ScaledTileComponent(
-				BasicGeometry.sphere(1f, 8, -1, ObjectShader.vertexInfo),
-				treeTexture);
+		StaticMesh treeMesh = BasicGeometry.sphere(1f, 8, -1, ObjectShader.vertexInfo); 
+		tree = new ScaledTileComponent(treeMesh, treeTexture);
+		cherryTree = new ScaledTileComponent(treeMesh, cherryTexture);
+		
 		trunk = new ScaledTileComponent(
 				BasicGeometry.cylinder(0.26f, 4, 1f, -1, ObjectShader.vertexInfo),
 				new Texture(new Color(0x615746)));
