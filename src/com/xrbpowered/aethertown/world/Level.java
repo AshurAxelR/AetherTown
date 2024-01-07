@@ -207,12 +207,10 @@ public class Level {
 			for(int z=0; z<levelSize; z++) {
 				Tile tile = map[x][z];
 				tile.t.decorateTile(tile, random);
-				if(tile.t==HouseT.template)
-					continue;
 				for(Corner c : Corner.values()) {
 					int fy = tile.t.getFenceY(tile, c);
 					int h = HeightMap.tiley(tile, c);
-					if(fy<h)
+					if(tile.t!=HouseT.template && fy<h)
 						GeneratorException.raise("Negative wall: [%d, %d] (%s) %d<%d\n", x, z, c.name(), fy, h);
 					if(fy>h+TileTemplate.wallHeightLimit)
 						GeneratorException.raise("Wall height over limit(%d): [%d, %d] (%s) = %d\n", TileTemplate.wallHeightLimit, x, z, c.name(), fy-h);

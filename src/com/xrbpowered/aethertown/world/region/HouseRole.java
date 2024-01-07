@@ -20,9 +20,9 @@ public class HouseRole {
 	public static final Color colorHotel = new Color(0x77dd00);
 	public static final Color colorFoodSmall = new Color(0x9999ff);
 	public static final Color colorFood = new Color(0x7777dd);
-	public static final Color colorShopSmall = new Color(0x0077dd);
+	public static final Color colorShopSmall = new Color(0x5599ff);
 	public static final Color colorShop = new Color(0x0000dd);
-	public static final Color colorShopLarge = new Color(0x005599);
+	public static final Color colorShopLarge = new Color(0x0077cc);
 	public static final Color colorChurch = new Color(0xffdd77);
 	public static final Color colorCulture = new Color(0xdd77bb);
 	public static final Color colorOffice = new Color(0x77aaaa);
@@ -307,7 +307,7 @@ public class HouseRole {
 	
 	public static HouseRole randomShop(Random random, int countRes) {
 		HouseRole shop = shopShuffle.nextItem(random);
-		if(shop==homeShop && countRes==0)
+		if(shop==homeShop && countRes<5)
 			return randomShop(random, countRes);
 		else
 			return shop;

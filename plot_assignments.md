@@ -43,9 +43,10 @@ a^X - X is a uniqueness tag; only one of X can appear in the settlement or hub
 * **hub:**
 	* 0: postOffice
 	* 1-4: supermarket; randomRestaurant; hotel; randomShop
-	* 5-9: { randomFastFood, randomRestaurant, randomShop, library, office, museum^, hospital^ }
+	* 5-9: { randomFastFood, randomRestaurant, randomShop, library, office, museum^M, hospital^ }
 	* 10: _residential_
 * 15+:
-	* /14: **hub**
+	* /15: **hub**
 	* /6: { localShop, supermarket, randomFastFood }
+	* /7: { supermarket, randomFastFood, randomRestaurant, inn, randomShop, library, office, museum^M, concertHall^M }
 	* _residential_

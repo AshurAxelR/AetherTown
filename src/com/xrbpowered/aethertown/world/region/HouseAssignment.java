@@ -248,7 +248,9 @@ public abstract class HouseAssignment {
 		private boolean hasLibrary = false;
 		private boolean hasMuseum = false;
 		private boolean hasHospital = false;
-		
+		private int countComm = 0;
+		private WRandom wComm = new WRandom(0.3, 0.6, 0.6, 0.1, 1.2, 0.2, 1, 0.2, 0.1);
+
 		public Town(Level level) {
 			super(level);
 		}
@@ -266,7 +268,7 @@ public abstract class HouseAssignment {
 					case 4: return HouseRole.hotel;
 					case 5: return HouseRole.hospital;
 					case 6: return HouseRole.museum;
-					case 7: return HouseRole.randomShop(random, index);
+					case 7: return HouseRole.randomShop(random, countRes);
 					case 8: return HouseRole.library;
 					default: throw new RuntimeException();
 				}
@@ -290,7 +292,7 @@ public abstract class HouseAssignment {
 						case 0: return HouseRole.supermarket;
 						case 1: return HouseRole.randomFastFood(random);
 						case 2: return HouseRole.hotel;
-						case 3: return HouseRole.randomShop(random, index);
+						case 3: return HouseRole.randomShop(random, countRes);
 						default: throw new RuntimeException();
 					}
 				}
@@ -327,11 +329,13 @@ public abstract class HouseAssignment {
 				}
 			}
 			else {
-				if(countHub<countRes/14) {
+				if(countHub<countRes/15) {
 					countHub++;
 					hubStart = index;
 					shHub.reset();
+					hasLibrary = false;
 					hasMuseum = false;
+					hasHospital = false;
 					return assignNext(index, random);
 				}
 				if(countConv<countRes/6) {
@@ -340,6 +344,31 @@ public abstract class HouseAssignment {
 						case 0: return HouseRole.localShop;
 						case 1: return HouseRole.supermarket;
 						case 2: return HouseRole.randomFastFood(random);
+						default: throw new RuntimeException();
+					}
+				}
+				if(countComm<countRes/7) {
+					countComm++;
+					switch(wComm.next(random)) {
+						case 0: return HouseRole.supermarket;
+						case 1: return HouseRole.randomFastFood(random);
+						case 2: return HouseRole.randomRestaurant(random);
+						case 3: return HouseRole.inn;
+						case 4: return HouseRole.randomShop(random, countRes);
+						case 5: return HouseRole.library;
+						case 6: return HouseRole.office;
+						case 7: {
+							if(hasMuseum)
+								return assignNext(index, random);
+							hasMuseum = true;
+							return HouseRole.museum;
+						}
+						case 8: {
+							if(hasMuseum)
+								return assignNext(index, random);
+							hasMuseum = true;
+							return HouseRole.concertHall;
+						}
 						default: throw new RuntimeException();
 					}
 				}
