@@ -93,7 +93,11 @@ public class AetherTown extends UIClient {
 		
 		@Override
 		protected Object parseValue(String name, String value, Class<?> type) {
-			if(name.equals("regionMode"))
+			if(name.equals("startTime"))
+				return WorldTime.parseTime(value);
+			else if(name.equals("startSeason"))
+				return WorldTime.parseDate(value);
+			else if(name.equals("regionMode"))
 				return RegionMode.parseValue(value);
 			else
 				return super.parseValue(name, value, type);
@@ -101,7 +105,9 @@ public class AetherTown extends UIClient {
 		
 		@Override
 		protected String formatValue(String name, Object obj) {
-			if(name.equals("regionMode"))
+			if(name.equals("startTime"))
+				return WorldTime.getFormattedTime((Float) obj);
+			else if(name.equals("regionMode"))
 				return ((RegionMode) obj).formatValue();
 			else
 				return super.formatValue(name, obj);

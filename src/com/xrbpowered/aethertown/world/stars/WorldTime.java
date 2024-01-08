@@ -3,6 +3,8 @@ package com.xrbpowered.aethertown.world.stars;
 import static com.xrbpowered.aethertown.AetherTown.settings;
 import static com.xrbpowered.aethertown.utils.MathUtils.frac;
 
+import java.util.Arrays;
+
 public class WorldTime {
 	
 	public static final String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
@@ -73,42 +75,49 @@ public class WorldTime {
 	public static float parseTime(String value) {
 		String[] s = value.split(":", 3);
 		if(s.length<2)
-			throw new NumberFormatException();
+			return Float.parseFloat(value);
 		int h = Integer.parseInt(s[0]);
 		int m = Integer.parseInt(s[1]);
 		return h/24f + m/(24f*60f);
 	}
 
-	public static String romanNumeral(int x) {
-		if(x>=4000 || x<0)
+	public static float parseDate(String value) {
+		String[] s = value.split(" ", 3);
+		if(s.length<2)
+			return Float.parseFloat(value);
+		int m = -1;
+		for(int i=0; i<monthNames.length; i++)
+			if(s[0].equals(monthNames[i])) {
+				m = i;
+				break;
+			}
+		if(m<0)
 			throw new NumberFormatException();
-		if(x>=1000)
-			return "M"+romanNumeral(x-1000);
-		if(x>=900)
-			return "CM"+romanNumeral(x-900);
-		if(x>=500)
-			return "D"+romanNumeral(x-500);
-		if(x>=400)
-			return "CD"+romanNumeral(x-400);
-		if(x>=100)
-			return "C"+romanNumeral(x-100);
-		if(x>=90)
-			return "XC"+romanNumeral(x-90);
-		if(x>=50)
-			return "L"+romanNumeral(x-50);
-		if(x>=40)
-			return "XL"+romanNumeral(x-40);
-		if(x>=10)
-			return "X"+romanNumeral(x-10);
-		if(x>=9)
-			return "IX"+romanNumeral(x-9);
-		if(x>=5)
-			return "V"+romanNumeral(x-5);
-		if(x>=4)
-			return "IV"+romanNumeral(x-4);
-		if(x>=1)
-			return "I"+romanNumeral(x-1);
-		return "";
+		int d = Integer.parseInt(s[1])-1;
+		int day = (m*7+d-equinoxDay+daysInYear)%daysInYear;
+		return day / (float)daysInYear;
+	}
+	
+	private static String[] romanLetters = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+	private static int[] romanValues = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+	
+	public static String romanNumeral(int x) {
+		if(x<0)
+			throw new NumberFormatException();
+		StringBuilder sb = new StringBuilder();
+		if(x>=4000) {
+			sb.append(romanNumeral(x/1000));
+			sb.append("\u2032");
+			x = x%1000;
+		}
+		for(int i=0; i<romanValues.length; i++) {
+			int v = romanValues[i];
+			while(x>=v) {
+				sb.append(romanLetters[i]);
+				x -= v;
+			}
+		}
+		return sb.toString();
 	}
 	
 }
