@@ -3,7 +3,6 @@ package com.xrbpowered.aethertown;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
-import com.xrbpowered.aethertools.RegionMapView;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
@@ -428,7 +427,6 @@ public class AetherTown extends UIClient {
 	private void activateLevel(LevelInfo info) {
 		if(region!=info.region) {
 			region = info.region;
-			RegionMapView.region = region;
 			sky.stars.updateStars(region.seed);
 			System.out.printf("\nREGION switched to *%04dL\n\n", region.seed%10000L);
 		}
@@ -438,7 +436,6 @@ public class AetherTown extends UIClient {
 		regionCache.portals.updateLevel();
 		// levelCache.createRenderers(sky.buffer, tiles);
 		
-		RegionMapView.active = info;
 		info.visited = true;
 		
 		System.out.printf("Level switched to *%04dL:[%d, %d]\n", info.region.seed%10000L, info.x0, info.z0);
@@ -463,9 +460,7 @@ public class AetherTown extends UIClient {
 		level = levelCache.setActive(info, true);
 		levelInfo = info;
 		regionCache.portals.updateLevel();
-		RegionMapView.region = region;
 		
-		RegionMapView.active = info;
 		info.visited = true;
 
 		sky.stars.updateStars(region.seed);
@@ -598,7 +593,6 @@ public class AetherTown extends UIClient {
 					break;
 				case KeyEvent.VK_A:
 					if((input.getKeyMods()&UIElement.modCtrlMask)!=0) {
-						RegionMapView.showVisited = !RegionMapView.showVisited;
 						getContainer().repaint();
 					}
 					break;
