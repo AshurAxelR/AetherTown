@@ -85,6 +85,7 @@ public class AetherTown extends UIClient {
 		public long regionSeed = -1L;
 		public boolean residentialLighting = true;
 		public boolean revealRegion = false;
+		public boolean markAdjVisited = false;
 		public boolean nosave = false;
 		
 		public ClientConfig() {

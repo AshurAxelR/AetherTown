@@ -7,6 +7,7 @@ import java.util.Iterator;
 
 import org.joml.Vector3f;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.world.Level;
@@ -76,7 +77,7 @@ public class LevelCache {
 		else {
 			info = infoMap.get(info).info;
 		}
-		if(markVisited)
+		if(markVisited && AetherTown.settings.markAdjVisited)
 			info.visited = true;
 		return info;
 	}

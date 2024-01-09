@@ -3,8 +3,6 @@ package com.xrbpowered.aethertown.world.stars;
 import static com.xrbpowered.aethertown.AetherTown.settings;
 import static com.xrbpowered.aethertown.utils.MathUtils.frac;
 
-import java.util.Arrays;
-
 public class WorldTime {
 	
 	public static final String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
