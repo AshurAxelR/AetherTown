@@ -94,7 +94,7 @@ public class FollowTerrainView extends UIContainer {
 	public FollowTerrainView(UIContainer parent) {
 		super(new UIZoomView(parent) {
 			@Override
-			protected void paintSelf(GraphAssist g) {
+			protected void paintBackground(GraphAssist g) {
 				g.fill(this, Color.WHITE);
 			}
 		});
@@ -121,7 +121,7 @@ public class FollowTerrainView extends UIContainer {
 	}
 	
 	@Override
-	protected void paintSelf(GraphAssist g) {
+	protected void paintBackground(GraphAssist g) {
 		guide.paint(g);
 		if(start!=null)
 			start.paint(g);

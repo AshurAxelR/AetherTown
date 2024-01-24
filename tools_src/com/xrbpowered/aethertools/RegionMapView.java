@@ -34,7 +34,7 @@ public class RegionMapView extends UIElement {
 	public RegionMapView(UIContainer parent) {
 		super(new UIPanView(parent) {
 			@Override
-			protected void paintSelf(GraphAssist g) {
+			protected void paintBackground(GraphAssist g) {
 				g.fill(this, colorMargin);
 			}
 			@Override
@@ -44,7 +44,7 @@ public class RegionMapView extends UIElement {
 			}
 		});
 		UIPanView view = (UIPanView) getParent();
-		view.setSize(getBase().getWindow().getClientWidth(), getBase().getWindow().getClientHeight());
+		view.setSize(getRoot().getWindow().getClientWidth(), getRoot().getWindow().getClientHeight());
 		if(region!=null)
 			centerAt(region.sizez/2, region.sizez/2);
 	}

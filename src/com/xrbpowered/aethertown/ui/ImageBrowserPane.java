@@ -56,7 +56,7 @@ public class ImageBrowserPane extends UINode {
 		if(panY<-limY) panY = -limY;
 		if(panY>limY) panY = limY;
 
-		image.setLocation((w-iw)/2 - panX, (h-ih)/2 - panY);
+		image.setPosition((w-iw)/2 - panX, (h-ih)/2 - panY);
 	}
 	
 	public void resetPan() {

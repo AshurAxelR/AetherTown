@@ -134,9 +134,9 @@ public class GateWalkTest extends UIElement {
 		if(hover==10)
 			hover = 9;
 		if(hover==0 || hover==1 || hover==9)
-			getBase().getWindow().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			getRoot().getWindow().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		else
-			getBase().getWindow().setCursor(Cursor.getDefaultCursor());
+			getRoot().getWindow().setCursor(Cursor.getDefaultCursor());
 		repaint();
 	}
 	

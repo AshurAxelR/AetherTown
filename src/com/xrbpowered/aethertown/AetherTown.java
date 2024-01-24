@@ -221,7 +221,7 @@ public class AetherTown extends UIClient {
 			public boolean onMouseDown(float x, float y, Button button, int mods) {
 				if(button==UIElement.Button.right) {
 					controllerEnabled = true;
-					getBase().resetFocus();
+					getRoot().resetFocus();
 					activeController.setMouseLook(true);
 				}
 				return true;
@@ -286,9 +286,9 @@ public class AetherTown extends UIClient {
 		uiRoot = new UINode(getContainer()) {
 			@Override
 			public void layout() {
-				uiTime.setLocation(20, getHeight()-uiTime.getHeight()-20);
-				uiLookInfo.setLocation(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
-				uiBookmarks.setLocation(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
+				uiTime.setPosition(20, getHeight()-uiTime.getHeight()-20);
+				uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
+				uiBookmarks.setPosition(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
 				super.layout();
 			}
 		};
@@ -296,7 +296,7 @@ public class AetherTown extends UIClient {
 		if(settings.showFps) {
 			uiDebugInfo = new UIPane(uiRoot, false) {
 				@Override
-				protected void paintSelf(GraphAssist g) {
+				protected void paintBackground(GraphAssist g) {
 					clear(g, bgColor);
 					g.setColor(Color.WHITE);
 					g.setFont(Fonts.small);
@@ -321,12 +321,12 @@ public class AetherTown extends UIClient {
 				}
 			};
 			uiDebugInfo.setSize(180, 50);
-			uiDebugInfo.setLocation(20, 20);
+			uiDebugInfo.setPosition(20, 20);
 		}
 		
 		uiTime = new UIPane(uiRoot, false) {
 			@Override
-			protected void paintSelf(GraphAssist g) {
+			protected void paintBackground(GraphAssist g) {
 				clear(g, bgColor);
 				g.setColor(Color.WHITE);
 				g.setFont(Fonts.large);
@@ -339,7 +339,7 @@ public class AetherTown extends UIClient {
 		
 		uiLookInfo = new UIPane(uiRoot, false) {
 			@Override
-			protected void paintSelf(GraphAssist g) {
+			protected void paintBackground(GraphAssist g) {
 				clear(g, bgColor);
 				g.setColor(Color.WHITE);
 				g.setFont(Fonts.small);

@@ -42,7 +42,7 @@ public class BookmarkPane extends UIPane {
 				}
 				@Override
 				public void paint(GraphAssist g) {
-					g.fill(this, selected==index ? bgColorSelected : hover ? bgColorHover : ClickButton.bgColor);
+					g.fill(this, selected==index ? bgColorSelected : isHover() ? bgColorHover : ClickButton.bgColor);
 					g.fillRect(0, 0, getWidth(), getHeight());
 					g.setColor(isEnabled() ? (selected==index ? textColorSelected : textColor) : textColorDisabled);
 
@@ -63,7 +63,7 @@ public class BookmarkPane extends UIPane {
 			};
 			
 			item.setSize(getWidth()-20, 32);
-			item.setLocation(10, 10+i*(item.getHeight()));
+			item.setPosition(10, 10+i*(item.getHeight()));
 		}
 		
 		buttonDelete = new ClickButton(this, "DELETE") {
@@ -75,7 +75,7 @@ public class BookmarkPane extends UIPane {
 			}
 		};
 		buttonDelete.setEnabled(false);
-		buttonDelete.setLocation(10, getHeight()-buttonDelete.getHeight()-10);
+		buttonDelete.setPosition(10, getHeight()-buttonDelete.getHeight()-10);
 
 		buttonAdd = new ClickButton(this, "ADD") {
 			@Override
@@ -86,7 +86,7 @@ public class BookmarkPane extends UIPane {
 			}
 		};
 		buttonAdd.setEnabled(false);
-		buttonAdd.setLocation(10, getHeight()-buttonAdd.getHeight()-buttonDelete.getHeight()-14);
+		buttonAdd.setPosition(10, getHeight()-buttonAdd.getHeight()-buttonDelete.getHeight()-14);
 		
 		buttonTravel = new ClickButton(this, "TRAVEL") {
 			@Override
@@ -96,7 +96,7 @@ public class BookmarkPane extends UIPane {
 		};
 		buttonTravel.setSize(200, buttonTravel.getHeight());
 		buttonTravel.setEnabled(false);
-		buttonTravel.setLocation(getWidth()-buttonTravel.getWidth()-10, getHeight()-buttonTravel.getHeight()-10);
+		buttonTravel.setPosition(getWidth()-buttonTravel.getWidth()-10, getHeight()-buttonTravel.getHeight()-10);
 	}
 	
 	public void selectNone() {
@@ -136,7 +136,7 @@ public class BookmarkPane extends UIPane {
 	}
 	
 	@Override
-	protected void paintSelf(GraphAssist g) {
+	protected void paintBackground(GraphAssist g) {
 		clear(g, bgColor);
 	}
 	

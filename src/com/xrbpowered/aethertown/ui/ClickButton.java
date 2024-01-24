@@ -27,7 +27,7 @@ public class ClickButton extends UIButtonBase {
 
 	@Override
 	public void paint(GraphAssist g) {
-		g.fill(this, hover ? bgColorHover : bgColor);
+		g.fill(this, isHover() ? bgColorHover : bgColor);
 		g.fillRect(0, 0, getWidth(), getHeight());
 		g.setColor(isEnabled() ? textColor : textColorDisabled);
 		g.setFont(Fonts.smallBold);

@@ -53,7 +53,7 @@ public class HeightMapView extends UIElement {
 	public HeightMapView(UIContainer parent) {
 		super(new UIPanView(parent) {
 			@Override
-			protected void paintSelf(GraphAssist g) {
+			protected void paintBackground(GraphAssist g) {
 				g.fill(this, colorBg);
 			}
 			@Override
@@ -63,7 +63,7 @@ public class HeightMapView extends UIElement {
 			}
 		});
 		UIPanView view = (UIPanView) getParent();
-		view.setSize(getBase().getWindow().getClientWidth(), getBase().getWindow().getClientHeight());
+		view.setSize(getRoot().getWindow().getClientWidth(), getRoot().getWindow().getClientHeight());
 
 		offsX = AetherTown.levelCache.activeLevel().info.x0*LevelInfo.baseSize;
 		offsZ = AetherTown.levelCache.activeLevel().info.z0*LevelInfo.baseSize;
