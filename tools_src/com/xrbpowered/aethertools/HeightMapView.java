@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertools;
 
+import static com.xrbpowered.zoomui.MouseInfo.LEFT;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -20,6 +22,7 @@ import com.xrbpowered.aethertown.world.tiles.Park;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.zoomui.GraphAssist;
+import com.xrbpowered.zoomui.MouseInfo;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
 import com.xrbpowered.zoomui.base.UIPanView;
@@ -155,8 +158,8 @@ public class HeightMapView extends UIElement {
 	}
 	
 	@Override
-	public boolean onMouseDown(float x, float y, Button button, int mods) {
-		if(button==Button.left) {
+	public boolean onMouseDown(float x, float y, MouseInfo mouse) {
+		if(mouse.eventButton==LEFT) {
 			LevelInfo level = AetherTown.region.getLevel(
 					((int)x/tileSize+offsX)/LevelInfo.baseSize,
 					((int)y/tileSize+offsZ)/LevelInfo.baseSize
@@ -168,7 +171,7 @@ public class HeightMapView extends UIElement {
 			return true;
 		}
 		else
-			return super.onMouseDown(x, y, button, mods);
+			return super.onMouseDown(x, y, mouse);
 	}
 
 	public static void main(String[] args) {

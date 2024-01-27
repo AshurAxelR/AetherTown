@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown;
 
+import static com.xrbpowered.zoomui.MouseInfo.RIGHT;
+
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
@@ -33,6 +35,7 @@ import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.aethertown.world.tiles.Hill.HillTile;
+import com.xrbpowered.gl.client.ClientInput;
 import com.xrbpowered.gl.client.UIClient;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
@@ -50,7 +53,7 @@ import com.xrbpowered.gl.ui.UINode;
 import com.xrbpowered.gl.ui.pane.UIOffscreen;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
-import com.xrbpowered.zoomui.UIElement;
+import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
@@ -218,8 +221,8 @@ public class AetherTown extends UIClient {
 			}
 			
 			@Override
-			public boolean onMouseDown(float x, float y, Button button, int mods) {
-				if(button==UIElement.Button.right) {
+			public boolean onMouseDown(float x, float y, MouseInfo mouse) {
+				if(mouse.eventButton==RIGHT) {
 					controllerEnabled = true;
 					getRoot().resetFocus();
 					activeController.setMouseLook(true);
@@ -571,7 +574,7 @@ public class AetherTown extends UIClient {
 	
 	@Override
 	public void mouseDown(float x, float y, int button) {
-		if(controllerEnabled && getMouseButton(button)==UIElement.Button.right)
+		if(controllerEnabled && ClientInput.getMouseButton(button)==RIGHT)
 			disableController();
 		else if(controllerEnabled && activeController==walkController && button==3)
 			autoWalk = !autoWalk;
@@ -590,11 +593,6 @@ public class AetherTown extends UIClient {
 				case KeyEvent.VK_M:
 					showRegionMap(false);
 					showLevelMap(true);
-					break;
-				case KeyEvent.VK_A:
-					if((input.getKeyMods()&UIElement.modCtrlMask)!=0) {
-						getContainer().repaint();
-					}
 					break;
 				default:
 					super.keyPressed(c, code);
@@ -722,7 +720,6 @@ public class AetherTown extends UIClient {
 		if(!settings.nosave)
 			save.load();
 		
-		// save.regionSeed = 1677924431066L;
 		generateRegion(save);
 		new AetherTown(save).run();
 	}

@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.world.stars.GateNetwork;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.zoomui.GraphAssist;
+import com.xrbpowered.zoomui.MouseInfo;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
 import com.xrbpowered.zoomui.swing.SwingFrame;
@@ -126,7 +127,7 @@ public class GateWalkTest extends UIElement {
 	}
 
 	@Override
-	public void onMouseMoved(float x, float y, int mods) {
+	public void onMouseMoved(float x, float y, MouseInfo mouse) {
 		if(y>=64 && y<=128)
 			hover = (int)(x-64)/box;
 		else
@@ -141,7 +142,7 @@ public class GateWalkTest extends UIElement {
 	}
 	
 	@Override
-	public boolean onMouseDown(float x, float y, Button button, int mods) {
+	public boolean onMouseDown(float x, float y, MouseInfo mouse) {
 		if(hover==0)
 			seed = gates.travelWest(seed, time);
 		else if(hover==1)
@@ -153,7 +154,7 @@ public class GateWalkTest extends UIElement {
 	}
 	
 	@Override
-	public boolean onMouseScroll(float x, float y, float delta, int mods) {
+	public boolean onMouseScroll(float x, float y, float delta, MouseInfo mouse) {
 		if(hover==9) {
 			time = (time+base+(int)delta) % base;
 			repaint();

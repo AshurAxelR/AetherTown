@@ -8,6 +8,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 import com.xrbpowered.gl.ui.UINode;
 import com.xrbpowered.gl.ui.pane.UITexture;
 import com.xrbpowered.zoomui.DragActor;
+import com.xrbpowered.zoomui.MouseInfo;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
 
@@ -15,21 +16,21 @@ public class ImageBrowserPane extends UINode {
 
 	private DragActor panActor = new DragActor() {
 		@Override
-		public boolean notifyMouseDown(float x, float y, Button button, int mods) {
+		public boolean notifyMouseDown(float x, float y, MouseInfo mouse) {
 			return true;
 		}
 
 		@Override
-		public boolean notifyMouseMove(float dx, float dy) {
-			float pix = getPixelScale();
-			pan(dx*pix, dy*pix);
+		public boolean notifyMouseMove(float rx, float ry, float drx, float dry, MouseInfo mouse) {
+			float pix = getPixelSize();
+			pan(drx*pix, dry*pix);
 			repaint();
 			return true;
 		}
 
 		@Override
-		public boolean notifyMouseUp(float x, float y, Button button, int mods, UIElement target) {
-			return true;
+		public void notifyMouseUp(float rx, float ry, MouseInfo mouse, UIElement target) {
+			// do nothing
 		}
 	};
 	
@@ -77,8 +78,8 @@ public class ImageBrowserPane extends UINode {
 	}
 	
 	@Override
-	public DragActor acceptDrag(float x, float y, Button button, int mods) {
-		if(panActor.notifyMouseDown(x, y, button, mods))
+	public DragActor acceptDrag(float x, float y, MouseInfo mouse) {
+		if(panActor.notifyMouseDown(x, y, mouse))
 			return panActor;
 		else
 			return null;
@@ -93,7 +94,7 @@ public class ImageBrowserPane extends UINode {
 	}
 	
 	@Override
-	public boolean onMouseDown(float x, float y, Button button, int mods) {
+	public boolean onMouseDown(float x, float y, MouseInfo mouse) {
 		return true;
 	}
 

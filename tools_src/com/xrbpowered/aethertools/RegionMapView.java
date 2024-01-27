@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.zoomui.GraphAssist;
+import com.xrbpowered.zoomui.MouseInfo;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
 import com.xrbpowered.zoomui.base.UIPanView;
@@ -72,7 +73,7 @@ public class RegionMapView extends UIElement {
 	}
 	
 	@Override
-	public void onMouseMoved(float x, float y, int mods) {
+	public void onMouseMoved(float x, float y, MouseInfo mouse) {
 		hoverx = (int)(x/tileSize);
 		hoverz = (int)(y/tileSize);
 		repaint();
