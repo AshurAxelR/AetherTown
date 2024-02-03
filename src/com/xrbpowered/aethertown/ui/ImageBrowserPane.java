@@ -10,27 +10,21 @@ import com.xrbpowered.gl.ui.pane.UITexture;
 import com.xrbpowered.zoomui.DragActor;
 import com.xrbpowered.zoomui.MouseInfo;
 import com.xrbpowered.zoomui.UIContainer;
-import com.xrbpowered.zoomui.UIElement;
 
 public class ImageBrowserPane extends UINode {
 
 	private DragActor panActor = new DragActor() {
 		@Override
-		public boolean notifyMouseDown(float x, float y, MouseInfo mouse) {
+		public boolean startDrag(float x, float y, MouseInfo mouse) {
 			return true;
 		}
 
 		@Override
-		public boolean notifyMouseMove(float rx, float ry, float drx, float dry, MouseInfo mouse) {
+		public boolean onMouseDrag(float rx, float ry, float drx, float dry, MouseInfo mouse) {
 			float pix = getPixelSize();
 			pan(drx*pix, dry*pix);
 			repaint();
 			return true;
-		}
-
-		@Override
-		public void notifyMouseUp(float rx, float ry, MouseInfo mouse, UIElement target) {
-			// do nothing
 		}
 	};
 	
@@ -79,7 +73,7 @@ public class ImageBrowserPane extends UINode {
 	
 	@Override
 	public DragActor acceptDrag(float x, float y, MouseInfo mouse) {
-		if(panActor.notifyMouseDown(x, y, mouse))
+		if(panActor.startDrag(x, y, mouse))
 			return panActor;
 		else
 			return null;
