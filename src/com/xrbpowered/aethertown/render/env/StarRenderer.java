@@ -31,9 +31,10 @@ public class StarRenderer {
 	public class StarShader extends CameraShader {
 		private int modelMatrixLocation;
 		
-		public StarShader() {
+		public StarShader(float renderScale) {
 			super(vertexInfo, "shaders/env/stars_v.glsl", "shaders/env/stars_f.glsl");
 			followCamera = true;
+			updateRenderScale(renderScale);
 		}
 		
 		@Override
@@ -55,6 +56,16 @@ public class StarRenderer {
 			uniform(modelMatrixLocation, transform);
 		}
 		
+		public void updateRenderScale(float renderScale) {
+			double exposure = 0.33 / Math.pow(renderScale, 2.7);
+			double contrast = 1.4 - Math.log(renderScale) / Math.log(2) * 0.3;
+			double saturation = 0.5;
+			GL20.glUseProgram(pId);
+			GL20.glUniform1f(GL20.glGetUniformLocation(pId, "exposure"), (float) exposure);
+			GL20.glUniform1f(GL20.glGetUniformLocation(pId, "contrast"), (float) contrast);
+			GL20.glUniform1f(GL20.glGetUniformLocation(pId, "saturation"), (float) saturation);
+		}
+		
 		@Override
 		public void unuse() {
 			glDisable(GL11.GL_BLEND);
@@ -71,8 +82,8 @@ public class StarRenderer {
 	
 	protected final Matrix4f transform = new Matrix4f();
 
-	public StarRenderer() {
-		starShader = new StarShader();
+	public StarRenderer(float renderScale) {
+		starShader = new StarShader(renderScale);
 	}
 	
 	public void update(Vector4f sun) {

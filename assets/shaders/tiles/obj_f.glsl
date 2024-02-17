@@ -82,7 +82,7 @@ vec4 calcPointLights(vec3 normal, float brightness) {
 
 void main(void) {
 	vec4 diffuseColor = texture(texDiffuse, pass_TexCoord);
-	if(diffuseColor.a<0.5)
+	if(diffuseColor.a<0.3)
 		discard;
 	
 	// vec4 specMask = texture(texSpecMask, pass_TexCoord);

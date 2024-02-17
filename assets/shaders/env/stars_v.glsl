@@ -1,14 +1,15 @@
 #version 150 core
 
-#define EXPOSURE (1/3.0)
-#define CONTRAST 1.3
-#define SATURATION (1/2.0)
 #define MAX_SIZE 32
 
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 uniform vec3 cameraPosition;
+
+uniform float exposure = 1/3.0;
+uniform float contrast = 1.4;
+uniform float saturation = 1/2.0;
 
 uniform float lightWashTop = 0;
 uniform float lightWashBottom = 0;
@@ -35,17 +36,14 @@ void main(void) {
 		lightWash = mix(lightWashBottom, 1, -hdot*20);
 	float yfog = clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1);
 	float mag = in_Magnitude + 10*yfog*yfog + 10*lightWash*lightWash;
+	float con = contrast * (1+2*yfog*lightWash);
 
-	pass_Brightness = 100 * EXPOSURE * pow(10, -0.4 * CONTRAST * mag);
+	pass_Brightness = 100 * exposure * pow(10, -0.4 * con * mag);
 	pass_Brightness *= (1-yfog)*(1-lightWash);
+	if(pass_Brightness>1)
+	 	pass_Brightness = pow(pass_Brightness, saturation);
 	
-	float s = sqrt(pass_Brightness);
-	float full = s;
-	if(pass_Brightness>1) {
-		pass_Brightness = pow(pass_Brightness, SATURATION);
-		full = 4*sqrt(pass_Brightness);
-	}
-	pass_Size = clamp(full, 1, MAX_SIZE);
+	pass_Size = (pass_Brightness>1) ? min(4*sqrt(pass_Brightness), MAX_SIZE) : 1;
 	gl_PointSize = pass_Size;
 	
 	pass_Color = vec4(mix(vec3(1, 1, 1), in_Color, clamp(pass_Brightness*0.5, 0, 1)), 1);

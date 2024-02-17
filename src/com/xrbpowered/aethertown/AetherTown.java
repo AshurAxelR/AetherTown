@@ -60,7 +60,7 @@ public class AetherTown extends UIClient {
 	public static final Color bgColor = new Color(0x22000000, true);
 	public static final float pawnHeight = 1.55f;
 	
-	private static final boolean useDebugAssets = false; 
+	private static final boolean useDebugAssets = true; 
 	
 	public static class ClientConfig extends AbstractConfig {
 		public boolean fullscreen = false;
@@ -206,7 +206,7 @@ public class AetherTown extends UIClient {
 				flyController.mouseSensitivity = settings.mouseSensitivity;
 				activeController = walkController;
 				
-				sky = new SkyRenderer().setCamera(camera);
+				sky = new SkyRenderer(bufferScale).setCamera(camera);
 				tiles = new TileRenderer().setCamera(camera);
 				System.out.println("Creating components...");
 				ComponentLibrary.createAllComponents();

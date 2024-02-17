@@ -13,9 +13,9 @@ public class SkyRenderer {
 	
 	private boolean renderStars;
 
-	public SkyRenderer() {
+	public SkyRenderer(float renderScale) {
 		buffer = new SkyBuffer();
-		stars = new StarRenderer();
+		stars = new StarRenderer(renderScale);
 		sun = new SunRenderer();
 	}
 	

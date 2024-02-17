@@ -27,6 +27,8 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
 
+	private static final boolean useBranchTexture = true;
+	
 	private enum ParkType {
 		common, lawn, xmas
 	}
@@ -98,14 +100,6 @@ public class Park extends TileTemplate {
 					new Color(0xb25c32),
 					new Color(0xe0eef1)
 				});
-		SeasonalTexture pineTexture = new SeasonalTexture(new int[] {10, 25, 45, 65, 77},
-				new Color[] {
-					new Color(0x426a18),
-					new Color(0x395e13),
-					new Color(0x485c12),
-					new Color(0x3a5c23),
-					new Color(0xcee1ed)
-				});
 		SeasonalTexture bushTexture = new SeasonalTexture(new int[] {14, 22, 30, 50, 70, 77},
 				new Color[] {
 					new Color(0x74ad45),
@@ -115,17 +109,36 @@ public class Park extends TileTemplate {
 					new Color(0xaf793d),
 					new Color(0xe9f2f4)
 				});
+		SeasonalTexture pineTexture = new SeasonalTexture(new int[] {10, 25, 45, 65, 77},
+				new Color[] {
+					new Color(0x426a18),
+					new Color(0x395e13),
+					new Color(0x485c12),
+					new Color(0x3a5c23),
+					new Color(0xcee1ed)
+				});
 		
 		StaticMesh treeMesh = BasicGeometry.sphere(1f, 8, -1, ObjectShader.vertexInfo); 
-		tree = new ScaledTileComponent(treeMesh, treeTexture);
-		cherryTree = new ScaledTileComponent(treeMesh, cherryTexture);
+
+		if(useBranchTexture) {
+			Texture branches = new Texture("trees/branches.png", true, true, false);
+			tree = new ScaledTileComponent(treeMesh, branches).setCulling(false);
+			cherryTree = new ScaledTileComponent(treeMesh, branches).setCulling(false);
+			bush = new ScaledTileComponent(
+					BasicGeometry.sphere(1f, 8, -0.5f, ObjectShader.vertexInfo),
+					branches).setCulling(false);
+		}
+		else {
+			tree = new ScaledTileComponent(treeMesh, treeTexture);
+			cherryTree = new ScaledTileComponent(treeMesh, cherryTexture);
+			bush = new ScaledTileComponent(
+					BasicGeometry.sphere(1f, 8, -0.5f, ObjectShader.vertexInfo),
+					bushTexture);
+		}
 		
 		trunk = new ScaledTileComponent(
 				BasicGeometry.cylinder(0.26f, 4, 1f, -1, ObjectShader.vertexInfo),
 				new Texture(new Color(0x615746)));
-		bush = new ScaledTileComponent(
-				BasicGeometry.sphere(1f, 8, -0.5f, ObjectShader.vertexInfo),
-				bushTexture);
 		
 		pine = new ScaledTileComponent(BasicGeometry.doubleCone(1f, 8, 0, 1, 0.2f, ObjectShader.vertexInfo), pineTexture);
 		xmasTree = new IllumTileComponent(

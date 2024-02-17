@@ -14,8 +14,6 @@ import com.xrbpowered.gl.ui.pane.PaneShader;
 
 public class SkyBuffer {
 
-	private static final int skyBufferScale = 8;
-	
 	public class SkyShader extends CameraShader {
 		public SkyShader() {
 			super(PaneShader.vertexInfo, "shaders/env/skyq_v.glsl", "shaders/env/skyq_f.glsl");
@@ -51,7 +49,7 @@ public class SkyBuffer {
 	public void createBuffer(int w, int h) {
 		if(buffer!=null)
 			buffer.release();
-		buffer = new OffscreenBuffer(w/skyBufferScale, h/skyBufferScale, false);
+		buffer = new OffscreenBuffer(w, h, false);
 	}
 	
 	public SkyShader getShader() {
