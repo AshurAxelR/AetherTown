@@ -45,6 +45,13 @@ public class StreetLayoutGenerator extends TokenGenerator {
 		}
 		clearTokens();
 		this.startToken = Crossroads.centerAt(startToken);
+		
+		int miny = startToken.level.heightLimiter.miny[this.startToken.x][this.startToken.z];
+		if(this.startToken.y<miny+4) {
+			System.err.printf("Start token y=%d under miny=%d, fixing...\n", this.startToken.y, miny);
+			this.startToken.y = miny+4;
+		}
+		
 		Crossroads start = new Crossroads(Monument.template);
 		start.ignoreHeightLimit = true;
 		if(!start.generate(this.startToken, random))
