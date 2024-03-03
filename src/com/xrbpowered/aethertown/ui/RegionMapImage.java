@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 
+import com.xrbpowered.aethertown.data.RegionVisits;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelSettlementType;
@@ -57,7 +58,7 @@ public class RegionMapImage extends ImageGenerator {
 		g.setColor(colorMarginText);
 		g.setFont(Fonts.large);
 		float y = (margin+marginTop)/2;
-		g.drawString("Region Map", w/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
+		g.drawString(RegionVisits.getRegionTitle(region)+" Map", w/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
 		
 		g.translate(margin - minx*tileSize, marginTop - minz*tileSize);
 		paintMap(g, region, active, !settings.revealRegion, bookmarks, minx, minz, maxx, maxz);
@@ -78,7 +79,7 @@ public class RegionMapImage extends ImageGenerator {
 			terrain = level.terrain.name;
 		g.drawString(String.format("[%d, %d] %s", hoverx, hoverz, terrain), x, y, GraphAssist.LEFT, GraphAssist.BOTTOM); y += h;
 		if(level!=null) {
-			boolean visited = !showVisited || level.visited;
+			boolean visited = !showVisited || RegionVisits.isVisited(level);
 			if(visited)
 				g.setFont(Fonts.smallBold);
 			g.setColor(Color.BLACK);
@@ -160,7 +161,7 @@ public class RegionMapImage extends ImageGenerator {
 				if(level.x0!=x || level.z0!=z)
 					continue;
 				
-				if(!showVisited || level.visited) {
+				if(!showVisited || RegionVisits.isVisited(level)) {
 					g.setColor(getLevelColor(level.terrain));
 					g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
 					g.setColor(colorLevelBorder);

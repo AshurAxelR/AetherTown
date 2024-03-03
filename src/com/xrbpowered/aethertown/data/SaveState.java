@@ -1,16 +1,20 @@
-package com.xrbpowered.aethertown;
+package com.xrbpowered.aethertown.data;
 
 import java.util.LinkedList;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionMode;
-import com.xrbpowered.aethertown.world.region.UniversalLevelInfo;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class SaveState extends AbstractConfig {
 
+	public static final String savePath = "./save/";
+	
+	public long uid = System.currentTimeMillis(); 
+	
 	public RegionMode regionMode = AetherTown.settings.regionMode;
 	public long regionSeed = AetherTown.settings.regionSeed;
 	public boolean defaultStart = true;
@@ -26,35 +30,13 @@ public class SaveState extends AbstractConfig {
 	public float cameraLookX = 0f;
 	public float cameraLookY = 0f;
 
-	// FIXME bookmarks and visited are not compatible with inter-region travel
-	public LinkedList<UniversalLevelInfo> bookmarks = new LinkedList<UniversalLevelInfo>();
-	public LinkedList<UniversalLevelInfo> visited = new LinkedList<UniversalLevelInfo>();
+	public LinkedList<LevelRef> bookmarks = new LinkedList<LevelRef>();
 	
 	public SaveState() {
-		super("./save.cfg");
+		super(savePath+"save.cfg");
 	}
 	
-	public void listVisited(Region region) {
-		visited.clear();
-		for(int x=0; x<region.sizex; x++)
-			for(int z=0; z<region.sizez; z++) {
-				LevelInfo level = region.map[x][z];
-				if(level!=null && level.visited)
-					visited.add(new UniversalLevelInfo(level));
-			}
-	}
-	
-	public void assignVisited(Region region) {
-		for(UniversalLevelInfo v : visited) {
-			if(v.regionSeed!=region.seed || !region.isInside(v.x, v.z))
-				continue;
-			LevelInfo level = region.map[v.x][v.z];
-			if(level!=null)
-				level.visited = true;
-		}
-	}
-	
-	private static Object parseLevelList(String value, LinkedList<UniversalLevelInfo> list, boolean allowNulls) {
+	private static Object parseLevelList(String value, LinkedList<LevelRef> list, boolean allowNulls) {
 		list.clear();
 		if(value.isEmpty())
 			return list;
@@ -64,7 +46,7 @@ public class SaveState extends AbstractConfig {
 				list.add(null);
 				continue;
 			}
-			UniversalLevelInfo level = UniversalLevelInfo.parseValue(v);
+			LevelRef level = LevelRef.parseValue(v);
 			if(level==null)
 				return null;
 			list.add(level);
@@ -72,10 +54,10 @@ public class SaveState extends AbstractConfig {
 		return list;
 	}
 
-	private static String formatLevelList(LinkedList<UniversalLevelInfo> list) {
+	private static String formatLevelList(LinkedList<LevelRef> list) {
 		StringBuilder sb = new StringBuilder();
 		boolean first = true;
-		for(UniversalLevelInfo v : list) {
+		for(LevelRef v : list) {
 			if(!first) sb.append(";");
 			first = false;
 			if(v!=null)
@@ -90,8 +72,6 @@ public class SaveState extends AbstractConfig {
 			return WorldTime.parseTime(value);
 		else if(name.equals("bookmarks"))
 			return parseLevelList(value, bookmarks, true);
-		else if(name.equals("visited"))
-			return parseLevelList(value, visited, false);
 		else if(name.equals("regionMode"))
 			return RegionMode.parseValue(value);
 		else
@@ -104,8 +84,6 @@ public class SaveState extends AbstractConfig {
 			return WorldTime.getFormattedTime((Float) obj);
 		else if(name.equals("bookmarks"))
 			return formatLevelList(bookmarks);
-		else if(name.equals("visited"))
-			return formatLevelList(visited);
 		else if(name.equals("regionMode"))
 			return ((RegionMode) obj).formatValue();
 		else
@@ -115,5 +93,18 @@ public class SaveState extends AbstractConfig {
 	public LevelInfo getLevel(Region region) {
 		return defaultStart ? region.startLevel : region.getLevel(levelx, levelz);
 	}
+	
+	@Override
+	public SaveState load() {
+		super.load();
+		RegionVisits.load(uid);
+		return this;
+	}
 
+	@Override
+	public void save() {
+		super.save();
+		RegionVisits.save(uid);
+	}
+	
 }

@@ -5,6 +5,8 @@ import static com.xrbpowered.zoomui.MouseInfo.RIGHT;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
+import com.xrbpowered.aethertown.data.RegionVisits;
+import com.xrbpowered.aethertown.data.SaveState;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
@@ -439,7 +441,7 @@ public class AetherTown extends UIClient {
 		regionCache.portals.updateLevel();
 		// levelCache.createRenderers(sky.buffer, tiles);
 		
-		info.visited = true;
+		RegionVisits.visit(info);
 		
 		System.out.printf("Level switched to *%04dL:[%d, %d]\n", info.region.seed%10000L, info.x0, info.z0);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
@@ -464,7 +466,7 @@ public class AetherTown extends UIClient {
 		levelInfo = info;
 		regionCache.portals.updateLevel();
 		
-		info.visited = true;
+		RegionVisits.visit(info);
 
 		sky.stars.updateStars(region.seed);
 		// levelCache.createRenderers(sky.buffer, tiles);
@@ -504,7 +506,6 @@ public class AetherTown extends UIClient {
 		save.cameraPosZ = camera.position.z;
 		save.cameraLookX = camera.rotation.x;
 		save.cameraLookY = camera.rotation.y;
-		save.listVisited(region);
 		uiBookmarks.saveBookmarks(save);
 		save.save();
 	}
@@ -697,7 +698,6 @@ public class AetherTown extends UIClient {
 		System.out.printf("Region seed: %dL\n", seed);
 		regionCache = new RegionCache(save.regionMode);
 		region = regionCache.get(seed);
-		save.assignVisited(region);
 		
 		levelCache = new LevelCache();
 		levelCache.addAllAdj(save.getLevel(region), true);

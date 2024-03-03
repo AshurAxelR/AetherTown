@@ -1,8 +1,10 @@
 package com.xrbpowered.aethertown.world.region;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.data.LevelRef;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.region.PortalSystem.PortalInfo;
 
@@ -106,6 +108,7 @@ public class LevelInfo {
 		}
 	}
 	
+	public final LevelRef ref;
 	public final Region region;
 	public final int x0, z0;
 	public final int size;
@@ -119,9 +122,8 @@ public class LevelInfo {
 	
 	public ArrayList<LevelConnection> conns = new ArrayList<>();
 	
-	public boolean visited = false;
-	
 	public LevelInfo(Region region, int x, int z, int size, long seed, boolean fixed) {
+		this.ref = new LevelRef(region.seed, x, z);
 		this.region = region;
 		this.x0 = x;
 		this.z0 = z;
@@ -198,17 +200,13 @@ public class LevelInfo {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + x0;
-		result = prime * result + z0;
-		return result;
+		return Objects.hash(region.seed, x0, z0);
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
 		LevelInfo info = (LevelInfo) obj;
-		return this.region==info.region && // ok, as long as RegionCache is used
+		return this.region.seed==info.region.seed &&
 				this.x0==info.x0 && this.z0==info.z0 && this.size==info.size;
 	}
 	

@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -101,7 +102,11 @@ public abstract class AbstractConfig {
 	
 	public static boolean saveValues(HashMap<String, String> values, String path) {
 		try {
-			PrintWriter out = new PrintWriter(new File(path));
+			File file = new File(path);
+			File dir = file.getParentFile();
+			if(!dir.isDirectory() && !dir.mkdir())
+				throw new IOException();
+			PrintWriter out = new PrintWriter(file);
 			for(Entry<String, String> entry : values.entrySet()) {
 				out.printf("%s=%s\n", entry.getKey(), entry.getValue());
 			}

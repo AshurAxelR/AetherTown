@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 import com.xrbpowered.aethertown.AetherTown;
-import com.xrbpowered.aethertown.SaveState;
+import com.xrbpowered.aethertown.data.SaveState;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.ColorBlend;
 import com.xrbpowered.aethertown.world.Level;
