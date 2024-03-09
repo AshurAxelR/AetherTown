@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.utils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -35,7 +36,7 @@ public abstract class ZipBuilder {
 				zip.closeEntry();
 				if(res)
 					entries.add(name);
-				if(!res && required.contains(name))
+				else if(required.contains(name))
 					throw new IOException();
 			}
 			
@@ -61,10 +62,15 @@ public abstract class ZipBuilder {
 			HashSet<String> required = new HashSet<>(data.listRequiredDataEntries());
 			
 			for(String name : data.listDataEntries()) {
-				zip.putNextEntry(new ZipEntry(name));
-				boolean res = data.saveDataEntry(name, zip);
-				zip.closeEntry();
-				if(!res && required.contains(name))
+				ByteArrayOutputStream buf = new ByteArrayOutputStream();
+				boolean res = data.saveDataEntry(name, buf);
+				
+				if(res) {
+					zip.putNextEntry(new ZipEntry(name));
+					zip.write(buf.toByteArray());
+					zip.closeEntry();
+				}
+				else if(required.contains(name))
 					throw new IOException();
 			}
 			

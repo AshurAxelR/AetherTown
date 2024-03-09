@@ -5,6 +5,7 @@ import static com.xrbpowered.zoomui.MouseInfo.RIGHT;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
+import com.xrbpowered.aethertown.data.Bookmarks;
 import com.xrbpowered.aethertown.data.Player;
 import com.xrbpowered.aethertown.data.RegionVisits;
 import com.xrbpowered.aethertown.data.SaveState;
@@ -91,6 +92,7 @@ public class AetherTown extends UIClient {
 		public boolean residentialLighting = true;
 		public boolean revealRegion = false;
 		public boolean markAdjVisited = false;
+		public boolean allowBookmaks = false;
 		public boolean nosave = false;
 		
 		public ClientConfig() {
@@ -155,7 +157,7 @@ public class AetherTown extends UIClient {
 	private UIOffscreen uiRender;
 	private UINode uiRoot;
 	private UIPane uiTime, uiLookInfo, uiDebugInfo;
-	public final BookmarkPane uiBookmarks; // TODO remove bookmarks
+	private BookmarkPane uiBookmarks;
 	
 	private ImageBrowserPane uiLevelMap;
 	private ImageBrowserPane uiRegionMap;
@@ -307,7 +309,8 @@ public class AetherTown extends UIClient {
 			public void layout() {
 				uiTime.setPosition(20, getHeight()-uiTime.getHeight()-20);
 				uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
-				uiBookmarks.setPosition(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
+				if(uiBookmarks!=null)
+					uiBookmarks.setPosition(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
 				super.layout();
 			}
 		};
@@ -368,9 +371,10 @@ public class AetherTown extends UIClient {
 		uiLookInfo.setSize(600, 32);
 		uiLookInfo.setVisible(false);
 		
-		uiBookmarks = new BookmarkPane(uiRoot);
-		// uiBookmarks.restoreBookmarks(save, regionCache); // FIXME load bookmarks
-		uiBookmarks.setVisible(false);
+		if(settings.allowBookmaks) {
+			uiBookmarks = new BookmarkPane(uiRoot);
+			uiBookmarks.setVisible(false);
+		}
 	}
 	
 	private int compass = -1;
@@ -460,7 +464,7 @@ public class AetherTown extends UIClient {
 		System.out.printf("Level switched to *%04dL:[%d, %d]\n", info.region.seed%10000L, info.x0, info.z0);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
 		
-		if(uiBookmarks.isVisible())
+		if(uiBookmarks!=null && uiBookmarks.isVisible())
 			uiBookmarks.updateSelection();
 	}
 	
@@ -514,7 +518,7 @@ public class AetherTown extends UIClient {
 		uiRegionMap.setVisible(show);
 		uiLookInfo.setVisible(!show && !lookAtInfo.isEmpty());
 		if(show) {
-			uiRegionMap.setImage(new RegionMapImage(region, levelInfo, uiBookmarks).create());
+			uiRegionMap.setImage(new RegionMapImage(region, levelInfo).create());
 		}
 		getContainer().repaint();
 	}
@@ -626,7 +630,7 @@ public class AetherTown extends UIClient {
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
 				break;
 			case KeyEvent.VK_B:
-				if(level!=null) {
+				if(level!=null && uiBookmarks!=null) {
 					uiBookmarks.setVisible(!uiBookmarks.isVisible());
 					uiBookmarks.selectNone();
 					getContainer().repaint();
@@ -663,8 +667,9 @@ public class AetherTown extends UIClient {
 		long seed = PortalSystem.getRegionSeed(save.regionSeed);
 		System.out.printf("Region seed: %dL\n", seed);
 		regionCache = new RegionCache(save.regionMode);
+		Bookmarks.init(regionCache);
 		region = regionCache.get(seed);
-		
+
 		levelCache = new LevelCache();
 		LevelInfo info = save.getLevel(region);
 		levelCache.addAllAdj(info, true);

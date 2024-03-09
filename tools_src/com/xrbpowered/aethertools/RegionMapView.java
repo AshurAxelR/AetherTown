@@ -1,12 +1,12 @@
 package com.xrbpowered.aethertools;
 
+import static com.xrbpowered.aethertown.ui.ImageGenerator.colorMargin;
 import static com.xrbpowered.aethertown.ui.RegionMapImage.*;
 
 import java.awt.Rectangle;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.data.SaveState;
-import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
@@ -29,8 +29,6 @@ public class RegionMapView extends UIElement {
 	public static boolean showVisited = true;
 	
 	private static int hoverx, hoverz;
-	
-	public BookmarkPane bookmarks = null;
 	
 	public RegionMapView(UIContainer parent) {
 		super(new UIPanView(parent) {
@@ -69,7 +67,7 @@ public class RegionMapView extends UIElement {
 	
 	@Override
 	public void paint(GraphAssist g) {
-		paintMap(g, region, active, showVisited, bookmarks);
+		paintMap(g, region, active, showVisited);
 	}
 	
 	@Override

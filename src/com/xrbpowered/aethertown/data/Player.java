@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.data;
 
 import org.joml.Vector3f;
 
+import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.gl.scene.CameraActor;
@@ -35,7 +36,7 @@ public class Player {
 			camera.rotation.x = cameraRotation.x;
 			camera.rotation.y = cameraRotation.y;
 		}
-		camera.position.y = 100f; // TODO level max y
+		camera.position.y = (HeightLimiter.maxHeight+1) * Tile.ysize;
 		updateCamera(camera);
 	}
 	

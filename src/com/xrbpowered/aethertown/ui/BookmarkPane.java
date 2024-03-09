@@ -1,14 +1,13 @@
 package com.xrbpowered.aethertown.ui;
 
+import static com.xrbpowered.aethertown.data.Bookmarks.bookmarks;
+import static com.xrbpowered.aethertown.data.Bookmarks.numBookmarks;
 import static com.xrbpowered.aethertown.ui.ClickButton.*;
 
 import java.awt.Color;
 
 import com.xrbpowered.aethertown.AetherTown;
-import com.xrbpowered.aethertown.data.SaveState;
-import com.xrbpowered.aethertown.data.LevelRef;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
-import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
@@ -16,13 +15,9 @@ import com.xrbpowered.zoomui.base.UIButtonBase;
 
 public class BookmarkPane extends UIPane {
 
-	public static final int numBookmarks = 10;
-	
 	public static final Color bgColor = new Color(0x44000000, true);
 	public static final Color bgColorSelected = Color.WHITE;
 	public static final Color textColorSelected = Color.BLACK;
-
-	public LevelInfo[] bookmarks = new LevelInfo[numBookmarks];
 	
 	private ClickButton buttonAdd, buttonDelete, buttonTravel;
 	private int selected = -1;
@@ -138,35 +133,6 @@ public class BookmarkPane extends UIPane {
 	@Override
 	protected void paintBackground(GraphAssist g) {
 		clear(g, bgColor);
-	}
-	
-	public void saveBookmarks(SaveState save) {
-		save.bookmarks.clear();
-		int nulls = 0;
-		for(int i=0; i<numBookmarks; i++) {
-			LevelInfo level = bookmarks[i];
-			if(level==null)
-				nulls++;
-			else {
-				for(int j=0; j<nulls; j++)
-					save.bookmarks.add(null);
-				save.bookmarks.add(level.ref);
-				nulls = 0;
-			}
-		}
-	}
-	
-	public void restoreBookmarks(SaveState save, RegionCache regions) {
-		for(int i=0; i<numBookmarks; i++)
-			bookmarks[i] = null;
-		int i = 0;
-		for(LevelRef v : save.bookmarks) {
-			if(v!=null && i<numBookmarks) {
-				bookmarks[i] = v.find(regions);
-			}
-			i++;
-		}
-		regions.verifyBookmarks(bookmarks);
 	}
 	
 }

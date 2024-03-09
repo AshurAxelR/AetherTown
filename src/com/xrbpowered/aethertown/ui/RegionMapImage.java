@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 
+import com.xrbpowered.aethertown.data.Bookmarks;
 import com.xrbpowered.aethertown.data.RegionVisits;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
@@ -30,14 +31,12 @@ public class RegionMapImage extends ImageGenerator {
 
 	public final Region region;
 	public final LevelInfo active;
-	public final BookmarkPane bookmarks;
 	
 	private final int minx, minz, maxx, maxz;
 	
-	public RegionMapImage(Region region, LevelInfo active, BookmarkPane bookmarks) {
+	public RegionMapImage(Region region, LevelInfo active) {
 		this.region = region;
 		this.active = active;
-		this.bookmarks = bookmarks;
 		minx = getMapMinX(region);
 		minz = getMapMinZ(region);
 		maxx = getMapMaxX(region);
@@ -61,7 +60,7 @@ public class RegionMapImage extends ImageGenerator {
 		g.drawString(RegionVisits.getRegionTitle(region)+" Map", w/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
 		
 		g.translate(margin - minx*tileSize, marginTop - minz*tileSize);
-		paintMap(g, region, active, !settings.revealRegion, bookmarks, minx, minz, maxx, maxz);
+		paintMap(g, region, active, !settings.revealRegion, minx, minz, maxx, maxz);
 	}
 
 	public static void paintInfo(GraphAssist g, Region region, int hoverx, int hoverz, boolean showVisited) {
@@ -118,17 +117,17 @@ public class RegionMapImage extends ImageGenerator {
 		return Math.min(region.sizez, ((region.getMaxZ()+10)/8)*8);
 	}
 
-	public static void paintMap(GraphAssist g, Region region, LevelInfo active, boolean showVisited, BookmarkPane bookmarkPane) {
-		paintMap(g, region, active, showVisited, bookmarkPane, 0, 0, region.sizex, region.sizez);
+	public static void paintMap(GraphAssist g, Region region, LevelInfo active, boolean showVisited) {
+		paintMap(g, region, active, showVisited, 0, 0, region.sizex, region.sizez);
 	}
 
-	public static void paintMap(GraphAssist g, Region region, LevelInfo active, boolean showVisited, BookmarkPane bookmarkPane,
+	public static void paintMap(GraphAssist g, Region region, LevelInfo active, boolean showVisited,
 			int minx, int minz, int maxx, int maxz) {
 		g.pushAntialiasing(false);
 		
 		HashSet<LevelInfo> bookmarks = new HashSet<>();
-		if(bookmarkPane!=null) {
-			for(LevelInfo level : bookmarkPane.bookmarks)
+		for(LevelInfo level : Bookmarks.bookmarks) {
+			if(level!=null)
 				bookmarks.add(level);
 		}
 		
@@ -182,7 +181,7 @@ public class RegionMapImage extends ImageGenerator {
 						g.setColor(bookmarks.contains(level) ? colorActive : colorTown);
 						g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
 					}
-					else if(bookmarks.contains(level)) {
+					if(bookmarks.contains(level)) {
 						g.setColor(colorActive);
 						g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
 					}
