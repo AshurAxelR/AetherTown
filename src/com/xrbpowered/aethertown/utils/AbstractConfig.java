@@ -1,8 +1,11 @@
 package com.xrbpowered.aethertown.utils;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
@@ -15,11 +18,23 @@ import com.xrbpowered.gl.res.asset.AssetManager;
 public abstract class AbstractConfig {
 
 	protected final String path;
+	private final boolean saveDefault;
+	
+	public AbstractConfig(String path, boolean saveDefault) {
+		this.path = path;
+		this.saveDefault = saveDefault;
+	}
 	
 	public AbstractConfig(String path) {
-		this.path = path;
+		this(path, false);
 	}
 
+	public AbstractConfig() {
+		this(null, false);
+	}
+
+	public abstract AbstractConfig reset();
+	
 	public AbstractConfig load() {
 		return load(this.path);
 	}
@@ -29,11 +44,7 @@ public abstract class AbstractConfig {
 		return Modifier.isPublic(mod) && !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
 	}
 	
-	public AbstractConfig load(String path) {
-		HashMap<String, String> values = loadValues(path);
-		if(values==null)
-			return this;
-		
+	protected AbstractConfig applyValues(String title, HashMap<String, String> values) {
 		Class<?> cls = this.getClass();
 		Field[] fields = cls.getFields();
 		for(Field fld : fields) {
@@ -51,17 +62,42 @@ public abstract class AbstractConfig {
 			}
 			catch (Exception e) {
 				e.printStackTrace();
+				return reset();
 			}
 		}
-		System.out.printf("%s loaded.\n", path);
+		System.out.printf("%s loaded.\n", title);
 		return this;
+	}
+	
+	public boolean load(String title, InputStream in) {
+		try {
+			applyValues(title, loadValues(in));
+			return true;
+		}
+		catch(IOException e) {
+			System.err.printf("Can't load %s. Using default.\n", title);
+			return false;
+		}
+	}
+
+	public AbstractConfig load(String path) {
+		HashMap<String, String> values = loadValues(path);
+		if(values!=null) {
+			return applyValues(path, values);
+		}
+		else {
+			AbstractConfig def = reset();
+			if(saveDefault)
+				def.save(path);
+			return def;
+		}
 	}
 	
 	public void save() {
 		save(this.path);
 	}
 	
-	public void save(String path) {
+	protected HashMap<String, String> collectValues() {
 		HashMap<String, String> values = new LinkedHashMap<>();
 		
 		Class<?> cls = this.getClass();
@@ -78,39 +114,71 @@ public abstract class AbstractConfig {
 				e.printStackTrace();
 			}
 		}
-		if(saveValues(values, path))
-			System.out.printf("%s saved.\n", path);
+		
+		return values;
 	}
 	
-	public static HashMap<String, String> loadValues(String path) {
+	public boolean save(String title, OutputStream out) {
 		try {
-			HashMap<String, String> values = new HashMap<>();
-			Scanner in = new Scanner(AssetManager.defaultAssets.openStream(path));
-			while(in.hasNextLine()) {
-				String[] s = in.nextLine().trim().split("\\s*=\\s*", 2);
-				if(s.length==2)
-					values.put(s[0], s[1]);
-			}
-			in.close();
-			return values;
+			saveValues(collectValues(), out);
+			System.out.printf("%s saved.\n", title);
+			return true;
+		}
+		catch(IOException e) {
+			System.err.printf("Can't save %s\n", title);
+			return false;
+		}
+	}
+	
+	public void save(String path) {
+		if(saveValues(collectValues(), path))
+			System.out.printf("%s saved.\n", path);
+	}
+
+	public static HashMap<String, String> loadValues(InputStream in) throws IOException {
+		HashMap<String, String> values = new HashMap<>();
+		@SuppressWarnings("resource")
+		Scanner scan = new Scanner(in);
+		while(scan.hasNextLine()) {
+			String[] s = scan.nextLine().trim().split("\\s*=\\s*", 2);
+			if(s.length==2)
+				values.put(s[0], s[1]);
+		}
+		return values;
+	}
+
+	public static HashMap<String, String> loadValues(String path) {
+		try(InputStream in = AssetManager.defaultAssets.openStream(path)) {
+			return loadValues(in);
 		}
 		catch(Exception e) {
 			System.err.printf("Can't load %s. Using default.\n", path);
 			return null;
 		}
 	}
-	
+
+	public static void saveValues(HashMap<String, String> values, OutputStream out) throws IOException {
+		PrintStream print = new PrintStream(out);
+		for(Entry<String, String> entry : values.entrySet()) {
+			String key = entry.getKey();
+			String v = entry.getValue();
+			if(v.contains("\n"))
+				System.err.printf("Warning: can't save multiline value for %s, skipping\n", key);
+			else
+				print.printf("%s=%s\n", key, v);
+		}
+	}
+
 	public static boolean saveValues(HashMap<String, String> values, String path) {
-		try {
-			File file = new File(path);
-			File dir = file.getParentFile();
-			if(!dir.isDirectory() && !dir.mkdir())
-				throw new IOException();
-			PrintWriter out = new PrintWriter(file);
-			for(Entry<String, String> entry : values.entrySet()) {
-				out.printf("%s=%s\n", entry.getKey(), entry.getValue());
-			}
-			out.close();
+		File file = new File(path);
+		File dir = file.getParentFile();
+		if(!dir.isDirectory() && !dir.mkdir()) {
+			System.err.printf("Can't create save directory for %s\n", path);
+			return false;
+		}
+		
+		try(OutputStream out = new FileOutputStream(file)) {
+			saveValues(values, out);
 			return true;
 		}
 		catch(Exception e) {

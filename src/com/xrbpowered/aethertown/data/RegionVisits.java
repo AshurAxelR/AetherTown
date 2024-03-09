@@ -2,16 +2,12 @@ package com.xrbpowered.aethertown.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.Region;
@@ -19,7 +15,6 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class RegionVisits {
 
-	private static final String path = SaveState.savePath+"visits.dat";
 	private static final String formatId = "AetherTown.RegionVisits.0";
 	
 	private static HashMap<Long, RegionVisits> regions = new HashMap<>();
@@ -31,15 +26,12 @@ public class RegionVisits {
 		this.index = index;
 	}
 
-	public static void load(long uid) {
-		try(ZipInputStream zip = new ZipInputStream(new FileInputStream(new File(path)))) {
-			zip.getNextEntry();
-			DataInputStream in = new DataInputStream(zip);
+	public static boolean load(InputStream ins) {
+		try {
+			DataInputStream in = new DataInputStream(ins);
 			
 			if(!formatId.equals(in.readUTF()))
-				throw new RuntimeException("Bad file format: "+path);
-			if(in.readLong()!=uid)
-				throw new RuntimeException("Save state UID mismatch");
+				throw new IOException("Bad file format");
 			
 			HashMap<Long, RegionVisits> regions = new HashMap<>();
 			int totalVisited = 0;
@@ -59,25 +51,21 @@ public class RegionVisits {
 			}
 			
 			RegionVisits.regions = regions;
-			System.out.println(path+" loaded");
-			System.out.printf("Visited %d levels in %d regions\n", totalVisited, numRegions);
-		}
-		catch(FileNotFoundException e) {
-			System.err.println("No data for region visits");
-			RegionVisits.regions.clear();
+			System.out.printf("Region visits loaded: visited %d levels in %d regions\n", totalVisited, numRegions);
+			return true;
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			System.err.println("Can't load region visits: "+e.getMessage());
+			RegionVisits.regions.clear();
+			return false;
 		}
 	}
 	
-	public static void save(long uid) {
-		try(ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(new File(path)))) {
-			zip.putNextEntry(new ZipEntry("RegionVisits"));
-			DataOutputStream out = new DataOutputStream(zip);
+	public static boolean save(OutputStream outs) {
+		try {
+			DataOutputStream out = new DataOutputStream(outs);
 			
 			out.writeUTF(formatId);
-			out.writeLong(uid);
 			out.writeInt(regions.size());
 			for(Map.Entry<Long, RegionVisits> e : regions.entrySet()) {
 				out.writeLong(e.getKey());
@@ -90,11 +78,12 @@ public class RegionVisits {
 				}
 			}
 			
-			zip.closeEntry();
-			System.out.println(path+" saved");
+			System.out.println("Region visits saved");
+			return true;
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			System.err.println("Can't save region visits: "+e.getMessage());
+			return false;
 		}
 	}
 	

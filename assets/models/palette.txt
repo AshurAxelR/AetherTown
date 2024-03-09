@@ -1,0 +1,14 @@
+Upper 4x2: horizontal surfaces, mostly get snowy in winter
+Lower 4x2: vertical surfaces, not changed in winter
+
+Top row:
+* street (no snow)
+* plaza (snow)
+* wall
+* cliff
+
+Bottom row:
+* lower wall
+* plaza (ice)
+* lamp post
+* water (ice)

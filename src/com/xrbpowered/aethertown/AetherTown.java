@@ -5,6 +5,7 @@ import static com.xrbpowered.zoomui.MouseInfo.RIGHT;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
+import com.xrbpowered.aethertown.data.Player;
 import com.xrbpowered.aethertown.data.RegionVisits;
 import com.xrbpowered.aethertown.data.SaveState;
 import com.xrbpowered.aethertown.render.LevelCache;
@@ -93,7 +94,12 @@ public class AetherTown extends UIClient {
 		public boolean nosave = false;
 		
 		public ClientConfig() {
-			super("./client.cfg");
+			super("./client.cfg", true);
+		}
+		
+		@Override
+		public ClientConfig reset() {
+			return new ClientConfig();
 		}
 		
 		@Override
@@ -124,6 +130,7 @@ public class AetherTown extends UIClient {
 	private DaytimeEnvironment environment = new DaytimeEnvironment();
 
 	public static AetherTown aether;
+	public static Player player = new Player();
 	public static RegionCache regionCache;
 	public static Region region;
 	public static LevelCache levelCache;
@@ -148,12 +155,12 @@ public class AetherTown extends UIClient {
 	private UIOffscreen uiRender;
 	private UINode uiRoot;
 	private UIPane uiTime, uiLookInfo, uiDebugInfo;
-	private BookmarkPane uiBookmarks;
+	public final BookmarkPane uiBookmarks; // TODO remove bookmarks
 	
 	private ImageBrowserPane uiLevelMap;
 	private ImageBrowserPane uiRegionMap;
 
-	public AetherTown(final SaveState save) {
+	public AetherTown(final LevelInfo startLevel) {
 		super("Aether Town", settings.uiScaling);
 		aether = this;
 		
@@ -209,16 +216,23 @@ public class AetherTown extends UIClient {
 				activeController = walkController;
 				
 				sky = new SkyRenderer(bufferScale).setCamera(camera);
+				sky.stars.updateStars(region.seed);
+				// updateEnvironment();
+				
 				tiles = new TileRenderer().setCamera(camera);
 				System.out.println("Creating components...");
 				ComponentLibrary.createAllComponents();
-				
+
 				pointActor = new TerrainMeshActor();
 				pointActor.setMesh(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null));
 				pointActor.setShader(tiles.objShader);
 				pointActor.setTextures(new Texture[] {new Texture(Color.RED)});
 
-				changeRegion(save);
+				activateLevel(startLevel);
+				player.initCamera(camera, level);
+				updateWalkY();
+
+				// setup child resources
 				super.setupResources();
 			}
 			
@@ -355,7 +369,7 @@ public class AetherTown extends UIClient {
 		uiLookInfo.setVisible(false);
 		
 		uiBookmarks = new BookmarkPane(uiRoot);
-		uiBookmarks.restoreBookmarks(save, regionCache);
+		// uiBookmarks.restoreBookmarks(save, regionCache); // FIXME load bookmarks
 		uiBookmarks.setVisible(false);
 	}
 	
@@ -459,57 +473,6 @@ public class AetherTown extends UIClient {
 		activateLevel(l.info);
 	}
 
-	private void changeRegion(SaveState save) {
-		// FIXME may not work with multiple regions in levelCache
-		LevelInfo info = save.getLevel(region);
-		level = levelCache.setActive(info, true);
-		levelInfo = info;
-		regionCache.portals.updateLevel();
-		
-		RegionVisits.visit(info);
-
-		sky.stars.updateStars(region.seed);
-		// levelCache.createRenderers(sky.buffer, tiles);
-
-		WorldTime.setTime(save.startSeason, save.day, save.time);
-		updateEnvironment();
-		
-		if(save.defaultStart) {
-			camera.position.x = level.getStartX()*Tile.size;
-			camera.position.z = level.getStartZ()*Tile.size;
-			camera.rotation.x = 0;
-			camera.rotation.y = 0;
-		}
-		else {
-			camera.position.x = save.cameraPosX;
-			camera.position.z = save.cameraPosZ;
-			camera.rotation.x = save.cameraLookX;
-			camera.rotation.y = save.cameraLookY;
-		}
-
-		camera.position.y = 100f;
-		activeController = walkController;
-		updateWalkY();
-	}
-	
-	public void saveState() {
-		SaveState save = new SaveState();
-		save.regionMode = regionCache.mode;
-		save.regionSeed = region.seed;
-		save.defaultStart = false;
-		save.levelx = levelInfo.x0;
-		save.levelz = levelInfo.z0;
-		save.startSeason = WorldTime.yearPhase;
-		save.day = WorldTime.getDay();
-		save.time = WorldTime.getTimeOfDay();
-		save.cameraPosX = camera.position.x;
-		save.cameraPosZ = camera.position.z;
-		save.cameraLookX = camera.rotation.x;
-		save.cameraLookY = camera.rotation.y;
-		uiBookmarks.saveBookmarks(save);
-		save.save();
-	}
-	
 	private static void printTileDebug(int hoverx, int hoverz, Tile tile) {
 		System.out.printf("Rendering %d levels\n", levelCache.renderedLevels);
 		System.out.printf("hover at [%d, %d]:\n", hoverx, hoverz);
@@ -688,19 +651,27 @@ public class AetherTown extends UIClient {
 	
 	@Override
 	public void destroyWindow() {
-		if(!settings.nosave)
-			saveState();
+		if(!settings.nosave) {
+			SaveState save = new SaveState();
+			save.update();
+			save.save();
+		}
 		super.destroyWindow();
 	}
 	
-	public static void generateRegion(SaveState save) {
+	public static LevelInfo generateRegion(SaveState save) {
+		WorldTime.setTime(save.startSeason, save.day, save.time);
+		player.fromSave(save);
+		
 		long seed = PortalSystem.getRegionSeed(save.regionSeed);
 		System.out.printf("Region seed: %dL\n", seed);
 		regionCache = new RegionCache(save.regionMode);
 		region = regionCache.get(seed);
 		
 		levelCache = new LevelCache();
-		levelCache.addAllAdj(save.getLevel(region), true);
+		LevelInfo info = save.getLevel(region);
+		levelCache.addAllAdj(info, true);
+		return info;
 	}
 	
 	public static void main(String[] args) {
@@ -720,7 +691,7 @@ public class AetherTown extends UIClient {
 		if(!settings.nosave)
 			save.load();
 		
-		generateRegion(save);
-		new AetherTown(save).run();
+		LevelInfo startLevel = generateRegion(save);
+		new AetherTown(startLevel).run();
 	}
 }
