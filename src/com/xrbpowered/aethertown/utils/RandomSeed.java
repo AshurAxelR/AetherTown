@@ -1,6 +1,8 @@
 package com.xrbpowered.aethertown.utils;
 
 public class RandomSeed {
+	
+	private RandomSeed() {}
 
 	public static long hashSeed(long seed, long add) {
 		// Multiply by Knuth's Random (Linear congruential generator) and add offset

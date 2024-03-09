@@ -651,11 +651,8 @@ public class AetherTown extends UIClient {
 	
 	@Override
 	public void destroyWindow() {
-		if(!settings.nosave) {
-			SaveState save = new SaveState();
-			save.update();
-			save.save();
-		}
+		if(!settings.nosave)
+			new SaveState().update().save();
 		super.destroyWindow();
 	}
 	

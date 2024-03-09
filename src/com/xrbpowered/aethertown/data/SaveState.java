@@ -2,35 +2,23 @@ package com.xrbpowered.aethertown.data;
 
 import static com.xrbpowered.aethertown.AetherTown.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
+import com.xrbpowered.aethertown.utils.ZipBuilder;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
-public class SaveState extends AbstractConfig {
+public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 
 	public static final String savePath = "./save.dat";
-	
-	private static final String cfgName = "save.cfg";
-	private static final String visitsName = "visits.dat";
-
-	private static final String[] all = {
-		cfgName, visitsName
-	};
-	private static final HashSet<String> required = new HashSet<>(Arrays.asList(all));
 	
 	public RegionMode regionMode = settings.regionMode;
 	public long regionSeed = AetherTown.settings.regionSeed;
@@ -115,7 +103,7 @@ public class SaveState extends AbstractConfig {
 		return defaultStart ? region.startLevel : region.getLevel(levelx, levelz);
 	}
 	
-	public void update() {
+	public SaveState update() {
 		regionMode = regionCache.mode;
 		regionSeed = region.seed;
 		levelx = levelInfo.x0;
@@ -129,74 +117,60 @@ public class SaveState extends AbstractConfig {
 		cameraLookX = player.cameraRotation.x;
 		cameraLookY = player.cameraRotation.y;
 		// aether.uiBookmarks.saveBookmarks(this); // FIXME save bookmarks
+		return this;
+	}
+	
+	private static final String cfgName = "save.cfg";
+	private static final String visitsName = "visits.dat";
+
+	private static final Collection<String> all = Arrays.asList(
+		cfgName, visitsName
+	);
+	private static final Collection<String> required = Arrays.asList(
+		cfgName, visitsName
+	);
+
+	@Override
+	public Collection<String> listDataEntries() {
+		return all;
+	}
+	
+	@Override
+	public Collection<String> listRequiredDataEntries() {
+		return required;
+	}
+	
+	@Override
+	public boolean loadDataEntry(String name, InputStream in) {
+		if(cfgName.equals(name))
+			return super.load(cfgName, in);
+		else if(visitsName.equals(name))
+			return RegionVisits.load(in);
+		else
+			return false;
+	}
+	
+	@Override
+	public boolean saveDataEntry(String name, OutputStream out) {
+		if(cfgName.equals(name))
+			return super.save(cfgName, out);
+		else if(visitsName.equals(name))
+			return RegionVisits.save(out);
+		else
+			return false;
 	}
 	
 	@Override
 	public SaveState load() {
-		try(ZipInputStream zip = new ZipInputStream(new FileInputStream(new File(savePath)))) {
-			HashSet<String> entries = new HashSet<>();
-			
-			ZipEntry zipEntry;
-			while((zipEntry = zip.getNextEntry()) != null) {
-				String name = zipEntry.getName();
-				boolean res;
-				
-				if(cfgName.equals(name))
-					res = super.load(cfgName, zip);
-				else if(visitsName.equals(name))
-					res = RegionVisits.load(zip);
-				else
-					res = false;
-				
-				zip.closeEntry();
-				if(res)
-					entries.add(name);
-				if(!res && required.contains(name))
-					throw new IOException();
-			}
-			
-			for(String name : required) {
-				if(!entries.contains(name)) {
-					System.err.println("Missing "+name);
-					throw new IOException();
-				}
-			}
-			
-			System.out.printf("%s loaded.\n", savePath);
+		if(ZipBuilder.load(savePath, this))
 			return this;
-		}
-		catch(IOException e) {
-			System.err.println(e.getMessage());
-			System.err.printf("Can't load %s. Using default.\n", savePath);
+		else
 			return reset();
-		}
 	}
-
+	
 	@Override
 	public void save() {
-		try(ZipOutputStream zip = new ZipOutputStream(new FileOutputStream(new File(savePath)))) {
-			for(String name : all) {
-				zip.putNextEntry(new ZipEntry(name));
-				boolean res;
-				
-				if(cfgName.equals(name))
-					res = super.save(cfgName, zip);
-				else if(visitsName.equals(name))
-					res = RegionVisits.save(zip);
-				else
-					res = false;
-				
-				zip.closeEntry();
-				if(!res && required.contains(name))
-					throw new IOException();
-			}
-			System.out.printf("%s saved.\n", savePath);
-		}
-		catch(IOException e) {
-			System.err.println(e.getMessage());
-			System.err.printf("Can't save %s.\n", savePath);
-			new File(savePath).delete();
-		}
+		ZipBuilder.save(savePath, this);
 	}
 	
 }

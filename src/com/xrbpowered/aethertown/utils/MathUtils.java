@@ -2,6 +2,8 @@ package com.xrbpowered.aethertown.utils;
 
 public class MathUtils {
 
+	private MathUtils() {}
+	
 	public static float lerp(float x0, float x1, float s) {
 		return x0*(1f-s) + x1*s;
 	}
