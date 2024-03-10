@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
-import com.xrbpowered.aethertown.data.LevelRef;
+import com.xrbpowered.aethertown.state.LevelRef;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.region.PortalSystem.PortalInfo;
 

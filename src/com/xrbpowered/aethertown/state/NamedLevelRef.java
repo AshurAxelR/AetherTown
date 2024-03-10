@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.data;
+package com.xrbpowered.aethertown.state;
 
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 

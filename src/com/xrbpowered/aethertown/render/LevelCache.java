@@ -8,9 +8,9 @@ import java.util.Iterator;
 import org.joml.Vector3f;
 
 import com.xrbpowered.aethertown.AetherTown;
-import com.xrbpowered.aethertown.data.RegionVisits;
 import com.xrbpowered.aethertown.render.env.SkyBuffer;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
+import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;

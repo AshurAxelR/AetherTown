@@ -6,7 +6,7 @@ import static com.xrbpowered.aethertown.ui.RegionMapImage.*;
 import java.awt.Rectangle;
 
 import com.xrbpowered.aethertown.AetherTown;
-import com.xrbpowered.aethertown.data.SaveState;
+import com.xrbpowered.aethertown.state.SaveState;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;

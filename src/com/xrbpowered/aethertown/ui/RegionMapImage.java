@@ -6,9 +6,9 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.HashSet;
 
-import com.xrbpowered.aethertown.data.Bookmarks;
-import com.xrbpowered.aethertown.data.NamedLevelRef;
-import com.xrbpowered.aethertown.data.RegionVisits;
+import com.xrbpowered.aethertown.state.Bookmarks;
+import com.xrbpowered.aethertown.state.NamedLevelRef;
+import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelSettlementType;

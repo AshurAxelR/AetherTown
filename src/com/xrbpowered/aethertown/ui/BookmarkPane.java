@@ -1,13 +1,13 @@
 package com.xrbpowered.aethertown.ui;
 
 import static com.xrbpowered.aethertown.AetherTown.*;
-import static com.xrbpowered.aethertown.data.Bookmarks.*;
+import static com.xrbpowered.aethertown.state.Bookmarks.*;
 import static com.xrbpowered.aethertown.ui.ClickButton.*;
 
 import java.awt.Color;
 
 import com.xrbpowered.aethertown.AetherTown;
-import com.xrbpowered.aethertown.data.NamedLevelRef;
+import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;

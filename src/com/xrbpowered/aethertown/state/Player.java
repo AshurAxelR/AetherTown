@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.data;
+package com.xrbpowered.aethertown.state;
 
 import org.joml.Vector3f;
 
@@ -21,6 +21,14 @@ public class Player {
 			cameraPosition = new Vector3f(save.cameraPosX, 0f, save.cameraPosZ);
 			cameraRotation = new Vector3f(save.cameraLookX, save.cameraLookY, 0f);
 		}
+	}
+	
+	public void toSave(SaveState save) {
+		save.defaultStart = false;
+		save.cameraPosX = cameraPosition.x;
+		save.cameraPosZ = cameraPosition.z;
+		save.cameraLookX = cameraRotation.x;
+		save.cameraLookY = cameraRotation.y;
 	}
 	
 	public void initCamera(CameraActor camera, Level level) {

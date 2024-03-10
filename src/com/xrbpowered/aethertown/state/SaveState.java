@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.data;
+package com.xrbpowered.aethertown.state;
 
 import static com.xrbpowered.aethertown.AetherTown.*;
 
@@ -74,11 +74,7 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 		startSeason = WorldTime.yearPhase;
 		day = WorldTime.getDay();
 		time = WorldTime.getTimeOfDay();
-		defaultStart = false;
-		cameraPosX = player.cameraPosition.x;
-		cameraPosZ = player.cameraPosition.z;
-		cameraLookX = player.cameraRotation.x;
-		cameraLookY = player.cameraRotation.y;
+		player.toSave(this);
 		return this;
 	}
 	
