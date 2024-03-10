@@ -6,21 +6,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
-import com.xrbpowered.aethertown.world.region.RegionCache;
 
 public class Bookmarks {
 
-	private static final String formatId = "AetherTown.Bookmarks.0";
+	private static final String formatId = "AetherTown.Bookmarks.1";
 	
 	public static final int numBookmarks = 10;
 
-	public static LevelInfo[] bookmarks = new LevelInfo[numBookmarks];
+	public static final NamedLevelRef[] bookmarks = new NamedLevelRef[numBookmarks];
 	
 	private Bookmarks() {}
 
-	private static LevelRef[] savedBookmarks = null;
+	public static boolean isBookmarked(LevelInfo level) {
+		for(int i=0; i<numBookmarks; i++) {
+			if(level.isRef(bookmarks[i]))
+				return true;
+		}
+		return false;
+	}
 	
 	public static boolean isEmpty() {
 		for(int i=0; i<numBookmarks; i++) {
@@ -35,20 +39,6 @@ public class Bookmarks {
 			bookmarks[i] = null;
 	}
 	
-	public static void init(RegionCache regions) {
-		reset();
-		if(savedBookmarks!=null && AetherTown.settings.allowBookmaks) {
-			int n = Math.min(numBookmarks, savedBookmarks.length);
-			for(int i=0; i<n; i++) {
-				LevelRef v = savedBookmarks[i];
-				if(v!=null)
-					bookmarks[i] = v.find(regions);
-			}
-			regions.verifyBookmarks(bookmarks);
-		}
-		savedBookmarks = null;
-	}
-	
 	public static boolean load(InputStream ins) {
 		try {
 			DataInputStream in = new DataInputStream(ins);
@@ -57,15 +47,18 @@ public class Bookmarks {
 				throw new IOException("Bad file format");
 			
 			int count = 0;
-			int num = Math.min(in.readInt(), numBookmarks);
-			savedBookmarks = new LevelRef[num];
+			reset();
+			int num = in.readInt();
 			for(int i=0; i<num; i++) {
 				if(in.readBoolean()) { // not null
 					long seed = in.readLong();
 					int x = in.readShort();
 					int z = in.readShort();
-					savedBookmarks[i] = new LevelRef(seed, x, z);
-					count++;
+					String name = in.readUTF();
+					if(i<numBookmarks) {
+						bookmarks[i] = new NamedLevelRef(seed, x, z, name);
+						count++;
+					}
 				}
 			}
 			
@@ -74,7 +67,7 @@ public class Bookmarks {
 		}
 		catch(Exception e) {
 			System.err.println("Can't load bookmarks: "+e.getMessage());
-			savedBookmarks = null;
+			reset();
 			return false;
 		}
 	}
@@ -86,12 +79,13 @@ public class Bookmarks {
 			out.writeUTF(formatId);
 			out.writeInt(numBookmarks);
 			for(int i=0; i<numBookmarks; i++) {
-				LevelInfo info = bookmarks[i];
-				if(info!=null) {
+				NamedLevelRef ref = bookmarks[i];
+				if(ref!=null) {
 					out.writeBoolean(true);
-					out.writeLong(info.region.seed);
-					out.writeShort(info.x0);
-					out.writeShort(info.z0);
+					out.writeLong(ref.regionSeed);
+					out.writeShort(ref.x);
+					out.writeShort(ref.z);
+					out.writeUTF(ref.name);
 				}
 				else {
 					out.writeBoolean(false);

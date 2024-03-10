@@ -1,12 +1,13 @@
 package com.xrbpowered.aethertown.ui;
 
-import static com.xrbpowered.aethertown.data.Bookmarks.bookmarks;
-import static com.xrbpowered.aethertown.data.Bookmarks.numBookmarks;
+import static com.xrbpowered.aethertown.AetherTown.*;
+import static com.xrbpowered.aethertown.data.Bookmarks.*;
 import static com.xrbpowered.aethertown.ui.ClickButton.*;
 
 import java.awt.Color;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.data.NamedLevelRef;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -45,15 +46,23 @@ public class BookmarkPane extends UIPane {
 					g.drawString(String.format("%d.", index+1), 40, getHeight()/2f, GraphAssist.RIGHT, GraphAssist.CENTER);
 					g.setFont(Fonts.small);
 					
-					LevelInfo level = bookmarks[index];
+					NamedLevelRef level = bookmarks[index];
+					boolean here = false;
 					String s;
 					if(level==null) {
 						s = "[EMPTY]";
 						g.setColor(textColorDisabled);
 					}
-					else
-						s = String.format("%s [%d, %d]", level.name, level.x0, level.z0);
+					else {
+						s = level.getFullName();
+						here = levelInfo.isRef(level);
+					}
 					g.drawString(s, 50, getHeight()/2f, GraphAssist.LEFT, GraphAssist.CENTER);
+					if(here) {
+						g.pushPureStroke(true);
+						g.fillCircle(getWidth() - 20, getHeight()/2, 5);
+						g.popPureStroke();
+					}
 				}
 			};
 			
@@ -65,7 +74,6 @@ public class BookmarkPane extends UIPane {
 			@Override
 			public void onAction() {
 				bookmarks[selected] = null;
-				AetherTown.regionCache.verifyBookmarks(bookmarks);
 				updateSelection();
 			}
 		};
@@ -75,8 +83,7 @@ public class BookmarkPane extends UIPane {
 		buttonAdd = new ClickButton(this, "ADD") {
 			@Override
 			public void onAction() {
-				bookmarks[selected] = AetherTown.level.info;
-				AetherTown.regionCache.verifyBookmarks(bookmarks);
+				bookmarks[selected] = new NamedLevelRef(level.info);
 				updateSelection();
 			}
 		};
@@ -86,7 +93,7 @@ public class BookmarkPane extends UIPane {
 		buttonTravel = new ClickButton(this, "TRAVEL") {
 			@Override
 			public void onAction() {
-				AetherTown.aether.teleportTo(bookmarks[selected]);
+				aether.teleportTo(bookmarks[selected].find(regionCache));
 			}
 		};
 		buttonTravel.setSize(200, buttonTravel.getHeight());
@@ -106,25 +113,17 @@ public class BookmarkPane extends UIPane {
 			buttonTravel.setEnabled(false);
 		}
 		else {
-			LevelInfo level = bookmarks[selected];
+			NamedLevelRef ref = bookmarks[selected];
 			LevelInfo active = AetherTown.level.info;
-			if(level==null) {
+			if(ref==null) {
+				buttonAdd.setEnabled(!active.isPortal() && !isBookmarked(active));
 				buttonDelete.setEnabled(false);
 				buttonTravel.setEnabled(false);
-				
-				boolean add = true;
-				for(int i=0; i<numBookmarks; i++) {
-					if(active==bookmarks[i]) {
-						add = false;
-						break;
-					}
-				}
-				buttonAdd.setEnabled(add);
 			}
 			else {
 				buttonAdd.setEnabled(false);
 				buttonDelete.setEnabled(true);
-				buttonTravel.setEnabled(level!=active);
+				buttonTravel.setEnabled(!active.isRef(ref));
 			}
 		}
 		repaint();

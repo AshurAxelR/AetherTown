@@ -1,13 +1,12 @@
 package com.xrbpowered.aethertown.world.region;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 import com.xrbpowered.aethertown.AetherTown;
 
 public class RegionCache {
 
-	private static final int targetCapacity = 4;
+	private static final int targetCapacity = 8;
 	
 	public final RegionMode mode;
 	public final PortalSystem portals;
@@ -20,24 +19,9 @@ public class RegionCache {
 		this.portals = new PortalSystem(this);
 	}
 	
-	public void verifyBookmarks(LevelInfo[] bookmarks) {
-		for(Region r : regions.values())
-			r.bookmark = false;
-		for(LevelInfo level : bookmarks) {
-			if(level!=null)
-				level.region.bookmark = true;
-		}
-	}
-	
 	public void cleanup() {
-		HashMap<Long, Region> old = regions;
 		regions = new HashMap<>();
-		for(Region r : old.values()) {
-			if(r.bookmark)
-				regions.put(r.seed, r);
-		}
-		HashSet<Region> used = AetherTown.levelCache.regionsInUse();
-		for(Region r : used)
+		for(Region r : AetherTown.levelCache.regionsInUse())
 			regions.put(r.seed, r);
 		capacity = regions.size() + targetCapacity;
 	}
@@ -54,5 +38,5 @@ public class RegionCache {
 		}
 		return r;
 	}
-
+	
 }

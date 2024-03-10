@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashSet;
 
 import com.xrbpowered.aethertown.data.Bookmarks;
+import com.xrbpowered.aethertown.data.NamedLevelRef;
 import com.xrbpowered.aethertown.data.RegionVisits;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
@@ -57,7 +58,7 @@ public class RegionMapImage extends ImageGenerator {
 		g.setColor(colorMarginText);
 		g.setFont(Fonts.large);
 		float y = (margin+marginTop)/2;
-		g.drawString(RegionVisits.getRegionTitle(region)+" Map", w/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
+		g.drawString(RegionVisits.getRegionTitle(region.seed, false)+" Map", w/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
 		
 		g.translate(margin - minx*tileSize, marginTop - minz*tileSize);
 		paintMap(g, region, active, !settings.revealRegion, minx, minz, maxx, maxz);
@@ -126,9 +127,9 @@ public class RegionMapImage extends ImageGenerator {
 		g.pushAntialiasing(false);
 		
 		HashSet<LevelInfo> bookmarks = new HashSet<>();
-		for(LevelInfo level : Bookmarks.bookmarks) {
-			if(level!=null)
-				bookmarks.add(level);
+		for(NamedLevelRef ref : Bookmarks.bookmarks) {
+			if(ref!=null)
+				bookmarks.add(ref.find(region));
 		}
 		
 		g.fillRect(minx*tileSize, minz*tileSize, (maxx-minx)*tileSize, (maxz-minz)*tileSize, colorBg);

@@ -5,7 +5,6 @@ import static com.xrbpowered.zoomui.MouseInfo.RIGHT;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
-import com.xrbpowered.aethertown.data.Bookmarks;
 import com.xrbpowered.aethertown.data.Player;
 import com.xrbpowered.aethertown.data.RegionVisits;
 import com.xrbpowered.aethertown.data.SaveState;
@@ -21,6 +20,7 @@ import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.ImageBrowserPane;
 import com.xrbpowered.aethertown.ui.LevelMapImage;
 import com.xrbpowered.aethertown.ui.RegionMapImage;
+import com.xrbpowered.aethertown.ui.ToastPane;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -92,6 +92,9 @@ public class AetherTown extends UIClient {
 		public boolean residentialLighting = true;
 		public boolean revealRegion = false;
 		public boolean markAdjVisited = false;
+		
+		public boolean allowFlying = false;
+		public boolean allowTimeControl = false;
 		public boolean allowBookmaks = false;
 		public boolean nosave = false;
 		
@@ -155,8 +158,9 @@ public class AetherTown extends UIClient {
 	private boolean showPointer = false;
 	
 	private UIOffscreen uiRender;
-	private UINode uiRoot;
+	private UINode uiHud;
 	private UIPane uiTime, uiLookInfo, uiDebugInfo;
+	private ToastPane uiToast;
 	private BookmarkPane uiBookmarks;
 	
 	private ImageBrowserPane uiLevelMap;
@@ -259,21 +263,24 @@ public class AetherTown extends UIClient {
 				}
 				
 				boolean blockUpdatePortals = false;
-				if(input.isKeyDown(KeyEvent.VK_MINUS)) {
-					WorldTime.shiftTimeOfYear(-dt);
-					blockUpdatePortals = true;
-				}
-				else if(input.isKeyDown(KeyEvent.VK_EQUALS)) {
-					WorldTime.shiftTimeOfYear(dt);
-					blockUpdatePortals = true;
+				if(settings.allowTimeControl) {
+					if(input.isKeyDown(KeyEvent.VK_MINUS)) {
+						WorldTime.shiftTimeOfYear(-dt);
+						blockUpdatePortals = true;
+					}
+					else if(input.isKeyDown(KeyEvent.VK_EQUALS)) {
+						WorldTime.shiftTimeOfYear(dt);
+						blockUpdatePortals = true;
+					}
 				}
 				
 				float dtDay = dt;
-				if(input.isKeyDown(KeyEvent.VK_OPEN_BRACKET))
+				if(settings.allowTimeControl && input.isKeyDown(KeyEvent.VK_OPEN_BRACKET))
 					dtDay = -settings.timeSpeedUp*dt;
-				else if(input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET))
-					dtDay = settings.timeSpeedUp*dt;
+				if(settings.allowTimeControl && input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET)) // TODO time-forwarding allowed by actions
+					dtDay = settings.timeSpeedUp*dt; 
 				sky.updateTime(dtDay);
+				
 				uiTime.repaint();
 				environment.recalc(sky.sun.position);
 				updateEnvironment();
@@ -304,11 +311,12 @@ public class AetherTown extends UIClient {
 		uiRegionMap = new ImageBrowserPane(getContainer());
 		uiRegionMap.setVisible(false);
 
-		uiRoot = new UINode(getContainer()) {
+		uiHud = new UINode(getContainer()) {
 			@Override
 			public void layout() {
 				uiTime.setPosition(20, getHeight()-uiTime.getHeight()-20);
 				uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
+				uiToast.setPosition(20, getHeight()/2-uiToast.getHeight()/2);
 				if(uiBookmarks!=null)
 					uiBookmarks.setPosition(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
 				super.layout();
@@ -316,26 +324,13 @@ public class AetherTown extends UIClient {
 		};
 		
 		if(settings.showFps) {
-			uiDebugInfo = new UIPane(uiRoot, false) {
+			uiDebugInfo = new UIPane(uiHud, false) {
 				@Override
 				protected void paintBackground(GraphAssist g) {
 					clear(g, bgColor);
 					g.setColor(Color.WHITE);
 					g.setFont(Fonts.small);
-					float y = 10;
-					
-					String s = String.format("%.1f fps", getFps());
-					Color c = environment.lightColor;
-					float illum = c.getRed()/255f + c.getGreen()/255f + c.getBlue()/255f;
-					s += String.format(" illum:%.2f", illum);
-					y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
-					
-					// float a = 90f - (float)Math.toDegrees(Math.acos(sky.sun.position.dot(0, 1, 0, 0)));
-					// y = g.drawString(String.format("Sun angle: %.1f\u00b0", a), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
-					s = String.format("[%d, %d] %s", hoverx, hoverz, Dir8.values()[compass].name().toUpperCase());
-					if(level!=null && level.isInside(hoverx, hoverz) && level.map[hoverx][hoverz]!=null)
-						s += String.format(" y:%d", level.map[hoverx][hoverz].basey);
-					y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+					paintDebugInfo(g);
 				}
 				@Override
 				public void updateTime(float dt) {
@@ -346,7 +341,7 @@ public class AetherTown extends UIClient {
 			uiDebugInfo.setPosition(20, 20);
 		}
 		
-		uiTime = new UIPane(uiRoot, false) {
+		uiTime = new UIPane(uiHud, false) {
 			@Override
 			protected void paintBackground(GraphAssist g) {
 				clear(g, bgColor);
@@ -359,7 +354,7 @@ public class AetherTown extends UIClient {
 		};
 		uiTime.setSize(220, 32);
 		
-		uiLookInfo = new UIPane(uiRoot, false) {
+		uiLookInfo = new UIPane(uiHud, false) {
 			@Override
 			protected void paintBackground(GraphAssist g) {
 				clear(g, bgColor);
@@ -371,8 +366,10 @@ public class AetherTown extends UIClient {
 		uiLookInfo.setSize(600, 32);
 		uiLookInfo.setVisible(false);
 		
+		uiToast = new ToastPane(uiHud);
+		
 		if(settings.allowBookmaks) {
-			uiBookmarks = new BookmarkPane(uiRoot);
+			uiBookmarks = new BookmarkPane(uiHud);
 			uiBookmarks.setVisible(false);
 		}
 	}
@@ -514,6 +511,22 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
+	private void paintDebugInfo(GraphAssist g) {
+		float y = 10;
+		String s = String.format("%.1f fps", getFps());
+		Color c = environment.lightColor;
+		float illum = c.getRed()/255f + c.getGreen()/255f + c.getBlue()/255f;
+		s += String.format(" illum:%.2f", illum);
+		y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+		
+		// float a = 90f - (float)Math.toDegrees(Math.acos(sky.sun.position.dot(0, 1, 0, 0)));
+		// y = g.drawString(String.format("Sun angle: %.1f\u00b0", a), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+		s = String.format("[%d, %d] %s", hoverx, hoverz, Dir8.values()[compass].name().toUpperCase());
+		if(level!=null && level.isInside(hoverx, hoverz) && level.map[hoverx][hoverz]!=null)
+			s += String.format(" y:%d", level.map[hoverx][hoverz].basey);
+		y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+	}
+	
 	private void showRegionMap(boolean show) {
 		uiRegionMap.setVisible(show);
 		uiLookInfo.setVisible(!show && !lookAtInfo.isEmpty());
@@ -591,19 +604,21 @@ public class AetherTown extends UIClient {
 				camera.rotation.y += Math.PI;
 				break;
 			case KeyEvent.VK_TAB:
-				autoWalk = false;
-				if(controllerEnabled)
+				if(settings.allowFlying && controllerEnabled) {
+					autoWalk = false;
 					activeController.setMouseLook(false);
-				if(activeController==flyController) {
-					activeController = walkController;
-					updateWalkY();
-				}
-				else {
-					activeController = flyController;
-					flyController.moveSpeed = settings.flySpeed;
-				}
-				if(controllerEnabled)
+					if(activeController==flyController) {
+						activeController = walkController;
+						updateWalkY();
+						showToast("Flying OFF");
+					}
+					else {
+						activeController = flyController;
+						flyController.moveSpeed = settings.flySpeed;
+						showToast("Flying ON");
+					}
 					activeController.setMouseLook(true);
+				}
 				break;
 			case KeyEvent.VK_F1: {
 					if(level!=null && level.isInside(hoverx, hoverz)) {
@@ -616,7 +631,7 @@ public class AetherTown extends UIClient {
 				break;
 			case KeyEvent.VK_F2:
 				showPointer = !showPointer;
-				System.out.println("Pointer "+(showPointer ? "on" : "off"));
+				showToast("Pointer "+(showPointer ? "ON" : "OFF"));
 				break;
 			case KeyEvent.VK_F3:
 				if(activeController==flyController) {
@@ -625,6 +640,10 @@ public class AetherTown extends UIClient {
 					else
 						flyController.moveSpeed = settings.flySpeed;
 				}
+				break;
+			case KeyEvent.VK_F5:
+				saveState();
+				showToast("Saved");
 				break;
 			case KeyEvent.VK_F10:
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
@@ -653,10 +672,19 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
+	public static void showToast(String msg) {
+		aether.uiToast.queue.push(msg);
+		System.out.printf("> %s\n", msg);
+	}
+	
+	public static void saveState() {
+		new SaveState().update().save();
+	}
+	
 	@Override
 	public void destroyWindow() {
 		if(!settings.nosave)
-			new SaveState().update().save();
+			saveState();
 		super.destroyWindow();
 	}
 	
@@ -667,7 +695,6 @@ public class AetherTown extends UIClient {
 		long seed = PortalSystem.getRegionSeed(save.regionSeed);
 		System.out.printf("Region seed: %dL\n", seed);
 		regionCache = new RegionCache(save.regionMode);
-		Bookmarks.init(regionCache);
 		region = regionCache.get(seed);
 
 		levelCache = new LevelCache();

@@ -108,7 +108,6 @@ public class LevelInfo {
 		}
 	}
 	
-	public final LevelRef ref;
 	public final Region region;
 	public final int x0, z0;
 	public final int size;
@@ -123,7 +122,6 @@ public class LevelInfo {
 	public ArrayList<LevelConnection> conns = new ArrayList<>();
 	
 	public LevelInfo(Region region, int x, int z, int size, long seed, boolean fixed) {
-		this.ref = new LevelRef(region.seed, x, z);
 		this.region = region;
 		this.x0 = x;
 		this.z0 = z;
@@ -208,6 +206,10 @@ public class LevelInfo {
 		LevelInfo info = (LevelInfo) obj;
 		return this.region.seed==info.region.seed &&
 				this.x0==info.x0 && this.z0==info.z0 && this.size==info.size;
+	}
+	
+	public boolean isRef(LevelRef ref) {
+		return ref!=null && region.seed==ref.regionSeed && x0==ref.x && z0==ref.z;
 	}
 	
 	public static LevelInfo createNullLevel(Region region, int x, int z) {

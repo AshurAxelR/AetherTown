@@ -2,32 +2,49 @@
 
 ## Player status
 
-* CR - credits (cash), daily +30 CR if total below 1000
+### Attributes
+* CR, £ - credits (cash), daily £20+ if total below £500; earned credits need to be collected by mail
 * INS - inspiration, determines speed of creative actions; min 0, max 100
 * XP - knowledge, determines quality chance of creative actions. XP is permanent.
-* items, hotkey **B**
-	* **Rune** (level ref.) required for instant travel
-	* **House Key** (house tile ref.) required for interacting with house tile
-	* **Room Key** (hotel tile ref.) required for room actions in a hotel tile, expires at 11am
-	* **Map** (level ref.) _use:_ view level map, hotkey **M**
-	* **Region Map** (region ref.) _use:_ view region map, hotkey **N**
-	* Trinket (level ref., timestamp) no use, just a memory
-	* Groceries (BAG)
-	* Snack (water, crisps, etc.) - food, consume: +5min
-	* Cooked Food (cuisine type) - food, but must be stored at home
-	* Takeaway Food (cuisine type) - food, consume: (4h gcd) +30min, +3 INS
 
-BAG items go in their own slot instead of the inventory. There are 2 BAG slots.
+### Inventory itmes
+
+Inventory hotkey **Q**  
+Player inventory has 12 slots (2 _heavy_).
+
+* **Rune** (level ref.) required for instant travel
+* **House Key** (house tile ref.) required for interacting with house tile
+* **Room Key** (hotel tile ref., expired - bool) required for room actions in a hotel tile, expires at 11am
+* **Map** (level ref.) _View:_ view level map, hotkey **M**
+* **Region Map** (region ref.) _View:_ view region map, hotkey **N**
+* Trinket (level ref., timestamp) no use, just a memory
+* Groceries (_heavy_)
+* Snack (water, crisps, etc.) - food, _Eat:_ (consumed) +5min
+* Cooked Food (cuisine type) - food, but must be stored at home
+* Takeaway Food (cuisine type) - food, _Eat:_ (consumed) (4h gcd) +30min, +3 INS
+
+### Other state variables
+
+* Region visits - hash map: region ref.
+	* Level visits - hash map: `ref.hash(region seed, x, z)`
+		* Tile visits, for "once per tile" action tracking - hash map: `tile.hash(x, z)`; check: template hash
+		* Owned home - bool
+* All owned homes - list: house tile ref.
+	* Storage - array: inventory data
+* All room keys - list: **Room Key**, item location (inventory or storage ref.)
+	* Storage (temporary) - inventory data
 
 ## Home improvements
 
-* Kitchenware - 10 CR
-* Computer - 50 CR
-* Board games - 5 CR
-* Musical Instrument (guitar, keyboard) - 20 CR
+* Kitchenware - £7.50
+* Computer - £50
+* Board games - £5.50
+* Musical Instrument (guitar, keyboard) - £15
 
 
 ## Actions and action types
+
+Tile action hotkey **E**, alternative (upstairs) **R**
 
 * _Enter_ or (room): (use item?) UI +time?
 	* (on enter event?)
@@ -42,9 +59,10 @@ BAG items go in their own slot instead of the inventory. There are 2 BAG slots.
 * _Maps:_ UI
 	* _View map:_ local or region
 	* _Get map:_ local or region **+item**
+	* in some tiles, _Get Rune:_ **+item: Rune**
 * ... room actions
-	* _Chill:_ +1h
-	* _Shower:_ +15min, +1 INS
+	* _Relax:_ +1h
+	* _Shower:_ +15min, +2 INS (daily)
 	* _Nap:_ (2h gcd: _Sleep_) +30min, +1 INS
 	* _Short sleep:_ (3h gcd: _Sleep_) +4h, +3 INS
 	* _Sleep:_ (10h gcd: _Sleep_) +6h, +10 INS
@@ -53,7 +71,7 @@ BAG items go in their own slot instead of the inventory. There are 2 BAG slots.
 ## Tiles
 
 ### Alcove / Fountain
-* **E:** _Throw coin:_ (once per tile) -1 CR, +1 INS
+* **E:** _Throw coin:_ (once per tile) £0.10, +1 INS
 
 ### Bench / (Table) / Pavillion / Plaza?
 * **E:** _Sit:_
@@ -89,7 +107,7 @@ BAG items go in their own slot instead of the inventory. There are 2 BAG slots.
 		* _Watch movies:_ +1.5h, +2 INS (daily)
 	* _Office:_
 		* _Work_ > (product type): req. **Computer** improvement, +2h, -INS (up to 10: improves progress speed)  
-			Completing a product grants +100 CR (+bonus for quality)
+			Completing a product normally shoud take 5-10 days and grants £100+ (+bonus for quality)
 		* _Play games:_ req. **Computer** improvement, +40min, +1 INS
 		* _Study:_ +1h, +1 XP
 		* _Read:_ +30min
@@ -100,12 +118,11 @@ BAG items go in their own slot instead of the inventory. There are 2 BAG slots.
 
 ### HouseRole: post office / civic centre
 * **E:** _Enter:_ UI
-	* _Maps:_ UI
-	* _Get Rune:_ **+item: Rune**
-	* _Collect Credits:_ +CR earned to this point, earned credits need to be collected at post offices
+	* _Maps:_ UI (+rune)
+	* _Collect earnings:_ +CR earned to this point
 	* _Order goods_ > select home improvement: (local home owned) ... ?
 	* **Civic Centre** _Residential Services:_
-		* _Claim home > select address:_ (cd until abandoned) +10min, -50 CR &times; number of homes owned,  
+		* _Claim home > select address:_ (no local home owned) +10min, £100 &times; number of homes owned (no crediting),  
 			**+item: House Key**
 		* _Recover key:_ (local home owned) +5min, **+item: House Key**
 		* _Abandon home:_ (local home owned) +5min, **-item: House Key** (all), stored items disposed
@@ -116,15 +133,15 @@ BAG items go in their own slot instead of the inventory. There are 2 BAG slots.
 ### HouseRole: hotel / inn
 * **E:** _Enter:_ UI
 	* _Reception:_
-		* _Check in:_ (cd until item expires) +5min, -10 CR once per tile, -30 CR after that, **+item: Room Key**
+		* _Check in:_ (cd until item expires) +5min, £5 once per tile (crediting allowed), £25 CR after that (no crediting), **+item: Room Key**
 		* _Check out:_ **-item: Room Key**, take items from room storage
-		* _Maps:_ UI
-		* _Get Rune:_ **+item: Rune**
+		* _Maps:_ UI (+rune)
+		* _Collect earnings:_ +CR earned to this point
 		* (inventory enabled, disposing, food not allowed)
 	* _Bar/Restaurant:_
 		* _Hang out:_ +20min
-		* _Drink:_ (2h gcd) +20min, -3 CR, +2 INS
-		* **Inn** _Eat_: (4h gcd) +40min, -10 CR, +5 INS
+		* _Drink:_ (2h gcd) +20min, £2.50, +2 INS
+		* **Inn**, _Eat_: (4h gcd) +40min, £7.50 CR, +5 INS
 		* (inventory enabled, disposing, food not allowed)
 	* _Room:_ (use **Room Key**)
 		* ... room actions
@@ -133,8 +150,8 @@ BAG items go in their own slot instead of the inventory. There are 2 BAG slots.
 
 ### HouseRole: local store / supermarket
 * **E:** _Enter:_ UI
-	* _Buy_ Groceries: -5CR **+item**
-	* _Buy_ Snack (type): -1CR **+item**
+	* _Buy_ Groceries: £5 **+item**
+	* _Buy_ Snack (type): £0.50 **+item**
 	* **Supermarket** ... ?
 
 ### HouseRole: ... shop

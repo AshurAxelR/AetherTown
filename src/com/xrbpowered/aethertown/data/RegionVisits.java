@@ -6,11 +6,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import com.xrbpowered.aethertown.world.region.LevelInfo;
-import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class RegionVisits {
@@ -20,10 +18,14 @@ public class RegionVisits {
 	private static HashMap<Long, RegionVisits> regions = new HashMap<>();
 
 	public final int index;
-	public final HashSet<LevelRef> visited = new HashSet<>();
+	private final HashMap<Integer, LevelRef> visited = new HashMap<>();
 	
 	private RegionVisits(int index) {
 		this.index = index;
+	}
+	
+	public void add(LevelRef ref) {
+		visited.put(ref.hashCode(), ref);
 	}
 
 	public static boolean load(InputStream ins) {
@@ -45,7 +47,7 @@ public class RegionVisits {
 				for(int j=0; j<numLevels; j++) {
 					int x = in.readShort();
 					int z = in.readShort();
-					r.visited.add(new LevelRef(seed, x, z));
+					r.add(new LevelRef(seed, x, z));
 				}
 				totalVisited += numLevels;
 			}
@@ -72,7 +74,7 @@ public class RegionVisits {
 				RegionVisits r = e.getValue();
 				out.writeInt(r.index);
 				out.writeInt(r.visited.size());
-				for(LevelRef level : r.visited) {
+				for(LevelRef level : r.visited.values()) {
 					out.writeShort(level.x);
 					out.writeShort(level.z);
 				}
@@ -87,14 +89,19 @@ public class RegionVisits {
 		}
 	}
 	
-	public static String getRegionTitle(Region region) {
-		RegionVisits r = regions.get(region.seed);
-		return (r==null) ? "Region" : "Region "+WorldTime.romanNumeral(r.index+1);
+	public static String getRegionTitle(long regionSeed, boolean brief) {
+		RegionVisits r = regions.get(regionSeed);
+		if(r==null)
+			return brief ? "" : "Region";
+		else {
+			String n = WorldTime.romanNumeral(r.index+1);
+			return brief ? String.format("R%s.", n) : String.format("Region %s", n);
+		}
 	}
 	
 	public static boolean isVisited(LevelInfo level) {
 		RegionVisits r = regions.get(level.region.seed);
-		return r!=null && r.visited.contains(level.ref);
+		return r!=null && r.visited.containsKey(level.hashCode());
 	}
 
 	public static void visit(LevelInfo level) {
@@ -103,9 +110,9 @@ public class RegionVisits {
 		if(r==null) {
 			r = new RegionVisits(regions.size());
 			regions.put(seed, r);
-			System.out.printf("Region *%d is now known as Region %s\n",
-					seed%10000L, getRegionTitle(level.region));
+			System.out.printf("Region *%d is now known as %s\n",
+					seed%10000L, getRegionTitle(level.region.seed, false));
 		}
-		r.visited.add(level.ref);
+		r.add(new LevelRef(level));
 	}
 }

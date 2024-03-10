@@ -17,12 +17,21 @@ public class LevelRef {
 		this.z = z;
 	}
 	
-	public LevelInfo find(RegionCache regions) {
-		Region r = regions.get(regionSeed);
-		if(r.isInside(x, z))
-			return r.map[x][z];
-		else
+	public LevelRef(LevelInfo level) {
+		this.regionSeed = level.region.seed;
+		this.x = level.x0;
+		this.z = level.z0;
+	}
+	
+	public LevelInfo find(Region region) {
+		if(region==null || region.seed!=regionSeed)
 			return null;
+		else
+			return region.getLevel(x, z);
+	}
+	
+	public LevelInfo find(RegionCache regions) {
+		return find(regions.get(regionSeed));
 	}
 	
 	@Override
@@ -35,28 +44,6 @@ public class LevelRef {
 		LevelRef info = (LevelRef) obj;
 		return this.regionSeed==info.regionSeed &&
 				this.x==info.x && this.z==info.z;
-	}
-
-
-	public String format() {
-		return String.format("%d,%d,%d", regionSeed, x, z);
-	}
-	
-	public static LevelRef parseValue(String v) {
-		String[] vs = v.split(",");
-		if(vs.length!=3)
-			return null;
-		try {
-			long seed = Long.parseLong(vs[0]);
-			if(seed<0L)
-				return null;
-			int x = Integer.parseInt(vs[1]);
-			int z = Integer.parseInt(vs[2]);
-			return new LevelRef(seed, x, z);
-		}
-		catch (NumberFormatException e) {
-			return null;
-		}
 	}
 	
 }

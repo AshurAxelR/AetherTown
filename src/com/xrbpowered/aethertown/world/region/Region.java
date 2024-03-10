@@ -25,8 +25,6 @@ public class Region {
 	public LevelInfo[] portals = null;
 	public LevelInfo startLevel = null;
 	
-	public boolean bookmark = false;
-	
 	private boolean empty = true;
 	private int minx, minz, maxx, maxz;
 	
