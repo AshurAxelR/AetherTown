@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.world.tiles;
 
+import com.xrbpowered.aethertown.actions.TileAction;
+import com.xrbpowered.aethertown.actions.ThrowCoinAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
@@ -14,6 +16,11 @@ public class Fountain extends Plaza {
 	public static final Fountain template = new Fountain();
 	
 	private static TileComponent fountain;
+	
+	@Override
+	public TileAction getTileAction(Tile tile) {
+		return ThrowCoinAction.action;
+	}
 	
 	@Override
 	public int getBlockY(Tile tile) {

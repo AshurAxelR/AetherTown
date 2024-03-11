@@ -3,6 +3,8 @@ package com.xrbpowered.aethertown.world.tiles;
 import java.util.LinkedList;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.actions.TileAction;
+import com.xrbpowered.aethertown.actions.ViewMapAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
@@ -58,6 +60,11 @@ public class NavBox extends Bench {
 		}
 		else
 			return tile.level.info.name;
+	}
+	
+	@Override
+	public TileAction getTileAction(Tile tile) {
+		return ViewMapAction.action;
 	}
 	
 	@Override

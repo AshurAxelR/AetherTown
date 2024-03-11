@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.world;
 
 import java.util.Random;
 
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -17,6 +18,10 @@ public abstract class TileTemplate implements Generator {
 
 	public String getTileInfo(Tile tile) {
 		return "";
+	}
+	
+	public TileAction getTileAction(Tile tile) {
+		return null;
 	}
 	
 	public int getFixedYStrength() {
