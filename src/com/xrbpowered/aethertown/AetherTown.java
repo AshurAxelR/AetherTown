@@ -646,7 +646,7 @@ public class AetherTown extends UIClient {
 					lookAtAction.performAt(lookAtTile);
 				break;
 			case KeyEvent.VK_Q:
-				// TODO InventoryDialog.show();
+				InventoryDialog.show();
 				break;
 			default:
 				break;

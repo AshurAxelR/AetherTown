@@ -19,9 +19,18 @@ public class DialogContainer extends UINode implements KeyInputHandler {
 		super(parent);
 	}
 
+	public void hideTop() {
+		UIElement top = topChild();
+		if(top!=null)
+			top.setVisible(false);
+	}
+	
 	public void reveal() {
-		if(!isEmpty())
+		UIElement top = topChild();
+		if(top!=null) {
 			aether.disableController();
+			top.setVisible(true);
+		}
 		repaint();
 	}
 	
