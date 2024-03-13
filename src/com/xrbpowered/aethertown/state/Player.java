@@ -31,8 +31,8 @@ public class Player {
 		save.cameraLookY = cameraRotation.y;
 	}
 	
-	public void initCamera(CameraActor camera, Level level) {
-		if(cameraPosition==null || cameraRotation==null) {
+	public void initCamera(CameraActor camera, Level level, boolean resetPosition) {
+		if(resetPosition || cameraPosition==null || cameraRotation==null) {
 			camera.position.x = level.getStartX()*Tile.size;
 			camera.position.z = level.getStartZ()*Tile.size;
 			camera.rotation.x = 0;

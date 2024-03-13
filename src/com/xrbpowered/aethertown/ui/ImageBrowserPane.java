@@ -68,6 +68,8 @@ public class ImageBrowserPane extends UINode {
 	
 	@Override
 	public void layout() {
+		setPosition(0, 0);
+		setSize(getParent().getWidth(), getParent().getHeight());
 		updateImageLocation();
 	}
 	

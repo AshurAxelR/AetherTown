@@ -2,23 +2,22 @@ package com.xrbpowered.aethertown.ui;
 
 import static com.xrbpowered.aethertown.AetherTown.*;
 import static com.xrbpowered.aethertown.state.Bookmarks.*;
-import static com.xrbpowered.aethertown.ui.ClickButton.*;
+import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.bgColor;
 
-import java.awt.Color;
+import java.awt.event.KeyEvent;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.state.NamedLevelRef;
+import com.xrbpowered.aethertown.ui.controls.ClickButton;
+import com.xrbpowered.aethertown.ui.controls.SlotButton;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
+import com.xrbpowered.zoomui.InputInfo;
+import com.xrbpowered.zoomui.KeyInputHandler;
 import com.xrbpowered.zoomui.UIContainer;
-import com.xrbpowered.zoomui.base.UIButtonBase;
 
-public class BookmarkPane extends UIPane {
-
-	public static final Color bgColor = new Color(0x44000000, true);
-	public static final Color bgColorSelected = Color.WHITE;
-	public static final Color textColorSelected = Color.BLACK;
+public class BookmarkPane extends UIPane implements KeyInputHandler {
 	
 	private ClickButton buttonAdd, buttonDelete, buttonTravel;
 	private int selected = -1;
@@ -30,39 +29,35 @@ public class BookmarkPane extends UIPane {
 		for(int i=0; i<numBookmarks; i++) {
 			final int index = i;
 			
-			UIButtonBase item =  new UIButtonBase(this) {
+			SlotButton item =  new SlotButton(this) {
 				@Override
 				public void onAction() {
 					selected = index;
 					updateSelection();
 				}
 				@Override
+				public boolean isEmpty() {
+					return bookmarks[index]==null;
+				}
+				@Override
+				public boolean isSelected() {
+					return selected==index;
+				}
+				@Override
+				public String getItemName() {
+					return bookmarks[index].getFullName();
+				}
+				@Override
+				protected float getLabelAnchorX() {
+					return 50;
+				}
+				@Override
 				public void paint(GraphAssist g) {
-					g.fill(this, selected==index ? bgColorSelected : isHover() ? bgColorHover : ClickButton.bgColor);
-					g.fillRect(0, 0, getWidth(), getHeight());
-					g.setColor(isEnabled() ? (selected==index ? textColorSelected : textColor) : textColorDisabled);
-
+					super.paint(g);
 					g.setFont(Fonts.smallBold);
 					g.drawString(String.format("%d.", index+1), 40, getHeight()/2f, GraphAssist.RIGHT, GraphAssist.CENTER);
-					g.setFont(Fonts.small);
-					
-					NamedLevelRef level = bookmarks[index];
-					boolean here = false;
-					String s;
-					if(level==null) {
-						s = "[EMPTY]";
-						g.setColor(textColorDisabled);
-					}
-					else {
-						s = level.getFullName();
-						here = levelInfo.isRef(level);
-					}
-					g.drawString(s, 50, getHeight()/2f, GraphAssist.LEFT, GraphAssist.CENTER);
-					if(here) {
-						g.pushPureStroke(true);
-						g.fillCircle(getWidth() - 20, getHeight()/2, 5);
-						g.popPureStroke();
-					}
+					if(levelInfo.isRef(bookmarks[index]))
+						paintDot(g);
 				}
 			};
 			
@@ -94,6 +89,7 @@ public class BookmarkPane extends UIPane {
 			@Override
 			public void onAction() {
 				aether.teleportTo(bookmarks[selected].find(regionCache));
+				updateSelection();
 			}
 		};
 		buttonTravel.setSize(200, buttonTravel.getHeight());
@@ -134,4 +130,17 @@ public class BookmarkPane extends UIPane {
 		clear(g, bgColor);
 	}
 	
+	@Override
+	public boolean onKeyPressed(char c, int code, InputInfo input) {
+		switch(code) {
+			case KeyEvent.VK_ESCAPE:
+			case KeyEvent.VK_B:
+				remove();
+				ui.repaint();
+				break;
+			default:
+				break;
+		}
+		return true;
+	}
 }

@@ -71,7 +71,7 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 		regionSeed = region.seed;
 		levelx = levelInfo.x0;
 		levelz = levelInfo.z0;
-		startSeason = WorldTime.yearPhase;
+		startSeason = (float) WorldTime.yearPhase;
 		day = WorldTime.getDay();
 		time = WorldTime.getTimeOfDay();
 		player.toSave(this);

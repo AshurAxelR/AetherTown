@@ -1,6 +1,5 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
-import static com.xrbpowered.aethertown.AetherTown.aether;
 import static com.xrbpowered.aethertown.AetherTown.ui;
 
 import java.awt.event.KeyEvent;
@@ -17,11 +16,10 @@ public class LevelMapDialog extends ImageBrowserPane implements KeyInputHandler 
 	private Level level;
 	private boolean unlockRegion; 
 	
-	public LevelMapDialog(UIContainer parent, Level level, boolean unlockRegion) {
+	private LevelMapDialog(UIContainer parent, Level level, boolean unlockRegion) {
 		super(parent);
 		this.level = level;
 		this.unlockRegion = unlockRegion;
-		aether.disableController();
 		setImage(new LevelMapImage(level).create());
 	}
 	
@@ -32,13 +30,13 @@ public class LevelMapDialog extends ImageBrowserPane implements KeyInputHandler 
 			case KeyEvent.VK_E:
 			case KeyEvent.VK_M:
 				remove();
-				getParent().repaint();
+				ui.repaint();
 				break;
 			case KeyEvent.VK_N:
 				if(unlockRegion) {
 					remove();
 					RegionMapDialog.show(level);
-					getParent().repaint();
+					ui.repaint();
 				}
 			default:
 				break;
@@ -48,7 +46,7 @@ public class LevelMapDialog extends ImageBrowserPane implements KeyInputHandler 
 	
 	public static void show(Level level, boolean unlockRegion) {
 		new LevelMapDialog(ui, level, unlockRegion);
-		ui.repaint();
+		ui.reveal();
 	}
 
 }

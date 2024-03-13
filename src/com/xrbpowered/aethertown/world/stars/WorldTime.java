@@ -9,34 +9,36 @@ public class WorldTime {
 
 	public static final int daysInYear = 12*7;
 	public static final int equinoxDay = 19;
-	
-	public static float yearPhase = 0f;
 
-	private static final float timeFactor = 1f / (float)(60*60*24);
+	public static final double hour = 1.0 / (double)(24);
+	public static final double minute = 1.0 / (double)(60*24);
+	public static final double second = 1.0 / (double)(60*60*24);
 	
-	public static float time = 0f;
+	public static double yearPhase = 0f;
+
+	public static double time = 0.0;
 	
-	public static void updateTime(float dt) {
-		time += dt*settings.timeSpeed*timeFactor;
+	public static void updateTime(double dt) {
+		time += dt*settings.timeSpeed*second;
 	}
 	
-	public static void shiftTimeOfYear(float dt) {
-		yearPhase += dt*0.05f;
+	public static void shiftTimeOfYear(double dt) {
+		yearPhase += dt*0.05;
 	}
 
 	public static float getTimeOfDay() {
-		return frac(time);
+		return (float) frac(time);
 	}
 	
 	public static float getTimeOfYear() {
-		return frac(time/daysInYear + yearPhase);
+		return (float) frac(time/daysInYear + yearPhase);
 	}
 	
 	public static int getHourOfDay() {
 		return Math.round(getTimeOfDay()*60*60*24)/3600%24;
 	}
 	
-	public static void setTime(float startSeason, int day, float t) {
+	public static void setTime(double startSeason, int day, float t) {
 		yearPhase = startSeason;
 		time = day + t;
 	}
@@ -46,7 +48,7 @@ public class WorldTime {
 	}
 	
 	public static int getDayOfYear() {
-		return ((int)((float)Math.floor(time) + yearPhase*daysInYear) + equinoxDay + daysInYear) % daysInYear;
+		return ((int)(Math.floor(time) + yearPhase*daysInYear) + equinoxDay + daysInYear) % daysInYear;
 	}
 	
 	public static String getFormattedTime(float t) {

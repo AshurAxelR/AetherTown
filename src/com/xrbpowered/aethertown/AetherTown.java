@@ -19,7 +19,8 @@ import com.xrbpowered.aethertown.state.SaveState;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.ToastPane;
-import com.xrbpowered.aethertown.ui.dialogs.DialogManager;
+import com.xrbpowered.aethertown.ui.dialogs.DialogContainer;
+import com.xrbpowered.aethertown.ui.dialogs.InventoryDialog;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.ui.dialogs.RegionMapDialog;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
@@ -142,7 +143,7 @@ public class AetherTown extends UIClient {
 	public static LevelCache levelCache;
 	public static Level level = null;
 	public static LevelInfo levelInfo = null;
-	public static DialogManager ui = null;
+	public static DialogContainer ui = null;
 
 	private CameraActor camera;
 	private Controller flyController, walkController;
@@ -165,7 +166,6 @@ public class AetherTown extends UIClient {
 	private UINode uiHud;
 	private UIPane uiTime, uiLookInfo, uiActionInfo, uiDebugInfo;
 	private ToastPane uiToast;
-	private BookmarkPane uiBookmarks;
 	
 	public AetherTown(final LevelInfo startLevel) {
 		super("Aether Town", settings.uiScaling);
@@ -236,7 +236,7 @@ public class AetherTown extends UIClient {
 				pointActor.setTextures(new Texture[] {new Texture(Color.RED)});
 
 				activateLevel(startLevel);
-				player.initCamera(camera, level);
+				player.initCamera(camera, level, false);
 				updateWalkY();
 
 				// setup child resources
@@ -306,17 +306,19 @@ public class AetherTown extends UIClient {
 			}
 		};
 		
-		ui = new DialogManager(getContainer());
+		ui = new DialogContainer(getContainer());
 		
 		uiHud = new UINode(getContainer()) {
+			@Override
+			public boolean isInside(float px, float py) {
+				return false;
+			}
 			@Override
 			public void layout() {
 				uiTime.setPosition(20, getHeight()-uiTime.getHeight()-20);
 				uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
 				uiActionInfo.setPosition(getWidth()/2-uiActionInfo.getWidth()/2, uiTime.getY()-uiActionInfo.getHeight()-40);
 				uiToast.setPosition(20, getHeight()/2-uiToast.getHeight()/2);
-				if(uiBookmarks!=null)
-					uiBookmarks.setPosition(getWidth()/2-uiBookmarks.getWidth()/2, getHeight()/2-uiBookmarks.getHeight()/2);
 				super.layout();
 			}
 		};
@@ -388,11 +390,6 @@ public class AetherTown extends UIClient {
 		uiActionInfo.setVisible(false);
 
 		uiToast = new ToastPane(uiHud);
-		
-		if(settings.allowBookmaks) {
-			uiBookmarks = new BookmarkPane(uiHud);
-			uiBookmarks.setVisible(false);
-		}
 	}
 	
 	private int compass = -1;
@@ -463,12 +460,7 @@ public class AetherTown extends UIClient {
 	
 	public void teleportTo(LevelInfo info) {
 		activateLevel(info);
-		camera.position.x = level.getStartX()*Tile.size;
-		camera.position.z = level.getStartZ()*Tile.size;
-		camera.rotation.x = 0;
-		camera.rotation.y = 0;
-		
-		camera.position.y = 100f;
+		player.initCamera(camera, level, true);
 		activeController = walkController;
 		updateWalkY();
 	}
@@ -496,9 +488,6 @@ public class AetherTown extends UIClient {
 		
 		System.out.printf("Level switched to *%04dL:[%d, %d]\n", info.region.seed%10000L, info.x0, info.z0);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
-		
-		if(uiBookmarks!=null && uiBookmarks.isVisible())
-			uiBookmarks.updateSelection();
 	}
 	
 	private void checkLevelChange() {
@@ -639,10 +628,9 @@ public class AetherTown extends UIClient {
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
 				break;
 			case KeyEvent.VK_B:
-				if(level!=null && uiBookmarks!=null) {
-					uiBookmarks.setVisible(!uiBookmarks.isVisible());
-					uiBookmarks.selectNone();
-					getContainer().repaint();
+				if(level!=null && settings.allowBookmaks) {
+					new BookmarkPane(ui);
+					ui.reveal();
 				}
 				break;
 			case KeyEvent.VK_N:
@@ -656,6 +644,9 @@ public class AetherTown extends UIClient {
 			case KeyEvent.VK_E:
 				if(lookAtAction!=null)
 					lookAtAction.performAt(lookAtTile);
+				break;
+			case KeyEvent.VK_Q:
+				// TODO InventoryDialog.show();
 				break;
 			default:
 				break;

@@ -18,7 +18,7 @@ public class RegionMapDialog extends ImageBrowserPane implements KeyInputHandler
 
 	private Level level;
 	
-	public RegionMapDialog(UIContainer parent, Region region, LevelInfo info, Level level) {
+	private RegionMapDialog(UIContainer parent, Region region, LevelInfo info, Level level) {
 		super(parent);
 		this.level = level;
 		aether.disableController();
@@ -32,13 +32,13 @@ public class RegionMapDialog extends ImageBrowserPane implements KeyInputHandler
 			case KeyEvent.VK_E:
 			case KeyEvent.VK_N:
 				remove();
-				getParent().repaint();
+				ui.repaint();
 				break;
 			case KeyEvent.VK_M:
 				if(level!=null) {
 					remove();
 					LevelMapDialog.show(level, true);
-					getParent().repaint();
+					ui.repaint();
 				}
 				break;
 			default:
@@ -49,7 +49,7 @@ public class RegionMapDialog extends ImageBrowserPane implements KeyInputHandler
 	
 	public static void show(Level level) {
 		new RegionMapDialog(ui, level.info.region, level.info, level);
-		ui.repaint();
+		ui.reveal();
 	}
 
 }

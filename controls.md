@@ -8,17 +8,20 @@ Movement:
 * **Mouse4** - toggle auto walk
 * **Backspace** - turn camera 180&deg;
 
-Flying:
-* **Tab** - toggle flying (if allowed)
-* **F3** - while flying, toogle super speed
-* **Space** / **LShift** - fly up / down
-
 Actions:
+* **E** - interact
+* **R** - alternative interaction
+* **Q** - open inventory
 * **M** - view local map
 * **N** - view region map
 * **B** - bookmarks UI (if allowed)
 * **F5** - save state (even if `nosave` is set)
 * **F10** - save screenshot
+
+Flying (if allowed):
+* **Tab** - toggle flying
+* **F3** - while flying, toogle super speed
+* **Space** / **LShift** - fly up / down
 
 Time control (if allowed):
 * **[** - rewind time of day

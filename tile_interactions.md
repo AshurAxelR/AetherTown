@@ -33,6 +33,41 @@ Player inventory has 12 slots (2 _heavy_).
 	* Storage - array: inventory data
 * All room keys - list: **Room Key**, item location (inventory or storage ref.)
 	* Storage (temporary) - inventory data
+* Gloabl cooldowns (gcd) - list: action id, timestamp of gcd ending
+
+
+## UI Layouts
+
+### Inventory / Storage
+
+* Character info:
+	* CR info
+	* INS info
+	* \[button\] **STATS** > UI
+		* XP, knowledge level?, statistics (number of created products by type, progress, etc.)
+* Storage name or **Backpack**
+	* Warning if storage is temporary
+	* Pages for large storage?
+* \[list\] Items (12 slots) - item name, **H** marks heavy > select item in item pane
+* Item pane:
+	* Item name and description
+	* Blocking info if action is disabled, e.g. gcd remaining
+	* \[button\] **USE** or action name > item action...
+	* \[button\] red **X** for _Dispose_ if allowed > confirmation dialog
+	* \[button\] **MOVE** if storage present > UI
+		* \[list\] Storage list, **dot** marks current location
+* \[list\] Storage list (if present) (horizontal)
+* \[button\] **CLOSE**
+
+### Action menu
+
+* Character info...
+* Tile type or name
+	* Tile address
+* \[list\] Actions - action name, cost, time > tile action...  
+	No general confirmation. If action is disabled, a message box/toast is shown
+* \[button\] **INVENTORY (N)** where N is the number of storages present, if any > inventory UI
+* \[button\] **LEAVE** or **BACK**
 
 ## Home improvements
 
