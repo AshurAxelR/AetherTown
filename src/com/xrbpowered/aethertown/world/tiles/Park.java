@@ -121,12 +121,21 @@ public class Park extends TileTemplate {
 		StaticMesh treeMesh = BasicGeometry.sphere(1f, 8, -1, ObjectShader.vertexInfo); 
 
 		if(useBranchTexture) {
-			Texture branches = new Texture("trees/branches.png", true, true, false);
-			tree = new ScaledTileComponent(treeMesh, branches).setCulling(false);
-			cherryTree = new ScaledTileComponent(treeMesh, branches).setCulling(false);
+			Texture branches = new Texture("models/trees/branches.png", true, true, false);
+			Texture branchesSnow = new Texture("models/trees/branches_snow.png", true, true, false);
+			
+			treeTexture.replace(70, 21, branches);
+			treeTexture.replace(77, 10, branchesSnow);
+			cherryTexture.replace(72, 16, branches);
+			cherryTexture.replace(77, 10, branchesSnow);
+			bushTexture.replace(72, 18, branches);
+			bushTexture.replace(77, 10, branchesSnow);
+			
+			tree = new ScaledTileComponent(treeMesh, treeTexture).setCulling(false);
+			cherryTree = new ScaledTileComponent(treeMesh, cherryTexture).setCulling(false);
 			bush = new ScaledTileComponent(
 					BasicGeometry.sphere(1f, 8, -0.5f, ObjectShader.vertexInfo),
-					branches).setCulling(false);
+					bushTexture).setCulling(false);
 		}
 		else {
 			tree = new ScaledTileComponent(treeMesh, treeTexture);

@@ -39,6 +39,8 @@ public class Tile {
 	}
 	
 	public void place(Level level, int x, int y, int z, Dir d) {
+		if(d==null)
+			throw new NullPointerException();
 		this.level = level;
 		this.x = x;
 		this.basey = y;

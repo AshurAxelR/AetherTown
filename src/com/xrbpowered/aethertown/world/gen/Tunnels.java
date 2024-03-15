@@ -279,6 +279,7 @@ public class Tunnels {
 				continue;
 			}
 			if(adj.t!=Hill.template) {
+				dt = d.flip();
 				count++;
 				int y = adj.getGroundY();
 				if(y<groundY)

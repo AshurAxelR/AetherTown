@@ -66,7 +66,7 @@ public class AetherTown extends UIClient {
 	public static final Color bgColor = new Color(0x22000000, true);
 	public static final float pawnHeight = 1.55f;
 	
-	private static final boolean useDebugAssets = true; 
+	private static final boolean useDebugAssets = false; 
 	
 	public static class ClientConfig extends AbstractConfig {
 		public boolean fullscreen = false;
