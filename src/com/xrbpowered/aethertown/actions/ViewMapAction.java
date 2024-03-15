@@ -7,9 +7,8 @@ public class ViewMapAction extends TileAction {
 
 	public static final ViewMapAction action = new ViewMapAction();
 
-	@Override
-	public String getName() {
-		return "View map";
+	public ViewMapAction() {
+		super("View map");
 	}
 
 	@Override

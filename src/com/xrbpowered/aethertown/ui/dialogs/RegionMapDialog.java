@@ -32,7 +32,7 @@ public class RegionMapDialog extends ImageBrowserPane implements KeyInputHandler
 			case KeyEvent.VK_E:
 			case KeyEvent.VK_N:
 				remove();
-				ui.repaint();
+				ui.reveal();
 				break;
 			case KeyEvent.VK_M:
 				if(level!=null) {
@@ -48,6 +48,7 @@ public class RegionMapDialog extends ImageBrowserPane implements KeyInputHandler
 	}
 	
 	public static void show(Level level) {
+		ui.hideTop();
 		new RegionMapDialog(ui, level.info.region, level.info, level);
 		ui.reveal();
 	}

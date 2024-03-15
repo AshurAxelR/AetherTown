@@ -1,7 +1,7 @@
 package com.xrbpowered.aethertown.world.tiles;
 
+import com.xrbpowered.aethertown.actions.InspirationAction;
 import com.xrbpowered.aethertown.actions.TileAction;
-import com.xrbpowered.aethertown.actions.ThrowCoinAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
@@ -19,7 +19,7 @@ public class Fountain extends Plaza {
 	
 	@Override
 	public TileAction getTileAction(Tile tile) {
-		return ThrowCoinAction.action;
+		return InspirationAction.throwCoin;
 	}
 	
 	@Override

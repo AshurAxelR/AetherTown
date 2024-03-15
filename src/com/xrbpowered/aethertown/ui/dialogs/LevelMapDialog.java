@@ -30,7 +30,7 @@ public class LevelMapDialog extends ImageBrowserPane implements KeyInputHandler 
 			case KeyEvent.VK_E:
 			case KeyEvent.VK_M:
 				remove();
-				ui.repaint();
+				ui.reveal();
 				break;
 			case KeyEvent.VK_N:
 				if(unlockRegion) {
@@ -45,6 +45,7 @@ public class LevelMapDialog extends ImageBrowserPane implements KeyInputHandler 
 	}
 	
 	public static void show(Level level, boolean unlockRegion) {
+		ui.hideTop();
 		new LevelMapDialog(ui, level, unlockRegion);
 		ui.reveal();
 	}

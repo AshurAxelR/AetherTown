@@ -9,6 +9,9 @@ import com.xrbpowered.gl.scene.CameraActor;
 
 public class Player {
 
+	public int cash = 1000;
+	public int inspiration = 0;
+	
 	public Vector3f cameraPosition = null;
 	public Vector3f cameraRotation = null;
 	

@@ -1,11 +1,13 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
+import static com.xrbpowered.aethertown.AetherTown.player;
 import static com.xrbpowered.aethertown.AetherTown.ui;
 import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.bgColor;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.gl.ui.pane.UIPane;
@@ -58,9 +60,9 @@ public class DialogBase extends UIPane implements KeyInputHandler {
 			g.line(10, 50, getWidth()-10, 50);
 			g.setColor(Color.WHITE);
 			g.setFont(Fonts.large);
-			g.drawString("£100.00", 30, 26, GraphAssist.LEFT, GraphAssist.CENTER);
+			g.drawString(TileAction.formatCurrency(player.cash), 30, 26, GraphAssist.LEFT, GraphAssist.CENTER);
 			g.setFont(Fonts.small);
-			g.drawString("1 INS", buttonStats.getX()-10, 26, GraphAssist.RIGHT, GraphAssist.CENTER);
+			g.drawString(String.format("%d INS", player.inspiration), buttonStats.getX()-10, 26, GraphAssist.RIGHT, GraphAssist.CENTER);
 		}
 	}
 	
@@ -75,6 +77,5 @@ public class DialogBase extends UIPane implements KeyInputHandler {
 			close();
 		return true;
 	}
-
 
 }

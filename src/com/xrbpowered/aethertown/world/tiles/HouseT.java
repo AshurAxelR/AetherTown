@@ -5,7 +5,7 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 
-import com.xrbpowered.aethertown.actions.TestMenuAction;
+import com.xrbpowered.aethertown.actions.EnterTileAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
@@ -28,7 +28,6 @@ import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
 import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
-import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
 
 public class HouseT extends TileTemplate {
 
@@ -63,14 +62,14 @@ public class HouseT extends TileTemplate {
 	@Override
 	public String getTileInfo(Tile tile) {
 		if(tile.sub.i==0 && tile.sub.j==0)
-			return ((HouseGeneratorBase) tile.sub.parent).getInfo();
+			return ((HouseGenerator) tile.sub.parent).getInfo();
 		else
 			return super.getTileInfo(tile);
 	}
 	
 	@Override
 	public TileAction getTileAction(Tile tile) {
-		return TestMenuAction.action;
+		return EnterTileAction.getHouseAction((HouseGenerator) tile.sub.parent);
 	}
 	
 	@Override

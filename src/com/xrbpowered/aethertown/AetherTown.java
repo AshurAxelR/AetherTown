@@ -381,7 +381,7 @@ public class AetherTown extends UIClient {
 				if(lookAtAction!=null) {
 					g.setColor(Color.WHITE);
 					g.setFont(Fonts.small);
-					g.drawString(String.format("[ E ]   %s", lookAtAction.getName()),
+					g.drawString(String.format("[ E ]   %s", lookAtAction.name),
 							getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
 				}
 			}
