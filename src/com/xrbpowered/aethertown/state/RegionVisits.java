@@ -8,23 +8,24 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class RegionVisits {
 
-	private static final String formatId = "AetherTown.RegionVisits.0";
+	private static final String formatId = "AetherTown.RegionVisits.1";
 	
 	private static HashMap<Long, RegionVisits> regions = new HashMap<>();
 
 	public final int index;
-	private final HashMap<Integer, LevelRef> visited = new HashMap<>();
+	private final HashMap<Integer, LevelVisit> visited = new HashMap<>();
 	
 	private RegionVisits(int index) {
 		this.index = index;
 	}
 	
-	public void add(LevelRef ref) {
+	public void add(LevelVisit ref) {
 		visited.put(ref.hashCode(), ref);
 	}
 
@@ -47,7 +48,9 @@ public class RegionVisits {
 				for(int j=0; j<numLevels; j++) {
 					int x = in.readShort();
 					int z = in.readShort();
-					r.add(new LevelRef(seed, x, z));
+					LevelVisit level = new LevelVisit(seed, x, z);
+					level.loadVisits(in);
+					r.add(level);
 				}
 				totalVisited += numLevels;
 			}
@@ -74,9 +77,10 @@ public class RegionVisits {
 				RegionVisits r = e.getValue();
 				out.writeInt(r.index);
 				out.writeInt(r.visited.size());
-				for(LevelRef level : r.visited.values()) {
+				for(LevelVisit level : r.visited.values()) {
 					out.writeShort(level.x);
 					out.writeShort(level.z);
+					level.saveVisits(out);
 				}
 			}
 			
@@ -105,6 +109,8 @@ public class RegionVisits {
 	}
 
 	public static void visit(LevelInfo level) {
+		if(isVisited(level))
+			return;
 		long seed = level.region.seed;
 		RegionVisits r = regions.get(seed);
 		if(r==null) {
@@ -113,6 +119,24 @@ public class RegionVisits {
 			System.out.printf("Region *%d is now known as %s\n",
 					seed%10000L, getRegionTitle(level.region.seed, false));
 		}
-		r.add(new LevelRef(level));
+		r.add(new LevelVisit(level));
+	}
+	
+	public static boolean isTileVisited(Tile tile) {
+		LevelInfo level = tile.level.info;
+		if(!isVisited(level))
+			return false;
+		RegionVisits r = regions.get(level.region.seed);
+		LevelVisit ref = r.visited.get(level.hashCode());
+		return ref.isVisited(tile);
+	}
+	
+	public static void visitTile(Tile tile) {
+		LevelInfo level = tile.level.info;
+		if(!isVisited(level))
+			visit(level);
+		RegionVisits r = regions.get(level.region.seed);
+		LevelVisit ref = r.visited.get(level.hashCode());
+		ref.visitTile(tile);
 	}
 }

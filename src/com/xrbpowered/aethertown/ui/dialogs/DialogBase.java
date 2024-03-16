@@ -57,7 +57,7 @@ public abstract class DialogBase extends UIPane implements KeyInputHandler {
 			g.setFont(Fonts.large);
 			g.drawString(TileAction.formatCurrency(player.cash), 30, 26, GraphAssist.LEFT, GraphAssist.CENTER);
 			g.setFont(Fonts.small);
-			g.drawString(String.format("%d INS", player.inspiration), buttonStats.getX()-10, 26, GraphAssist.RIGHT, GraphAssist.CENTER);
+			g.drawString(String.format("%d INS", player.getInspiration()), buttonStats.getX()-10, 26, GraphAssist.RIGHT, GraphAssist.CENTER);
 		}
 	}
 	

@@ -12,7 +12,7 @@ public class ViewMapAction extends TileAction {
 	}
 
 	@Override
-	public void performAt(Tile tile, boolean alt) {
+	public void onSuccess(Tile tile, boolean alt) {
 		LevelMapDialog.show(tile.level, false);
 	}
 

@@ -8,10 +8,23 @@ import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.region.HouseRole;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class HouseTileAction extends EnterTileAction {
 
-	public static final HouseTileAction hotelAction = new HouseTileAction(HotelActionMenu.menu);
+	public static final HouseTileAction hotel = new HouseTileAction(HotelActionMenu.menu);
+
+	public static final HouseTileAction home = new HouseTileAction(HotelActionMenu.menu) {
+		@Override
+		public boolean isEnabled(Tile tile, boolean alt) {
+			return false;
+		}
+		@Override
+		protected void onFail(Tile tile, boolean alt) {
+			showToast("Requires key");
+		}
+	};
 
 	public HouseTileAction(TileActionMenu menu) {
 		super(menu);
@@ -24,7 +37,7 @@ public class HouseTileAction extends EnterTileAction {
 
 	@Override
 	public boolean isEnabled(Tile tile, boolean alt) {
-		return !house(tile).isClosed(alt);
+		return !house(tile).isClosed(alt, 0f);
 	}
 	
 	protected HouseGenerator house(Tile tile) {
@@ -55,14 +68,26 @@ public class HouseTileAction extends EnterTileAction {
 	@Override
 	protected void onFail(Tile tile, boolean alt) {
 		HouseGenerator house = house(tile);
-		if(house.isClosed(alt))
+		if(house.isClosed(alt, 0f))
 			showToast("%s is closed until %02d:00", house.getRole(alt).title, house.arch.getIllumLayer(alt ? 1 : 0).open);
+	}
+	
+	public static boolean closingSoon(Tile tile, boolean alt, TileAction action) {
+		if(tile.t==HouseT.template) {
+			float addTime = (action==null) ? 0f : action.getDelay(tile, alt) * (float) WorldTime.minute;
+			return ((HouseGenerator) tile.sub.parent).isClosed(alt, addTime);
+		}
+		else
+			return false;
 	}
 
 	public static TileAction getAction(HouseRole role) {
 		if(role==null)
 			return null;
-		return hotelAction;
+		else if(role==HouseRole.residential)
+			return home;
+		else
+			return hotel;
 	}
 
 }

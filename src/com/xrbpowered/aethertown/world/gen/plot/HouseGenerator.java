@@ -44,8 +44,9 @@ public class HouseGenerator extends HouseGeneratorBase {
 		return alt ? addRole : role;
 	}
 	
-	public boolean isClosed(boolean alt) {
-		return getRole(alt)!=HouseRole.residential && !arch.getIllumLayer(alt ? 1 : 0).isActive(WorldTime.getHourOfDay());
+	public boolean isClosed(boolean alt, float addTime) {
+		return getRole(alt)!=HouseRole.residential && !arch.getIllumLayer(alt ? 1 : 0)
+				.isActive(WorldTime.getHourOfDay(addTime));
 	}
 	
 	public String getAddress() {
@@ -54,7 +55,7 @@ public class HouseGenerator extends HouseGeneratorBase {
 	
 	public String getRoleTitle(boolean alt) {
 		String title = getRole(alt).title;
-		if(isClosed(alt))
+		if(isClosed(alt, 0f))
 			title += " [closed]";
 		return title;
 	}

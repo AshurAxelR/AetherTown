@@ -500,6 +500,7 @@ public class AetherTown extends UIClient {
 						showToast("Flying OFF");
 					}
 					else {
+						hud.setLookAtTile(null);
 						activeController = flyController;
 						flyController.moveSpeed = settings.flySpeed;
 						showToast("Flying ON");

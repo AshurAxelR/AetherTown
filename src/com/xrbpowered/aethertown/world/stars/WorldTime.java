@@ -27,17 +27,25 @@ public class WorldTime {
 	}
 
 	public static float getTimeOfDay() {
-		return (float) frac(time);
+		return getTimeOfDay(0f);
 	}
-	
+
+	public static float getTimeOfDay(float addTime) {
+		return (float) frac(time + addTime);
+	}
+
 	public static float getTimeOfYear() {
 		return (float) frac(time/daysInYear + yearPhase);
 	}
 	
 	public static int getHourOfDay() {
-		return Math.round(getTimeOfDay()*60*60*24)/3600%24;
+		return getHourOfDay(0f);
 	}
-	
+
+	public static int getHourOfDay(float addTime) {
+		return Math.round(getTimeOfDay(addTime)*60*60*24)/3600%24;
+	}
+
 	public static void setTime(double startSeason, int day, float t) {
 		yearPhase = startSeason;
 		time = day + t;

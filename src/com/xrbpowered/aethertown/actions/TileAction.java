@@ -1,6 +1,8 @@
 package com.xrbpowered.aethertown.actions;
 
 import static com.xrbpowered.aethertown.AetherTown.player;
+import static com.xrbpowered.aethertown.actions.HouseTileAction.closingSoon;
+import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
@@ -17,7 +19,7 @@ public abstract class TileAction {
 	}
 	
 	public boolean isEnabled(Tile tile, boolean alt) {
-		return true;
+		return !closingSoon(tile, alt, this);
 	}
 	
 	public TileAction setCost(int cost) {
@@ -52,13 +54,15 @@ public abstract class TileAction {
 	}
 	
 	protected void onFail(Tile tile, boolean alt) {
+		if(closingSoon(tile, alt, this))
+			showToast("Closing soon");
 	}
 
 	protected void onSuccess(Tile tile, boolean alt) {
 		applyCost(tile, alt);
 	}
 
-	public void performAt(Tile tile, boolean alt) {
+	public final void performAt(Tile tile, boolean alt) {
 		if(isEnabled(tile, alt))
 			onSuccess(tile, alt);
 		else

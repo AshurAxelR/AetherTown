@@ -13,35 +13,35 @@ public class MapsMenu extends TileActionMenu {
 	private MapsMenu() {
 		addAction(new TileAction("View map") {
 			@Override
-			public void performAt(Tile tile, boolean alt) {
+			public void onSuccess(Tile tile, boolean alt) {
 				LevelMapDialog.show(tile.level, true);
 			}
 		});
 		
 		addAction(new TileAction("View region map") {
 			@Override
-			public void performAt(Tile tile, boolean alt) {
+			public void onSuccess(Tile tile, boolean alt) {
 				RegionMapDialog.show(tile.level);
 			}
 		});
 		
 		addAction(new TileAction("Get map") {
 			@Override
-			public void performAt(Tile tile, boolean alt) {
+			public void onSuccess(Tile tile, boolean alt) {
 				// TODO add item
 			}
 		});
 		
 		addAction(new TileAction("Get region map") {
 			@Override
-			public void performAt(Tile tile, boolean alt) {
+			public void onSuccess(Tile tile, boolean alt) {
 				// TODO add item
 			}
 		});
 		
 		addAction(new TileAction("Get level token") {
 			@Override
-			public void performAt(Tile tile, boolean alt) {
+			public void onSuccess(Tile tile, boolean alt) {
 				// TODO add item
 			}
 		});

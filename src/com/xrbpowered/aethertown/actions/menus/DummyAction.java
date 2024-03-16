@@ -18,7 +18,7 @@ public class DummyAction extends TileAction {
 
 	@Override
 	public boolean isEnabled(Tile tile, boolean alt) {
-		return enabled;
+		return enabled && super.isEnabled(tile, alt);
 	}
 
 }

@@ -9,11 +9,29 @@ import com.xrbpowered.gl.scene.CameraActor;
 
 public class Player {
 
-	public int cash = 1000;
-	public int inspiration = 0;
+	public static final int maxInspiration = 10;
+	
+	public int cash = 10000;
+	
+	private int inspiration = 0;
 	
 	public Vector3f cameraPosition = null;
 	public Vector3f cameraRotation = null;
+	
+	public int getInspiration() {
+		return inspiration;
+	}
+	
+	public int addInspiration(int ins) {
+		inspiration += ins;
+		if(inspiration>maxInspiration) {
+			int added = ins - (inspiration - maxInspiration);
+			inspiration = maxInspiration;
+			return added;
+		}
+		else
+			return ins;
+	}
 	
 	public void fromSave(SaveState save) {
 		if(save.defaultStart) {
