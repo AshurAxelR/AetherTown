@@ -5,7 +5,7 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 
-import com.xrbpowered.aethertown.actions.EnterTileAction;
+import com.xrbpowered.aethertown.actions.HouseTileAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
@@ -69,9 +69,20 @@ public class HouseT extends TileTemplate {
 	
 	@Override
 	public TileAction getTileAction(Tile tile) {
-		return EnterTileAction.getHouseAction((HouseGenerator) tile.sub.parent);
+		if(tile.sub.i==0 && tile.sub.j==0)
+			return HouseTileAction.getAction(((HouseGenerator) tile.sub.parent).getRole(false));
+		else
+			return null;
 	}
-	
+
+	@Override
+	public TileAction getTileAltAction(Tile tile) {
+		if(tile.sub.i==0 && tile.sub.j==0)
+			return HouseTileAction.getAction(((HouseGenerator) tile.sub.parent).getRole(true));
+		else
+			return null;
+	}
+
 	@Override
 	public int getFixedYStrength() {
 		return 1;

@@ -40,19 +40,35 @@ public class HouseGenerator extends HouseGeneratorBase {
 			return new HouseGenerator();
 	}
 	
-	public String getRoleTitle(boolean simple) {
-		String title = role.title;
-		if(!simple && role!=HouseRole.residential && !arch.getIllumLayer(0).isActive(WorldTime.getHourOfDay()))
-			title += " [closed]";
-		if(addRole!=null)
-			return String.format("%s + %s", title, addRole.title);
-		else
-			return title;
+	public HouseRole getRole(boolean alt) {
+		return alt ? addRole : role;
 	}
 	
+	public boolean isClosed(boolean alt) {
+		return getRole(alt)!=HouseRole.residential && !arch.getIllumLayer(alt ? 1 : 0).isActive(WorldTime.getHourOfDay());
+	}
+	
+	public String getAddress() {
+		return String.format("%d, %s", index+1, startToken.level.info.name);
+	}
+	
+	public String getRoleTitle(boolean alt) {
+		String title = getRole(alt).title;
+		if(isClosed(alt))
+			title += " [closed]";
+		return title;
+	}
+
+	public String getRoleTitles() {
+		if(addRole!=null)
+			return String.format("%s + %s", getRoleTitle(false), getRoleTitle(true));
+		else
+			return getRoleTitle(false);
+	}
+
 	@Override
 	public String getInfo() {
-		return String.format("%d, %s: %s", index+1, startToken.level.info.name, getRoleTitle(false));
+		return String.format("%s: %s", getAddress(), getRoleTitles());
 	}
 	
 	@Override

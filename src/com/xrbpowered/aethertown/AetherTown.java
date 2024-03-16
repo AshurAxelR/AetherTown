@@ -1,11 +1,12 @@
 package com.xrbpowered.aethertown;
 
+import static com.xrbpowered.aethertown.ui.hud.Hud.performAction;
+import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 import static com.xrbpowered.zoomui.MouseInfo.RIGHT;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 
-import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
@@ -18,11 +19,11 @@ import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.state.SaveState;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
-import com.xrbpowered.aethertown.ui.ToastPane;
 import com.xrbpowered.aethertown.ui.dialogs.DialogContainer;
 import com.xrbpowered.aethertown.ui.dialogs.InventoryDialog;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.ui.dialogs.RegionMapDialog;
+import com.xrbpowered.aethertown.ui.hud.Hud;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
@@ -55,15 +56,12 @@ import com.xrbpowered.gl.scene.CameraActor.Perspective;
 import com.xrbpowered.gl.scene.Controller;
 import com.xrbpowered.gl.scene.StaticMeshActor;
 import com.xrbpowered.gl.scene.WalkController;
-import com.xrbpowered.gl.ui.UINode;
 import com.xrbpowered.gl.ui.pane.UIOffscreen;
-import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final Color bgColor = new Color(0x22000000, true);
 	public static final float pawnHeight = 1.55f;
 	
 	private static final boolean useDebugAssets = false; 
@@ -144,6 +142,7 @@ public class AetherTown extends UIClient {
 	public static Level level = null;
 	public static LevelInfo levelInfo = null;
 	public static DialogContainer ui = null;
+	public static Hud hud = null;
 
 	private CameraActor camera;
 	private Controller flyController, walkController;
@@ -157,15 +156,9 @@ public class AetherTown extends UIClient {
 	private StaticMeshActor pointActor;
 
 	private int hoverx, hoverz;
-	private Tile lookAtTile = null;
-	private String lookAtInfo = null;
-	private TileAction lookAtAction = null;
 	private boolean showPointer = false;
 	
 	private UIOffscreen uiRender;
-	private UINode uiHud;
-	private UIPane uiTime, uiLookInfo, uiActionInfo, uiDebugInfo;
-	private ToastPane uiToast;
 	
 	public AetherTown(final LevelInfo startLevel) {
 		super("Aether Town", settings.uiScaling);
@@ -282,7 +275,6 @@ public class AetherTown extends UIClient {
 					dtDay = settings.timeSpeedUp*dt; 
 				sky.updateTime(dtDay);
 				
-				uiTime.repaint();
 				environment.recalc(sky.sun.position);
 				updateEnvironment();
 				if(!blockUpdatePortals)
@@ -307,89 +299,7 @@ public class AetherTown extends UIClient {
 		};
 		
 		ui = new DialogContainer(getContainer());
-		
-		uiHud = new UINode(getContainer()) {
-			@Override
-			public boolean isInside(float px, float py) {
-				return false;
-			}
-			@Override
-			public void layout() {
-				uiTime.setPosition(20, getHeight()-uiTime.getHeight()-20);
-				uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
-				uiActionInfo.setPosition(getWidth()/2-uiActionInfo.getWidth()/2, uiTime.getY()-uiActionInfo.getHeight()-40);
-				uiToast.setPosition(20, getHeight()/2-uiToast.getHeight()/2);
-				super.layout();
-			}
-		};
-		
-		if(settings.showFps) {
-			uiDebugInfo = new UIPane(uiHud, false) {
-				@Override
-				protected void paintBackground(GraphAssist g) {
-					clear(g, bgColor);
-					g.setColor(Color.WHITE);
-					g.setFont(Fonts.small);
-					paintDebugInfo(g);
-				}
-				@Override
-				public void updateTime(float dt) {
-					repaint();
-				}
-			};
-			uiDebugInfo.setSize(180, 50);
-			uiDebugInfo.setPosition(20, 20);
-		}
-		
-		uiTime = new UIPane(uiHud, false) {
-			@Override
-			protected void paintBackground(GraphAssist g) {
-				clear(g, bgColor);
-				g.setColor(Color.WHITE);
-				g.setFont(Fonts.large);
-				g.drawString(WorldTime.getFormattedTime(), 50, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
-				g.setFont(Fonts.small);
-				g.drawString(String.format("DAY %d, %s", WorldTime.getDay()+1, WorldTime.getFormattedDate()), 100, getHeight()/2, GraphAssist.LEFT, GraphAssist.CENTER);
-			}
-		};
-		uiTime.setSize(220, 32);
-		
-		uiLookInfo = new UIPane(uiHud, false) {
-			@Override
-			public boolean isVisible() {
-				return super.isVisible() && ui.isEmpty();
-			}
-			@Override
-			protected void paintBackground(GraphAssist g) {
-				clear(g, bgColor);
-				g.setColor(Color.WHITE);
-				g.setFont(Fonts.small);
-				g.drawString(lookAtInfo, getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
-			}
-		};
-		uiLookInfo.setSize(600, 32);
-		uiLookInfo.setVisible(false);
-
-		uiActionInfo = new UIPane(uiHud, false) {
-			@Override
-			public boolean isVisible() {
-				return super.isVisible() && ui.isEmpty();
-			}
-			@Override
-			protected void paintBackground(GraphAssist g) {
-				clear(g, bgColor);
-				if(lookAtAction!=null) {
-					g.setColor(Color.WHITE);
-					g.setFont(Fonts.small);
-					g.drawString(String.format("[ E ]   %s", lookAtAction.name),
-							getWidth()/2, getHeight()/2, GraphAssist.CENTER, GraphAssist.CENTER);
-				}
-			}
-		};
-		uiActionInfo.setSize(200, 32);
-		uiActionInfo.setVisible(false);
-
-		uiToast = new ToastPane(uiHud);
+		hud = new Hud(getContainer());
 	}
 	
 	private int compass = -1;
@@ -402,17 +312,15 @@ public class AetherTown extends UIClient {
 		hoverx = Level.hover(camera.position.x);
 		hoverz = Level.hover(camera.position.z);
 		
-		String info = "";
-		TileAction action = null;
 		if(activeController==walkController) {
 			Dir d = Dir.values()[(int)Math.round(-camera.rotation.y*2.0/Math.PI) & 0x03];
-			lookAtTile = level.getAdj(hoverx, hoverz, d);
-			if(lookAtTile!=null) {
+			hud.setLookAtTile(level.getAdj(hoverx, hoverz, d));
+			/*if(lookAtTile!=null) {
 				info = lookAtTile.t.getTileInfo(lookAtTile);
 				action = lookAtTile.t.getTileAction(lookAtTile);
-			}
+			}*/
 		}
-		boolean hudRepaint = false;
+		/*boolean hudRepaint = false;
 		if(!info.equals(lookAtInfo)) { // FIXME can change by time and need repaint
 			lookAtInfo = info;
 			if(info.isEmpty())
@@ -432,7 +340,7 @@ public class AetherTown extends UIClient {
 			}
 		}
 		if(hudRepaint)
-			uiHud.repaint();
+			uiHud.repaint();*/
 		
 		int comp = (int)Math.round(-camera.rotation.y*4.0/Math.PI) & 0x07;
 		if(comp!=compass) {
@@ -536,7 +444,7 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
-	private void paintDebugInfo(GraphAssist g) {
+	public void paintDebugInfo(GraphAssist g) {
 		float y = 10;
 		String s = String.format("%.1f fps", getFps());
 		Color c = environment.lightColor;
@@ -641,21 +549,18 @@ public class AetherTown extends UIClient {
 				if(level!=null)
 					LevelMapDialog.show(level, true);
 				break;
-			case KeyEvent.VK_E:
-				if(lookAtAction!=null)
-					lookAtAction.performAt(lookAtTile);
-				break;
 			case KeyEvent.VK_Q:
 				InventoryDialog.show();
+				break;
+			case KeyEvent.VK_E:
+				performAction(false);
+				break;
+			case KeyEvent.VK_R:
+				performAction(true);
 				break;
 			default:
 				break;
 		}
-	}
-	
-	public static void showToast(String msg) {
-		aether.uiToast.queue.push(msg);
-		System.out.printf("> %s\n", msg);
 	}
 	
 	public static void saveState() {

@@ -1,10 +1,11 @@
-package com.xrbpowered.aethertown.ui;
+package com.xrbpowered.aethertown.ui.hud;
 
-import static com.xrbpowered.aethertown.AetherTown.bgColor;
+import static com.xrbpowered.aethertown.ui.hud.Hud.bgColor;
 
 import java.awt.Color;
 import java.util.LinkedList;
 
+import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;

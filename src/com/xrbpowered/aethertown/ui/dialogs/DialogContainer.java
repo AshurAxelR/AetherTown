@@ -1,8 +1,10 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
 import static com.xrbpowered.aethertown.AetherTown.aether;
+import static com.xrbpowered.aethertown.AetherTown.ui;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 
 import com.xrbpowered.gl.ui.UINode;
 import com.xrbpowered.zoomui.InputInfo;
@@ -64,6 +66,24 @@ public class DialogContainer extends UINode implements KeyInputHandler {
 	@Override
 	public boolean onMouseDown(float x, float y, MouseInfo mouse) {
 		return !isEmpty();
+	}
+	
+	public static void close(UINode dialog) {
+		dialog.remove();
+		ui.reveal();
+	}
+	
+	public static void checkCloseKey(UINode dialog, int code) {
+		switch(code) {
+			case KeyEvent.VK_ESCAPE:
+			case KeyEvent.VK_Q:
+			case KeyEvent.VK_E:
+			case KeyEvent.VK_R:
+				close(dialog);
+				break;
+			default:
+				break;
+		}
 	}
 	
 }

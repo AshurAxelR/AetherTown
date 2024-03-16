@@ -23,7 +23,11 @@ public abstract class TileTemplate implements Generator {
 	public TileAction getTileAction(Tile tile) {
 		return null;
 	}
-	
+
+	public TileAction getTileAltAction(Tile tile) {
+		return null;
+	}
+
 	public int getFixedYStrength() {
 		return 2;
 	}

@@ -8,29 +8,29 @@ import com.xrbpowered.aethertown.ui.ImageBrowserPane;
 import com.xrbpowered.aethertown.ui.LevelMapImage;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.zoomui.InputInfo;
-import com.xrbpowered.zoomui.KeyInputHandler;
 import com.xrbpowered.zoomui.UIContainer;
 
-public class LevelMapDialog extends ImageBrowserPane implements KeyInputHandler {
+public class LevelMapDialog extends FullscreenDialogNode {
 	
-	private Level level;
-	private boolean unlockRegion; 
+	private final ImageBrowserPane image;
+	
+	private final Level level;
+	private final boolean unlockRegion; 
 	
 	private LevelMapDialog(UIContainer parent, Level level, boolean unlockRegion) {
 		super(parent);
 		this.level = level;
 		this.unlockRegion = unlockRegion;
-		setImage(new LevelMapImage(level).create());
+		
+		image = new ImageBrowserPane(content);
+		image.setImage(new LevelMapImage(level).create());
 	}
 	
 	@Override
 	public boolean onKeyPressed(char c, int code, InputInfo input) {
 		switch(code) {
-			case KeyEvent.VK_ESCAPE:
-			case KeyEvent.VK_E:
 			case KeyEvent.VK_M:
-				remove();
-				ui.reveal();
+				close();
 				break;
 			case KeyEvent.VK_N:
 				if(unlockRegion) {
@@ -38,8 +38,9 @@ public class LevelMapDialog extends ImageBrowserPane implements KeyInputHandler 
 					RegionMapDialog.show(level);
 					ui.repaint();
 				}
-			default:
 				break;
+			default:
+				return super.onKeyPressed(c, code, input);
 		}
 		return true;
 	}

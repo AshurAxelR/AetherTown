@@ -85,7 +85,7 @@ public class LevelMapImage extends ImageGenerator {
 		for(HouseGenerator house : level.houses) {
 			g.setColor(colorMarginText);
 			g.drawString(Integer.toString(house.index+1), x+24, y, GraphAssist.RIGHT, GraphAssist.CENTER);
-			g.drawString(house.getRoleTitle(true), x+64, y, GraphAssist.LEFT, GraphAssist.CENTER);
+			g.drawString(house.role.title, x+64, y, GraphAssist.LEFT, GraphAssist.CENTER);
 			g.setColor(colorMarginTextDim);
 			g.drawString(String.format("%s%d", getXBinName(house.startToken.x/gridStep), house.startToken.z/gridStep+1),
 					x+40, y, GraphAssist.CENTER, GraphAssist.CENTER);
@@ -116,7 +116,7 @@ public class LevelMapImage extends ImageGenerator {
 		if(tile!=null && (tile.t==HouseT.template || tile.t==ChurchT.template)) {
 			String info = null;
 			if(tile.sub.parent instanceof HouseGenerator)
-				info = ((HouseGenerator) tile.sub.parent).getRoleTitle(true);
+				info = ((HouseGenerator) tile.sub.parent).getRoleTitles();
 			else if(tile.sub.parent instanceof ChurchGenerator)
 				info = tile.t.getTileInfo(tile);
 			g.setFont(Fonts.smallBold);

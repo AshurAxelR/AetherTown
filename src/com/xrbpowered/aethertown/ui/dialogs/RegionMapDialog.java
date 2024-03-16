@@ -1,6 +1,5 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
-import static com.xrbpowered.aethertown.AetherTown.aether;
 import static com.xrbpowered.aethertown.AetherTown.ui;
 
 import java.awt.event.KeyEvent;
@@ -11,25 +10,25 @@ import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.zoomui.InputInfo;
-import com.xrbpowered.zoomui.KeyInputHandler;
 import com.xrbpowered.zoomui.UIContainer;
 
-public class RegionMapDialog extends ImageBrowserPane implements KeyInputHandler {
+public class RegionMapDialog extends FullscreenDialogNode {
 
-	private Level level;
+	private final ImageBrowserPane image;
+	
+	private final Level level;
 	
 	private RegionMapDialog(UIContainer parent, Region region, LevelInfo info, Level level) {
 		super(parent);
 		this.level = level;
-		aether.disableController();
-		setImage(new RegionMapImage(region, info).create());
+		
+		image = new ImageBrowserPane(content);
+		image.setImage(new RegionMapImage(region, info).create());
 	}
 	
 	@Override
 	public boolean onKeyPressed(char c, int code, InputInfo input) {
 		switch(code) {
-			case KeyEvent.VK_ESCAPE:
-			case KeyEvent.VK_E:
 			case KeyEvent.VK_N:
 				remove();
 				ui.reveal();
@@ -42,7 +41,7 @@ public class RegionMapDialog extends ImageBrowserPane implements KeyInputHandler
 				}
 				break;
 			default:
-				break;
+				return super.onKeyPressed(c, code, input);
 		}
 		return true;
 	}

@@ -8,10 +8,10 @@ import com.xrbpowered.aethertown.world.Tile;
 public class TileActionMenu {
 
 	public abstract class Item {
-		public abstract void performAt(Tile tile, TileActionMenuDialog dialog);
-		public abstract String getLabel(Tile tile);
+		public abstract void performAt(Tile tile, boolean alt, TileActionMenuDialog dialog);
+		public abstract String getLabel(Tile tile, boolean alt);
 		
-		public String getCostInfo(Tile tile) {
+		public String getCostInfo(Tile tile, boolean alt) {
 			return null;
 		}
 		
@@ -19,7 +19,7 @@ public class TileActionMenu {
 			return false;
 		}
 		
-		public boolean isEnabled(Tile tile) {
+		public boolean isEnabled(Tile tile, boolean alt) {
 			return true;
 		}
 	}
@@ -32,23 +32,23 @@ public class TileActionMenu {
 		}
 		
 		@Override
-		public String getLabel(Tile tile) {
-			return action.getLabel(tile);
+		public String getLabel(Tile tile, boolean alt) {
+			return action.getLabel(tile, alt);
 		}
 		
 		@Override
-		public String getCostInfo(Tile tile) {
-			return action.getCostInfo(tile);
+		public String getCostInfo(Tile tile, boolean alt) {
+			return action.getCostInfo(tile, alt);
 		}
 		
 		@Override
-		public boolean isEnabled(Tile tile) {
-			return action.isEnabled(tile);
+		public boolean isEnabled(Tile tile, boolean alt) {
+			return action.isEnabled(tile, alt);
 		}
 		
 		@Override
-		public void performAt(Tile tile, TileActionMenuDialog dialog) {
-			action.performAt(tile);
+		public void performAt(Tile tile, boolean alt, TileActionMenuDialog dialog) {
+			action.performAt(tile, alt);
 			dialog.repaint();
 		}
 	}
@@ -70,22 +70,23 @@ public class TileActionMenu {
 		}
 		
 		@Override
-		public String getLabel(Tile tile) {
+		public String getLabel(Tile tile, boolean alt) {
 			return label;
 		}
 		
 		@Override
-		public String getCostInfo(Tile tile) {
+		public String getCostInfo(Tile tile, boolean alt) {
 			return delay>0 ? TileAction.formatDelay(delay) : null;
 		}
 		
-		public boolean isEnabled(Tile tile) {
+		@Override
+		public boolean isEnabled(Tile tile, boolean alt) {
 			return menu.isEnabled(tile);
 		}
 		
 		@Override
-		public void performAt(Tile tile, TileActionMenuDialog dialog) {
-			if(isEnabled(tile))
+		public void performAt(Tile tile, boolean alt, TileActionMenuDialog dialog) {
+			if(isEnabled(tile, alt))
 				dialog.pushMenu(menu);
 			else
 				menu.disabledAction(tile, dialog);

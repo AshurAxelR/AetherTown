@@ -1,11 +1,10 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
 import static com.xrbpowered.aethertown.AetherTown.player;
-import static com.xrbpowered.aethertown.AetherTown.ui;
 import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.bgColor;
+import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.checkCloseKey;
 
 import java.awt.Color;
-import java.awt.event.KeyEvent;
 
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.ui.Fonts;
@@ -16,7 +15,7 @@ import com.xrbpowered.zoomui.InputInfo;
 import com.xrbpowered.zoomui.KeyInputHandler;
 import com.xrbpowered.zoomui.UIContainer;
 
-public class DialogBase extends UIPane implements KeyInputHandler {
+public abstract class DialogBase extends UIPane implements KeyInputHandler {
 
 	public static final Color borderColor = new Color(0xdddddd);
 
@@ -46,10 +45,6 @@ public class DialogBase extends UIPane implements KeyInputHandler {
 		return "CLOSE";
 	}
 	
-	public int getCloseKeyCode() {
-		return KeyEvent.VK_E;
-	}
-	
 	@Override
 	protected void paintBackground(GraphAssist g) {
 		clear(g, bgColor);
@@ -67,14 +62,12 @@ public class DialogBase extends UIPane implements KeyInputHandler {
 	}
 	
 	public void close() {
-		remove();
-		ui.repaint();
+		DialogContainer.close(this);
 	}
 	
 	@Override
 	public boolean onKeyPressed(char c, int code, InputInfo input) {
-		if(code==KeyEvent.VK_ESCAPE || code==getCloseKeyCode())
-			close();
+		checkCloseKey(this, code);
 		return true;
 	}
 

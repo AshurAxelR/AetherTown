@@ -1,6 +1,6 @@
 package com.xrbpowered.aethertown.actions.menus;
 
-import static com.xrbpowered.aethertown.AetherTown.showToast;
+import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.actions.InspirationAction;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;

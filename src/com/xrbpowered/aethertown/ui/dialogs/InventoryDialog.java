@@ -4,10 +4,8 @@ import static com.xrbpowered.aethertown.AetherTown.ui;
 import static com.xrbpowered.aethertown.ui.controls.ClickButton.bgColorHover;
 import static com.xrbpowered.aethertown.ui.controls.ClickButton.textColorDisabled;
 
-import java.awt.event.KeyEvent;
-
 import com.xrbpowered.aethertown.ui.Fonts;
-import com.xrbpowered.aethertown.ui.controls.ClickButton;
+import com.xrbpowered.aethertown.ui.controls.SelectButton;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
@@ -18,7 +16,13 @@ public class InventoryDialog extends DialogBase {
 	public InventoryDialog(UIContainer parent) {
 		super(parent, 700, 550, true);
 		
-		new ClickButton(this, "BACKPACK").setPosition(10, 60);
+		SelectButton invButton = new SelectButton(this, "BACKPACK") {
+			@Override
+			public boolean isSelected() {
+				return true;
+			}
+		};
+		invButton.setPosition(10, 60);
 
 		for(int i=0; i<12; i++) {
 			// final int index = i;
@@ -41,12 +45,8 @@ public class InventoryDialog extends DialogBase {
 		}
 	}
 
-	@Override
-	public int getCloseKeyCode() {
-		return KeyEvent.VK_Q;
-	}
-	
 	public static void show() {
+		ui.hideTop();
 		new InventoryDialog(ui);
 		ui.reveal();
 	}

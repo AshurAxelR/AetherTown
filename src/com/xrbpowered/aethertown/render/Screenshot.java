@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.ui.Fonts;
+import com.xrbpowered.aethertown.ui.hud.Hud;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.res.buffer.OffscreenBuffer;
@@ -90,7 +91,7 @@ public class Screenshot {
 	public static final Screenshot screenshot = new Screenshot() {
 		@Override
 		protected void decorate(GraphAssist g, int width, int height) {
-			g.fillRect(width-300, height-70, 280, 50, AetherTown.bgColor);
+			g.fillRect(width-300, height-70, 280, 50, Hud.bgColor);
 			g.setColor(Color.WHITE);
 			g.setFont(Fonts.small);
 			

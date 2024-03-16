@@ -24,22 +24,22 @@ public class TileActionMenuDialog extends DialogBase {
 		
 		@Override
 		public void onAction() {
-			item.performAt(tile, TileActionMenuDialog.this);
+			item.performAt(tile, alt, TileActionMenuDialog.this);
 		}
 		
 		@Override
 		public String getLabel() {
-			return item.getLabel(tile);
+			return item.getLabel(tile, alt);
 		}
 		
 		@Override
 		protected Color getTextColor() {
-			return item.isEnabled(tile) ? super.getTextColor() : textColorDisabled;
+			return item.isEnabled(tile, alt) ? super.getTextColor() : textColorDisabled;
 		}
 		
 		@Override
 		protected Color getBackgroundColor() {
-			return item.isEnabled(tile) && isHover() ? bgColorHover :
+			return item.isEnabled(tile, alt) && isHover() ? bgColorHover :
 				item.isMenu() ? bgColor : SlotButton.bgColorEmpty;
 		}
 		
@@ -61,7 +61,7 @@ public class TileActionMenuDialog extends DialogBase {
 		@Override
 		public void paint(GraphAssist g) {
 			super.paint(g);
-			String info = item.getCostInfo(tile);
+			String info = item.getCostInfo(tile, alt);
 			float x = getWidth()-10;
 			float y = getHeight()/2;
 			if(item.isMenu()) {
@@ -78,20 +78,22 @@ public class TileActionMenuDialog extends DialogBase {
 	
 	public final TileActionMenu menu;
 	public final Tile tile;
+	public final boolean alt;
 	
 	private String title;
-	private String address;
+	private String subtitle;
 	
 	protected UIContainer menuContainer;
 	
 	private LinkedList<TileActionMenu> history = new LinkedList<>();
 	
-	public TileActionMenuDialog(UIContainer parent, TileActionMenu menu, Tile tile, String title, String address) {
+	public TileActionMenuDialog(UIContainer parent, TileActionMenu menu, Tile tile, boolean alt, String title, String subtitle) {
 		super(parent, 500, calcSize(menu, title!=null), true);
 		this.menu = menu;
 		this.tile = tile;
+		this.alt = alt;
 		this.title = title;
-		this.address = address;
+		this.subtitle = subtitle;
 		
 		menuContainer = new UIContainer(this) {
 			@Override
@@ -118,10 +120,10 @@ public class TileActionMenuDialog extends DialogBase {
 			g.setColor(Color.WHITE);
 			g.setFont(Fonts.large);
 			g.drawString(title, 30, 80, GraphAssist.LEFT, GraphAssist.CENTER);
-			if(address!=null) {
+			if(subtitle!=null) {
 				g.setColor(ClickButton.textColorDisabled);
 				g.setFont(Fonts.small);
-				g.drawString(address, getWidth()-20, 80, GraphAssist.RIGHT, GraphAssist.CENTER);
+				g.drawString(subtitle, getWidth()-20, 80, GraphAssist.RIGHT, GraphAssist.CENTER);
 			}
 		}
 	}

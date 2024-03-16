@@ -16,7 +16,7 @@ public abstract class TileAction {
 		this.name = name;
 	}
 	
-	public boolean isEnabled(Tile tile) {
+	public boolean isEnabled(Tile tile, boolean alt) {
 		return true;
 	}
 	
@@ -25,7 +25,7 @@ public abstract class TileAction {
 		return this;
 	}
 	
-	public int getCost(Tile tile) {
+	public int getCost(Tile tile, boolean alt) {
 		return cost;
 	}
 	
@@ -34,35 +34,35 @@ public abstract class TileAction {
 		return this;
 	}
 	
-	public int getDelay(Tile tile) {
+	public int getDelay(Tile tile, boolean alt) {
 		return delay;
 	}
 
-	public String getLabel(Tile tile) {
+	public String getLabel(Tile tile, boolean alt) {
 		return name;
 	}
 	
-	public String getCostInfo(Tile tile) {
-		return formatCostInfo(getDelay(tile), getCost(tile));
+	public String getCostInfo(Tile tile, boolean alt) {
+		return formatCostInfo(getDelay(tile, alt), getCost(tile, alt));
 	}
 	
-	protected void applyCost(Tile tile) {
-		player.cash -= getCost(tile);
-		WorldTime.time += getDelay(tile) * WorldTime.minute;
+	protected void applyCost(Tile tile, boolean alt) {
+		player.cash -= getCost(tile, alt);
+		WorldTime.time += getDelay(tile, alt) * WorldTime.minute;
 	}
 	
-	protected void onFail(Tile tile) {
+	protected void onFail(Tile tile, boolean alt) {
 	}
 
-	protected void onSuccess(Tile tile) {
-		applyCost(tile);
+	protected void onSuccess(Tile tile, boolean alt) {
+		applyCost(tile, alt);
 	}
 
-	public void performAt(Tile tile) {
-		if(isEnabled(tile))
-			onSuccess(tile);
+	public void performAt(Tile tile, boolean alt) {
+		if(isEnabled(tile, alt))
+			onSuccess(tile, alt);
 		else
-			onFail(tile);
+			onFail(tile, alt);
 	}
 	
 	public static String formatCostInfo(int delay, int cost) {
