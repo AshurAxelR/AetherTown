@@ -1,6 +1,10 @@
 package com.xrbpowered.aethertown.actions.menus;
 
+import com.xrbpowered.aethertown.actions.GetItemAction;
 import com.xrbpowered.aethertown.actions.TileAction;
+import com.xrbpowered.aethertown.state.items.Item;
+import com.xrbpowered.aethertown.state.items.ItemType;
+import com.xrbpowered.aethertown.state.items.TravelTokenItem;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.ui.dialogs.RegionMapDialog;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
@@ -39,10 +43,19 @@ public class MapsMenu extends TileActionMenu {
 			}
 		});
 		
-		addAction(new TileAction("Get level token") {
+		addAction(new GetItemAction("Get", ItemType.travelToken) {
 			@Override
-			public void onSuccess(Tile tile, boolean alt) {
-				// TODO add item
+			protected boolean isSameItem(Item item, Tile tile, boolean alt) {
+				if(item instanceof TravelTokenItem) {
+					TravelTokenItem tt = (TravelTokenItem) item;
+					if(tt.destination.isLevel(tile.level.info))
+						return true;
+				}
+				return false;
+			}
+			@Override
+			protected Item generateItem(Tile tile, boolean alt) {
+				return new TravelTokenItem(tile.level.info);
 			}
 		});
 	}

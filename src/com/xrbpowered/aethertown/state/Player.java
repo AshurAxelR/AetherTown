@@ -12,8 +12,9 @@ public class Player {
 	public static final int maxInspiration = 10;
 	
 	public int cash = 10000;
-	
 	private int inspiration = 0;
+	
+	public final Inventory backpack = new Inventory();
 	
 	public Vector3f cameraPosition = null;
 	public Vector3f cameraRotation = null;

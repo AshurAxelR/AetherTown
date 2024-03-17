@@ -7,7 +7,7 @@ import com.xrbpowered.aethertown.world.Tile;
 
 public class TileActionMenu {
 
-	public abstract class Item {
+	public abstract class Command {
 		public abstract void performAt(Tile tile, boolean alt, TileActionMenuDialog dialog);
 		public abstract String getLabel(Tile tile, boolean alt);
 		
@@ -24,10 +24,10 @@ public class TileActionMenu {
 		}
 	}
 	
-	public class ActionItem extends Item {
+	public class ActionCommand extends Command {
 		public final TileAction action;
 		
-		public ActionItem(TileAction action) {
+		public ActionCommand(TileAction action) {
 			this.action = action;
 		}
 		
@@ -53,12 +53,12 @@ public class TileActionMenu {
 		}
 	}
 	
-	public class MenuItem extends Item {
+	public class MenuCommand extends Command {
 		public final String label;
 		public final TileActionMenu menu;
 		public final int delay;
 		
-		public MenuItem(String label, TileActionMenu menu, int delay) {
+		public MenuCommand(String label, TileActionMenu menu, int delay) {
 			this.label = label;
 			this.menu = menu;
 			this.delay = delay;
@@ -93,18 +93,18 @@ public class TileActionMenu {
 		}
 	}
 	
-	public final ArrayList<Item> items = new ArrayList<>();
+	public final ArrayList<Command> items = new ArrayList<>();
 	
 	public void addAction(TileAction action) {
-		items.add(new ActionItem(action));
+		items.add(new ActionCommand(action));
 	}
 	
 	public void addMenu(String label, TileActionMenu menu) {
-		items.add(new MenuItem(label, menu, 0));
+		items.add(new MenuCommand(label, menu, 0));
 	}
 
 	public void addMenu(String label, TileActionMenu menu, int delayMin) {
-		items.add(new MenuItem(label, menu, delayMin));
+		items.add(new MenuCommand(label, menu, delayMin));
 	}
 
 	public boolean isEnabled(Tile tile) {
@@ -113,9 +113,9 @@ public class TileActionMenu {
 	
 	public int getSize() {
 		int max = items.size();
-		for(Item item : items) {
-			if(item instanceof MenuItem)
-				max = Math.max(max, ((MenuItem) item).menu.getSize());
+		for(Command item : items) {
+			if(item instanceof MenuCommand)
+				max = Math.max(max, ((MenuCommand) item).menu.getSize());
 		}
 		return max;
 	}

@@ -159,7 +159,7 @@ public class Hud extends UINode {
 	
 	public static void showToast(String msg) {
 		if(hud!=null)
-			hud.uiToast.queue.push(msg);
+			hud.uiToast.queue.addLast(msg);
 		System.out.printf("> %s\n", msg);
 	}
 

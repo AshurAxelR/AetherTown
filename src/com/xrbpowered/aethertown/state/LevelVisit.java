@@ -50,7 +50,7 @@ public class LevelVisit extends LevelRef {
 	public boolean validateVisits(Level level) {
 		if(validated)
 			return true;
-		if(this.hashCode()!=level.info.hashCode())
+		if(!this.isLevel(level.info))
 			return false;
 		for(TileVisit v : visitedTiles.values()) {
 			Tile tile = level.map[v.x][v.z];

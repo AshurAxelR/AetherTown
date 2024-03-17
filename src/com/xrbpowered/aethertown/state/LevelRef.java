@@ -34,6 +34,11 @@ public class LevelRef {
 		return find(regions.get(regionSeed));
 	}
 	
+	public boolean isLevel(LevelInfo level) {
+		return this.regionSeed==level.region.seed &&
+				this.x==level.x0 && this.z==level.z0;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(regionSeed, x, z);
@@ -41,9 +46,9 @@ public class LevelRef {
 	
 	@Override
 	public boolean equals(Object obj) {
-		LevelRef info = (LevelRef) obj;
-		return this.regionSeed==info.regionSeed &&
-				this.x==info.x && this.z==info.z;
+		LevelRef ref = (LevelRef) obj;
+		return this.regionSeed==ref.regionSeed &&
+				this.x==ref.x && this.z==ref.z;
 	}
 	
 }

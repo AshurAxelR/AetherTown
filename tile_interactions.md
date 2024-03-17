@@ -12,7 +12,7 @@
 Inventory hotkey **Q**  
 Player inventory has 12 slots (2 _heavy_).
 
-* **Rune** (level ref.) required for instant travel
+* **Travel Token** (level ref.) required for instant travel
 * **House Key** (house tile ref.) required for interacting with house tile
 * **Room Key** (hotel tile ref., expired - bool) required for room actions in a hotel tile, expires at 11am
 * **Map** (level ref.) _View:_ view level map, hotkey **M**
@@ -94,7 +94,7 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 * _Maps:_ UI
 	* _View map:_ local or region
 	* _Get map:_ local or region **+item**
-	* in some tiles, _Get Rune:_ **+item: Rune**
+	* in some tiles, _Get Travel Token:_ **+item: Travel Token**
 * ... room actions
 	* _Relax:_ +1h
 	* _Shower:_ +15min, +2 INS (daily)
@@ -124,7 +124,7 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 		* (inventory enabled, food allowed)
 
 ### Monument
-* **E:** _Travel_ > select **Rune**: (2h gcd) fast travel to ref. level
+* **E:** _Travel_ > select **Travel Token**: (2h gcd) fast travel to ref. level
 
 ### NavBox
 * **E:** _View map:_ local
@@ -153,7 +153,7 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 
 ### HouseRole: post office / civic centre
 * **E:** _Enter:_ UI
-	* _Maps:_ UI (+rune)
+	* _Maps:_ UI (+Travel Token)
 	* _Collect earnings:_ +CR earned to this point
 	* _Order goods_ > select home improvement: (local home owned) ... ?
 	* **Civic Centre** _Residential Services:_
@@ -170,7 +170,7 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 	* _Reception:_
 		* _Check in:_ (cd until item expires) +5min, £5 once per tile (crediting allowed), £25 CR after that (no crediting), **+item: Room Key**
 		* _Check out:_ **-item: Room Key**, take items from room storage
-		* _Maps:_ UI (+rune)
+		* _Maps:_ UI (+Travel Token)
 		* _Collect earnings:_ +CR earned to this point
 		* (inventory enabled, disposing, food not allowed)
 	* _Bar/Restaurant:_

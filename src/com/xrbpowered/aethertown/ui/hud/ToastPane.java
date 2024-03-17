@@ -40,7 +40,7 @@ public class ToastPane extends UIPane {
 		if(time>0f)
 			time -= dt;
 		if(time<switchTime && !queue.isEmpty()) {
-			msg = queue.pop();
+			msg = queue.removeFirst();
 			time = duration;
 			repaint();
 		}

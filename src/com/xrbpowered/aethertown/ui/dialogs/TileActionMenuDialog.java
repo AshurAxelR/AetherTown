@@ -16,9 +16,9 @@ import com.xrbpowered.zoomui.UIElement;
 public class TileActionMenuDialog extends DialogBase {
 
 	private class TileActionButton extends ClickButton {
-		public final TileActionMenu.Item item;
+		public final TileActionMenu.Command item;
 		
-		public TileActionButton(TileActionMenu.Item item) {
+		public TileActionButton(TileActionMenu.Command item) {
 			super(menuContainer, null);
 			this.item = item;
 		}
@@ -140,7 +140,7 @@ public class TileActionMenuDialog extends DialogBase {
 	
 	private void switchMenu(TileActionMenu m) {
 		menuContainer.removeAllChildren();
-		for(TileActionMenu.Item item : m.items) {
+		for(TileActionMenu.Command item : m.items) {
 			new TileActionButton(item);
 		}
 		buttonClose.label = (m==menu) ? "LEAVE" : "BACK";
