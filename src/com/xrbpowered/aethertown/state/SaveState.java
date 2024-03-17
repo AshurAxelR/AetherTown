@@ -80,13 +80,14 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 	
 	private static final String cfgName = "save.cfg";
 	private static final String visitsName = "visits.dat";
+	private static final String cooldownsName = "cooldowns.dat";
 	private static final String bookmarksName = "bookmarks.dat";
 
 	private static final Collection<String> all = Arrays.asList(
-		cfgName, visitsName, bookmarksName
+		cfgName, visitsName, cooldownsName, bookmarksName
 	);
 	private static final Collection<String> required = Arrays.asList(
-		cfgName, visitsName
+		cfgName, visitsName, cooldownsName
 	);
 
 	@Override
@@ -105,6 +106,8 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 			return super.load(cfgName, in);
 		else if(visitsName.equals(name))
 			return RegionVisits.load(in);
+		else if(cooldownsName.equals(name))
+			return GlobalCooldowns.load(in);
 		else if(bookmarksName.equals(name))
 			return AetherTown.settings.allowBookmaks && Bookmarks.load(in);
 		else
@@ -117,6 +120,8 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 			return super.save(cfgName, out);
 		else if(visitsName.equals(name))
 			return RegionVisits.save(out);
+		else if(cooldownsName.equals(name))
+			return GlobalCooldowns.save(out);
 		else if(bookmarksName.equals(name))
 			return AetherTown.settings.allowBookmaks && !Bookmarks.isEmpty() && Bookmarks.save(out);
 		else

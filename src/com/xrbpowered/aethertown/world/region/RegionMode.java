@@ -130,7 +130,7 @@ public abstract class RegionMode {
 		}
 		@Override
 		public String formatValue() {
-			return String.format("oneLevel,%s,%s", settlement.name(), terrain.name);
+			return String.format("fewLevels,%s,%s", settlement.name(), terrain.name);
 		}
 	}
 	

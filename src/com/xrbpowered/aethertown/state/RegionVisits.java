@@ -122,21 +122,22 @@ public class RegionVisits {
 		r.add(new LevelVisit(level));
 	}
 	
+	private static LevelVisit getVisit(LevelInfo level) {
+		RegionVisits r = regions.get(level.region.seed);
+		return r.visited.get(level.hashCode());
+	}
+	
 	public static boolean isTileVisited(Tile tile) {
 		LevelInfo level = tile.level.info;
 		if(!isVisited(level))
 			return false;
-		RegionVisits r = regions.get(level.region.seed);
-		LevelVisit ref = r.visited.get(level.hashCode());
-		return ref.isVisited(tile);
+		return getVisit(level).isVisited(tile);
 	}
 	
 	public static void visitTile(Tile tile) {
 		LevelInfo level = tile.level.info;
 		if(!isVisited(level))
 			visit(level);
-		RegionVisits r = regions.get(level.region.seed);
-		LevelVisit ref = r.visited.get(level.hashCode());
-		ref.visitTile(tile);
+		getVisit(level).visitTile(tile);
 	}
 }

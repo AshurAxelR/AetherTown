@@ -1,6 +1,5 @@
-package com.xrbpowered.aethertown.actions.menus;
+package com.xrbpowered.aethertown.actions;
 
-import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.world.Tile;
 
 public class DummyAction extends TileAction {

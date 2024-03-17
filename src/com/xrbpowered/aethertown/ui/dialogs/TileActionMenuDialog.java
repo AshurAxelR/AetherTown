@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
@@ -85,6 +86,7 @@ public class TileActionMenuDialog extends DialogBase {
 	
 	protected UIContainer menuContainer;
 	
+	private double repaintTime = 0.0;
 	private LinkedList<TileActionMenu> history = new LinkedList<>();
 	
 	public TileActionMenuDialog(UIContainer parent, TileActionMenu menu, Tile tile, boolean alt, String title, String subtitle) {
@@ -113,6 +115,13 @@ public class TileActionMenuDialog extends DialogBase {
 	}
 	
 	@Override
+	public void updateTime(float dt) {
+		super.updateTime(dt);
+		if(WorldTime.time>=repaintTime)
+			repaint();
+	}
+	
+	@Override
 	protected void paintBackground(GraphAssist g) {
 		super.paintBackground(g);
 		if(title!=null) {
@@ -126,6 +135,7 @@ public class TileActionMenuDialog extends DialogBase {
 				g.drawString(subtitle, getWidth()-20, 80, GraphAssist.RIGHT, GraphAssist.CENTER);
 			}
 		}
+		repaintTime = WorldTime.time + WorldTime.minute/2;
 	}
 	
 	private void switchMenu(TileActionMenu m) {

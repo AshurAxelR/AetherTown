@@ -27,7 +27,7 @@ public class HouseRole {
 	public static final Color colorCulture = new Color(0xdd77bb);
 	public static final Color colorOffice = new Color(0x77aaaa);
 	
-	private static class LocalShopRole extends HouseRole {
+	public static class LocalShopRole extends HouseRole {
 		private boolean addOffice;
 		private LocalShopRole(String title, final DoorInfo door, Color color, boolean addOffice) {
 			super(title, color,
@@ -84,7 +84,7 @@ public class HouseRole {
 		}
 	}
 
-	private static class RestaurantRole extends HouseRole {
+	public static class RestaurantRole extends HouseRole {
 		private RestaurantRole(String title, DoorInfo door) {
 			super(title, colorFood,
 				new ArchitectureStyle.BlankGroundBack(1, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant).setDoorInfo(door),

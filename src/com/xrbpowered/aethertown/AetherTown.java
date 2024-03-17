@@ -605,7 +605,7 @@ public class AetherTown extends UIClient {
 
 		SaveState save = new SaveState();
 		if(!settings.nosave)
-			save.load();
+			save = save.load();
 		
 		LevelInfo startLevel = generateRegion(save);
 		new AetherTown(startLevel).run();

@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.actions;
 
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
+import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
 import com.xrbpowered.aethertown.actions.menus.HotelActionMenu;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
@@ -13,9 +14,12 @@ import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class HouseTileAction extends EnterTileAction {
 
-	public static final HouseTileAction hotel = new HouseTileAction(HotelActionMenu.menu);
+	public static final HouseTileAction hotel = new HouseTileAction(new HotelActionMenu(false));
+	public static final HouseTileAction inn = new HouseTileAction(new HotelActionMenu(true));
+	public static final HouseTileAction restaurant = new HouseTileAction(FoodActionMenu.restaurant);
+	public static final HouseTileAction fastFood = new HouseTileAction(FoodActionMenu.fastFood);
 
-	public static final HouseTileAction home = new HouseTileAction(HotelActionMenu.menu) {
+	public static final HouseTileAction home = new HouseTileAction(null) {
 		@Override
 		public boolean isEnabled(Tile tile, boolean alt) {
 			return false;
@@ -86,8 +90,16 @@ public class HouseTileAction extends EnterTileAction {
 			return null;
 		else if(role==HouseRole.residential)
 			return home;
-		else
+		else if(role==HouseRole.hotel)
 			return hotel;
+		else if(role==HouseRole.inn)
+			return inn;
+		else if(role instanceof HouseRole.RestaurantRole)
+			return restaurant;
+		else if(role instanceof HouseRole.LocalShopRole)
+			return fastFood; // TODO groceries, coffee shop
+		else
+			return null;
 	}
 
 }

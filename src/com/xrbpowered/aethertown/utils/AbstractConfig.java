@@ -44,7 +44,7 @@ public abstract class AbstractConfig {
 		return Modifier.isPublic(mod) && !Modifier.isStatic(mod) && !Modifier.isFinal(mod);
 	}
 	
-	protected AbstractConfig applyValues(String title, HashMap<String, String> values) {
+	protected boolean applyValues(String title, HashMap<String, String> values) {
 		Class<?> cls = this.getClass();
 		Field[] fields = cls.getFields();
 		for(Field fld : fields) {
@@ -62,17 +62,16 @@ public abstract class AbstractConfig {
 			}
 			catch (Exception e) {
 				e.printStackTrace();
-				return reset();
+				return false;
 			}
 		}
 		System.out.printf("%s loaded.\n", title);
-		return this;
+		return true;
 	}
 	
 	public boolean load(String title, InputStream in) {
 		try {
-			applyValues(title, loadValues(in));
-			return true;
+			return applyValues(title, loadValues(in));
 		}
 		catch(IOException e) {
 			System.err.printf("Can't load %s. Using default.\n", title);
@@ -82,15 +81,13 @@ public abstract class AbstractConfig {
 
 	public AbstractConfig load(String path) {
 		HashMap<String, String> values = loadValues(path);
-		if(values!=null) {
-			return applyValues(path, values);
-		}
-		else {
-			AbstractConfig def = reset();
-			if(saveDefault)
-				def.save(path);
-			return def;
-		}
+		if(values!=null && applyValues(path, values))
+			return this;
+		
+		AbstractConfig def = reset();
+		if(saveDefault)
+			def.save(path);
+		return def;
 	}
 	
 	public void save() {
