@@ -28,11 +28,16 @@ public class LevelVisit extends LevelRef {
 			this.z = tile.z;
 			this.templateHash = calcTileTemplateHash(tile.t);
 		}
+
+		public boolean isTile(Tile tile) {
+			return x==tile.x && z==tile.z;
+		}
 		
 		@Override
 		public int hashCode() {
 			return tileHash(x, z);
 		}
+		
 	}
 
 	private final HashMap<Integer, TileVisit> visitedTiles = new HashMap<>();
@@ -45,6 +50,14 @@ public class LevelVisit extends LevelRef {
 
 	public LevelVisit(LevelInfo level) {
 		super(level);
+	}
+	
+	public void resetVisits() {
+		int count = visitedTiles.size();
+		if(count>0) {
+			System.err.printf("Reset %s visit(s) for %s\n", count, this);
+			visitedTiles.clear();
+		}
 	}
 	
 	public boolean validateVisits(Level level) {
@@ -62,9 +75,8 @@ public class LevelVisit extends LevelRef {
 	}
 	
 	public boolean isVisited(Tile tile) {
-		if(!validateVisits(tile.level))
-			throw new RuntimeException("Tile visits validation failed");
-		return visitedTiles.containsKey(tileHash(tile.x, tile.z));
+		TileVisit t = visitedTiles.get(tileHash(tile.x, tile.z));
+		return t!=null && t.isTile(tile);
 	}
 	
 	private void add(TileVisit v) {

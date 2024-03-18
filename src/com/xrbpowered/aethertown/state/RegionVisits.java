@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
@@ -105,7 +106,10 @@ public class RegionVisits {
 	
 	public static boolean isVisited(LevelInfo level) {
 		RegionVisits r = regions.get(level.region.seed);
-		return r!=null && r.visited.containsKey(level.hashCode());
+		if(r==null)
+			return false;
+		LevelVisit v = r.visited.get(level.hashCode());
+		return v!=null && v.isLevel(level);
 	}
 
 	public static void visit(LevelInfo level) {
@@ -120,6 +124,16 @@ public class RegionVisits {
 					seed%10000L, getRegionTitle(level.region.seed, false));
 		}
 		r.add(new LevelVisit(level));
+	}
+	
+	public static void validateVisits(Level level) {
+		if(!isVisited(level.info))
+			return;
+		LevelVisit v = getVisit(level.info);
+		if(!v.validateVisits(level)) {
+			System.err.printf("Validating visits failed for %s\n", level.info);
+			v.resetVisits();
+		}
 	}
 	
 	private static LevelVisit getVisit(LevelInfo level) {

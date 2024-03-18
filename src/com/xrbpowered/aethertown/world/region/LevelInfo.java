@@ -212,6 +212,15 @@ public class LevelInfo {
 		return ref!=null && region.seed==ref.regionSeed && x0==ref.x && z0==ref.z;
 	}
 	
+	@Override
+	public String toString() {
+		return formatInfo(region.seed, x0, z0);
+	}
+	
+	public static String formatInfo(long regionSeed, int x, int z) {
+		return String.format("*%04dL:[%d, %d]", regionSeed%10000L, x, z);
+	}
+	
 	public static LevelInfo createNullLevel(Region region, int x, int z) {
 		long seed = region.seedXZ(x, z, 6799L);
 		return new LevelInfo(region, x, z, 1, seed).setTerrain(LevelTerrainModel.nullTerrain);

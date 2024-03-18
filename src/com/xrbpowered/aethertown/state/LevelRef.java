@@ -51,4 +51,9 @@ public class LevelRef {
 				this.x==ref.x && this.z==ref.z;
 	}
 	
+	@Override
+	public String toString() {
+		return LevelInfo.formatInfo(regionSeed, x, z);
+	}
+	
 }

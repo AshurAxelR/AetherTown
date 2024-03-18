@@ -393,8 +393,9 @@ public class AetherTown extends UIClient {
 		// levelCache.createRenderers(sky.buffer, tiles);
 		
 		RegionVisits.visit(info);
+		RegionVisits.validateVisits(level);
 		
-		System.out.printf("Level switched to *%04dL:[%d, %d]\n", info.region.seed%10000L, info.x0, info.z0);
+		System.out.printf("Level switched to %s\n", info);
 		System.out.printf("Level cache storage: %d blocks\n", levelCache.getStoredBlocks());
 	}
 	
@@ -597,7 +598,6 @@ public class AetherTown extends UIClient {
 		
 		LevelNames.load();
 		settings.load();
-		// settings.save();
 
 		ParseParams params = new ParseParams();
 		params.addFlagParam("-nosave", x -> { settings.nosave = x; }, "ignore save file");
