@@ -1,7 +1,5 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
-import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.checkCloseKey;
-
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.ControlPane;
 import com.xrbpowered.gl.ui.UINode;
@@ -48,7 +46,8 @@ public class FullscreenDialogNode extends UINode implements KeyInputHandler {
 	
 	@Override
 	public boolean onKeyPressed(char c, int code, InputInfo input) {
-		checkCloseKey(this, code);
+		if(DialogContainer.isCloseKey(this, code))
+			close();
 		return true;
 	}
 

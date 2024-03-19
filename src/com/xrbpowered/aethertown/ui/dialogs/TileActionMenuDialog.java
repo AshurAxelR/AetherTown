@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.ui.dialogs;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
 import java.util.LinkedList;
 
 import com.xrbpowered.aethertown.ui.Fonts;
@@ -10,6 +11,7 @@ import com.xrbpowered.aethertown.ui.controls.SlotButton;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.zoomui.GraphAssist;
+import com.xrbpowered.zoomui.InputInfo;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
 
@@ -85,6 +87,7 @@ public class TileActionMenuDialog extends DialogBase {
 	private String subtitle;
 	
 	protected UIContainer menuContainer;
+	protected ClickButton buttonInventory;
 	
 	private double repaintTime = 0.0;
 	private LinkedList<TileActionMenu> history = new LinkedList<>();
@@ -96,6 +99,15 @@ public class TileActionMenuDialog extends DialogBase {
 		this.alt = alt;
 		this.title = title;
 		this.subtitle = subtitle;
+		
+		buttonInventory = new ClickButton(this, "INVENTORY") {
+			@Override
+			public void onAction() {
+				InventoryDialog.show();
+			}
+		};
+		buttonInventory.setSize(150, buttonInventory.getHeight());
+		buttonInventory.setPosition(getWidth()-buttonInventory.getWidth()-10, getHeight()-buttonInventory.getHeight()-10);
 		
 		menuContainer = new UIContainer(this) {
 			@Override
@@ -166,6 +178,16 @@ public class TileActionMenuDialog extends DialogBase {
 	@Override
 	public String getCloseLabel() {
 		return "LEAVE";
+	}
+	
+	@Override
+	public boolean onKeyPressed(char c, int code, InputInfo input) {
+		if(code==KeyEvent.VK_Q) {
+			InventoryDialog.show();
+			return true;
+		}
+		else
+			return super.onKeyPressed(c, code, input);
 	}
 
 	private static int calcSize(TileActionMenu menu, boolean hasTitle) {

@@ -2,9 +2,13 @@ package com.xrbpowered.aethertown.state;
 
 import org.joml.Vector3f;
 
+import com.xrbpowered.aethertown.state.items.Item;
+import com.xrbpowered.aethertown.state.items.LevelMapItem;
+import com.xrbpowered.aethertown.state.items.RegionMapItem;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
+import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.gl.scene.CameraActor;
 
 public class Player {
@@ -73,6 +77,30 @@ public class Player {
 	public void updateCamera(CameraActor camera) {
 		cameraPosition = camera.position;
 		cameraRotation = camera.rotation;
+	}
+	
+	public boolean hasLevelMap(LevelInfo info) {
+		for(int i=0; i<backpack.size; i++) {
+			Item aitem = backpack.get(i);
+			if(aitem!=null && aitem instanceof LevelMapItem) {
+				LevelMapItem item = (LevelMapItem) aitem;
+				if(item.level.isLevel(info))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean hasRegionMap(long regionSeed) {
+		for(int i=0; i<backpack.size; i++) {
+			Item aitem = backpack.get(i);
+			if(aitem!=null && aitem instanceof RegionMapItem) {
+				RegionMapItem item = (RegionMapItem) aitem;
+				if(item.regionSeed==regionSeed)
+					return true;
+			}
+		}
+		return false;
 	}
 
 }

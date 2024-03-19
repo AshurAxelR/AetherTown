@@ -73,16 +73,15 @@ public class DialogContainer extends UINode implements KeyInputHandler {
 		ui.reveal();
 	}
 	
-	public static void checkCloseKey(UINode dialog, int code) {
+	public static boolean isCloseKey(UINode dialog, int code) {
 		switch(code) {
 			case KeyEvent.VK_ESCAPE:
 			case KeyEvent.VK_Q:
 			case KeyEvent.VK_E:
 			case KeyEvent.VK_R:
-				close(dialog);
-				break;
+				return true;
 			default:
-				break;
+				return false;
 		}
 	}
 	

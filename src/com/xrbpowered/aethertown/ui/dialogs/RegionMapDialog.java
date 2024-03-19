@@ -4,6 +4,7 @@ import static com.xrbpowered.aethertown.AetherTown.ui;
 
 import java.awt.event.KeyEvent;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.ui.ImageBrowserPane;
 import com.xrbpowered.aethertown.ui.RegionMapImage;
 import com.xrbpowered.aethertown.world.Level;
@@ -49,6 +50,13 @@ public class RegionMapDialog extends FullscreenDialogNode {
 	public static void show(Level level) {
 		ui.hideTop();
 		new RegionMapDialog(ui, level.info.region, level.info, level);
+		ui.reveal();
+	}
+
+	public static void show(Region region) {
+		ui.hideTop();
+		LevelInfo active = (region==AetherTown.region) ? AetherTown.levelInfo : null;
+		new RegionMapDialog(ui, region, active, null);
 		ui.reveal();
 	}
 

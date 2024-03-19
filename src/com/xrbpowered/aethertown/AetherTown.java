@@ -91,6 +91,7 @@ public class AetherTown extends UIClient {
 		public long regionSeed = -1L;
 		public boolean residentialLighting = true;
 		public boolean revealRegion = false;
+		public boolean mapRequireItem = true;
 		public boolean markAdjVisited = false;
 		
 		public boolean allowFlying = false;
@@ -544,12 +545,20 @@ public class AetherTown extends UIClient {
 				}
 				break;
 			case KeyEvent.VK_N:
-				if(level!=null)
-					RegionMapDialog.show(level);
+				if(level!=null) {
+					if(!settings.mapRequireItem || player.hasRegionMap(region.seed))
+						RegionMapDialog.show(level);
+					else
+						showToast("You don't a map of this region");
+				}
 				break;
 			case KeyEvent.VK_M:
-				if(level!=null)
-					LevelMapDialog.show(level, true);
+				if(level!=null) {
+					if(!settings.mapRequireItem || player.hasLevelMap(levelInfo))
+						LevelMapDialog.show(level, true);
+					else
+						showToast("You don't have a local map");
+				}
 				break;
 			case KeyEvent.VK_Q:
 				InventoryDialog.show();

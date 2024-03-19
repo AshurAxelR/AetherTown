@@ -4,6 +4,8 @@ import com.xrbpowered.aethertown.actions.GetItemAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.ItemType;
+import com.xrbpowered.aethertown.state.items.LevelMapItem;
+import com.xrbpowered.aethertown.state.items.RegionMapItem;
 import com.xrbpowered.aethertown.state.items.TravelTokenItem;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.ui.dialogs.RegionMapDialog;
@@ -29,26 +31,44 @@ public class MapsMenu extends TileActionMenu {
 			}
 		});
 		
-		addAction(new TileAction("Get map") {
+		addAction(new GetItemAction("Get", ItemType.map) {
 			@Override
-			public void onSuccess(Tile tile, boolean alt) {
-				// TODO add item
+			protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
+				if(aitem instanceof LevelMapItem) {
+					LevelMapItem item = (LevelMapItem) aitem;
+					if(item.level.isLevel(tile.level.info))
+						return true;
+				}
+				return false;
+			}
+			@Override
+			protected Item generateItem(Tile tile, boolean alt) {
+				return new LevelMapItem(tile.level.info);
 			}
 		});
 		
-		addAction(new TileAction("Get region map") {
+		addAction(new GetItemAction("Get", ItemType.regionMap) {
 			@Override
-			public void onSuccess(Tile tile, boolean alt) {
-				// TODO add item
+			protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
+				if(aitem instanceof RegionMapItem) {
+					RegionMapItem item = (RegionMapItem) aitem;
+					if(item.regionSeed==tile.level.info.region.seed)
+						return true;
+				}
+				return false;
+			}
+			@Override
+			protected Item generateItem(Tile tile, boolean alt) {
+				return new RegionMapItem(tile.level.info.region.seed);
 			}
 		});
 		
 		addAction(new GetItemAction("Get", ItemType.travelToken) {
 			@Override
-			protected boolean isSameItem(Item item, Tile tile, boolean alt) {
-				if(item instanceof TravelTokenItem) {
-					TravelTokenItem tt = (TravelTokenItem) item;
-					if(tt.destination.isLevel(tile.level.info))
+			protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
+				if(aitem instanceof TravelTokenItem) {
+					TravelTokenItem item = (TravelTokenItem) aitem;
+					if(item.destination.isLevel(tile.level.info))
 						return true;
 				}
 				return false;

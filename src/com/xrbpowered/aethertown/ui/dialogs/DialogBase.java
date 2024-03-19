@@ -2,7 +2,6 @@ package com.xrbpowered.aethertown.ui.dialogs;
 
 import static com.xrbpowered.aethertown.AetherTown.player;
 import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.bgColor;
-import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.checkCloseKey;
 
 import java.awt.Color;
 
@@ -67,7 +66,8 @@ public abstract class DialogBase extends UIPane implements KeyInputHandler {
 	
 	@Override
 	public boolean onKeyPressed(char c, int code, InputInfo input) {
-		checkCloseKey(this, code);
+		if(DialogContainer.isCloseKey(this, code))
+			close();
 		return true;
 	}
 

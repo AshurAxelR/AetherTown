@@ -63,9 +63,10 @@ public class LevelCache {
 		return active.renderer;
 	}
 	
-	public LevelInfo add(LevelInfo info, boolean markVisited) {
+	public CacheEntry add(LevelInfo info, boolean markVisited) {
+		CacheEntry c;
 		if(!infoMap.containsKey(info)) {
-			CacheEntry c = new CacheEntry(info);
+			c = new CacheEntry(info);
 			generatorQueue.queueLevel(c);
 			infoMap.put(info, c);
 			list.add(c);
@@ -76,11 +77,11 @@ public class LevelCache {
 				expel(getLRU());
 		}
 		else {
-			info = infoMap.get(info).info;
+			c = infoMap.get(info);
 		}
 		if(markVisited && AetherTown.settings.markAdjVisited)
-			RegionVisits.visit(info);
-		return info;
+			RegionVisits.visit(c.info);
+		return c;
 	}
 	
 	public void addAllAdj(LevelInfo info, boolean markVisited, boolean followPortals) {
@@ -103,7 +104,7 @@ public class LevelCache {
 			for(int z=info.z0-1; z<info.z0+info.size+1; z++) {
 				if(x==info.x0 && z==info.z0)
 					continue;
-				LevelInfo level = add(info.region.getLevel(x, z), markVisited);
+				LevelInfo level = add(info.region.getLevel(x, z), markVisited).info;
 				if(followPortals && level.isPortal())
 					add(info.region.cache.portals.otherLevel, markVisited);
 			}
@@ -136,20 +137,12 @@ public class LevelCache {
 	public int getStoredBlocks() {
 		return storage;
 	}
-	
-	public Level getLevel(LevelInfo info) {
-		return infoMap.get(info).level;
-	}
-	
-	public Level setActive(LevelInfo info, boolean waitGenerator) {
-		active = infoMap.get(info);
-		for(CacheEntry c : list)
-			updateLevelOffset(c);
-		
-		if(waitGenerator && active.level==null) {
+
+	private Level getLevel(CacheEntry cache, boolean waitGenerator) {
+		if(waitGenerator && cache.level==null) {
 			System.err.println("... Level cache waiting for the generator thread");
 			try {
-				while(active.level==null)
+				while(cache.level==null)
 					Thread.sleep(10);
 			}
 			catch (InterruptedException e) {
@@ -157,8 +150,21 @@ public class LevelCache {
 			}
 			System.err.println("... Level cache ready");
 		}
-		
-		return active.level;
+		return cache.level;
+	}
+
+	public Level getLevel(LevelInfo info, boolean waitGenerator) {
+		CacheEntry c = infoMap.get(info);
+		if(c==null)
+			c = add(info, false);
+		return getLevel(c, waitGenerator);
+	}
+	
+	public Level setActive(LevelInfo info, boolean waitGenerator) {
+		active = infoMap.get(info);
+		for(CacheEntry c : list)
+			updateLevelOffset(c);
+		return getLevel(active, waitGenerator);
 	}
 	
 	public Iterable<Level> list() {

@@ -1,7 +1,5 @@
 package com.xrbpowered.aethertown.state;
 
-import java.util.Objects;
-
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
@@ -41,7 +39,7 @@ public class LevelRef {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(regionSeed, x, z);
+		return LevelInfo.levelHash(regionSeed, x, z);
 	}
 	
 	@Override

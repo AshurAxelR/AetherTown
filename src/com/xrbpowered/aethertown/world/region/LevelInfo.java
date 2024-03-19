@@ -1,7 +1,6 @@
 package com.xrbpowered.aethertown.world.region;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.state.LevelRef;
@@ -198,7 +197,7 @@ public class LevelInfo {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(region.seed, x0, z0);
+		return levelHash(region.seed, x0, z0);
 	}
 	
 	@Override
@@ -215,6 +214,10 @@ public class LevelInfo {
 	@Override
 	public String toString() {
 		return formatInfo(region.seed, x0, z0);
+	}
+	
+	public static int levelHash(long regionSeed, int x, int z) {
+		return (int) regionSeed ^ ((z<<16) + x);
 	}
 	
 	public static String formatInfo(long regionSeed, int x, int z) {

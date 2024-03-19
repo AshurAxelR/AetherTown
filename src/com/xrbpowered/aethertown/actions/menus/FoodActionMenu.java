@@ -38,7 +38,7 @@ public class FoodActionMenu extends TileActionMenu {
 	
 	private static TileActionMenu createFastFoodMenu() {
 		FoodActionMenu food = new FoodActionMenu();
-		food.addAction(new InspirationAction("Eat-in meal", 3).setDelay(30).setCost(650).setCooldown(GlobalCooldowns.eat, 3));
+		food.addAction(new InspirationAction("Eat-in meal", 3).setDelay(30).setCost(650).setCooldown(GlobalCooldowns.eat, 2.5));
 		food.addAction(new DummyAction("Takeaway meal").setEnabled(false).setDelay(10).setCost(650));
 		food.addAction(new DummyAction("Buy Soda bottle").setEnabled(false).setCost(100));
 		food.addAction(new DummyAction("Buy Snack").setEnabled(false).setCost(150));

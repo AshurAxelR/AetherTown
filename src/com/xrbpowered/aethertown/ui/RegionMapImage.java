@@ -179,7 +179,7 @@ public class RegionMapImage extends ImageGenerator {
 					
 					if(level.settlement!=LevelSettlementType.none) {
 						int s = getSettlementRectSize(level.settlement);
-						g.setColor(bookmarks.contains(level) ? colorActive : colorTown);
+						g.setColor(colorTown);
 						g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
 					}
 					if(bookmarks.contains(level)) {

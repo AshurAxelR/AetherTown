@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Objects;
 
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -53,11 +52,7 @@ public class LevelVisit extends LevelRef {
 	}
 	
 	public void resetVisits() {
-		int count = visitedTiles.size();
-		if(count>0) {
-			System.err.printf("Reset %s visit(s) for %s\n", count, this);
-			visitedTiles.clear();
-		}
+		visitedTiles.clear();
 	}
 	
 	public boolean validateVisits(Level level) {
@@ -66,6 +61,8 @@ public class LevelVisit extends LevelRef {
 		if(!this.isLevel(level.info))
 			return false;
 		for(TileVisit v : visitedTiles.values()) {
+			if(!level.isInside(v.x, v.z))
+				return false;
 			Tile tile = level.map[v.x][v.z];
 			if(calcTileTemplateHash(tile.t)!=v.templateHash)
 				return false;
@@ -108,7 +105,7 @@ public class LevelVisit extends LevelRef {
 	}
 
 	private static int tileHash(int x, int z) {
-		return Objects.hash(x, z);
+		return (z<<16) + x;
 	}
 	
 	private static int calcTileTemplateHash(TileTemplate t) {

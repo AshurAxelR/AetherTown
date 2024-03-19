@@ -8,6 +8,8 @@ import java.awt.Color;
 import com.xrbpowered.aethertown.state.Inventory;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.ui.Fonts;
+import com.xrbpowered.aethertown.ui.controls.ClickButton;
+import com.xrbpowered.aethertown.ui.controls.InfoBox;
 import com.xrbpowered.aethertown.ui.controls.SelectButton;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -20,6 +22,9 @@ public class InventoryDialog extends DialogBase {
 	private int selected = -1;
 	private Item selectedItem = null;
 	
+	protected ClickButton buttonUse;
+	protected InfoBox infoBox;
+
 	public InventoryDialog(UIContainer parent) {
 		super(parent, 700, 550, true);
 		inventory = player.backpack;
@@ -57,11 +62,42 @@ public class InventoryDialog extends DialogBase {
 			item.setSize(260, 32);
 			item.setPosition(10, 102+i*(item.getHeight()));
 		}
+		
+		infoBox = new InfoBox(this);
+		infoBox.setPosition(300, 160);
+		infoBox.setSize(getWidth()-330, 260);
+		infoBox.setVisible(false);
+		
+		buttonUse = new ClickButton(this, "USE") {
+			@Override
+			public void onAction() {
+				selectedItem.useItem();
+			}
+		};
+		buttonUse.setSize(150, buttonUse.getHeight());
+		buttonUse.setPosition(getWidth()-buttonUse.getWidth()-20, 486-buttonUse.getHeight()-10);
+		buttonUse.setVisible(false);
 	}
 	
 	private void select(int index) {
 		selected = index;
 		selectedItem = inventory.get(index);
+		
+		String info = selectedItem.getInfoHtml();
+		if(info!=null) {
+			infoBox.setVisible(true);
+			infoBox.setHtml(info);
+		}
+		else
+			infoBox.setVisible(false);
+		
+		String use = selectedItem.getUseActionName();
+		if(use!=null) {
+			buttonUse.setVisible(true);
+			buttonUse.label = use;
+		}
+		else
+			buttonUse.setVisible(false);
 	}
 	
 	@Override
@@ -72,7 +108,7 @@ public class InventoryDialog extends DialogBase {
 			g.fillRect(280, 102, getWidth()-290, 384, Color.BLACK);
 			g.setColor(Color.WHITE);
 			g.setFont(Fonts.large);
-			g.drawString(selectedItem.getName(), 300, 122, GraphAssist.LEFT, GraphAssist.CENTER);
+			g.drawString(selectedItem.getName(), 300, 130, GraphAssist.LEFT, GraphAssist.CENTER);
 		}
 	}
 
