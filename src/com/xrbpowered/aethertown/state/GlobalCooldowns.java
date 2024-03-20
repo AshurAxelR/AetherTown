@@ -66,7 +66,8 @@ public enum GlobalCooldowns {
 			return true;
 		}
 		catch(Exception e) {
-			System.err.println("Can't load global cooldowns: "+e.getMessage());
+			System.err.println("Can't load global cooldowns");
+			e.printStackTrace();
 			clear();
 			return false;
 		}
@@ -85,7 +86,8 @@ public enum GlobalCooldowns {
 			return true;
 		}
 		catch(Exception e) {
-			System.err.println("Can't save global cooldowns: "+e.getMessage());
+			System.err.println("Can't save global cooldowns");
+			e.printStackTrace();
 			return false;
 		}
 	}

@@ -7,11 +7,15 @@ public class TravelTokenItem extends Item {
 
 	public final NamedLevelRef destination;
 	
-	public TravelTokenItem(LevelInfo level) {
+	public TravelTokenItem(NamedLevelRef ref) {
 		super(ItemType.travelToken);
-		this.destination = new NamedLevelRef(level);
+		this.destination = ref;
 	}
-	
+
+	public TravelTokenItem(LevelInfo level) {
+		this(new NamedLevelRef(level));
+	}
+
 	@Override
 	public String getInfoHtml() {
 		return String.format(

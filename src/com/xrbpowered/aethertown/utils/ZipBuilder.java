@@ -51,7 +51,7 @@ public abstract class ZipBuilder {
 			return true;
 		}
 		catch(IOException e) {
-			System.err.println(e.getMessage());
+			e.printStackTrace();
 			System.err.printf("Can't load %s. Using default.\n", path);
 			return false;
 		}
@@ -78,7 +78,7 @@ public abstract class ZipBuilder {
 			return true;
 		}
 		catch(IOException e) {
-			System.err.println(e.getMessage());
+			e.printStackTrace();
 			System.err.printf("Can't save %s.\n", path);
 			new File(path).delete();
 			return false;

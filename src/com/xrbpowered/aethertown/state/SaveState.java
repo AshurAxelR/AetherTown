@@ -74,20 +74,21 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 		startSeason = (float) WorldTime.yearPhase;
 		day = WorldTime.getDay();
 		time = WorldTime.getTimeOfDay();
-		player.toSave(this);
+		defaultStart = false;
 		return this;
 	}
 	
 	private static final String cfgName = "save.cfg";
+	private static final String playerName = "player.dat";
 	private static final String visitsName = "visits.dat";
 	private static final String cooldownsName = "cooldowns.dat";
 	private static final String bookmarksName = "bookmarks.dat";
 
 	private static final Collection<String> all = Arrays.asList(
-		cfgName, visitsName, cooldownsName, bookmarksName
+		cfgName, playerName, visitsName, cooldownsName, bookmarksName
 	);
 	private static final Collection<String> required = Arrays.asList(
-		cfgName, visitsName, cooldownsName
+		cfgName, playerName, visitsName, cooldownsName
 	);
 
 	@Override
@@ -104,6 +105,8 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 	public boolean loadDataEntry(String name, InputStream in) {
 		if(cfgName.equals(name))
 			return super.load(cfgName, in);
+		else if(playerName.equals(name))
+			return Player.load(in);
 		else if(visitsName.equals(name))
 			return RegionVisits.load(in);
 		else if(cooldownsName.equals(name))
@@ -118,6 +121,8 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 	public boolean saveDataEntry(String name, OutputStream out) {
 		if(cfgName.equals(name))
 			return super.save(cfgName, out);
+		else if(playerName.equals(name))
+			return Player.save(out);
 		else if(visitsName.equals(name))
 			return RegionVisits.save(out);
 		else if(cooldownsName.equals(name))

@@ -1,5 +1,8 @@
 package com.xrbpowered.aethertown.state;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 
@@ -79,5 +82,24 @@ public class Inventory {
 		else
 			return null;
 	}
-	
+
+	public void loadItems(DataInputStream in) throws IOException {
+		if(in.readByte()!=size)
+			throw new IOException("Inventory size mismatch");
+		int n = in.readByte();
+		for(int i=0; i<size; i++) {
+			slots[i] = (i<n) ? Item.load(in) : null;
+		}
+		free = size -n;
+		sort();
+	}
+
+	public void saveItems(DataOutputStream out) throws IOException {
+		out.writeByte(size);
+		out.writeByte(size - free);
+		for(int i=0; i<size; i++) {
+			if(slots[i]!=null)
+				Item.save(out, slots[i]);
+		}
+	}
 }

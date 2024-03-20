@@ -51,12 +51,9 @@ public class Bookmarks {
 			int num = in.readInt();
 			for(int i=0; i<num; i++) {
 				if(in.readBoolean()) { // not null
-					long seed = in.readLong();
-					int x = in.readShort();
-					int z = in.readShort();
-					String name = in.readUTF();
+					NamedLevelRef ref = NamedLevelRef.load(in);
 					if(i<numBookmarks) {
-						bookmarks[i] = new NamedLevelRef(seed, x, z, name);
+						bookmarks[i] = ref;
 						count++;
 					}
 				}
@@ -66,7 +63,8 @@ public class Bookmarks {
 			return true;
 		}
 		catch(Exception e) {
-			System.err.println("Can't load bookmarks: "+e.getMessage());
+			System.err.println("Can't load bookmarks");
+			e.printStackTrace();
 			reset();
 			return false;
 		}
@@ -82,10 +80,7 @@ public class Bookmarks {
 				NamedLevelRef ref = bookmarks[i];
 				if(ref!=null) {
 					out.writeBoolean(true);
-					out.writeLong(ref.regionSeed);
-					out.writeShort(ref.x);
-					out.writeShort(ref.z);
-					out.writeUTF(ref.name);
+					NamedLevelRef.save(out, ref);
 				}
 				else {
 					out.writeBoolean(false);
@@ -96,7 +91,8 @@ public class Bookmarks {
 			return true;
 		}
 		catch(Exception e) {
-			System.err.println("Can't save bookmarks: "+e.getMessage());
+			System.err.println("Can't save bookmarks");
+			e.printStackTrace();
 			return false;
 		}
 	}

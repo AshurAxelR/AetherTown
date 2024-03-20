@@ -61,7 +61,8 @@ public class RegionVisits {
 			return true;
 		}
 		catch(Exception e) {
-			System.err.println("Can't load region visits: "+e.getMessage());
+			System.err.println("Can't load region visit");
+			e.printStackTrace();
 			RegionVisits.regions.clear();
 			return false;
 		}
@@ -89,7 +90,8 @@ public class RegionVisits {
 			return true;
 		}
 		catch(Exception e) {
-			System.err.println("Can't save region visits: "+e.getMessage());
+			System.err.println("Can't save region visits");
+			e.printStackTrace();
 			return false;
 		}
 	}

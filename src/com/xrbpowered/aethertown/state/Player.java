@@ -1,7 +1,16 @@
 package com.xrbpowered.aethertown.state;
 
+import static com.xrbpowered.aethertown.AetherTown.player;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.joml.Vector3f;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.LevelMapItem;
 import com.xrbpowered.aethertown.state.items.RegionMapItem;
@@ -13,9 +22,11 @@ import com.xrbpowered.gl.scene.CameraActor;
 
 public class Player {
 
-	public static final int maxInspiration = 10;
+	private static final String formatId = "AetherTown.Player.0";
+
+	public static final int maxInspiration = 100;
 	
-	public int cash = 10000;
+	public int cash = 0;
 	private int inspiration = 0;
 	
 	public final Inventory backpack = new Inventory();
@@ -36,25 +47,6 @@ public class Player {
 		}
 		else
 			return ins;
-	}
-	
-	public void fromSave(SaveState save) {
-		if(save.defaultStart) {
-			cameraPosition = null;
-			cameraRotation = null;
-		}
-		else {
-			cameraPosition = new Vector3f(save.cameraPosX, 0f, save.cameraPosZ);
-			cameraRotation = new Vector3f(save.cameraLookX, save.cameraLookY, 0f);
-		}
-	}
-	
-	public void toSave(SaveState save) {
-		save.defaultStart = false;
-		save.cameraPosX = cameraPosition.x;
-		save.cameraPosZ = cameraPosition.z;
-		save.cameraLookX = cameraRotation.x;
-		save.cameraLookY = cameraRotation.y;
 	}
 	
 	public void initCamera(CameraActor camera, Level level, boolean resetPosition) {
@@ -103,4 +95,59 @@ public class Player {
 		return false;
 	}
 
+	public static boolean load(InputStream ins) {
+		try {
+			DataInputStream in = new DataInputStream(ins);
+			
+			if(!formatId.equals(in.readUTF()))
+				throw new IOException("Bad file format");
+			
+			Player player = new Player();
+			float cameraPosX = in.readFloat();
+			float cameraPosZ = in.readFloat();
+			float cameraLookX = in.readFloat();
+			float cameraLookY = in.readFloat();
+			player.cameraPosition = new Vector3f(cameraPosX, 0f, cameraPosZ);
+			player.cameraRotation = new Vector3f(cameraLookX, cameraLookY, 0f);
+			
+			player.cash = in.readInt();
+			player.inspiration = in.readInt();
+			player.backpack.loadItems(in);
+			
+			AetherTown.player = player;
+			System.out.println("Player state loaded");
+			return true;
+		}
+		catch(Exception e) {
+			System.err.println("Can't load player state");
+			e.printStackTrace();
+			player = new Player();
+			return false;
+		}
+	}
+	
+	public static boolean save(OutputStream outs) {
+		try {
+			DataOutputStream out = new DataOutputStream(outs);
+			
+			out.writeUTF(formatId);
+			
+			out.writeFloat(player.cameraPosition.x);
+			out.writeFloat(player.cameraPosition.z);
+			out.writeFloat(player.cameraRotation.x);
+			out.writeFloat(player.cameraRotation.y);
+
+			out.writeInt(player.cash);
+			out.writeInt(player.inspiration);
+			player.backpack.saveItems(out);
+			
+			System.out.println("Player state saved");
+			return true;
+		}
+		catch(Exception e) {
+			System.err.println("Can't save player state");
+			e.printStackTrace();
+			return false;
+		}
+	}
 }

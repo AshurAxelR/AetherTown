@@ -12,9 +12,13 @@ public class LevelMapItem extends Item {
 
 	public final NamedLevelRef level;
 	
-	public LevelMapItem(LevelInfo level) {
+	public LevelMapItem(NamedLevelRef ref) {
 		super(ItemType.map);
-		this.level = new NamedLevelRef(level);
+		this.level = ref;
+	}
+	
+	public LevelMapItem(LevelInfo level) {
+		this(new NamedLevelRef(level));
 	}
 	
 	@Override

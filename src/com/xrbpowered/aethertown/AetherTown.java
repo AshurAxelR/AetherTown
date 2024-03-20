@@ -587,7 +587,6 @@ public class AetherTown extends UIClient {
 	
 	public static LevelInfo generateRegion(SaveState save) {
 		WorldTime.setTime(save.startSeason, save.day, save.time);
-		player.fromSave(save);
 		
 		long seed = PortalSystem.getRegionSeed(save.regionSeed);
 		System.out.printf("Region seed: %dL\n", seed);
