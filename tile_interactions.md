@@ -30,6 +30,7 @@ Player inventory has 12 slots (2 _heavy_).
 		* Tile visits, for "once per tile" action tracking - hash map: `tile.hash(x, z)`; check: template hash
 		* Owned home - bool
 * All owned homes - list: house tile ref.
+	* Improvements - array: boolean per enum
 	* Storage - array: inventory data
 * All room keys - list: **Room Key**, item location (inventory or storage ref.)
 	* Storage (temporary) - inventory data
@@ -117,7 +118,7 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 
 ### Church
 * **E:** _Enter:_ UI
-	* _Pray:_ +10min, +5 INS (daily)
+	* _Pray:_ +15min, +5 INS (daily)
 	* _Look around:_ (once per tile) +10min, +3 INS, +3 XP
 	* _Shelter:_ +30min
 		* _Wait:_ +30min

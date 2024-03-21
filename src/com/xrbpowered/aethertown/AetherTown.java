@@ -549,7 +549,7 @@ public class AetherTown extends UIClient {
 					if(!settings.mapRequireItem || player.hasRegionMap(region.seed))
 						RegionMapDialog.show(level);
 					else
-						showToast("You don't a map of this region");
+						showToast("You don't have a map of this region");
 				}
 				break;
 			case KeyEvent.VK_M:

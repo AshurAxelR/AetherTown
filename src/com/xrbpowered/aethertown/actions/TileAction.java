@@ -4,7 +4,6 @@ import static com.xrbpowered.aethertown.AetherTown.player;
 import static com.xrbpowered.aethertown.actions.HouseTileAction.closingSoon;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
-import com.xrbpowered.aethertown.state.GlobalCooldowns;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
@@ -14,8 +13,8 @@ public abstract class TileAction {
 	
 	protected int delay = 0;
 	protected int cost = 0;
-	protected GlobalCooldowns cooldown = null;
-	protected double cooldownHours = 0;
+	
+	protected CooldownSettings cooldown = null;
 
 	public TileAction(String name) {
 		this.name = name;
@@ -46,12 +45,11 @@ public abstract class TileAction {
 		return delay;
 	}
 
-	public TileAction setCooldown(GlobalCooldowns cd, double hours) {
+	public TileAction setCooldown(CooldownSettings cd) {
 		this.cooldown = cd;
-		this.cooldownHours = hours;
 		return this;
 	}
-	
+
 	public String getLabel(Tile tile, boolean alt) {
 		return name;
 	}
@@ -60,22 +58,18 @@ public abstract class TileAction {
 		return formatCostInfo(getDelay(tile, alt), getCost(tile, alt));
 	}
 	
-	protected void startCooldown() {
-		cooldown.startH(cooldownHours);
-	}
-	
 	protected void applyCost(Tile tile, boolean alt) {
 		player.cash -= getCost(tile, alt);
 		WorldTime.time += getDelay(tile, alt) * WorldTime.minute;
 		if(cooldown!=null)
-			startCooldown();
+			cooldown.start();
 	}
 	
 	protected void onFail(Tile tile, boolean alt) {
 		if(closingSoon(tile, alt, this))
 			showToast("Closing soon");
 		else if(cooldown!=null && cooldown.isOnCooldown())
-			showToast(cooldown.formatRemaining());
+			showToast(cooldown.cooldown.formatRemaining());
 	}
 
 	protected void onSuccess(Tile tile, boolean alt) {

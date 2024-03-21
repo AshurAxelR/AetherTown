@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.actions;
 
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
+import com.xrbpowered.aethertown.actions.menus.CivicCentreActionMenu;
 import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
 import com.xrbpowered.aethertown.actions.menus.HotelActionMenu;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
@@ -14,6 +15,8 @@ import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class HouseTileAction extends EnterTileAction {
 
+	public static final HouseTileAction civicCentre = new HouseTileAction(new CivicCentreActionMenu(true));
+	public static final HouseTileAction postOffice = new HouseTileAction(new CivicCentreActionMenu(false));
 	public static final HouseTileAction hotel = new HouseTileAction(new HotelActionMenu(false));
 	public static final HouseTileAction inn = new HouseTileAction(new HotelActionMenu(true));
 	public static final HouseTileAction restaurant = new HouseTileAction(FoodActionMenu.restaurant);
@@ -90,6 +93,10 @@ public class HouseTileAction extends EnterTileAction {
 			return null;
 		else if(role==HouseRole.residential)
 			return home;
+		else if(role==HouseRole.civicCentre)
+			return civicCentre;
+		else if(role==HouseRole.postOffice)
+			return postOffice;
 		else if(role==HouseRole.hotel)
 			return hotel;
 		else if(role==HouseRole.inn)

@@ -2,6 +2,8 @@ package com.xrbpowered.aethertown.world.tiles;
 
 import java.awt.Color;
 
+import com.xrbpowered.aethertown.actions.EnterChurchAction;
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
@@ -38,6 +40,14 @@ public class ChurchT extends TileTemplate {
 	@Override
 	public String getTileInfo(Tile tile) {
 		return ((HouseGeneratorBase) tile.sub.parent).getInfo();
+	}
+	
+	@Override
+	public TileAction getTileAction(Tile tile) {
+		if((tile.sub.i==0 || tile.sub.i==1) && tile.sub.j==1)
+			return EnterChurchAction.action;
+		else
+			return null;
 	}
 	
 	@Override

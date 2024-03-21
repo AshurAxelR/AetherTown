@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.xrbpowered.aethertown.actions.CooldownSettings;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public enum GlobalCooldowns {
 
-	sleep, eat, drink;
+	sleep, eat, drink,
+	prayIns;
 	
 	private static final String formatId = "AetherTown.GlobalCooldowns.0";
 
@@ -38,12 +40,24 @@ public enum GlobalCooldowns {
 		start(hours*WorldTime.hour);
 	}
 
+	public void startDailyH(double hour) {
+		start(1.0 - WorldTime.getTimeOfDay() + hour*WorldTime.hour);
+	}
+
 	public void pushBack(double duration) {
 		cooldowns[ordinal()] = Math.max(cooldowns[ordinal()], WorldTime.time) + duration;
 	}
 
 	public void pushBackH(double hours) {
 		pushBack(hours*WorldTime.hour);
+	}
+
+	public CooldownSettings hours(double h) {
+		return new CooldownSettings(this, false, h);
+	}
+
+	public CooldownSettings daily(double h) {
+		return new CooldownSettings(this, true, h);
 	}
 
 	private static void clear() {

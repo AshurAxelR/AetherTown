@@ -16,8 +16,6 @@ public class EnterTileAction extends TileAction {
 	}
 	
 	public String getMenuTitle(Tile tile, boolean alt) {
-		// if(tile.t==ChurchT.template)
-		//     return ((ChurchGenerator) tile.sub.parent).getInfo();
 		return null;
 	}
 
