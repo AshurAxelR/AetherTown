@@ -33,7 +33,6 @@ Player inventory has 12 slots (2 _heavy_).
 	* Improvements - array: boolean per enum
 	* Storage - array: inventory data
 * All room keys - list: **Room Key**, item location (inventory or storage ref.)
-	* Storage (temporary) - inventory data
 * Gloabl cooldowns (gcd) - list: action id, timestamp of gcd ending
 
 

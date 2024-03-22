@@ -3,11 +3,11 @@ package com.xrbpowered.aethertown.actions;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.world.Tile;
 
-public class ViewMapAction extends TileAction {
+public class NavBoxAction extends TileAction {
 
-	public static final ViewMapAction action = new ViewMapAction();
+	public static final NavBoxAction action = new NavBoxAction();
 
-	public ViewMapAction() {
+	public NavBoxAction() {
 		super("View map");
 	}
 

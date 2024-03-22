@@ -30,7 +30,9 @@ public abstract class GetItemAction extends TileAction {
 		int count = 0;
 		for(int i=0; i<inv.size; i++) {
 			Item item = inv.get(i);
-			if(item!=null && isSameItem(item, tile, alt))
+			if(item==null)
+				break;
+			if(isSameItem(item, tile, alt))
 				count++;
 		}
 		return count;

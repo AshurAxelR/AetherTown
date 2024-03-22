@@ -74,7 +74,9 @@ public class Player {
 	public boolean hasLevelMap(LevelInfo info) {
 		for(int i=0; i<backpack.size; i++) {
 			Item aitem = backpack.get(i);
-			if(aitem!=null && aitem instanceof LevelMapItem) {
+			if(aitem==null)
+				break;
+			if(aitem instanceof LevelMapItem) {
 				LevelMapItem item = (LevelMapItem) aitem;
 				if(item.level.isLevel(info))
 					return true;
@@ -86,7 +88,9 @@ public class Player {
 	public boolean hasRegionMap(long regionSeed) {
 		for(int i=0; i<backpack.size; i++) {
 			Item aitem = backpack.get(i);
-			if(aitem!=null && aitem instanceof RegionMapItem) {
+			if(aitem==null)
+				break;
+			if(aitem instanceof RegionMapItem) {
 				RegionMapItem item = (RegionMapItem) aitem;
 				if(item.regionSeed==regionSeed)
 					return true;

@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
+import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TileTemplate;
@@ -105,7 +106,7 @@ public class LevelVisit extends LevelRef {
 	}
 
 	private static int tileHash(int x, int z) {
-		return (z<<16) + x;
+		return RandomSeed.smallHashXY(x, z);
 	}
 	
 	private static int calcTileTemplateHash(TileTemplate t) {

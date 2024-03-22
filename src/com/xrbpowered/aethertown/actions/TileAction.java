@@ -49,6 +49,10 @@ public abstract class TileAction {
 		this.cooldown = cd;
 		return this;
 	}
+	
+	public CooldownSettings getCooldown() {
+		return cooldown;
+	}
 
 	public String getLabel(Tile tile, boolean alt) {
 		return name;
@@ -58,7 +62,7 @@ public abstract class TileAction {
 		return formatCostInfo(getDelay(tile, alt), getCost(tile, alt));
 	}
 	
-	protected void applyCost(Tile tile, boolean alt) {
+	public void applyCost(Tile tile, boolean alt) {
 		player.cash -= getCost(tile, alt);
 		WorldTime.time += getDelay(tile, alt) * WorldTime.minute;
 		if(cooldown!=null)

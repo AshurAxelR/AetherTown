@@ -5,6 +5,7 @@ import com.xrbpowered.aethertown.actions.InspirationAction;
 import com.xrbpowered.aethertown.actions.WaitAction;
 import com.xrbpowered.aethertown.state.GlobalCooldowns;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
+import com.xrbpowered.aethertown.world.Tile;
 
 public class FoodActionMenu extends TileActionMenu {
 
@@ -22,7 +23,7 @@ public class FoodActionMenu extends TileActionMenu {
 		
 		food.addAction(new InspirationAction("Drink tea/coffee with dessert", 2) {
 			@Override
-			protected void applyCost(com.xrbpowered.aethertown.world.Tile tile, boolean alt) {
+			public void applyCost(Tile tile, boolean alt) {
 				super.applyCost(tile, alt);
 				GlobalCooldowns.eat.pushBackH(1);
 			}

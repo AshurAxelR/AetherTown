@@ -4,6 +4,10 @@ public class RandomSeed {
 	
 	private RandomSeed() {}
 
+	public static int smallHashXY(int x, int y) {
+		return x * 32323 + y * 31;
+	}
+	
 	public static long hashSeed(long seed, long add) {
 		// Multiply by Knuth's Random (Linear congruential generator) and add offset
 		seed *= seed * 6364136223846793005L + 1442695040888963407L;

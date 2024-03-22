@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.state.LevelRef;
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.world.region.PortalSystem.PortalInfo;
 
 public class LevelInfo {
@@ -217,7 +218,7 @@ public class LevelInfo {
 	}
 	
 	public static int levelHash(long regionSeed, int x, int z) {
-		return (int) regionSeed ^ ((z<<16) + x);
+		return (int) regionSeed ^ RandomSeed.smallHashXY(x, z);
 	}
 	
 	public static String formatInfo(long regionSeed, int x, int z) {

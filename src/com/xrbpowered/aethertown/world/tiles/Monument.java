@@ -2,6 +2,8 @@ package com.xrbpowered.aethertown.world.tiles;
 
 import java.awt.Color;
 
+import com.xrbpowered.aethertown.actions.FastTravelAction;
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
@@ -21,6 +23,11 @@ public class Monument extends Plaza {
 	
 	private static TileComponent pillar, statue;
 
+	@Override
+	public TileAction getTileAction(Tile tile) {
+		return FastTravelAction.action;
+	}
+	
 	protected boolean canGenerate(Token t) {
 		return t.level.isInside(t.x, t.z) && t.isFree() && t.level.overlapsHeight(t.x, t.y, t.z, 4);
 	}
