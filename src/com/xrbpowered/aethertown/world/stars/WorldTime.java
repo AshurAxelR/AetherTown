@@ -55,10 +55,14 @@ public class WorldTime {
 		return (int)Math.floor(time);
 	}
 	
-	public static int getDayOfYear() {
+	public static int getDayOfYear(double time) {
 		return ((int)(Math.floor(time) + yearPhase*daysInYear) + equinoxDay + daysInYear) % daysInYear;
 	}
-	
+
+	public static int getDayOfYear() {
+		return getDayOfYear(time);
+	}
+
 	public static String getFormattedTime(float t) {
 		int s = Math.round(t*60*60*24);
 		int m = (s/60)%60;
@@ -70,6 +74,13 @@ public class WorldTime {
 		return getFormattedTime(getTimeOfDay());
 	}
 	
+	public static String getFormattedTimestamp(double time) {
+		return String.format("Day %d, %s, %s",
+				(int)Math.floor(time)+1,
+				getFormattedDate(getDayOfYear(time)),
+				getFormattedTime((float) frac(time)));
+	}
+
 	public static String getFormattedDate(int day) {
 		int m = day/7;
 		int d = day%7;

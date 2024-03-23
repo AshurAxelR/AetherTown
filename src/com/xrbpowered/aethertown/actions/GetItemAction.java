@@ -63,7 +63,9 @@ public abstract class GetItemAction extends TileAction {
 	@Override
 	public void onSuccess(Tile tile, boolean alt) {
 		Item item = generateItem(tile, alt);
-		if(player.backpack.put(item))
+		if(player.backpack.put(item)) {
 			showToast(item.getName()+" added");
+			super.onSuccess(tile, alt);
+		}
 	}
 }

@@ -57,6 +57,12 @@ public class InventoryDialog extends DialogBase {
 				public String getItemName() {
 					return  inventory.get(index).getName();
 				}
+				@Override
+				public void paint(GraphAssist g) {
+					super.paint(g);
+					if(!isEmpty() && inventory.get(index).markDot())
+						paintDot(g);
+				}
 			};
 			
 			item.setSize(260, 32);

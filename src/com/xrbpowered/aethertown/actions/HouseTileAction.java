@@ -5,22 +5,26 @@ import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 import com.xrbpowered.aethertown.actions.menus.CivicCentreActionMenu;
 import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
 import com.xrbpowered.aethertown.actions.menus.HotelActionMenu;
+import com.xrbpowered.aethertown.actions.menus.ShopActionMenu;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
-import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
-import com.xrbpowered.aethertown.world.region.HouseRole;
+import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.houses.HouseRole;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class HouseTileAction extends EnterTileAction {
 
-	public static final HouseTileAction civicCentre = new HouseTileAction(new CivicCentreActionMenu(true));
-	public static final HouseTileAction postOffice = new HouseTileAction(new CivicCentreActionMenu(false));
+	public static final HouseTileAction civicCentre = new HouseTileAction(new CivicCentreActionMenu(true, true));
+	public static final HouseTileAction postOffice = new HouseTileAction(new CivicCentreActionMenu(false, true));
+	public static final HouseTileAction hospital = new HouseTileAction(new CivicCentreActionMenu(false, false));
 	public static final HouseTileAction hotel = new HouseTileAction(new HotelActionMenu(false));
 	public static final HouseTileAction inn = new HouseTileAction(new HotelActionMenu(true));
 	public static final HouseTileAction restaurant = new HouseTileAction(FoodActionMenu.restaurant);
 	public static final HouseTileAction fastFood = new HouseTileAction(FoodActionMenu.fastFood);
+	public static final HouseTileAction coffeeShop = new HouseTileAction(FoodActionMenu.cafeteria);
+	public static final HouseTileAction giftShop = new HouseTileAction(ShopActionMenu.giftShop);
 
 	public static final HouseTileAction home = new HouseTileAction(null) {
 		@Override
@@ -86,27 +90,6 @@ public class HouseTileAction extends EnterTileAction {
 		}
 		else
 			return false;
-	}
-
-	public static TileAction getAction(HouseRole role) {
-		if(role==null)
-			return null;
-		else if(role==HouseRole.residential)
-			return home;
-		else if(role==HouseRole.civicCentre)
-			return civicCentre;
-		else if(role==HouseRole.postOffice)
-			return postOffice;
-		else if(role==HouseRole.hotel)
-			return hotel;
-		else if(role==HouseRole.inn)
-			return inn;
-		else if(role instanceof HouseRole.RestaurantRole)
-			return restaurant;
-		else if(role instanceof HouseRole.LocalShopRole)
-			return fastFood; // TODO groceries, coffee shop
-		else
-			return null;
 	}
 
 }

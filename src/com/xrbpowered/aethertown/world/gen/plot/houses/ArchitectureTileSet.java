@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.world.gen.plot;
+package com.xrbpowered.aethertown.world.gen.plot.houses;
 
 import java.awt.Color;
 

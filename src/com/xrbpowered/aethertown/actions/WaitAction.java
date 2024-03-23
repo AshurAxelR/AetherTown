@@ -7,4 +7,9 @@ public class WaitAction extends TileAction {
 		setDelay(delay);
 	}
 
+	public WaitAction(int delay) {
+		super("Wait");
+		setDelay(delay);
+	}
+
 }

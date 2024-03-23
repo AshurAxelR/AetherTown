@@ -1,11 +1,10 @@
-package com.xrbpowered.aethertown.world.region;
+package com.xrbpowered.aethertown.world.gen.plot.houses;
 
 import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Level;
-import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 
 public abstract class HouseAssignment {
 

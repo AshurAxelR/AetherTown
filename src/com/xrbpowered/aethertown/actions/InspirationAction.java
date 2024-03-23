@@ -49,16 +49,28 @@ public class InspirationAction extends TileAction {
 		return isGranting(tile, alt) ? inspiration : 0;
 	}
 
+	public int getXP(Tile tile, boolean alt) {
+		return isGranting(tile, alt) ? xp : 0;
+	}
+
 	@Override
 	protected void onSuccess(Tile tile, boolean alt) {
 		super.onSuccess(tile, alt);
+		
 		int ins = player.addInspiration(getInspiration(tile, alt));
-		// TODO grant XP
-		if(ins>0) {
-			showToast(String.format("%+d inspiration", ins));
+		int xp = player.addXP(getXP(tile, alt));
+		
+		if(ins>0 || xp>0) {
+			if(ins>0 && xp>0)
+				showToast(String.format("%+d inspiration, %+d XP", ins, xp));
+			else if(ins>0)
+				showToast(String.format("%+d inspiration", ins));
+			else if(xp>0)
+				showToast(String.format("%+d XP", xp));
 			if(insCooldown!=null)
 				insCooldown.start();
 		}
+		
 		if(oncePerTile)
 			RegionVisits.visitTile(tile);
 	}

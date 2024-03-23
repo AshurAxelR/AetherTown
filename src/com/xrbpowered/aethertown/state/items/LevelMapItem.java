@@ -1,7 +1,6 @@
 package com.xrbpowered.aethertown.state.items;
 
-import static com.xrbpowered.aethertown.AetherTown.levelCache;
-import static com.xrbpowered.aethertown.AetherTown.regionCache;
+import static com.xrbpowered.aethertown.AetherTown.*;
 
 import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
@@ -36,8 +35,13 @@ public class LevelMapItem extends Item {
 	@Override
 	public String getInfoHtml() {
 		return String.format(
-			"<p><span class=\"w\">%s</span></p>"+
+			"<p><span class=\"w\">%s</span>%s</p>"+
 			"<p>Map of location.</p>",
-			level.getFullName());
+			level.getFullName(), markDot() ? "<br>(You are here)": "");
+	}
+	
+	@Override
+	public boolean markDot() {
+		return levelInfo.isRef(level);
 	}
 }

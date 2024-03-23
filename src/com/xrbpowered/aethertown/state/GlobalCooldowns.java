@@ -16,6 +16,7 @@ public enum GlobalCooldowns {
 	sleep,
 	eat,
 	drink,
+	showerIns,
 	prayIns;
 	
 	private static final String formatId = "AetherTown.GlobalCooldowns.0";
@@ -61,6 +62,10 @@ public enum GlobalCooldowns {
 
 	public CooldownSettings daily(double h) {
 		return new CooldownSettings(this, true, h);
+	}
+
+	public CooldownSettings daily() {
+		return daily(2); // default reset time is 02:00
 	}
 
 	private static void clear() {

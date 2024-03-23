@@ -5,7 +5,6 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 
-import com.xrbpowered.aethertown.actions.HouseTileAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
@@ -25,9 +24,9 @@ import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.gen.Fences;
-import com.xrbpowered.aethertown.world.gen.plot.ArchitectureStyle;
-import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet;
-import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.houses.ArchitectureStyle;
+import com.xrbpowered.aethertown.world.gen.plot.houses.ArchitectureTileSet;
+import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
 
 public class HouseT extends TileTemplate {
 
@@ -70,7 +69,7 @@ public class HouseT extends TileTemplate {
 	@Override
 	public TileAction getTileAction(Tile tile) {
 		if(tile.sub.i==0 && tile.sub.j==0)
-			return HouseTileAction.getAction(((HouseGenerator) tile.sub.parent).getRole(false));
+			return ((HouseGenerator) tile.sub.parent).getAction(false);
 		else
 			return null;
 	}
@@ -78,7 +77,7 @@ public class HouseT extends TileTemplate {
 	@Override
 	public TileAction getTileAltAction(Tile tile) {
 		if(tile.sub.i==0 && tile.sub.j==0)
-			return HouseTileAction.getAction(((HouseGenerator) tile.sub.parent).getRole(true));
+			return ((HouseGenerator) tile.sub.parent).getAction(true);
 		else
 			return null;
 	}

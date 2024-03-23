@@ -28,6 +28,7 @@ public class Player {
 	
 	public int cash = 0;
 	private int inspiration = 0;
+	private int xp = 0;
 	
 	public final Inventory backpack = new Inventory();
 	
@@ -36,6 +37,10 @@ public class Player {
 	
 	public int getInspiration() {
 		return inspiration;
+	}
+	
+	public int getXP() {
+		return xp;
 	}
 	
 	public int addInspiration(int ins) {
@@ -48,7 +53,12 @@ public class Player {
 		else
 			return ins;
 	}
-	
+
+	public int addXP(int xp) {
+		this.xp += xp;
+		return xp;
+	}
+
 	public void initCamera(CameraActor camera, Level level, boolean resetPosition) {
 		if(resetPosition || cameraPosition==null || cameraRotation==null) {
 			camera.position.x = level.getStartX()*Tile.size;
@@ -116,6 +126,7 @@ public class Player {
 			
 			player.cash = in.readInt();
 			player.inspiration = in.readInt();
+			player.xp = in.readInt();
 			player.backpack.loadItems(in);
 			
 			AetherTown.player = player;
@@ -143,6 +154,7 @@ public class Player {
 
 			out.writeInt(player.cash);
 			out.writeInt(player.inspiration);
+			out.writeInt(player.xp);
 			player.backpack.saveItems(out);
 			
 			System.out.println("Player state saved");

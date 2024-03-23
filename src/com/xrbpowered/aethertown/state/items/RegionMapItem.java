@@ -1,6 +1,6 @@
 package com.xrbpowered.aethertown.state.items;
 
-import static com.xrbpowered.aethertown.AetherTown.regionCache;
+import static com.xrbpowered.aethertown.AetherTown.*;
 
 import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.ui.dialogs.RegionMapDialog;
@@ -28,7 +28,13 @@ public class RegionMapItem extends Item {
 	@Override
 	public String getInfoHtml() {
 		return String.format(
-			"<p><span class=\"w\">%s</span></p>",
-			RegionVisits.getRegionTitle(regionSeed, false));
+			"<p><span class=\"w\">%s</span>%s</p>",
+			RegionVisits.getRegionTitle(regionSeed, false),
+			markDot() ? " (this region)" : "");
+	}
+	
+	@Override
+	public boolean markDot() {
+		return region.seed == regionSeed;
 	}
 }

@@ -1,4 +1,4 @@
-package com.xrbpowered.aethertown.world.gen.plot;
+package com.xrbpowered.aethertown.world.gen.plot.houses;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
@@ -6,7 +6,7 @@ import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.Tile;
-import com.xrbpowered.aethertown.world.gen.plot.ArchitectureTileSet.DoorInfo;
+import com.xrbpowered.aethertown.world.gen.plot.houses.ArchitectureTileSet.DoorInfo;
 import com.xrbpowered.aethertown.world.tiles.Hill;
 import com.xrbpowered.aethertown.world.tiles.HouseT.HouseTile;
 

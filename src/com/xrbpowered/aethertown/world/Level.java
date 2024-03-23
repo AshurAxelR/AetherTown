@@ -12,9 +12,9 @@ import com.xrbpowered.aethertown.world.gen.StreetLayoutGenerator;
 import com.xrbpowered.aethertown.world.gen.Tunnels;
 import com.xrbpowered.aethertown.world.gen.WalkingDistance;
 import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
-import com.xrbpowered.aethertown.world.gen.plot.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
-import com.xrbpowered.aethertown.world.region.HouseAssignment;
+import com.xrbpowered.aethertown.world.gen.plot.houses.HouseAssignment;
+import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 

@@ -1,8 +1,9 @@
-package com.xrbpowered.aethertown.world.gen.plot;
+package com.xrbpowered.aethertown.world.gen.plot.houses;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.actions.HouseTileAction;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.GeneratorException;
@@ -10,8 +11,9 @@ import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
+import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.HouseGeneratorBase;
 import com.xrbpowered.aethertown.world.Token;
-import com.xrbpowered.aethertown.world.region.HouseRole;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.aethertown.world.tiles.HouseT;
 import com.xrbpowered.aethertown.world.tiles.Street;
@@ -43,7 +45,12 @@ public class HouseGenerator extends HouseGeneratorBase {
 	public HouseRole getRole(boolean alt) {
 		return alt ? addRole : role;
 	}
-	
+
+	public HouseTileAction getAction(boolean alt) {
+		HouseRole role = getRole(alt);
+		return role==null ? null : role.action;
+	}
+
 	public boolean isClosed(boolean alt, float addTime) {
 		return getRole(alt)!=HouseRole.residential && !arch.getIllumLayer(alt ? 1 : 0)
 				.isActive(WorldTime.getHourOfDay(addTime));

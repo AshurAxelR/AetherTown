@@ -46,8 +46,6 @@ Player inventory has 12 slots (2 _heavy_).
 	* \[button\] **STATS** > UI
 		* XP, knowledge level?, statistics (number of created products by type, progress, etc.)
 * Storage name or **Backpack**
-	* Warning if storage is temporary
-	* Pages for large storage?
 * \[list\] Items (12 slots) - item name, **H** marks heavy > select item in item pane
 * Item pane:
 	* Item name and description
@@ -97,7 +95,7 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 	* in some tiles, _Get Travel Token:_ **+item: Travel Token**
 * ... room actions
 	* _Relax:_ +1h
-	* _Shower:_ +15min, +2 INS (daily)
+	* _Shower:_ +10min, +2 INS (daily)
 	* _Nap:_ (2h gcd: _Sleep_) +30min, +1 INS
 	* _Short sleep:_ (3h gcd: _Sleep_) +4h, +3 INS
 	* _Sleep:_ (10h gcd: _Sleep_) +6h, +10 INS
@@ -163,6 +161,7 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 		* _Abandon home:_ (local home owned) +5min, **-item: House Key** (all), stored items disposed
 
 ### HouseRole: hospital
+* _Wait:_ +20min
 * view/get map
 
 ### HouseRole: hotel / inn
@@ -180,7 +179,6 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 		* (inventory enabled, disposing, food not allowed)
 	* _Room:_ (use **Room Key**)
 		* ... room actions
-		* (storage, temporary until **Room Key** expires)
 		* (inventory enabled, disposing, food allowed)
 
 ### HouseRole: local store / supermarket
@@ -190,6 +188,13 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 	* **Supermarket** ... ?
 
 ### HouseRole: ... shop
+* clothes +2 INS, (Buy new clothes?)
+* gift + cafe, +3 INS, Buy trinket, food
+* home +1 INS, **Kitchenware**
+* tech +2 INS, **Computer**
+* book +3 INS, **Board games**, Play board games, Read?
+* art +5 INS
+* music +3 INS, **Musical instrument**, Play music
 * **E:** _Enter:_ UI
 	* browse?
 
