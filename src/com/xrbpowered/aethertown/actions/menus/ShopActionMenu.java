@@ -1,7 +1,10 @@
 package com.xrbpowered.aethertown.actions.menus;
 
+import com.xrbpowered.aethertown.actions.DummyAction;
 import com.xrbpowered.aethertown.actions.GetItemAction;
 import com.xrbpowered.aethertown.actions.InspirationAction;
+import com.xrbpowered.aethertown.actions.TileAction;
+import com.xrbpowered.aethertown.actions.WaitAction;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.ItemType;
 import com.xrbpowered.aethertown.state.items.TrinketItem;
@@ -10,6 +13,10 @@ import com.xrbpowered.aethertown.world.Tile;
 
 public class ShopActionMenu extends TileActionMenu {
 
+	public static final TileAction buyNewClothesAction = new WaitAction("Buy new clothes", 10).setCost(2500);
+
+	public static final TileActionMenu supermarket = createSupermarketMenu();
+	public static final TileActionMenu clothesShop = createClothesShopMenu();
 	public static final TileActionMenu giftShop = createGiftShopMenu();
 	
 	private ShopActionMenu(int browseIns) {
@@ -17,9 +24,19 @@ public class ShopActionMenu extends TileActionMenu {
 			addAction(new InspirationAction("Browse", browseIns).oncePerTile().setDelay(15));
 	}
 
-	// TODO localShop
-	// TODO supermarket
-	// TODO clothesShop
+	private static TileActionMenu createSupermarketMenu() {
+		ShopActionMenu shop = new ShopActionMenu(1);
+		shop.addMenu("FOOD ISLE", GroceriesActionMenu.groceries);
+		shop.addAction(buyNewClothesAction);
+		shop.addAction(homeImprovement("Kitchenware"));
+		return shop;
+	}
+
+	private static TileActionMenu createClothesShopMenu() {
+		ShopActionMenu shop = new ShopActionMenu(2);
+		shop.addAction(buyNewClothesAction);
+		return shop;
+	}
 	
 	private static TileActionMenu createGiftShopMenu() {
 		ShopActionMenu shop = new ShopActionMenu(3);
@@ -49,4 +66,8 @@ public class ShopActionMenu extends TileActionMenu {
 	// TODO Book Shop
 	// TODO Art Shop
 	// TODO Music Shop
+	
+	private static TileAction homeImprovement(String name) {
+		return new DummyAction("Home improvement: "+name).setEnabled(false);
+	}
 }

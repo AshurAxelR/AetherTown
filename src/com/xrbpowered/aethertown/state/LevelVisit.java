@@ -105,11 +105,11 @@ public class LevelVisit extends LevelRef {
 		}
 	}
 
-	private static int tileHash(int x, int z) {
+	public static int tileHash(int x, int z) {
 		return RandomSeed.smallHashXY(x, z);
 	}
 	
-	private static int calcTileTemplateHash(TileTemplate t) {
+	public static int calcTileTemplateHash(TileTemplate t) {
 		return t.getClass().getTypeName().hashCode();
 	}
 

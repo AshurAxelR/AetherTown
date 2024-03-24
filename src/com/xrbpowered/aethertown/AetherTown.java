@@ -316,32 +316,7 @@ public class AetherTown extends UIClient {
 		if(activeController==walkController) {
 			Dir d = Dir.values()[(int)Math.round(-camera.rotation.y*2.0/Math.PI) & 0x03];
 			hud.setLookAtTile(level.getAdj(hoverx, hoverz, d));
-			/*if(lookAtTile!=null) {
-				info = lookAtTile.t.getTileInfo(lookAtTile);
-				action = lookAtTile.t.getTileAction(lookAtTile);
-			}*/
 		}
-		/*boolean hudRepaint = false;
-		if(!info.equals(lookAtInfo)) { // FIXME can change by time and need repaint
-			lookAtInfo = info;
-			if(info.isEmpty())
-				uiLookInfo.setVisible(false);
-			else {
-				uiLookInfo.setVisible(true);
-				hudRepaint = true;
-			}
-		}
-		if(action!=lookAtAction) { // FIXME can change by time and need repaint
-			lookAtAction = action;
-			if(lookAtAction==null)
-				uiActionInfo.setVisible(false);
-			else {
-				uiActionInfo.setVisible(true);
-				hudRepaint = true;
-			}
-		}
-		if(hudRepaint)
-			uiHud.repaint();*/
 		
 		int comp = (int)Math.round(-camera.rotation.y*4.0/Math.PI) & 0x07;
 		if(comp!=compass) {

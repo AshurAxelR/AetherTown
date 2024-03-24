@@ -95,9 +95,9 @@ public class HouseRole {
 	public static final HouseRole hotel = new HotelRole("Hotel", HouseTileAction.hotel);
 	public static final HouseRole inn = new HotelRole("Inn", HouseTileAction.inn);
 	
-	public static final HouseRole localShop = new LocalShopRole("Groceries", colorShopSmall, null, DoorInfo.localShop, false); // TODO groceries action
+	public static final HouseRole localShop = new LocalShopRole("Groceries", colorShopSmall, HouseTileAction.localShop, DoorInfo.localShop, false);
 	
-	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge, null, // TODO supermarket action
+	public static final HouseRole supermarket = new HouseRole("Supermarket", colorShopLarge, HouseTileAction.supermarket,
 			new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop).setDoorInfo(DoorInfo.supermarket),
 			new ArchitectureStyle.BlankGroundNotFront(3, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(IllumPattern.shop).setDoorInfo(DoorInfo.supermarket)
 		) {
@@ -107,8 +107,8 @@ public class HouseRole {
 		}
 	};
 	
-	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", IllumPattern.shop);
-	public static final HouseRole homeShop = new ShopRole("Home Goods", IllumPattern.shop);
+	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", HouseTileAction.clothesShop, IllumPattern.shop);
+	public static final HouseRole homeShop = new ShopRole("Home Goods", null, IllumPattern.shop); // TODO home shop action
 	
 	public static final HouseRole giftShop = new HouseRole("Gift Shop + Cafeteria", colorShop, HouseTileAction.giftShop,
 		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop, IllumLayer.living).setDoorInfo(DoorInfo.coffeeShop)
@@ -203,11 +203,11 @@ public class HouseRole {
 			clothesShop,
 			giftShop,
 			homeShop,
-			new ShopRole("Tech Store", IllumPattern.shop),
-			new ShopRole("Book Shop", IllumPattern.hotel),
-			new ShopRole("Art Shop", IllumPattern.hotel),
-			new ShopRole("Music Shop", IllumPattern.restaurant)
-	);
+			new ShopRole("Tech Store", null, IllumPattern.shop),
+			new ShopRole("Book Shop", null, IllumPattern.hotel),
+			new ShopRole("Art Shop", null, IllumPattern.hotel),
+			new ShopRole("Music Shop", null, IllumPattern.restaurant)
+	); // TODO shop actions
 	
 	public static HouseRole randomShop(Random random, int countRes) {
 		HouseRole shop = shopShuffle.nextItem(random);

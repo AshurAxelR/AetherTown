@@ -38,7 +38,7 @@ public class HotelActionMenu extends TileActionMenu {
 		};
 		room.addAction(new WaitAction("Relax", 60));
 		room.addAction(new InspirationAction("Shower", 2).setInsCooldown(GlobalCooldowns.showerIns.daily()).setDelay(10));
-		room.addAction(new DummyAction("Sleep"));
+		room.addAction(new InspirationAction("Sleep", 1).setDelay(60)); // TODO sleep UI
 		addMenu("ROOM", room, 5);
 	}
 	

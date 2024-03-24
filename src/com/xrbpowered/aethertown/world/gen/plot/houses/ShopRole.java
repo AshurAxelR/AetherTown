@@ -2,13 +2,14 @@ package com.xrbpowered.aethertown.world.gen.plot.houses;
 
 import java.util.Random;
 
+import com.xrbpowered.aethertown.actions.HouseTileAction;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 
 class ShopRole extends HouseRole {
 	
-	ShopRole(String title, IllumPattern illum) {
-		super(title, colorShop, null, // TODO shop actions
+	ShopRole(String title, HouseTileAction action, IllumPattern illum) {
+		super(title, colorShop, action,
 			new ArchitectureStyle.BlankGroundNotFront(1, ArchitectureTileSet.shopSet).setIllum(illum, IllumLayer.shopping),
 			new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.officeSet).setIllum(illum, IllumLayer.shopping),
 			new ArchitectureStyle.BlankGroundNotFront(2, ArchitectureTileSet.shopSet, ArchitectureTileSet.baseSet).setIllum(illum, IllumLayer.shopping, null, null),

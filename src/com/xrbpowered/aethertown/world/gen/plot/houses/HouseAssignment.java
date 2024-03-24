@@ -4,10 +4,14 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.utils.WRandom;
+import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.region.LevelSettlementType;
 
 public abstract class HouseAssignment {
 
+	public static final int minResidential = 3;
+	
 	public final Level level;
 	
 	protected int countRes;
@@ -390,6 +394,8 @@ public abstract class HouseAssignment {
 		}
 		ha.assign(random);
 		System.out.printf("%d houses: %d (%d) res\n", level.houseCount, ha.countRes, ha.countResOnly);
+		if(level.info.settlement!=LevelSettlementType.inn && ha.countRes<minResidential)
+			GeneratorException.raise("Not enough residential (%d)", ha.countRes);
 	}
 	
 }

@@ -71,11 +71,13 @@ Player inventory has 12 slots (2 _heavy_).
 
 ## Home improvements
 
-* Kitchenware - £7.50
-* Computer - £50
-* Board games - £5.50
-* Musical Instrument (guitar, keyboard) - £15
-
+* Kitchenware - £7.50, 75%
+* Board games - £5.50, 25%
+* Musical instrument - £15, 10%
+* TV - £30, 80%
+* Computer - £50, 20%
+* Art supplies - £15, 10%
+* Books - £10, 90%
 
 ## Actions and action types
 
@@ -183,12 +185,19 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 		* ... room actions
 		* (inventory enabled, disposing, food allowed)
 
-### HouseRole: local store / supermarket
+### HouseRole: groceries
 * **E:** _Enter:_ UI
 	* _Buy_ Groceries: £5 **+item**
-	* _Buy_ Snack (type): £0.50 **+item**
-	* **Supermarket** ... ?
+	* _Buy_ Bottle of water (type): £0.50 **+item**
+	* _Buy_ Snack: £1.50 **+item**
 
+
+### HouseRole: supermarket
+* **E:** _Enter:_ UI
+	* _Browse:_ (once per tile) + 15min, +1 INS
+	* _Food isle:_ UI groceries
+	* Buy new clothes?
+	* **Kitchenware**
 
 ### HouseRole: ... shop
 * _Fashion:_ +2 INS, Buy new clothes?

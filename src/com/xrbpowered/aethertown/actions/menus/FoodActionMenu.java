@@ -46,7 +46,6 @@ public class FoodActionMenu extends TileActionMenu {
 	}
 	
 	private static TileActionMenu createFastFoodMenu(boolean cafe) {
-		// TODO complete takeaway actions
 		FoodActionMenu food = new FoodActionMenu();
 		if(cafe) {
 			food.addAction(drinkAction);
