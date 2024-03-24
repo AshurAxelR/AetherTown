@@ -293,7 +293,8 @@ public class Tunnels {
 	private int calcYFromAdj(TunnelInfo tunnel, Dir d) {
 		TunnelInfo adjTunnel = adjTunnel(tunnel.below, d);
 		if(adjTunnel==null) {
-			System.err.println("Missing connecting tunnel");
+			System.err.printf("Missing connecting tunnel [%d, %d]\n", tunnel.below.x, tunnel.below.z);
+			tunnel.type = TunnelType.junction;
 			return tunnel.topy;
 		}
 		int y = adjTunnel.type==TunnelType.fixed ? adjTunnel.topy : Math.max(tunnel.topy, adjTunnel.topy);
