@@ -77,7 +77,7 @@ Player inventory has 12 slots (2 _heavy_).
 * TV - £30, 80%
 * Computer - £50, 20%
 * Art supplies - £15, 10%
-* Books - £10, 90%
+* Book collection - £10, 90%
 
 ## Actions and action types
 

@@ -30,7 +30,7 @@ public class FastTravelDialog extends UIPane implements KeyInputHandler {
 
 	private ClickButton buttonClose, buttonTravel;
 
-	public FastTravelDialog(UIContainer parent) {
+	private FastTravelDialog(UIContainer parent) {
 		super(parent, false);
 		this.cooldown = FastTravelAction.action.getCooldown();
 		

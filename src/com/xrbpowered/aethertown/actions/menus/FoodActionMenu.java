@@ -12,6 +12,7 @@ import com.xrbpowered.aethertown.world.Tile;
 public class FoodActionMenu extends TileActionMenu {
 
 	public static final TileAction drinkAction = new InspirationAction("Drink tea/coffee", 1).setDelay(15).setCost(150).setCooldown(GlobalCooldowns.drink.hours(1));
+	public static final TileAction freeDrinkAction = new InspirationAction("Drink tea/coffee", 1).setDelay(15).setCooldown(GlobalCooldowns.drink.hours(1));
 	
 	public static final TileAction dessertAction = new InspirationAction("Drink tea/coffee with dessert", 2) {
 		@Override

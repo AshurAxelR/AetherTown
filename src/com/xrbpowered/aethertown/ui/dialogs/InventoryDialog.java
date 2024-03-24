@@ -18,6 +18,9 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class InventoryDialog extends DialogBase {
 
+	public static final Color bgDeleteColor = new Color(0x773333);
+	public static final Color bgDeleteColorHover = new Color(0xaa0000);
+
 	private final Tile tile;
 	private final boolean alt;
 
@@ -26,7 +29,7 @@ public class InventoryDialog extends DialogBase {
 	private int selected = -1;
 	private Item selectedItem = null;
 	
-	protected ClickButton buttonUse;
+	protected ClickButton buttonUse, buttonDelete;
 	protected InfoBox infoBox;
 
 	public InventoryDialog(UIContainer parent, Tile tile, boolean alt) {
@@ -67,7 +70,7 @@ public class InventoryDialog extends DialogBase {
 				@Override
 				public void paint(GraphAssist g) {
 					super.paint(g);
-					if(!isEmpty() && inventory.get(index).markDot())
+					if(!isEmpty() && inventory.get(index).markDot(tile, alt))
 						paintDot(g);
 				}
 			};
@@ -102,6 +105,30 @@ public class InventoryDialog extends DialogBase {
 		buttonUse.setSize(150, buttonUse.getHeight());
 		buttonUse.setPosition(getWidth()-buttonUse.getWidth()-20, 486-buttonUse.getHeight()-10);
 		buttonUse.setVisible(false);
+		
+		buttonDelete = new ClickButton(this, "X") {
+			@Override
+			public void onAction() {
+				ConfirmDialog.show("Dispose", String.format(
+					"<p>Do you want to dispose this item?<br>"+
+					"<span class=\"w\">%s</span></p>",
+					selectedItem.getFullName()),
+					180, "DISPOSE", new Runnable() {
+						@Override
+						public void run() {
+							inventory.remove(selected);
+							select(-1);
+						}
+					});
+			}
+			@Override
+			protected Color getBackgroundColor() {
+				return isHover() ? bgDeleteColorHover : bgDeleteColor;
+			}
+		};
+		buttonDelete.setSize(40, buttonDelete.getHeight());
+		buttonDelete.setPosition(290, 486-buttonDelete.getHeight()-10);
+		buttonDelete.setVisible(false);
 	}
 	
 	private boolean isUseEnabled() {
@@ -127,6 +154,8 @@ public class InventoryDialog extends DialogBase {
 		}
 		else
 			buttonUse.setVisible(false);
+		
+		buttonDelete.setVisible(selectedItem!=null);
 	}
 	
 	@Override

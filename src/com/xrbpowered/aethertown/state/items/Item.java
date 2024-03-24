@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import com.xrbpowered.aethertown.state.HouseTileRef;
 import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.state.items.FoodItem.FoodItemType;
 import com.xrbpowered.aethertown.world.Tile;
@@ -33,6 +34,10 @@ public abstract class Item implements Comparable<Item> {
 	public String getName() {
 		return type.name;
 	}
+	
+	public String getFullName() {
+		return getName();
+	}
 
 	public String getUseActionName() {
 		return null;
@@ -42,7 +47,7 @@ public abstract class Item implements Comparable<Item> {
 		return null;
 	}
 	
-	public boolean markDot() {
+	public boolean markDot(Tile tile, boolean alt) {
 		return false;
 	}
 	
@@ -60,6 +65,8 @@ public abstract class Item implements Comparable<Item> {
 		switch(type) {
 			case travelToken:
 				return new TravelTokenItem(NamedLevelRef.load(in), time);
+			case houseKey:
+				return new HouseKeyItem(HouseTileRef.load(in), time);
 			case map:
 				return new LevelMapItem(NamedLevelRef.load(in), time);
 			case regionMap:
@@ -78,6 +85,9 @@ public abstract class Item implements Comparable<Item> {
 		switch(aitem.type) {
 			case travelToken:
 				NamedLevelRef.save(out, ((TravelTokenItem) aitem).destination);
+				return;
+			case houseKey:
+				HouseTileRef.save(out, ((HouseKeyItem) aitem).house);
 				return;
 			case map:
 				NamedLevelRef.save(out, ((LevelMapItem) aitem).level);

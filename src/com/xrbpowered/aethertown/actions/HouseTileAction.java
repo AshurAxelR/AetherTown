@@ -8,7 +8,6 @@ import com.xrbpowered.aethertown.actions.menus.GroceriesActionMenu;
 import com.xrbpowered.aethertown.actions.menus.HotelActionMenu;
 import com.xrbpowered.aethertown.actions.menus.ShopActionMenu;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
-import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
@@ -44,22 +43,6 @@ public class HouseTileAction extends EnterTileAction {
 	public static final HouseTileAction supermarket = new HouseTileAction(ShopActionMenu.supermarket);
 	public static final HouseTileAction clothesShop = new HouseTileAction(ShopActionMenu.clothesShop);
 	public static final HouseTileAction giftShop = new HouseTileAction(ShopActionMenu.giftShop);
-
-	public static final HouseTileAction home = new HouseTileAction(null) {
-		@Override
-		public boolean isEnabled(Tile tile, boolean alt) {
-			HomeData home = HomeData.getLocal(tile.level.info);
-			return home!=null && home.ref.isHouse((HouseGenerator) tile.sub.parent);
-		}
-		@Override
-		protected void onFail(Tile tile, boolean alt) {
-			showToast("Requires key");
-		}
-		@Override
-		protected void onSuccess(Tile tile, boolean alt) {
-			showToast("Welcome!");
-		}
-	};
 
 	public HouseTileAction(TileActionMenu menu) {
 		super(menu);

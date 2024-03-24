@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.gen.plot.houses;
 import java.awt.Color;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.actions.EnterHomeAction;
 import com.xrbpowered.aethertown.actions.HouseTileAction;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
@@ -26,7 +27,7 @@ public class HouseRole {
 	public static final Color colorCulture = new Color(0xdd77bb);
 	public static final Color colorOffice = new Color(0x77aaaa);
 	
-	public static final HouseRole residential = new HouseRole("Residential", colorResidential, HouseTileAction.home,
+	public static final HouseRole residential = new HouseRole("Residential", colorResidential, EnterHomeAction.action,
 			new ArchitectureStyle(2, ArchitectureTileSet.baseSet),
 			new ArchitectureStyle(3, ArchitectureTileSet.baseSet)
 		) {

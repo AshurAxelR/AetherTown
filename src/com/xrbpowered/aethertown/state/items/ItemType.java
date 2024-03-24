@@ -3,7 +3,7 @@ package com.xrbpowered.aethertown.state.items;
 public enum ItemType {
 
 	travelToken("Travel Token"),
-	// houseKey("House Key"),
+	houseKey("House Key"),
 	// roomKey("Room Key"),
 	map("Map"),
 	regionMap("Region Map"),

@@ -21,17 +21,22 @@ public class TravelTokenItem extends Item {
 	}
 
 	@Override
+	public String getFullName() {
+		return String.format("%s for %s", super.getFullName(), destination.getFullName());
+	}
+	
+	@Override
 	public String getInfoHtml(Tile tile, boolean alt) {
 		return String.format(
 			"<p>Use at monuments to instantly travel to a location. "+
 			"Monuments can be used only once every 2h.</p>"+
 			"<p>Destination:<br><span class=\"w\">%s</span>%s</p>",
 			destination.getFullName(),
-			markDot() ? "<br>(You are here)": "");
+			markDot(tile, alt) ? "<br>(You are here)": "");
 	}
 
 	@Override
-	public boolean markDot() {
+	public boolean markDot(Tile tile, boolean alt) {
 		return levelInfo.isRef(destination);
 	}
 }

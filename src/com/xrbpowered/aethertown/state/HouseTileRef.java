@@ -5,7 +5,9 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class HouseTileRef {
 
@@ -43,7 +45,11 @@ public class HouseTileRef {
 		else
 			return false;
 	}
-	
+
+	public boolean isTile(Tile tile) {
+		return tile.t==HouseT.template && isHouse((HouseGenerator) tile.sub.parent);
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(level, LevelVisit.tileHash(x, z));

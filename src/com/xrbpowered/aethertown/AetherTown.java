@@ -445,6 +445,10 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
+	public void flipCamera() {
+		camera.rotation.y += Math.PI;
+	}
+	
 	@Override
 	public void mouseDown(float x, float y, int button) {
 		if(controllerEnabled && ClientInput.getMouseButton(button)==RIGHT)
@@ -465,7 +469,7 @@ public class AetherTown extends UIClient {
 				requestExit();
 				break;
 			case KeyEvent.VK_BACK_SPACE:
-				camera.rotation.y += Math.PI;
+				flipCamera();
 				break;
 			case KeyEvent.VK_TAB:
 				if(settings.allowFlying && controllerEnabled) {

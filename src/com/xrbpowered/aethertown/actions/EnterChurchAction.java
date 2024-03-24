@@ -7,10 +7,10 @@ import com.xrbpowered.aethertown.world.gen.plot.ChurchGenerator;
 
 public class EnterChurchAction extends EnterTileAction {
 
-	public static final EnterChurchAction action = new EnterChurchAction(createMenu());
+	public static final EnterChurchAction action = new EnterChurchAction();
 	
-	public EnterChurchAction(TileActionMenu menu) {
-		super(menu);
+	private EnterChurchAction() {
+		super(createMenu());
 	}
 	
 	@Override

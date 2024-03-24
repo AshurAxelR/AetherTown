@@ -23,6 +23,11 @@ public class LevelMapItem extends Item {
 	}
 	
 	@Override
+	public String getFullName() {
+		return String.format("%s of %s", super.getFullName(), level.getFullName());
+	}
+
+	@Override
 	public String getUseActionName() {
 		return "VIEW";
 	}
@@ -40,11 +45,11 @@ public class LevelMapItem extends Item {
 		return String.format(
 			"<p><span class=\"w\">%s</span>%s</p>"+
 			"<p>Map of location.</p>",
-			level.getFullName(), markDot() ? "<br>(You are here)": "");
+			level.getFullName(), markDot(tile, alt) ? "<br>(You are here)": "");
 	}
 	
 	@Override
-	public boolean markDot() {
+	public boolean markDot(Tile tile, boolean alt) {
 		return levelInfo.isRef(level);
 	}
 }

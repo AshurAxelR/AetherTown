@@ -1,5 +1,10 @@
 package com.xrbpowered.aethertown.state;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -22,9 +27,60 @@ public class HomeData {
 	
 	// TODO home improvements
 	// TODO home inventory
-	
+
+	private HomeData(HouseTileRef ref) {
+		this.ref = ref;
+	}
+
 	private HomeData(HouseGenerator house) {
 		this.ref = new HouseTileRef(house);
+	}
+	
+	public static boolean load(InputStream ins) {
+		try {
+			DataInputStream in = new DataInputStream(ins);
+			
+			if(!formatId.equals(in.readUTF()))
+				throw new IOException("Bad file format");
+			
+			HashMap<Integer, HomeData> homes = new HashMap<>();
+			int numHomes = in.readInt();
+			for(int i=0; i<numHomes; i++) {
+				HouseTileRef ref = HouseTileRef.load(in);
+				HomeData home = new HomeData(ref);
+				homes.put(ref.level.hashCode(), home);
+			}
+			
+			HomeData.homes = homes;
+			System.out.printf("Homes loaded (%d claimed)\n", numHomes);
+			return true;
+		}
+		catch(Exception e) {
+			System.err.println("Can't load homes");
+			e.printStackTrace();
+			HomeData.homes.clear();
+			return false;
+		}
+	}
+	
+	public static boolean save(OutputStream outs) {
+		try {
+			DataOutputStream out = new DataOutputStream(outs);
+			
+			out.writeUTF(formatId);
+			out.writeInt(homes.size());
+			for(HomeData home : homes.values()) {
+				HouseTileRef.save(out, home.ref);
+			}
+			
+			System.out.println("Homes saved");
+			return true;
+		}
+		catch(Exception e) {
+			System.err.println("Can't save homes");
+			e.printStackTrace();
+			return false;
+		}
 	}
 	
 	public static int totalClaimed() {

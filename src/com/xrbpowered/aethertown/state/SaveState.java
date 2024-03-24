@@ -81,14 +81,15 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 	private static final String cfgName = "save.cfg";
 	private static final String playerName = "player.dat";
 	private static final String visitsName = "visits.dat";
+	private static final String homesName = "homes.dat";
 	private static final String cooldownsName = "cooldowns.dat";
 	private static final String bookmarksName = "bookmarks.dat";
 
 	private static final Collection<String> all = Arrays.asList(
-		cfgName, playerName, visitsName, cooldownsName, bookmarksName
+		cfgName, playerName, visitsName, homesName, cooldownsName, bookmarksName
 	);
 	private static final Collection<String> required = Arrays.asList(
-		cfgName, playerName, visitsName, cooldownsName
+		cfgName, playerName, visitsName, homesName, cooldownsName
 	);
 
 	@Override
@@ -109,6 +110,8 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 			return Player.load(in);
 		else if(visitsName.equals(name))
 			return RegionVisits.load(in);
+		else if(homesName.equals(name))
+			return HomeData.load(in);
 		else if(cooldownsName.equals(name))
 			return GlobalCooldowns.load(in);
 		else if(bookmarksName.equals(name))
@@ -125,6 +128,8 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 			return Player.save(out);
 		else if(visitsName.equals(name))
 			return RegionVisits.save(out);
+		else if(homesName.equals(name))
+			return HomeData.save(out);
 		else if(cooldownsName.equals(name))
 			return GlobalCooldowns.save(out);
 		else if(bookmarksName.equals(name))

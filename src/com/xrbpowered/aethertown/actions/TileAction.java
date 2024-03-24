@@ -4,6 +4,7 @@ import static com.xrbpowered.aethertown.AetherTown.player;
 import static com.xrbpowered.aethertown.actions.HouseTileAction.closingSoon;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
+import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
@@ -15,13 +16,16 @@ public abstract class TileAction {
 	protected int cost = 0;
 	
 	protected CooldownSettings cooldown = null;
+	protected boolean reqHome = false;
 
 	public TileAction(String name) {
 		this.name = name;
 	}
 	
 	public boolean isEnabled(Tile tile, boolean alt) {
-		if(cooldown!=null && cooldown.isOnCooldown())
+		if(isReqHome() && !HomeData.hasLocalHome(tile.level.info))
+			return false;
+		else if(cooldown!=null && cooldown.isOnCooldown())
 			return false;
 		else
 			return !closingSoon(tile, alt, this);
@@ -53,6 +57,15 @@ public abstract class TileAction {
 	public CooldownSettings getCooldown() {
 		return cooldown;
 	}
+	
+	public TileAction reqHome() {
+		this.reqHome = true;
+		return this;
+	}
+	
+	public boolean isReqHome() {
+		return reqHome;
+	}
 
 	public String getLabel(Tile tile, boolean alt) {
 		return name;
@@ -70,7 +83,9 @@ public abstract class TileAction {
 	}
 	
 	protected void onFail(Tile tile, boolean alt) {
-		if(closingSoon(tile, alt, this))
+		if(isReqHome() && !HomeData.hasLocalHome(tile.level.info))
+			showToast("Requires local home");
+		else if(closingSoon(tile, alt, this))
 			showToast("Closing soon");
 		else if(cooldown!=null && cooldown.isOnCooldown())
 			showToast(cooldown.cooldown.formatRemaining());

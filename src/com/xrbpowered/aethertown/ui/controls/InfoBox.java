@@ -8,10 +8,14 @@ import com.xrbpowered.zoomui.std.UIFormattedLabel;
 
 public class InfoBox extends UIFormattedLabel {
 
-	public InfoBox(UIContainer parent) {
-		super(parent, "");
+	public InfoBox(UIContainer parent, String html) {
+		super(parent, html);
 	}
 
+	public InfoBox(UIContainer parent) {
+		this(parent, "");
+	}
+	
 	@Override
 	public void setupHtmlKit() {
 		htmlKit.defaultFont = Fonts.small;

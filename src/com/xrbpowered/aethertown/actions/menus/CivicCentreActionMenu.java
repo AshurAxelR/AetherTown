@@ -5,8 +5,13 @@ import static com.xrbpowered.aethertown.state.HomeData.*;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.actions.DummyAction;
+import com.xrbpowered.aethertown.actions.GetItemAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.actions.WaitAction;
+import com.xrbpowered.aethertown.state.HomeData;
+import com.xrbpowered.aethertown.state.items.HouseKeyItem;
+import com.xrbpowered.aethertown.state.items.Item;
+import com.xrbpowered.aethertown.state.items.ItemType;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
@@ -14,7 +19,6 @@ import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
 public class CivicCentreActionMenu extends TileActionMenu {
 
 	public static final TileAction claimHomeAction = new TileAction("Claim home") {
-		
 		@Override
 		public boolean isEnabled(Tile tile, boolean alt) {
 			return super.isEnabled(tile, alt) &&
@@ -42,22 +46,43 @@ public class CivicCentreActionMenu extends TileActionMenu {
 		protected void onSuccess(Tile tile, boolean alt) {
 			super.onSuccess(tile, alt);
 			HouseGenerator sel = selectRandomRes(tile.level, 1).get(0);
-			claim(sel);
+			HomeData home = claim(sel);
+			player.backpack.put(new HouseKeyItem(home));
 			showToast(sel.getAddress()+" claimed");
 		}
-		
 	}.setDelay(15);
+
+	
+	public static final TileAction recoverKeyAction = new GetItemAction("Recover key") {
+		@Override
+		protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
+			if(aitem.type==ItemType.houseKey) {
+				HouseKeyItem item = (HouseKeyItem) aitem;
+				if(item.house.level.isLevel(tile.level.info))
+					return true;
+			}
+			return false;
+		}
+		
+		@Override
+		protected Item generateItem(Tile tile, boolean alt) {
+			HomeData home = getLocal(tile.level.info);
+			return home==null ? null : new HouseKeyItem(home);
+		}
+	}.setDelay(5).reqHome();
+	
 	
 	public CivicCentreActionMenu(boolean civic, boolean post) {
-		// TODO complete civic centre actions
 		if(civic) {
+			// TODO complete civic centre actions
 			TileActionMenu res = new TileActionMenu();
 			res.addAction(claimHomeAction);
-			res.addAction(new DummyAction("Recover key").setEnabled(false));
+			res.addAction(recoverKeyAction);
 			res.addAction(new DummyAction("Abandon home").setEnabled(false));
 			addMenu("HOME OFFICE", res);
 		}
 		if(post) {
+			// TODO complete post office actions
 			addAction(new DummyAction("Collect earnings").setEnabled(false));
 			addAction(new DummyAction("Order goods").setEnabled(false));
 		}

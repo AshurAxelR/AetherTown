@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
+import static com.xrbpowered.aethertown.AetherTown.aether;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
@@ -157,8 +159,10 @@ public class TileActionMenuDialog extends DialogBase {
 	@Override
 	public void close() {
 		history.pop();
-		if(history.isEmpty())
+		if(history.isEmpty()) {
+			aether.flipCamera();
 			super.close();
+		}
 		else {
 			switchMenu(history.getFirst());
 			repaint();

@@ -19,7 +19,7 @@ public class FullscreenDialogNode extends UINode implements KeyInputHandler {
 		super(parent);
 		content = new UINode(this);
 		closeButtonPane = new ControlPane(this);
-		closeButtonPane.setSize(32, 32);
+		closeButtonPane.setSize(40, 32);
 		
 		new ClickButton(closeButtonPane, "X") {
 			@Override

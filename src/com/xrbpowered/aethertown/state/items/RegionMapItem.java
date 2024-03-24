@@ -21,6 +21,12 @@ public class RegionMapItem extends Item {
 	}
 
 	@Override
+	public String getFullName() {
+		return String.format("%s of %s", super.getFullName(),
+				RegionVisits.getRegionTitle(regionSeed, false));
+	}
+	
+	@Override
 	public String getUseActionName() {
 		return "VIEW";
 	}
@@ -36,11 +42,11 @@ public class RegionMapItem extends Item {
 		return String.format(
 			"<p><span class=\"w\">%s</span>%s</p>",
 			RegionVisits.getRegionTitle(regionSeed, false),
-			markDot() ? " (this region)" : "");
+			markDot(tile, alt) ? " (this region)" : "");
 	}
 	
 	@Override
-	public boolean markDot() {
+	public boolean markDot(Tile tile, boolean alt) {
 		return region.seed == regionSeed;
 	}
 }
