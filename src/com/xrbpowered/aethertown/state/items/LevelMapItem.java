@@ -5,19 +5,21 @@ import static com.xrbpowered.aethertown.AetherTown.*;
 import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class LevelMapItem extends Item {
 
 	public final NamedLevelRef level;
 	
-	public LevelMapItem(NamedLevelRef ref) {
-		super(ItemType.map);
+	public LevelMapItem(NamedLevelRef ref, double time) {
+		super(ItemType.map, time);
 		this.level = ref;
 	}
 	
 	public LevelMapItem(LevelInfo level) {
-		this(new NamedLevelRef(level));
+		this(new NamedLevelRef(level), WorldTime.time);
 	}
 	
 	@Override
@@ -26,14 +28,15 @@ public class LevelMapItem extends Item {
 	}
 	
 	@Override
-	public void useItem() {
+	public boolean useItem(Tile tile, boolean alt) {
 		LevelInfo info = this.level.find(regionCache);
 		Level level = levelCache.getLevel(info, true);
 		LevelMapDialog.show(level, false);
+		return true;
 	}
 
 	@Override
-	public String getInfoHtml() {
+	public String getInfoHtml(Tile tile, boolean alt) {
 		return String.format(
 			"<p><span class=\"w\">%s</span>%s</p>"+
 			"<p>Map of location.</p>",

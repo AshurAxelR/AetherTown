@@ -7,7 +7,8 @@ public enum ItemType {
 	// roomKey("Room Key"),
 	map("Map"),
 	regionMap("Region Map"),
-	trinket("Trinket");
+	trinket("Trinket"),
+	foodItem(null);
 	
 	public final String name;
 	

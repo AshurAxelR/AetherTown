@@ -95,6 +95,11 @@ public class TileActionMenu {
 	
 	public final ArrayList<Command> items = new ArrayList<>();
 	
+	public TileActionMenu(TileAction... actions) {
+		for(TileAction a: actions)
+			addAction(a);
+	}
+	
 	public void addAction(TileAction action) {
 		items.add(new ActionCommand(action));
 	}

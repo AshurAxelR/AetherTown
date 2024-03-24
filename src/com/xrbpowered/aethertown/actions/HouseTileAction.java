@@ -21,9 +21,23 @@ public class HouseTileAction extends EnterTileAction {
 	public static final HouseTileAction hospital = new HouseTileAction(new CivicCentreActionMenu(false, false));
 	public static final HouseTileAction hotel = new HouseTileAction(new HotelActionMenu(false));
 	public static final HouseTileAction inn = new HouseTileAction(new HotelActionMenu(true));
+	
+	public static final HouseTileAction museum = new HouseTileAction(new TileActionMenu(
+		LeisureActions.viewMuseum
+	));
+	public static final HouseTileAction library = new HouseTileAction(new TileActionMenu(
+		LeisureActions.study,
+		LeisureActions.readBooks
+	));
+	public static final HouseTileAction concertHall = new HouseTileAction(new TileActionMenu(
+		LeisureActions.playMusic(true),
+		LeisureActions.watchMovies(true)
+	));
+	
 	public static final HouseTileAction restaurant = new HouseTileAction(FoodActionMenu.restaurant);
 	public static final HouseTileAction fastFood = new HouseTileAction(FoodActionMenu.fastFood);
 	public static final HouseTileAction coffeeShop = new HouseTileAction(FoodActionMenu.cafeteria);
+	
 	public static final HouseTileAction giftShop = new HouseTileAction(ShopActionMenu.giftShop);
 
 	public static final HouseTileAction home = new HouseTileAction(null) {

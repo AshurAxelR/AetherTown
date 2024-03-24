@@ -5,16 +5,29 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import com.xrbpowered.aethertown.state.NamedLevelRef;
+import com.xrbpowered.aethertown.state.items.FoodItem.FoodItemType;
+import com.xrbpowered.aethertown.world.Tile;
 
 public abstract class Item implements Comparable<Item> {
 
 	public final ItemType type;
+	public final double timestamp;
 	
-	public Item(ItemType type) {
+	public Item(ItemType type, double time) {
 		this.type = type;
+		this.timestamp = time;
 	}
 	
-	public void useItem() {
+	public boolean isConsumable() {
+		return false;
+	}
+	
+	public boolean isUseEnabled(Tile tile, boolean alt) {
+		return true;
+	}
+	
+	public boolean useItem(Tile tile, boolean alt) {
+		return true;
 	}
 	
 	public String getName() {
@@ -25,7 +38,7 @@ public abstract class Item implements Comparable<Item> {
 		return null;
 	}
 	
-	public String getInfoHtml() {
+	public String getInfoHtml(Tile tile, boolean alt) {
 		return null;
 	}
 	
@@ -35,29 +48,33 @@ public abstract class Item implements Comparable<Item> {
 	
 	@Override
 	public int compareTo(Item o) {
-		return type.compareTo(o.type);
+		int res = type.compareTo(o.type);
+		if(res==0)
+			res = Double.compare(timestamp, o.timestamp);
+		return res;
 	}
 
 	public static Item load(DataInputStream in) throws IOException {
 		ItemType type = ItemType.values()[in.readInt()];
+		double time = in.readDouble();
 		switch(type) {
 			case travelToken:
-				return new TravelTokenItem(NamedLevelRef.load(in));
+				return new TravelTokenItem(NamedLevelRef.load(in), time);
 			case map:
-				return new LevelMapItem(NamedLevelRef.load(in));
+				return new LevelMapItem(NamedLevelRef.load(in), time);
 			case regionMap:
-				return new RegionMapItem(in.readLong());
-			case trinket: {
-				NamedLevelRef ref = NamedLevelRef.load(in);
-				double time = in.readDouble();
-				return new TrinketItem(ref, time);
-			}
+				return new RegionMapItem(in.readLong(), time);
+			case trinket:
+				return new TrinketItem(NamedLevelRef.load(in), time);
+			case foodItem:
+				return new FoodItem(FoodItemType.values()[in.readInt()], time);
 		}
 		return null; // should not happen
 	}
 
 	public static void save(DataOutputStream out, Item aitem) throws IOException {
 		out.writeInt(aitem.type.ordinal());
+		out.writeDouble(aitem.timestamp);
 		switch(aitem.type) {
 			case travelToken:
 				NamedLevelRef.save(out, ((TravelTokenItem) aitem).destination);
@@ -68,12 +85,12 @@ public abstract class Item implements Comparable<Item> {
 			case regionMap:
 				out.writeLong(((RegionMapItem) aitem).regionSeed);
 				return;
-			case trinket: {
-				TrinketItem item = (TrinketItem) aitem;
-				NamedLevelRef.save(out, item.location);
-				out.writeDouble(item.timestamp);
+			case trinket:
+				out.writeDouble(((TrinketItem) aitem).timestamp);
 				return;
-			}
+			case foodItem:
+				out.writeInt(((FoodItem) aitem).food.ordinal());
+				return;
 		}
 	}
 }

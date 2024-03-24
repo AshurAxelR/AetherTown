@@ -1,10 +1,11 @@
 package com.xrbpowered.aethertown.actions.menus;
 
-import com.xrbpowered.aethertown.actions.DummyAction;
+import com.xrbpowered.aethertown.actions.BuyFoodAction;
 import com.xrbpowered.aethertown.actions.InspirationAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.actions.WaitAction;
 import com.xrbpowered.aethertown.state.GlobalCooldowns;
+import com.xrbpowered.aethertown.state.items.FoodItem.FoodItemType;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
 
@@ -53,10 +54,10 @@ public class FoodActionMenu extends TileActionMenu {
 		}
 		else {
 			food.addAction(new InspirationAction("Eat-in meal", 3).setDelay(30).setCost(650).setCooldown(GlobalCooldowns.eat.hours(2.5)));
-			food.addAction(new DummyAction("Takeaway meal").setEnabled(false).setDelay(10).setCost(650));
+			food.addAction(new BuyFoodAction(FoodItemType.takeawayMeal, 650).setDelay(10));
 		}
-		food.addAction(new DummyAction("Buy Soda bottle").setEnabled(false).setCost(100));
-		food.addAction(new DummyAction("Buy Snack").setEnabled(false).setCost(150));
+		food.addAction(GroceriesActionMenu.buyWaterBottleAction);
+		food.addAction(GroceriesActionMenu.buySnackAction);
 		food.addAction(hangOutAction);
 		return food;
 	}

@@ -1,18 +1,17 @@
 package com.xrbpowered.aethertown.state.items;
 
 import com.xrbpowered.aethertown.state.NamedLevelRef;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class TrinketItem extends Item {
 
 	public final NamedLevelRef location;
-	public final double timestamp;
 
 	public TrinketItem(NamedLevelRef ref, double time) {
-		super(ItemType.trinket);
+		super(ItemType.trinket, time);
 		this.location = ref;
-		this.timestamp = time;
 	}
 	
 	public TrinketItem(LevelInfo level) {
@@ -20,7 +19,7 @@ public class TrinketItem extends Item {
 	}
 
 	@Override
-	public String getInfoHtml() {
+	public String getInfoHtml(Tile tile, boolean alt) {
 		return String.format(
 			"<p>A piece of memorabilia.</p>"+
 			"<p>Bought on <span class=\"w\">%s</span><br>"+

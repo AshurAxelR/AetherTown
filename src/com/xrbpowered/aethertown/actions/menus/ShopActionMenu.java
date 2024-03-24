@@ -17,6 +17,10 @@ public class ShopActionMenu extends TileActionMenu {
 			addAction(new InspirationAction("Browse", browseIns).oncePerTile().setDelay(15));
 	}
 
+	// TODO localShop
+	// TODO supermarket
+	// TODO clothesShop
+	
 	private static TileActionMenu createGiftShopMenu() {
 		ShopActionMenu shop = new ShopActionMenu(3);
 		
@@ -39,4 +43,10 @@ public class ShopActionMenu extends TileActionMenu {
 		shop.addMenu("CAFETERIA", FoodActionMenu.cafeteria);
 		return shop;
 	}
+	
+	// TODO homeShop
+	// TODO Tech Store
+	// TODO Book Shop
+	// TODO Art Shop
+	// TODO Music Shop
 }

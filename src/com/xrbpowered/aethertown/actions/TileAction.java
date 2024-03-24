@@ -80,11 +80,15 @@ public abstract class TileAction {
 		applyCost(tile, alt);
 	}
 
-	public final void performAt(Tile tile, boolean alt) {
-		if(isEnabled(tile, alt))
+	public final boolean performAt(Tile tile, boolean alt) {
+		if(isEnabled(tile, alt)) {
 			onSuccess(tile, alt);
-		else
+			return true;
+		}
+		else {
 			onFail(tile, alt);
+			return false;
+		}
 	}
 	
 	public static String formatCostInfo(int delay, int cost) {

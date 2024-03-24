@@ -13,11 +13,14 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 public enum GlobalCooldowns {
 
 	fastTravel,
-	sleep,
 	eat,
 	drink,
-	showerIns,
-	prayIns;
+	
+	prayIns,
+	playMusicIns,
+	moviesIns,
+	readIns,
+	showerIns;
 	
 	private static final String formatId = "AetherTown.GlobalCooldowns.0";
 

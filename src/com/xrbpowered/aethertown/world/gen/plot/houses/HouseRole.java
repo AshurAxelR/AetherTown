@@ -114,13 +114,13 @@ public class HouseRole {
 		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop, IllumLayer.living).setDoorInfo(DoorInfo.coffeeShop)
 	);
 	
-	public static final HouseRole museum = new HouseRole("Museum", colorCulture, null, // TODO museum action
+	public static final HouseRole museum = new HouseRole("Museum", colorCulture, HouseTileAction.museum,
 		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.library)
 	);
-	public static final HouseRole library = new HouseRole("Library", colorCulture, null, // TODO library action
+	public static final HouseRole library = new HouseRole("Library", colorCulture, HouseTileAction.library,
 		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.library)
 	);
-	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture, null, // TODO concert hall action
+	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture, HouseTileAction.concertHall,
 		new ArchitectureStyle.BlankNotFront(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant, IllumLayer.leisure)
 	);
 	public static final HouseRole office = new HouseRole("Office", colorOffice, null, // TODO office action

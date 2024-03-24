@@ -7,13 +7,13 @@ import java.util.LinkedList;
 
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
+import com.xrbpowered.aethertown.ui.controls.MenuContainer;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.InputInfo;
 import com.xrbpowered.zoomui.UIContainer;
-import com.xrbpowered.zoomui.UIElement;
 
 public class TileActionMenuDialog extends DialogBase {
 
@@ -103,23 +103,13 @@ public class TileActionMenuDialog extends DialogBase {
 		buttonInventory = new ClickButton(this, "INVENTORY") {
 			@Override
 			public void onAction() {
-				InventoryDialog.show();
+				InventoryDialog.show(tile, alt);
 			}
 		};
 		buttonInventory.setSize(150, buttonInventory.getHeight());
 		buttonInventory.setPosition(getWidth()-buttonInventory.getWidth()-10, getHeight()-buttonInventory.getHeight()-10);
 		
-		menuContainer = new UIContainer(this) {
-			@Override
-			public void layout() {
-				float y = 0f;
-				for(UIElement c : children) {
-					c.setSize(getWidth(), c.getHeight());
-					c.setPosition(0, y);
-					y += c.getHeight();
-				}
-			}
-		};
+		menuContainer = new MenuContainer(this);
 		menuContainer.setPosition(10, (title!=null) ? 110 : 60);
 		menuContainer.setSize(getWidth()-20, getHeight()-menuContainer.getY()-60);
 		
@@ -183,7 +173,7 @@ public class TileActionMenuDialog extends DialogBase {
 	@Override
 	public boolean onKeyPressed(char c, int code, InputInfo input) {
 		if(code==KeyEvent.VK_Q) {
-			InventoryDialog.show();
+			InventoryDialog.show(tile, alt);
 			return true;
 		}
 		else

@@ -12,21 +12,28 @@ import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.InfoBox;
 import com.xrbpowered.aethertown.ui.controls.SelectButton;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.UIContainer;
 
 public class InventoryDialog extends DialogBase {
 
+	private final Tile tile;
+	private final boolean alt;
+
 	private Inventory inventory;
-	
+
 	private int selected = -1;
 	private Item selectedItem = null;
 	
 	protected ClickButton buttonUse;
 	protected InfoBox infoBox;
 
-	public InventoryDialog(UIContainer parent) {
+	public InventoryDialog(UIContainer parent, Tile tile, boolean alt) {
 		super(parent, 700, 550, true);
+		this.tile = tile;
+		this.alt = alt;
+		
 		inventory = player.backpack;
 		
 		SelectButton invButton = new SelectButton(this, "BACKPACK") {
@@ -77,7 +84,19 @@ public class InventoryDialog extends DialogBase {
 		buttonUse = new ClickButton(this, "USE") {
 			@Override
 			public void onAction() {
-				selectedItem.useItem();
+				if(selectedItem.useItem(tile, alt) && selectedItem.isConsumable()) {
+					inventory.remove(selected);
+					select(-1);
+				}
+				repaint();
+			}
+			@Override
+			protected Color getBackgroundColor() {
+				return isHover() && isUseEnabled() ? bgColorHover : bgColor;
+			}
+			@Override
+			protected Color getTextColor() {
+				return isUseEnabled() ? textColor : textColorDisabled;
 			}
 		};
 		buttonUse.setSize(150, buttonUse.getHeight());
@@ -85,11 +104,15 @@ public class InventoryDialog extends DialogBase {
 		buttonUse.setVisible(false);
 	}
 	
+	private boolean isUseEnabled() {
+		return selectedItem!=null && selectedItem.isUseEnabled(tile, alt);
+	}
+	
 	private void select(int index) {
 		selected = index;
-		selectedItem = inventory.get(index);
+		selectedItem = index<0 ? null : inventory.get(index);
 		
-		String info = selectedItem.getInfoHtml();
+		String info = selectedItem==null ? null : selectedItem.getInfoHtml(tile, alt);
 		if(info!=null) {
 			infoBox.setVisible(true);
 			infoBox.setHtml(info);
@@ -97,7 +120,7 @@ public class InventoryDialog extends DialogBase {
 		else
 			infoBox.setVisible(false);
 		
-		String use = selectedItem.getUseActionName();
+		String use = selectedItem==null ? null : selectedItem.getUseActionName();
 		if(use!=null) {
 			buttonUse.setVisible(true);
 			buttonUse.label = use;
@@ -118,9 +141,9 @@ public class InventoryDialog extends DialogBase {
 		}
 	}
 
-	public static void show() {
+	public static void show(Tile tile, boolean alt) {
 		ui.hideTop();
-		new InventoryDialog(ui);
+		new InventoryDialog(ui, tile, alt);
 		ui.reveal();
 	}
 }

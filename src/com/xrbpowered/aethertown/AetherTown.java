@@ -561,7 +561,8 @@ public class AetherTown extends UIClient {
 				}
 				break;
 			case KeyEvent.VK_Q:
-				InventoryDialog.show();
+				if(level!=null && level.isInside(hoverx, hoverz))
+					InventoryDialog.show(level.map[hoverx][hoverz], false);
 				break;
 			case KeyEvent.VK_E:
 				performAction(false);

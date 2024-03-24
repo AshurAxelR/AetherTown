@@ -19,9 +19,11 @@ Player inventory has 12 slots (2 _heavy_).
 * **Region Map** (region ref.) _View:_ view region map, hotkey **N**
 * Trinket (level ref., timestamp) no use, just a memory
 * Groceries (_heavy_)
-* Snack (water, crisps, etc.) - food, _Eat:_ (consumed) +5min
-* Cooked Food (cuisine type) - food, but must be stored at home
-* Takeaway Food (cuisine type) - food, _Eat:_ (consumed) (4h gcd) +30min, +3 INS
+* Food items:
+	* Water bottle
+	* Snack - food, _Eat:_ (consumed) +5min
+	* Takeaway meal - food, _Eat:_ (consumed) (4h gcd) +30min, +3 INS
+	* Home-cooked meal - food, but must be stored at home
 
 ### Other state variables
 
@@ -142,8 +144,8 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 		* _Work_ > (product type): req. **Computer** improvement, +2h, -INS (up to 10: improves progress speed)  
 			Completing a product normally shoud take 5-10 days and grants £100+ (+bonus for quality)
 		* _Play games:_ req. **Computer** improvement, +40min, +1 INS
-		* _Study:_ +1h, +1 XP
-		* _Read:_ +30min
+		* _Study:_ +30min, +1 XP
+		* _Read:_ +30min, +1 INS (daily)
 	* _Bedroom:_
 		* ... room actions
 	* (storage: Kitchen, Office, Bedroom)
@@ -187,28 +189,41 @@ Tile action hotkey **E**, alternative (upstairs) **R**
 	* _Buy_ Snack (type): £0.50 **+item**
 	* **Supermarket** ... ?
 
+
 ### HouseRole: ... shop
-* clothes +2 INS, (Buy new clothes?)
-* gift + cafe, +3 INS, Buy trinket, food
-* home +1 INS, **Kitchenware**
-* tech +2 INS, **Computer**
-* book +3 INS, **Board games**, Play board games, Read?
-* art +5 INS
-* music +3 INS, **Musical instrument**, Play music
+* _Fashion:_ +2 INS, Buy new clothes?
+* _Gift shop:_ +3 INS, Buy **Trinket**, Cafeteria UI
+* _Home goods:_ +1 INS, **Kitchenware**
+* _Tech:_ +2 INS, **Computer**
+* _Book:_ +3 INS, **Board games**, Play board games
+* _Art:_ +5 INS
+* _Music:_ +3 INS, **Musical instrument**, Play music
+
+#### gift shop
 * **E:** _Enter:_ UI
-	* browse?
+	* _Browse:_ (once per tile) + 15min, +3 INS
+	* _Buy Trinket:_ **+item**, £2.50
+	* _Cafeteria:_ UI food
+
 
 ### HouseRole: museum
-* wait 30min-1h (visit)
+* **E:** _Enter:_ UI
+	* _View collection:_ (once per tile) +30min, +3 INS, +3 XP
 
 ### HouseRole: library
-* wait 30min-2h (read, study)
+* **E:** _Enter:_ UI
+	* _Study:_ +30min, +1 XP
+	* _Read:_ +30min, +1 INS (daily)
 
 ### HouseRole: concert hall
-* $ wait 1h-2h (music, movie?)
+* **E:** _Enter:_ UI
+	* _Play music:_ +1h, +12 INS (daily)
+	* _Watch movies:_ +1.5h, +5 INS (daily)
 
 ### HouseRole: office
-* +$ wait 1h-3h (work, play games)
+* **E:** _Enter:_ UI
+	* _Work_ > (product type): +2h, ... office grants bonus to productivity
+	* _Play games:_ +40min, +1 INS
 
 ### HouseRole: ... restaurant / fast food
-* $ wait 20min-1h (food)
+* UI food
