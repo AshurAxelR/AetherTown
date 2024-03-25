@@ -14,6 +14,9 @@ public class ClickButton extends UIButtonBase {
 	public static final Color bgColorHover = new Color(0x777777);
 	public static final Color textColor = Color.WHITE;
 	public static final Color textColorDisabled = new Color(0x999999);
+	public static final Color bgDeleteColor = new Color(0x773333);
+	public static final Color bgDeleteColorHover = new Color(0xaa0000);
+
 
 	public String label;
 	

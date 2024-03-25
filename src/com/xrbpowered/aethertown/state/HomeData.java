@@ -1,14 +1,19 @@
 package com.xrbpowered.aethertown.state;
 
+import static com.xrbpowered.aethertown.AetherTown.player;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Random;
 
+import com.xrbpowered.aethertown.state.items.HouseKeyItem;
 import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.Level;
@@ -21,9 +26,11 @@ public class HomeData {
 
 	private static final String formatId = "AetherTown.HomeData.0";
 	
-	private static HashMap<Integer, HomeData> homes = new HashMap<>();
+	private static LinkedHashMap<Integer, HomeData> homes = new LinkedHashMap<>();
 	
 	public final HouseTileRef ref;
+	
+	private transient int index = -1;
 	
 	// TODO home improvements
 	// TODO home inventory
@@ -36,6 +43,10 @@ public class HomeData {
 		this.ref = new HouseTileRef(house);
 	}
 	
+	public int getIndex() {
+		return index;
+	}
+	
 	public static boolean load(InputStream ins) {
 		try {
 			DataInputStream in = new DataInputStream(ins);
@@ -43,11 +54,12 @@ public class HomeData {
 			if(!formatId.equals(in.readUTF()))
 				throw new IOException("Bad file format");
 			
-			HashMap<Integer, HomeData> homes = new HashMap<>();
+			LinkedHashMap<Integer, HomeData> homes = new LinkedHashMap<>();
 			int numHomes = in.readInt();
 			for(int i=0; i<numHomes; i++) {
 				HouseTileRef ref = HouseTileRef.load(in);
 				HomeData home = new HomeData(ref);
+				home.index = i;
 				homes.put(ref.level.hashCode(), home);
 			}
 			
@@ -83,8 +95,19 @@ public class HomeData {
 		}
 	}
 	
+	private static void updateIndices() {
+		int index = 0;
+		for(HomeData home : homes.values()) {
+			home.index = index++;
+		}
+	}
+	
 	public static int totalClaimed() {
 		return homes.size();
+	}
+	
+	public static Collection<HomeData> list() {
+		return homes.values();
 	}
 	
 	public static boolean hasLocalHome(LevelInfo level) {
@@ -99,17 +122,32 @@ public class HomeData {
 		else
 			return null;
 	}
+	
+	public static HomeData forHouse(HouseTileRef ref) {
+		HomeData h = homes.get(ref.level.hashCode());
+		if(h!=null && h.ref.equals(ref))
+			return h;
+		else
+			return null;
+	}
 
 	public static HomeData claim(HouseGenerator house) {
 		LevelInfo level = house.startToken.level.info;
 		if(hasLocalHome(level))
 			return null;
 		HomeData home = new HomeData(house);
+		home.index = homes.size();
 		homes.put(level.hashCode(), home);
 		return home;
 	}
 	
-	// TODO abandon: remove all keys
+	public static boolean  abandon(HomeData home) {
+		if(!homes.remove(home.ref.level.hashCode(), home))
+			return false;
+		updateIndices();
+		HouseKeyItem.removeKeys(player.backpack, home.ref); // TODO remove from all inventories
+		return true;
+	}
 
 	public static ArrayList<HouseGenerator> selectRandomRes(Level level, int count) {
 		ArrayList<HouseGenerator> res = new ArrayList<>();
@@ -128,6 +166,12 @@ public class HomeData {
 		ArrayList<HouseGenerator> out = new ArrayList<>();
 		for(int i=0; i<count; i++)
 			out.add(res.get(shuffle.next(random)));
+		out.sort(new Comparator<HouseGenerator>() {
+			@Override
+			public int compare(HouseGenerator o1, HouseGenerator o2) {
+				return o1.index - o2.index;
+			}
+		});
 		return out;
 	}
 	

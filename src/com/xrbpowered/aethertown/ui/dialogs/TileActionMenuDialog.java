@@ -160,8 +160,8 @@ public class TileActionMenuDialog extends DialogBase {
 	public void close() {
 		history.pop();
 		if(history.isEmpty()) {
-			aether.flipCamera();
 			super.close();
+			aether.flipCamera();
 		}
 		else {
 			switchMenu(history.getFirst());

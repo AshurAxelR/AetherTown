@@ -51,6 +51,13 @@ public class HouseTileRef {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		HouseTileRef ref = (HouseTileRef) obj;
+		return this.x==ref.x && this.z==ref.z &&
+				this.houseIndex==ref.houseIndex && level.equals(ref.level);
+	}
+	
+	@Override
 	public int hashCode() {
 		return Objects.hash(level, LevelVisit.tileHash(x, z));
 	}

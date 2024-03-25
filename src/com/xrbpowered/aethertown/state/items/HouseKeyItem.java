@@ -2,12 +2,15 @@ package com.xrbpowered.aethertown.state.items;
 
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HouseTileRef;
+import com.xrbpowered.aethertown.state.Inventory;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class HouseKeyItem extends Item {
 
 	public final HouseTileRef house;
+	
+	private transient int index = -1;
 	
 	public HouseKeyItem(HouseTileRef house, double time) {
 		super(ItemType.houseKey, time);
@@ -16,6 +19,22 @@ public class HouseKeyItem extends Item {
 	
 	public HouseKeyItem(HomeData home) {
 		this(home.ref, WorldTime.time);
+	}
+	
+	public void updateHomeIndex() {
+		HomeData h = HomeData.forHouse(house);
+		index = (h==null) ? -1 : h.getIndex();
+	}
+	
+	public int getHomeIndex() {
+		if(index<0)
+			updateHomeIndex();
+		return index;
+	}
+	
+	@Override
+	public String getName() {
+		return String.format("%s #%d", super.getName(), getHomeIndex()+1);
 	}
 	
 	@Override
@@ -35,5 +54,24 @@ public class HouseKeyItem extends Item {
 	@Override
 	public boolean markDot(Tile tile, boolean alt) {
 		return house.level.isLevel(tile.level.info); 
+	}
+	
+	public static void removeKeys(Inventory inv, HouseTileRef ref) {
+		boolean removed = false;
+		for(int i=0; i<inv.size; i++) {
+			Item item = inv.get(i);
+			if(item==null)
+				break;
+			if(item.type==ItemType.houseKey) {
+				HouseKeyItem key = (HouseKeyItem) item;
+				key.index = -1;
+				if(ref.equals(key.house)) {
+					inv.remove(i, false);
+					removed = true;
+				}
+			}
+		}
+		if(removed)
+			inv.sort();
 	}
 }

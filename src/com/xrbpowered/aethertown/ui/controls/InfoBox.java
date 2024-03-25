@@ -8,6 +8,9 @@ import com.xrbpowered.zoomui.std.UIFormattedLabel;
 
 public class InfoBox extends UIFormattedLabel {
 
+	public static final Color textColor = new Color(0x999999);
+	public static final Color darkColor = new Color(0x555555);
+	
 	public InfoBox(UIContainer parent, String html) {
 		super(parent, html);
 	}
@@ -19,10 +22,10 @@ public class InfoBox extends UIFormattedLabel {
 	@Override
 	public void setupHtmlKit() {
 		htmlKit.defaultFont = Fonts.small;
-		htmlKit.defaultColor = new Color(0x999999);
+		htmlKit.defaultColor = textColor;
 		htmlKit.zoomableCss = new ZoomableCss(
 			"p{text-align:left;margin-bottom:10} "+
-			"span.w{color:#ffffff} span.d{color:#555555}"
+			"span.w{color:#ffffff} span.d{color:#"+Integer.toHexString(darkColor.getRGB())+"}"
 		);
 	}
 

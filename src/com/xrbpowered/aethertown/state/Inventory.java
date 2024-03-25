@@ -40,7 +40,7 @@ public class Inventory {
 		return slots[index]==null;
 	}
 	
-	private void sort() {
+	public void sort() {
 		Arrays.sort(slots, new Comparator<Item>() {
 			@Override
 			public int compare(Item o1, Item o2) {
@@ -71,7 +71,7 @@ public class Inventory {
 		return slots[index];
 	}
 	
-	public Item remove(int index) {
+	public Item remove(int index, boolean sort) {
 		if(slots[index]!=null) {
 			Item item = slots[index];
 			slots[index] = null;
@@ -81,6 +81,10 @@ public class Inventory {
 		}
 		else
 			return null;
+	}
+
+	public Item remove(int index) {
+		return remove(index, true);
 	}
 
 	public void loadItems(DataInputStream in) throws IOException {

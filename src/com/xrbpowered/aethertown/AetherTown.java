@@ -447,6 +447,8 @@ public class AetherTown extends UIClient {
 	
 	public void flipCamera() {
 		camera.rotation.y += Math.PI;
+		if(activeController==walkController)
+			updateWalkY();
 	}
 	
 	@Override

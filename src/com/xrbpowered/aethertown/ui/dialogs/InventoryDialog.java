@@ -18,9 +18,6 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class InventoryDialog extends DialogBase {
 
-	public static final Color bgDeleteColor = new Color(0x773333);
-	public static final Color bgDeleteColorHover = new Color(0xaa0000);
-
 	private final Tile tile;
 	private final boolean alt;
 

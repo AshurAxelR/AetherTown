@@ -6,23 +6,25 @@ import com.xrbpowered.aethertown.utils.WRandom;
 
 public enum LevelSettlementType {
 
-	none("Park", 0, 0),
-	inn("Inn", 1, 2),
-	outpost("Outpost", 4, 10),
-	village("Village", 10, 30),
-	smallTown("Town", 30, 50),
-	largeTown("Town", 30, 80),
-	smallCity("City", 90, 120),
-	mediumCity("City", 90, 160),
-	largeCity("City", 90, 200);
+	none("Park", 0, 0, 0),
+	inn("Inn", 1, 2, 0),
+	outpost("Outpost", 4, 10, 1),
+	village("Village", 10, 30, 2),
+	smallTown("Town", 30, 50, 3),
+	largeTown("Town", 30, 80, 3),
+	smallCity("City", 90, 120, 5),
+	mediumCity("City", 90, 160, 5),
+	largeCity("City", 90, 200, 5);
 	
 	public final String title;
 	public final int minHouses, maxHouses;
+	public final int claimOptions;
 	
-	private LevelSettlementType(String title, int minHouses, int maxHouses) {
+	private LevelSettlementType(String title, int minHouses, int maxHouses, int claimOptions) {
 		this.title = title;
 		this.minHouses = minHouses;
 		this.maxHouses = maxHouses;
+		this.claimOptions = claimOptions;
 	}
 	
 	public LevelSettlementType demote() {
