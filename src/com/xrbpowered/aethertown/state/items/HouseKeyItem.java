@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.state.items;
 
+import static com.xrbpowered.aethertown.AetherTown.player;
+
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HouseTileRef;
 import com.xrbpowered.aethertown.state.Inventory;
@@ -55,7 +57,21 @@ public class HouseKeyItem extends Item {
 	public boolean markDot(Tile tile, boolean alt) {
 		return house.level.isLevel(tile.level.info); 
 	}
-	
+
+	public static boolean hasKey(HouseTileRef ref) {
+		for(int i=0; i<player.backpack.size; i++) {
+			Item item = player.backpack.get(i);
+			if(item==null)
+				break;
+			if(item.type==ItemType.houseKey) {
+				HouseKeyItem key = (HouseKeyItem) item;
+				if(ref.equals(key.house))
+					return true;
+			}
+		}
+		return false;
+	}
+
 	public static void removeKeys(Inventory inv, HouseTileRef ref) {
 		boolean removed = false;
 		for(int i=0; i<inv.size; i++) {

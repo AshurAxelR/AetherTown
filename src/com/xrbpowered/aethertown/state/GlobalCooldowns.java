@@ -19,6 +19,7 @@ public enum GlobalCooldowns {
 	prayIns,
 	playMusicIns,
 	moviesIns,
+	artIns,
 	readIns,
 	showerIns;
 	

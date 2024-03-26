@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Random;
 
@@ -24,23 +25,25 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class HomeData {
 
-	private static final String formatId = "AetherTown.HomeData.0";
+	private static final String formatId = "AetherTown.HomeData.1";
 	
 	private static LinkedHashMap<Integer, HomeData> homes = new LinkedHashMap<>();
 	
 	public final HouseTileRef ref;
 	
 	private transient int index = -1;
+	public final EnumSet<HomeImprovement> improvements;
 	
-	// TODO home improvements
 	// TODO home inventory
 
 	private HomeData(HouseTileRef ref) {
 		this.ref = ref;
+		this.improvements = EnumSet.noneOf(HomeImprovement.class);
 	}
 
 	private HomeData(HouseGenerator house) {
 		this.ref = new HouseTileRef(house);
+		this.improvements = HomeImprovement.generateDefaults(house);
 	}
 	
 	public int getIndex() {
@@ -59,6 +62,7 @@ public class HomeData {
 			for(int i=0; i<numHomes; i++) {
 				HouseTileRef ref = HouseTileRef.load(in);
 				HomeData home = new HomeData(ref);
+				HomeImprovement.fromBits(in.readInt(), home.improvements);
 				home.index = i;
 				homes.put(ref.level.hashCode(), home);
 			}
@@ -83,6 +87,7 @@ public class HomeData {
 			out.writeInt(homes.size());
 			for(HomeData home : homes.values()) {
 				HouseTileRef.save(out, home.ref);
+				out.writeInt(HomeImprovement.getBits(home.improvements));
 			}
 			
 			System.out.println("Homes saved");

@@ -52,4 +52,18 @@ public class LevelMapItem extends Item {
 	public boolean markDot(Tile tile, boolean alt) {
 		return levelInfo.isRef(level);
 	}
+	
+	public static boolean hasLevelMap(LevelInfo info) {
+		for(int i=0; i<player.backpack.size; i++) {
+			Item aitem = player.backpack.get(i);
+			if(aitem==null)
+				break;
+			if(aitem.type==ItemType.map) {
+				LevelMapItem item = (LevelMapItem) aitem;
+				if(item.level.isLevel(info))
+					return true;
+			}
+		}
+		return false;
+	}
 }

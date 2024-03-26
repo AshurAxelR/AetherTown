@@ -73,10 +73,12 @@ Player inventory has 12 slots (2 _heavy_).
 
 * Kitchenware - £7.50, 75%
 * Board games - £5.50, 25%
-* Musical instrument - £15, 10%
-* TV - £30, 80%
-* Computer - £50, 20%
-* Art supplies - £15, 10%
+* Guitar - £15, 5%
+* Piano - £30, 15%
+* TV - £35, 60%
+* Game console - £20, 15%, requires TV
+* Computer - £70, 30%
+* Art supplies - £15, 5%
 * Book collection - £10, 90%
 
 ## Actions and action types

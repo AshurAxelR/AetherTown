@@ -9,9 +9,10 @@ public abstract class LeisureActions {
 	public static final TileAction readBooks = new InspirationAction("Read books", 1).setInsCooldown(GlobalCooldowns.readIns.daily()).setDelay(30);
 	public static final TileAction playBoardGames = new InspirationAction("Play board games", 1).setDelay(60);
 	public static final TileAction playVideoGames = new InspirationAction("Play video games", 1).setDelay(40);
+	public static final TileAction paintArt = new InspirationAction("Paint art", 5).setInsCooldown(GlobalCooldowns.artIns.daily()).setDelay(60);
 	
-	public static TileAction playMusic(boolean bonus) {
-		return new InspirationAction("Play music", bonus ? 12 : 5)
+	public static TileAction playMusic(String instrument, boolean bonus) {
+		return new InspirationAction("Play "+instrument, bonus ? 12 : 5)
 				.setInsCooldown(GlobalCooldowns.playMusicIns.daily())
 				.setDelay(bonus ? 60 : 30);
 	}

@@ -31,7 +31,8 @@ public class HouseTileAction extends EnterTileAction {
 		LeisureActions.readBooks
 	));
 	public static final HouseTileAction concertHall = new HouseTileAction(new TileActionMenu(
-		LeisureActions.playMusic(true),
+		LeisureActions.playMusic("Guitar", true),
+		LeisureActions.playMusic("Piano", true),
 		LeisureActions.watchMovies(true)
 	));
 	

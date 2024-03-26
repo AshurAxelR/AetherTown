@@ -15,7 +15,7 @@ import com.xrbpowered.zoomui.UIElement;
 
 public class DialogContainer extends UINode implements KeyInputHandler {
 
-	public static final Color bgColor = new Color(0x55000000, true);
+	public static final Color bgColor = new Color(0xbb000000, true);
 
 	public DialogContainer(UIContainer parent) {
 		super(parent);

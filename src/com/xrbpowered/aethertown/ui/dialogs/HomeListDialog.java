@@ -1,17 +1,18 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
-import static com.xrbpowered.aethertown.AetherTown.player;
-import static com.xrbpowered.aethertown.AetherTown.ui;
+import static com.xrbpowered.aethertown.AetherTown.*;
 import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.bgColor;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
 import java.util.ArrayList;
+import java.util.EnumSet;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.state.HomeData;
-import com.xrbpowered.aethertown.state.HomeImprovements;
+import com.xrbpowered.aethertown.state.HomeImprovement;
 import com.xrbpowered.aethertown.state.items.HouseKeyItem;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
@@ -27,10 +28,12 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class HomeListDialog extends UIPane implements KeyInputHandler {
 
+	public static final int costPerHome = 10000;
+	
 	private class HouseInfo {
 		public final int index;
 		public final String level;
-		// TODO impromvements
+		public final EnumSet<HomeImprovement> improvements;
 		
 		public HomeData home;
 		public HouseGenerator house;
@@ -40,6 +43,7 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 			this.house = null;
 			this.index = home.ref.houseIndex;
 			this.level = home.ref.level.getFullName();
+			this.improvements = home.improvements;
 		}
 		
 		public HouseInfo(HouseGenerator house) {
@@ -47,6 +51,7 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 			this.house = house;
 			this.index = house.index;
 			this.level = house.startToken.level.info.name;
+			this.improvements = HomeImprovement.generateDefaults(house);
 		}
 	}
 	
@@ -57,19 +62,23 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 	private ArrayList<HouseInfo> infoList = new ArrayList<>();
 	private int selected = -1;
 	private HouseInfo selectedInfo = null;
+	private int cost = 0;
 	
 	private ClickButton buttonClose, buttonMap, buttonAction;
 	
 	public HomeListDialog(UIContainer parent, ArrayList<HouseGenerator> claimOptions) {
 		super(parent, false);
 		this.claim = (claimOptions!=null);
-		
+
+		int x = 10;
+		int y = 0;
 		if(!claim) {
 			int i = 0;
-			int x = 10;
 			for(HomeData home : HomeData.list()) {
-				if(i>0 && i%10==0)
+				if(i>0 && i%8==0) {
 					x += buttonWidth;
+					y = 0;
+				}
 				
 				infoList.add(new HouseInfo(home));
 				final int index = i;
@@ -108,17 +117,25 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 				};
 				
 				button.setSize(buttonWidth, button.getHeight());
-				button.setPosition(x, 50+i*(button.getHeight()));
+				button.setPosition(x, 50+y);
+				y += button.getHeight();
 				i++;
 			}
-			setSize(x+buttonWidth+320, 360);
+			setSize(x+buttonWidth+320, 356);
 		}
 		else {
+			Level level = claimOptions.get(0).startToken.level;
+			HomeData owned = HomeData.getLocal(level.info	);
+			int ownedIndex = (owned==null) ? -1 : owned.ref.houseIndex;
+			
 			int i = 0;
-			int x = 10;
 			for(HouseGenerator house : claimOptions) {
-				if(i>0 && i%10==0)
+				if(house.index==ownedIndex)
+					continue;
+				if(i>0 && i%8==0) {
 					x += buttonWidth;
+					y = 0;
+				}
 				
 				infoList.add(new HouseInfo(house));
 				final int index = i;
@@ -137,12 +154,12 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 				};
 				
 				button.setSize(buttonWidth, button.getHeight());
-				button.setPosition(x, 50+i*(button.getHeight()));
+				button.setPosition(x, 50+y);
+				y += button.getHeight();
 				i++;
 			}
-			setSize(x+buttonWidth+320, 360);
+			setSize(x+buttonWidth+320, 356);
 			
-			Level level = claimOptions.get(0).startToken.level;
 			buttonMap = new ClickButton(this, "MAP") {
 				public void onAction() {
 					LevelMapDialog.show(level, false);
@@ -150,8 +167,10 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 			};
 			buttonMap.setSize(80, buttonMap.getHeight());
 			buttonMap.setPosition(getWidth()-buttonMap.getWidth()-10, 10);
+			
+			cost = HomeData.totalClaimed() * costPerHome;
 		}
-		
+
 		buttonClose = new ClickButton(this, "CLOSE") {
 			@Override
 			public void onAction() {
@@ -164,12 +183,15 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 			@Override
 			public void onAction() {
 				if(claim) {
-					if(player.backpack.isFull())
-						showToast("Inventory full");
-					else if(HomeData.hasLocalHome(selectedInfo.house.startToken.level.info))
+					if(HomeData.hasLocalHome(selectedInfo.house.startToken.level.info))
 						showToast("Already own a home here");
+					else if(!canAfford())
+						showToast("Not enough funds");
+					else if(player.backpack.isFull())
+						showToast("Inventory full");
 					else {
 						HomeData home = HomeData.claim(selectedInfo.house);
+						player.cash -= cost;
 						player.backpack.put(new HouseKeyItem(home));
 						showToast(selectedInfo.house.getAddress()+" claimed");
 						close();
@@ -205,14 +227,28 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 				else
 					return isHover() ? bgDeleteColorHover : bgDeleteColor;
 			}
+			
+			@Override
+			protected void paintLabel(GraphAssist g) {
+				super.paintLabel(g);
+				if(claim) {
+					g.setColor(canAfford() ? textColor : textColorDisabled);
+					g.drawString(TileAction.formatCost(cost), -10, getHeight()/2, GraphAssist.RIGHT, GraphAssist.CENTER);
+				}
+			}
 		};
 		buttonAction.setPosition(getWidth()-buttonAction.getWidth()-10, getHeight()-buttonClose.getHeight()-10);
 		select(selected);
 	}
 	
+	private boolean canAfford() {
+		return settings.homeCrediting || cost==0 || player.cash>=cost;
+	}
+	
 	private boolean canClaim() {
 		return claim &&
 				!HomeData.hasLocalHome(selectedInfo.house.startToken.level.info) &&
+				canAfford() &&
 				!player.backpack.isFull();
 	}
 	
@@ -241,11 +277,19 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 			float y = 10+g.drawString(selectedInfo.level, x, 94, GraphAssist.LEFT, GraphAssist.CENTER);
 			
 			g.setFont(Fonts.small);
-			for(HomeImprovements imp : HomeImprovements.values()) {
+			for(HomeImprovement imp : HomeImprovement.values()) {
 				g.setColor(InfoBox.textColor);
 				g.drawString(imp.name, x, y, GraphAssist.LEFT, GraphAssist.CENTER);
-				g.setColor(Color.WHITE);
-				y = g.drawString("YES", x+180, y, GraphAssist.CENTER, GraphAssist.CENTER);
+				String s;
+				if(selectedInfo.improvements.contains(imp)) {
+					g.setColor(Color.WHITE);
+					s = "YES";
+				}
+				else {
+					g.setColor(InfoBox.darkColor);
+					s = "NO";
+				}
+				y = g.drawString(s, x+180, y, GraphAssist.CENTER, GraphAssist.CENTER);
 			}
 		}
 	}

@@ -17,6 +17,8 @@ import com.xrbpowered.aethertown.render.tiles.TileRenderer;
 import com.xrbpowered.aethertown.state.Player;
 import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.state.SaveState;
+import com.xrbpowered.aethertown.state.items.LevelMapItem;
+import com.xrbpowered.aethertown.state.items.RegionMapItem;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.dialogs.DialogContainer;
@@ -90,8 +92,9 @@ public class AetherTown extends UIClient {
 		public RegionMode regionMode = RegionMode.defaultMode;
 		public long regionSeed = -1L;
 		public boolean residentialLighting = true;
-		public boolean revealRegion = false;
+		public boolean revealRegion = true;
 		public boolean mapRequireItem = true;
+		public boolean homeCrediting = false;
 		public boolean markAdjVisited = false;
 		
 		public boolean allowFlying = false;
@@ -527,7 +530,7 @@ public class AetherTown extends UIClient {
 				break;
 			case KeyEvent.VK_N:
 				if(level!=null) {
-					if(!settings.mapRequireItem || player.hasRegionMap(region.seed))
+					if(!settings.mapRequireItem || RegionMapItem.hasRegionMap(region.seed))
 						RegionMapDialog.show(level);
 					else
 						showToast("You don't have a map of this region");
@@ -535,7 +538,7 @@ public class AetherTown extends UIClient {
 				break;
 			case KeyEvent.VK_M:
 				if(level!=null) {
-					if(!settings.mapRequireItem || player.hasLevelMap(levelInfo))
+					if(!settings.mapRequireItem || LevelMapItem.hasLevelMap(levelInfo))
 						LevelMapDialog.show(level, true);
 					else
 						showToast("You don't have a local map");

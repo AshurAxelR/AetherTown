@@ -49,4 +49,18 @@ public class RegionMapItem extends Item {
 	public boolean markDot(Tile tile, boolean alt) {
 		return region.seed == regionSeed;
 	}
+	
+	public static boolean hasRegionMap(long regionSeed) {
+		for(int i=0; i<player.backpack.size; i++) {
+			Item aitem = player.backpack.get(i);
+			if(aitem==null)
+				break;
+			if(aitem.type==ItemType.regionMap) {
+				RegionMapItem item = (RegionMapItem) aitem;
+				if(item.regionSeed==regionSeed)
+					return true;
+			}
+		}
+		return false;
+	}
 }
