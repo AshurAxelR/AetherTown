@@ -10,13 +10,13 @@ public enum HomeImprovement {
 
 	kitchenware("Kitchenware", 750, 0.75f),
 	boardGames("Board games", 550, 0.25f),
-	guitar("Guitar", 1500, 0.05f),
-	piano("Piano", 3000, 0.15f),
-	tv("TV", 3500, 0.6f),
-	console("Game console", 2000, 0.15f, tv),
+	guitar("Guitar", 2000, 0.1f),
+	piano("Piano", 3500, 0.25f),
+	tv("TV", 4000, 0.65f),
+	console("Game console", 2500, 0.25f, tv),
 	computer("Computer", 7000, 0.3f),
 	art("Art supplies", 1500, 0.05f),
-	books("Book collection", 1000, 0.9f);
+	books("Book collection", 750, 0.9f);
 	
 	public final String name;
 	public final int cost;

@@ -7,6 +7,7 @@ import com.xrbpowered.aethertown.actions.GetItemAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.actions.WaitAction;
 import com.xrbpowered.aethertown.state.HomeData;
+import com.xrbpowered.aethertown.state.HomeImprovement;
 import com.xrbpowered.aethertown.state.items.HouseKeyItem;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.ItemType;
@@ -94,9 +95,12 @@ public class CivicCentreActionMenu extends TileActionMenu {
 			addMenu("HOME OFFICE", res);
 		}
 		if(post) {
-			// TODO complete post office actions
-			addAction(new DummyAction("Collect earnings").setEnabled(false));
-			addAction(new DummyAction("Order goods").setEnabled(false));
+			addAction(new DummyAction("Collect earnings").setEnabled(false)); // TODO collect earnings
+			
+			TileActionMenu order = new TileActionMenu();
+			for(HomeImprovement imp : HomeImprovement.values())
+				order.addAction(new ShopActionMenu.BuyHomeImprovementAction(imp, true));
+			addMenu("ORDER GOODS", order);
 		}
 
 		addMenu("MAPS", MapsMenu.menu);

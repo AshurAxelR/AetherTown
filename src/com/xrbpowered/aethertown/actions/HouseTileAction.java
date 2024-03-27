@@ -41,7 +41,6 @@ public class HouseTileAction extends EnterTileAction {
 	
 	public static final HouseTileAction localShop = new HouseTileAction(GroceriesActionMenu.groceries);
 	public static final HouseTileAction supermarket = new HouseTileAction(ShopActionMenu.supermarket);
-	public static final HouseTileAction clothesShop = new HouseTileAction(ShopActionMenu.clothesShop);
 	public static final HouseTileAction giftShop = new HouseTileAction(ShopActionMenu.giftShop);
 
 	public HouseTileAction(TileActionMenu menu) {

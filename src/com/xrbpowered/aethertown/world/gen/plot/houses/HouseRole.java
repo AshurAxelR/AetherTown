@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.xrbpowered.aethertown.actions.EnterHomeAction;
 import com.xrbpowered.aethertown.actions.HouseTileAction;
+import com.xrbpowered.aethertown.actions.menus.ShopActionMenu;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
@@ -109,8 +110,8 @@ public class HouseRole {
 		}
 	};
 	
-	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", HouseTileAction.clothesShop, IllumPattern.shop);
-	public static final HouseRole homeShop = new ShopRole("Home Goods", null, IllumPattern.shop); // TODO home shop action
+	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", new HouseTileAction(ShopActionMenu.clothesShop), IllumPattern.shop);
+	public static final HouseRole homeShop = new ShopRole("Home Goods", new HouseTileAction(ShopActionMenu.homeShop), IllumPattern.shop);
 	
 	public static final HouseRole giftShop = new HouseRole("Gift Shop + Cafeteria", colorShop, HouseTileAction.giftShop,
 		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop, IllumLayer.living).setDoorInfo(DoorInfo.coffeeShop)
@@ -205,11 +206,11 @@ public class HouseRole {
 			clothesShop,
 			giftShop,
 			homeShop,
-			new ShopRole("Tech Store", null, IllumPattern.shop),
-			new ShopRole("Book Shop", null, IllumPattern.hotel),
-			new ShopRole("Art Shop", null, IllumPattern.hotel),
-			new ShopRole("Music Shop", null, IllumPattern.restaurant)
-	); // TODO shop actions
+			new ShopRole("Tech Store", new HouseTileAction(ShopActionMenu.techShop), IllumPattern.shop),
+			new ShopRole("Book Shop", new HouseTileAction(ShopActionMenu.bookShop), IllumPattern.hotel),
+			new ShopRole("Art Shop", new HouseTileAction(ShopActionMenu.artShop), IllumPattern.hotel),
+			new ShopRole("Music Shop", new HouseTileAction(ShopActionMenu.musicShop), IllumPattern.restaurant)
+	);
 	
 	public static HouseRole randomShop(Random random, int countRes) {
 		HouseRole shop = shopShuffle.nextItem(random);
