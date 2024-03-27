@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.world;
 
+import com.xrbpowered.aethertown.state.TileRef;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
@@ -17,6 +18,7 @@ public class Tile {
 	}
 	
 	public final TileTemplate t;
+	public TileRef ref = null;
 
 	public Level level = null;
 	public int x, z;
@@ -47,6 +49,7 @@ public class Tile {
 		this.z = z;
 		this.d = d;
 		level.map[x][z] = this;
+		this.ref = new TileRef(this);
 	}
 
 	public void place(Token t) {

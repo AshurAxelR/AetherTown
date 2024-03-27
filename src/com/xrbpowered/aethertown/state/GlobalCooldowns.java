@@ -72,7 +72,7 @@ public enum GlobalCooldowns {
 		return daily(2); // default reset time is 02:00
 	}
 
-	private static void clear() {
+	public static void resetAll() {
 		for(int i=0; i<cooldowns.length; i++)
 			cooldowns[i] = 0.0;
 	}
@@ -94,7 +94,7 @@ public enum GlobalCooldowns {
 		catch(Exception e) {
 			System.err.println("Can't load global cooldowns");
 			e.printStackTrace();
-			clear();
+			resetAll();
 			return false;
 		}
 	}

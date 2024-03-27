@@ -77,6 +77,10 @@ public class Player {
 		cameraRotation = camera.rotation;
 	}
 
+	public static void reset() {
+		player = new Player();
+	}
+	
 	public static boolean load(InputStream ins) {
 		try {
 			DataInputStream in = new DataInputStream(ins);
@@ -104,7 +108,7 @@ public class Player {
 		catch(Exception e) {
 			System.err.println("Can't load player state");
 			e.printStackTrace();
-			player = new Player();
+			reset();
 			return false;
 		}
 	}

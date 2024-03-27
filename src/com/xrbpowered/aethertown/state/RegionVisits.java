@@ -20,14 +20,18 @@ public class RegionVisits {
 	private static HashMap<Long, RegionVisits> regions = new HashMap<>();
 
 	public final int index;
-	private final HashMap<Integer, LevelVisit> visited = new HashMap<>();
+	private final HashMap<LevelRef, LevelVisit> visited = new HashMap<>();
 	
 	private RegionVisits(int index) {
 		this.index = index;
 	}
 	
 	public void add(LevelVisit ref) {
-		visited.put(ref.hashCode(), ref);
+		visited.put(ref, ref);
+	}
+	
+	public static void reset() {
+		regions.clear();
 	}
 
 	public static boolean load(InputStream ins) {
@@ -63,7 +67,7 @@ public class RegionVisits {
 		catch(Exception e) {
 			System.err.println("Can't load region visit");
 			e.printStackTrace();
-			RegionVisits.regions.clear();
+			reset();
 			return false;
 		}
 	}
@@ -110,8 +114,7 @@ public class RegionVisits {
 		RegionVisits r = regions.get(level.region.seed);
 		if(r==null)
 			return false;
-		LevelVisit v = r.visited.get(level.hashCode());
-		return v!=null && v.isLevel(level);
+		return r.visited.get(level.ref)!=null;
 	}
 
 	public static void visit(LevelInfo level) {
@@ -140,7 +143,7 @@ public class RegionVisits {
 	
 	private static LevelVisit getVisit(LevelInfo level) {
 		RegionVisits r = regions.get(level.region.seed);
-		return r.visited.get(level.hashCode());
+		return r.visited.get(level.ref);
 	}
 	
 	public static boolean isTileVisited(Tile tile) {

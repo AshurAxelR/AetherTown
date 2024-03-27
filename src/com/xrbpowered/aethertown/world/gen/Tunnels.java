@@ -373,11 +373,7 @@ public class Tunnels {
 	private void addTop(TunnelTile tile) {
 		TunnelInfo tunnel = tile.tunnel;
 		HillTile top = (HillTile) Hill.template.createTile();
-		top.level = tile.level;
-		top.x = tile.x;
-		top.basey = tunnel.topy;
-		top.z = tile.z;
-		top.d = tile.d;
+		top.place(tile.level, tile.x, tunnel.topy, tile.z, tile.d);
 		Hill.recalcBase(top);
 		tunnel.top = top;
 	}

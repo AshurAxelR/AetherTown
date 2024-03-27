@@ -33,8 +33,7 @@ public class LevelRef {
 	}
 	
 	public boolean isLevel(LevelInfo level) {
-		return this.regionSeed==level.region.seed &&
-				this.x==level.x0 && this.z==level.z0;
+		return this.equals(level.ref);
 	}
 	
 	@Override

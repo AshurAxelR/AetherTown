@@ -39,6 +39,12 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 	
 	@Override
 	public SaveState reset() {
+		Player.reset();
+		RegionVisits.reset();
+		HomeData.reset();
+		GlobalCooldowns.resetAll();
+		if(AetherTown.settings.allowBookmaks)
+			Bookmarks.reset();
 		return new SaveState();
 	}
 	

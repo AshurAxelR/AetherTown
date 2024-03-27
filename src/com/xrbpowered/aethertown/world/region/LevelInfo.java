@@ -108,6 +108,8 @@ public class LevelInfo {
 		}
 	}
 	
+	public final LevelRef ref;
+	
 	public final Region region;
 	public final int x0, z0;
 	public final int size;
@@ -129,6 +131,7 @@ public class LevelInfo {
 		this.seed = seed;
 		this.fixed = fixed;
 		updateName();
+		this.ref = new LevelRef(this);
 	}
 
 	public LevelInfo(Region region, int x, int z, int size, long seed) {

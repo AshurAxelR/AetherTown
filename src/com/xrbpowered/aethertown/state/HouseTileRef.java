@@ -3,11 +3,8 @@ package com.xrbpowered.aethertown.state;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.Objects;
 
-import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
-import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class HouseTileRef {
 
@@ -46,20 +43,11 @@ public class HouseTileRef {
 			return false;
 	}
 
-	public boolean isTile(Tile tile) {
-		return tile.t==HouseT.template && isHouse((HouseGenerator) tile.sub.parent);
-	}
-
 	@Override
 	public boolean equals(Object obj) {
 		HouseTileRef ref = (HouseTileRef) obj;
 		return this.x==ref.x && this.z==ref.z &&
 				this.houseIndex==ref.houseIndex && level.equals(ref.level);
-	}
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(level, LevelVisit.tileHash(x, z));
 	}
 
 	public static HouseTileRef load(DataInputStream in) throws IOException {

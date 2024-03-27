@@ -5,42 +5,27 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 
-import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
-import com.xrbpowered.aethertown.world.TileTemplate;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 
 public class LevelVisit extends LevelRef {
 
-	private static class TileVisit {
-		public final int x, z;
+	private static class TileVisit extends TileRef {
 		public final int templateHash;
 		
 		public TileVisit(int x, int z, int templateHash) {
-			this.x = x;
-			this.z = z;
+			super(x, z);
 			this.templateHash = templateHash;
 		}
 		
 		public TileVisit(Tile tile) {
-			this.x = tile.x;
-			this.z = tile.z;
+			super(tile);
 			this.templateHash = calcTileTemplateHash(tile.t);
 		}
-
-		public boolean isTile(Tile tile) {
-			return x==tile.x && z==tile.z;
-		}
-		
-		@Override
-		public int hashCode() {
-			return tileHash(x, z);
-		}
-		
 	}
 
-	private final HashMap<Integer, TileVisit> visitedTiles = new HashMap<>();
+	private final HashMap<TileRef, TileVisit> visitedTiles = new HashMap<>();
 
 	private boolean validated = false;
 
@@ -65,7 +50,7 @@ public class LevelVisit extends LevelRef {
 			if(!level.isInside(v.x, v.z))
 				return false;
 			Tile tile = level.map[v.x][v.z];
-			if(calcTileTemplateHash(tile.t)!=v.templateHash)
+			if(TileRef.calcTileTemplateHash(tile.t)!=v.templateHash)
 				return false;
 		}
 		validated = true;
@@ -73,12 +58,11 @@ public class LevelVisit extends LevelRef {
 	}
 	
 	public boolean isVisited(Tile tile) {
-		TileVisit t = visitedTiles.get(tileHash(tile.x, tile.z));
-		return t!=null && t.isTile(tile);
+		return visitedTiles.get(tile.ref)!=null;
 	}
 	
 	private void add(TileVisit v) {
-		visitedTiles.put(v.hashCode(), v);
+		visitedTiles.put(v, v);
 	}
 	
 	public void visitTile(Tile tile) {
@@ -103,14 +87,6 @@ public class LevelVisit extends LevelRef {
 			out.writeShort(v.z);
 			out.writeInt(v.templateHash);
 		}
-	}
-
-	public static int tileHash(int x, int z) {
-		return RandomSeed.smallHashXY(x, z);
-	}
-	
-	public static int calcTileTemplateHash(TileTemplate t) {
-		return t.getClass().getTypeName().hashCode();
 	}
 
 }

@@ -27,7 +27,7 @@ public class HomeData {
 
 	private static final String formatId = "AetherTown.HomeData.1";
 	
-	private static LinkedHashMap<Integer, HomeData> homes = new LinkedHashMap<>();
+	private static LinkedHashMap<LevelRef, HomeData> homes = new LinkedHashMap<>();
 	
 	public final HouseTileRef ref;
 	
@@ -50,6 +50,10 @@ public class HomeData {
 		return index;
 	}
 	
+	public static void reset() {
+		homes.clear();
+	}
+	
 	public static boolean load(InputStream ins) {
 		try {
 			DataInputStream in = new DataInputStream(ins);
@@ -57,14 +61,14 @@ public class HomeData {
 			if(!formatId.equals(in.readUTF()))
 				throw new IOException("Bad file format");
 			
-			LinkedHashMap<Integer, HomeData> homes = new LinkedHashMap<>();
+			LinkedHashMap<LevelRef, HomeData> homes = new LinkedHashMap<>();
 			int numHomes = in.readInt();
 			for(int i=0; i<numHomes; i++) {
 				HouseTileRef ref = HouseTileRef.load(in);
 				HomeData home = new HomeData(ref);
 				HomeImprovement.fromBits(in.readInt(), home.improvements);
 				home.index = i;
-				homes.put(ref.level.hashCode(), home);
+				homes.put(home.ref.level, home);
 			}
 			
 			HomeData.homes = homes;
@@ -74,7 +78,7 @@ public class HomeData {
 		catch(Exception e) {
 			System.err.println("Can't load homes");
 			e.printStackTrace();
-			HomeData.homes.clear();
+			reset();
 			return false;
 		}
 	}
@@ -116,20 +120,15 @@ public class HomeData {
 	}
 	
 	public static boolean hasLocalHome(LevelInfo level) {
-		HomeData h = homes.get(level.hashCode());
-		return h!=null && h.ref.level.isLevel(level);
+		return homes.get(level.ref)!=null;
 	}
 
 	public static HomeData getLocal(LevelInfo level) {
-		HomeData h = homes.get(level.hashCode());
-		if(h!=null && h.ref.level.isLevel(level))
-			return h;
-		else
-			return null;
+		return homes.get(level.ref);
 	}
 	
 	public static HomeData forHouse(HouseTileRef ref) {
-		HomeData h = homes.get(ref.level.hashCode());
+		HomeData h = homes.get(ref.level);
 		if(h!=null && h.ref.equals(ref))
 			return h;
 		else
@@ -142,7 +141,7 @@ public class HomeData {
 			return null;
 		HomeData home = new HomeData(house);
 		home.index = homes.size();
-		homes.put(level.hashCode(), home);
+		homes.put(home.ref.level, home);
 		return home;
 	}
 	
