@@ -4,6 +4,7 @@ import static com.xrbpowered.aethertown.AetherTown.player;
 import static com.xrbpowered.aethertown.AetherTown.ui;
 
 import java.awt.Color;
+import java.util.ArrayList;
 
 import com.xrbpowered.aethertown.state.Inventory;
 import com.xrbpowered.aethertown.state.items.Item;
@@ -18,33 +19,65 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class InventoryDialog extends DialogBase {
 
+	private class SelectInvButton extends SelectButton {
+		public final Inventory inv;
+		
+		public SelectInvButton(int index, Inventory inv) {
+			super(InventoryDialog.this, inv.name);
+			this.inv = inv;
+			setPosition(10+index*getWidth(), 60);
+		}
+		
+		@Override
+		public void onAction() {
+			if(!isSelected()) {
+				for(int i=0; i<itemButtons.length; i++)
+					itemButtons[i].setVisible(i<inv.size);
+				inventory = inv;
+				select(-1);
+			}
+			repaint();
+		}
+		
+		@Override
+		public boolean isSelected() {
+			return inventory==inv;
+		}
+	}
+	
 	private final Tile tile;
 	private final boolean alt;
 
 	private Inventory inventory;
+	private ArrayList<Inventory> inventoryList = null;
 
 	private int selected = -1;
 	private Item selectedItem = null;
 	
-	protected ClickButton buttonUse, buttonDelete;
-	protected InfoBox infoBox;
+	private ClickButton buttonUse, buttonDelete, buttonMove;
+	private InfoBox infoBox;
+	private SlotButton[] itemButtons;
 
 	public InventoryDialog(UIContainer parent, Tile tile, boolean alt) {
 		super(parent, 700, 550, true);
 		this.tile = tile;
 		this.alt = alt;
 		
-		inventory = player.backpack;
-		
-		SelectButton invButton = new SelectButton(this, "BACKPACK") {
-			@Override
-			public boolean isSelected() {
-				return true;
+		new SelectInvButton(0, player.backpack);
+		Inventory[] tileInv = Inventory.getTileInventory(tile, alt);
+		if(tileInv!=null) {
+			inventoryList = new ArrayList<>();
+			inventoryList.add(player.backpack);
+			for(int i=0; i<tileInv.length; i++) {
+				new SelectInvButton(i+1, tileInv[i]);
+				inventoryList.add(tileInv[i]);
 			}
-		};
-		invButton.setPosition(10, 60);
+		}
+		inventory = player.backpack;
 
-		for(int i=0; i<inventory.size; i++) {
+		// maximum displayed slots is <= player.backpack.size
+		itemButtons = new SlotButton[player.backpack.size];
+		for(int i=0; i<itemButtons.length; i++) {
 			final int index = i;
 			SlotButton item =  new SlotButton(this) {
 				@Override
@@ -58,11 +91,11 @@ public class InventoryDialog extends DialogBase {
 				}
 				@Override
 				public boolean isEmpty() {
-					return inventory.isEmptySlot(index);
+					return index<inventory.size && inventory.isEmptySlot(index);
 				}
 				@Override
 				public String getItemName() {
-					return  inventory.get(index).getName();
+					return inventory.get(index).getName();
 				}
 				@Override
 				public void paint(GraphAssist g) {
@@ -74,6 +107,7 @@ public class InventoryDialog extends DialogBase {
 			
 			item.setSize(260, 32);
 			item.setPosition(10, 102+i*(item.getHeight()));
+			itemButtons[i] = item;
 		}
 		
 		infoBox = new InfoBox(this);
@@ -110,12 +144,9 @@ public class InventoryDialog extends DialogBase {
 					"<p>Do you want to dispose this item?<br>"+
 					"<span class=\"w\">%s</span></p>",
 					selectedItem.getFullName()),
-					180, "DISPOSE", new Runnable() {
-						@Override
-						public void run() {
-							inventory.remove(selected);
-							select(-1);
-						}
+					180, "DISPOSE", () -> {
+						inventory.remove(selected);
+						select(-1);
 					});
 			}
 			@Override
@@ -126,6 +157,19 @@ public class InventoryDialog extends DialogBase {
 		buttonDelete.setSize(40, buttonDelete.getHeight());
 		buttonDelete.setPosition(290, 486-buttonDelete.getHeight()-10);
 		buttonDelete.setVisible(false);
+		
+		if(inventoryList!=null) {
+			buttonMove = new ClickButton(this, "MOVE") {
+				@Override
+				public void onAction() {
+					MoveItemDialog.show(selectedItem.getName(), inventoryList,
+							inventory, selected, () -> { select(-1); });
+				}
+			};
+			buttonMove.setSize(80, buttonMove.getHeight());
+			buttonMove.setPosition(buttonDelete.getX()+buttonDelete.getWidth(), buttonDelete.getY());
+			buttonMove.setVisible(false);
+		}
 	}
 	
 	private boolean isUseEnabled() {
@@ -153,6 +197,8 @@ public class InventoryDialog extends DialogBase {
 			buttonUse.setVisible(false);
 		
 		buttonDelete.setVisible(selectedItem!=null);
+		if(inventoryList!=null)
+			buttonMove.setVisible(selectedItem!=null);
 	}
 	
 	@Override
@@ -166,7 +212,7 @@ public class InventoryDialog extends DialogBase {
 			g.drawString(selectedItem.getName(), 300, 130, GraphAssist.LEFT, GraphAssist.CENTER);
 		}
 	}
-
+	
 	public static void show(Tile tile, boolean alt) {
 		ui.hideTop();
 		new InventoryDialog(ui, tile, alt);

@@ -18,14 +18,20 @@ import com.xrbpowered.aethertown.state.items.HouseKeyItem;
 import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.Level;
+import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseRole;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
+import com.xrbpowered.aethertown.world.tiles.HouseT;
 
 public class HomeData {
 
-	private static final String formatId = "AetherTown.HomeData.1";
+	public static final String[] storageNames = {"KITCHEN", "CUPBOARD", "OFFICE", "BEDROOM"};
+	public static final int storageCount = storageNames.length;
+	public static final int storageSize = Inventory.backpackSize;
+
+	private static final String formatId = "AetherTown.HomeData.2";
 	
 	private static LinkedHashMap<LevelRef, HomeData> homes = new LinkedHashMap<>();
 	
@@ -33,17 +39,22 @@ public class HomeData {
 	
 	private transient int index = -1;
 	public final EnumSet<HomeImprovement> improvements;
-	
-	// TODO home inventory
+	public final Inventory[] storage;
 
-	private HomeData(HouseTileRef ref) {
+	private HomeData(HouseTileRef ref, EnumSet<HomeImprovement> improvements) {
 		this.ref = ref;
-		this.improvements = EnumSet.noneOf(HomeImprovement.class);
+		this.improvements = improvements;
+		this.storage = new Inventory[storageCount];
+		for(int i=0; i<storageCount; i++)
+			storage[i] = new Inventory(storageSize, storageNames[i]);
+	}
+	
+	private HomeData(HouseTileRef ref) {
+		this(ref, EnumSet.noneOf(HomeImprovement.class));
 	}
 
 	private HomeData(HouseGenerator house) {
-		this.ref = new HouseTileRef(house);
-		this.improvements = HomeImprovement.generateDefaults(house);
+		this(new HouseTileRef(house), HomeImprovement.generateDefaults(house));
 	}
 	
 	public int getIndex() {
@@ -67,6 +78,8 @@ public class HomeData {
 				HouseTileRef ref = HouseTileRef.load(in);
 				HomeData home = new HomeData(ref);
 				HomeImprovement.fromBits(in.readInt(), home.improvements);
+				for(int j=0; j<storageCount; j++)
+					home.storage[j].loadItems(in);
 				home.index = i;
 				homes.put(home.ref.level, home);
 			}
@@ -92,6 +105,8 @@ public class HomeData {
 			for(HomeData home : homes.values()) {
 				HouseTileRef.save(out, home.ref);
 				out.writeInt(HomeImprovement.getBits(home.improvements));
+				for(int j=0; j<storageCount; j++)
+					home.storage[j].saveItems(out);
 			}
 			
 			System.out.println("Homes saved");
@@ -135,6 +150,21 @@ public class HomeData {
 			return null;
 	}
 
+	public static HomeData forHouse(HouseGenerator house) {
+		HomeData h = homes.get(house.startToken.level.info.ref);
+		if(h!=null && h.ref.isHouse(house))
+			return h;
+		else
+			return null;
+	}
+
+	public static HomeData forTile(Tile tile) {
+		if(tile.t==HouseT.template)
+			return forHouse((HouseGenerator) tile.sub.parent);
+		else
+			return null;
+	}
+
 	public static HomeData claim(HouseGenerator house) {
 		LevelInfo level = house.startToken.level.info;
 		if(hasLocalHome(level))
@@ -145,7 +175,7 @@ public class HomeData {
 		return home;
 	}
 	
-	public static boolean  abandon(HomeData home) {
+	public static boolean abandon(HomeData home) {
 		if(!homes.remove(home.ref.level.hashCode(), home))
 			return false;
 		updateIndices();

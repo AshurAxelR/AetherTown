@@ -6,6 +6,7 @@ import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import java.awt.Color;
 import java.awt.FontMetrics;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.EnumSet;
 
@@ -203,13 +204,10 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 							"<span class=\"w\">%s</span></p>"+
 							"<p>All stored items will be permanently disposed.</p>",
 							selectedInfo.home.ref.getFullAddress()),
-							200, "ABANDON", new Runnable() {
-								@Override
-								public void run() {
-									if(HomeData.abandon(selectedInfo.home)) {
-										selectedInfo.home = null;
-										select(-1);
-									}
+							200, "ABANDON", () -> {
+								if(HomeData.abandon(selectedInfo.home)) {
+									selectedInfo.home = null;
+									select(-1);
 								}
 							});
 				}
@@ -300,8 +298,16 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 	
 	@Override
 	public boolean onKeyPressed(char c, int code, InputInfo input) {
-		if(DialogContainer.isCloseKey(this, code))
-			close();
+		switch(code) {
+			case KeyEvent.VK_M:
+				if(claim)
+					LevelMapDialog.show(level, false);
+				break;
+			default:
+				if(DialogContainer.isCloseKey(this, code))
+					close();
+				break;
+		}
 		return true;
 	}
 
