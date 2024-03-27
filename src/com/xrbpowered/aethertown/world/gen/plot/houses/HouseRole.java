@@ -8,6 +8,7 @@ import com.xrbpowered.aethertown.actions.HouseTileAction;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.render.tiles.IllumPattern;
 import com.xrbpowered.aethertown.render.tiles.IllumTileComponent;
+import com.xrbpowered.aethertown.state.items.FoodItem.FoodItemType;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.gen.plot.houses.ArchitectureTileSet.DoorInfo;
 import com.xrbpowered.aethertown.world.region.LevelSettlementType;
@@ -187,13 +188,13 @@ public class HouseRole {
 	}
 
 	private static final Shuffle.List<HouseRole> fastFoodShuffle = new Shuffle.List<>(
-			new FastFoodRole("Sandwich Bar"),
-			new FastFoodRole("Burrito Bar"),
-			new FastFoodRole("Burger Bar"),
-			new FastFoodRole("Pizza Bar"),
+			new FastFoodRole("Sandwich Bar", FoodItemType.takeawaySandwich),
+			new FastFoodRole("Burrito Bar", FoodItemType.takeawayBurrito),
+			new FastFoodRole("Burger Bar", FoodItemType.takeawayBurger),
+			new FastFoodRole("Pizza Bar", FoodItemType.takeawayPizza),
 			new FastFoodRole("Coffee Shop", DoorInfo.coffeeShop, HouseTileAction.coffeeShop),
-			new FastFoodRole("Chinese Takeaway"),
-			new FastFoodRole("Chicken Grill Bar")
+			new FastFoodRole("Chinese Takeaway", FoodItemType.takeawayChinese),
+			new FastFoodRole("Chicken Grill Bar", FoodItemType.takeawayChicken)
 	);
 
 	public static HouseRole randomFastFood(Random random) {

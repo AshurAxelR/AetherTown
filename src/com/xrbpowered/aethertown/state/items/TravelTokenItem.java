@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.state.items;
 
 import static com.xrbpowered.aethertown.AetherTown.levelInfo;
+import static com.xrbpowered.aethertown.AetherTown.player;
 
 import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.world.Tile;
@@ -39,4 +40,16 @@ public class TravelTokenItem extends Item {
 	public boolean markDot(Tile tile, boolean alt) {
 		return levelInfo.isRef(destination);
 	}
+	
+	public static boolean hasTravelTokens() {
+		for(int i=0; i<player.backpack.size; i++) {
+			Item aitem = player.backpack.get(i);
+			if(aitem==null)
+				break;
+			if(aitem.type==ItemType.travelToken)
+				return true;
+		}
+		return false;
+	}
+
 }

@@ -50,16 +50,22 @@ public class RegionMapItem extends Item {
 		return region.seed == regionSeed;
 	}
 	
+	public static boolean isSameItem(Item aitem, long regionSeed) {
+		if(aitem.type==ItemType.regionMap) {
+			RegionMapItem item = (RegionMapItem) aitem;
+			if(item.regionSeed==regionSeed)
+				return true;
+		}
+		return false;
+	}
+	
 	public static boolean hasRegionMap(long regionSeed) {
 		for(int i=0; i<player.backpack.size; i++) {
 			Item aitem = player.backpack.get(i);
 			if(aitem==null)
 				break;
-			if(aitem.type==ItemType.regionMap) {
-				RegionMapItem item = (RegionMapItem) aitem;
-				if(item.regionSeed==regionSeed)
-					return true;
-			}
+			if(isSameItem(aitem, regionSeed))
+				return true;
 		}
 		return false;
 	}

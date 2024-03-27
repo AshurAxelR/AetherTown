@@ -6,6 +6,10 @@ import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
 import com.xrbpowered.aethertown.actions.menus.RoomMenu;
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HomeImprovement;
+import com.xrbpowered.aethertown.state.Inventory;
+import com.xrbpowered.aethertown.state.items.FoodItem;
+import com.xrbpowered.aethertown.state.items.FoodItem.FoodItemType;
+import com.xrbpowered.aethertown.state.items.GroceriesItem;
 import com.xrbpowered.aethertown.state.items.HouseKeyItem;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
@@ -37,6 +41,81 @@ public class EnterHomeAction extends HouseTileAction {
 		}
 	}
 	
+	private static final TileAction eatAction = new ProxyAction(FoodItemType.homeCooked.action) {
+		@Override
+		public boolean isEnabled(Tile tile, boolean alt) {
+			HomeData home = HomeData.getLocal(tile.level.info);
+			return FoodItem.hasFoodType(home, FoodItemType.homeCooked) && action.isEnabled(tile, alt);
+		}
+		
+		@Override
+		public String getLabel(Tile tile, boolean alt) {
+			String name = "Eat " + FoodItemType.homeCooked.getName();
+			HomeData home = HomeData.getLocal(tile.level.info);
+			int count = FoodItem.countFoodType(home, FoodItemType.homeCooked);
+			if(count > 0)
+				return String.format("%s (have %d)", name, count);
+			else
+				return name;
+		}
+		
+		@Override
+		protected void onFail(Tile tile, boolean alt) {
+			HomeData home = HomeData.getLocal(tile.level.info);
+			if(!FoodItem.hasFoodType(home, FoodItemType.homeCooked))
+				showToast("No item: "+FoodItemType.homeCooked.getName());
+			else
+				action.onFail(tile, alt);
+		}
+		
+		@Override
+		protected void onSuccess(Tile tile, boolean alt) {
+			super.onSuccess(tile, alt);
+			HomeData home = HomeData.getLocal(tile.level.info);
+			Inventory inv = FoodItem.findFoodType(home, FoodItemType.homeCooked);
+			inv.remove(FoodItem.findFoodType(inv, FoodItemType.homeCooked));
+		}
+	};
+	
+	private static final TileAction cookAction = new TileAction("Cook") {
+		@Override
+		public boolean isEnabled(Tile tile, boolean alt) {
+			HomeData home = HomeData.getLocal(tile.level.info);
+			if(!home.improvements.contains(HomeImprovement.kitchenware))
+				return false;
+			if(!GroceriesItem.hasGroceries(home))
+				return false;
+			if(home.storage[0].getFreeSlots()<2)
+				return false;
+			return true;
+		}
+		
+		@Override
+		protected void onFail(Tile tile, boolean alt) {
+			HomeData home = HomeData.getLocal(tile.level.info);
+			if(!home.improvements.contains(HomeImprovement.kitchenware))
+				showToast("Missing "+HomeImprovement.kitchenware.name);
+			else if(!GroceriesItem.hasGroceries(home))
+				showToast("Requires groceries");
+			else if(home.storage[0].getFreeSlots()<2)
+				showToast("Kitchen inventory full");
+			else
+				super.onFail(tile, alt);
+		}
+		
+		@Override
+		protected void onSuccess(Tile tile, boolean alt) {
+			super.onSuccess(tile, alt);
+			HomeData home = HomeData.getLocal(tile.level.info);
+			Inventory inv = GroceriesItem.findGroceries(home);
+			inv.remove(GroceriesItem.findGroceries(inv));
+			home.storage[0].put(new FoodItem(FoodItemType.homeCooked));
+			home.storage[0].put(new FoodItem(FoodItemType.homeCooked));
+			showToast(String.format("2x %s added", FoodItemType.homeCooked.getName()));
+		}
+	}.setDelay(40);
+	
+	
 	public static final EnterHomeAction action = new EnterHomeAction();
 	
 	private EnterHomeAction() {
@@ -61,8 +140,8 @@ public class EnterHomeAction extends HouseTileAction {
 		
 		TileActionMenu kitchen = new TileActionMenu();
 		kitchen.addAction(FoodActionMenu.freeDrinkAction);
-		kitchen.addAction(new DummyAction("Eat").setEnabled(false)); // TODO eat at home
-		kitchen.addAction(new DummyAction("Cook").setEnabled(false)); // TODO cooking action
+		kitchen.addAction(eatAction);
+		kitchen.addAction(cookAction);
 		home.addMenu("KITCHEN", kitchen);
 
 		TileActionMenu living = new TileActionMenu();
@@ -79,9 +158,9 @@ public class EnterHomeAction extends HouseTileAction {
 		office.addAction(new ReqImprovementAction(HomeImprovement.art, LeisureActions.paintArt));
 		office.addAction(new ReqImprovementAction(HomeImprovement.books, LeisureActions.study));
 		office.addAction(new ReqImprovementAction(HomeImprovement.books, LeisureActions.readBooks));
-		home.addMenu("OFFICE", office, 5);
+		home.addMenu("OFFICE", office);
 
-		home.addMenu("BEDROOM", new RoomMenu(), 5);
+		home.addMenu("BEDROOM", new RoomMenu());
 
 		return home;
 	}

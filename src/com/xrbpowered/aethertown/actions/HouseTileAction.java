@@ -37,7 +37,6 @@ public class HouseTileAction extends EnterTileAction {
 	));
 	
 	public static final HouseTileAction restaurant = new HouseTileAction(FoodActionMenu.restaurant);
-	public static final HouseTileAction fastFood = new HouseTileAction(FoodActionMenu.fastFood);
 	public static final HouseTileAction coffeeShop = new HouseTileAction(FoodActionMenu.cafeteria);
 	
 	public static final HouseTileAction localShop = new HouseTileAction(GroceriesActionMenu.groceries);

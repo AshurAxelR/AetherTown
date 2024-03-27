@@ -17,12 +17,7 @@ public class BuyFoodAction extends GetItemAction {
 
 	@Override
 	protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
-		if(aitem instanceof FoodItem) {
-			FoodItem item = (FoodItem) aitem;
-			if(item.food==this.food)
-				return true;
-		}
-		return false;
+		return FoodItem.isSameItem(aitem, food);
 	}
 
 	@Override

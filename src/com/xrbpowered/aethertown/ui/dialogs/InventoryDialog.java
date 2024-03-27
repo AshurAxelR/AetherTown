@@ -25,6 +25,7 @@ public class InventoryDialog extends DialogBase {
 		public SelectInvButton(int index, Inventory inv) {
 			super(InventoryDialog.this, inv.name);
 			this.inv = inv;
+			setSize(140, getHeight());
 			setPosition(10+index*getWidth(), 60);
 		}
 		
@@ -59,7 +60,7 @@ public class InventoryDialog extends DialogBase {
 	private SlotButton[] itemButtons;
 
 	public InventoryDialog(UIContainer parent, Tile tile, boolean alt) {
-		super(parent, 700, 550, true);
+		super(parent, 720, 550, true);
 		this.tile = tile;
 		this.alt = alt;
 		

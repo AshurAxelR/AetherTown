@@ -75,6 +75,8 @@ public abstract class Item implements Comparable<Item> {
 				return new TrinketItem(NamedLevelRef.load(in), time);
 			case foodItem:
 				return new FoodItem(FoodItemType.values()[in.readInt()], time);
+			case groceries:
+				return new GroceriesItem(time);
 		}
 		return null; // should not happen
 	}
@@ -96,10 +98,12 @@ public abstract class Item implements Comparable<Item> {
 				out.writeLong(((RegionMapItem) aitem).regionSeed);
 				return;
 			case trinket:
-				out.writeDouble(((TrinketItem) aitem).timestamp);
+				NamedLevelRef.save(out, ((TrinketItem) aitem).location);
 				return;
 			case foodItem:
 				out.writeInt(((FoodItem) aitem).food.ordinal());
+				return;
+			case groceries:
 				return;
 		}
 	}

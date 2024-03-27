@@ -4,11 +4,11 @@ public enum ItemType {
 
 	travelToken("Travel Token"),
 	houseKey("House Key"),
-	// roomKey("Room Key"),
 	map("Map"),
 	regionMap("Region Map"),
 	trinket("Trinket"),
-	foodItem(null);
+	foodItem(null),
+	groceries("Groceries");
 	
 	public final String name;
 	

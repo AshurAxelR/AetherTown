@@ -34,12 +34,7 @@ public class MapsMenu extends TileActionMenu {
 		addAction(new GetItemAction("Get", ItemType.map) {
 			@Override
 			protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
-				if(aitem instanceof LevelMapItem) {
-					LevelMapItem item = (LevelMapItem) aitem;
-					if(item.level.isLevel(tile.level.info))
-						return true;
-				}
-				return false;
+				return LevelMapItem.isSameItem(aitem, tile.level.info);
 			}
 			@Override
 			protected Item generateItem(Tile tile, boolean alt) {
@@ -50,12 +45,7 @@ public class MapsMenu extends TileActionMenu {
 		addAction(new GetItemAction("Get", ItemType.regionMap) {
 			@Override
 			protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
-				if(aitem instanceof RegionMapItem) {
-					RegionMapItem item = (RegionMapItem) aitem;
-					if(item.regionSeed==tile.level.info.region.seed)
-						return true;
-				}
-				return false;
+				return RegionMapItem.isSameItem(aitem, tile.level.info.region.seed);
 			}
 			@Override
 			protected Item generateItem(Tile tile, boolean alt) {
@@ -66,7 +56,7 @@ public class MapsMenu extends TileActionMenu {
 		addAction(new GetItemAction("Get", ItemType.travelToken) {
 			@Override
 			protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
-				if(aitem instanceof TravelTokenItem) {
+				if(aitem.type==ItemType.travelToken) {
 					TravelTokenItem item = (TravelTokenItem) aitem;
 					if(item.destination.isLevel(tile.level.info))
 						return true;

@@ -19,9 +19,8 @@ import com.xrbpowered.zoomui.UIContainer;
 public class MoveItemDialog extends UIPane implements KeyInputHandler {
 
 	private final String prompt;
-	private int selected = -1;
 
-	private ClickButton buttonClose, buttonMove;
+	private ClickButton buttonClose;
 	
 	public MoveItemDialog(UIContainer parent, String itemName, ArrayList<Inventory> inventories,
 			Inventory current, int itemIndex, Runnable after) {
@@ -32,15 +31,18 @@ public class MoveItemDialog extends UIPane implements KeyInputHandler {
 		setSize(400, 100+inventories.size()*32);
 
 		for(int i=0; i<inventories.size(); i++) {
-			final int index = i;
-			final Inventory inv = inventories.get(index);
+			final Inventory inv = inventories.get(i);
 			
 			SlotButton item =  new SlotButton(this) {
 				@Override
 				public void onAction() {
-					selected = index;
-					buttonMove.setEnabled(inv!=current);
-					repaint();
+					if(inv!=current) {
+						Item item = current.remove(itemIndex);
+						inv.put(item);
+						if(after!=null)
+							after.run();
+					}
+					close();
 				}
 				@Override
 				public boolean isEmpty() {
@@ -48,7 +50,7 @@ public class MoveItemDialog extends UIPane implements KeyInputHandler {
 				}
 				@Override
 				public boolean isSelected() {
-					return selected==index;
+					return inv==current;
 				}
 				@Override
 				public String getItemName() {
@@ -73,21 +75,6 @@ public class MoveItemDialog extends UIPane implements KeyInputHandler {
 			}
 		};
 		buttonClose.setPosition(10, getHeight()-buttonClose.getHeight()-10);
-		
-		buttonMove = new ClickButton(this, "MOVE") {
-			@Override
-			public void onAction() {
-				if(selected<0)
-					return;
-				Item item = current.remove(itemIndex);
-				inventories.get(selected).put(item);
-				close();
-				if(after!=null)
-					after.run();
-			}
-		};
-		buttonMove.setEnabled(false);
-		buttonMove.setPosition(getWidth()-buttonMove.getWidth()-10, getHeight()-buttonMove.getHeight()-10);
 	}
 
 	@Override

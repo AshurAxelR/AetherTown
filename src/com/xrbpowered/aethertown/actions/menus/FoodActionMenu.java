@@ -26,8 +26,7 @@ public class FoodActionMenu extends TileActionMenu {
 
 	public static final TileActionMenu bar = createBarRestaurantMenu(false);
 	public static final TileActionMenu restaurant = createBarRestaurantMenu(true);
-	public static final TileActionMenu fastFood = createFastFoodMenu(false);
-	public static final TileActionMenu cafeteria = createFastFoodMenu(true);
+	public static final TileActionMenu cafeteria = createFastFoodMenu(null);
 
 	private FoodActionMenu() {
 	}
@@ -46,15 +45,15 @@ public class FoodActionMenu extends TileActionMenu {
 		return food;
 	}
 	
-	private static TileActionMenu createFastFoodMenu(boolean cafe) {
+	public static TileActionMenu createFastFoodMenu(FoodItemType takeaway) {
 		FoodActionMenu food = new FoodActionMenu();
-		if(cafe) {
+		if(takeaway==null) {
 			food.addAction(drinkAction);
 			food.addAction(dessertAction);
 		}
 		else {
 			food.addAction(new InspirationAction("Eat-in meal", 3).setDelay(30).setCost(650).setCooldown(GlobalCooldowns.eat.hours(2.5)));
-			food.addAction(new BuyFoodAction(FoodItemType.takeawayMeal, 650).setDelay(10));
+			food.addAction(new BuyFoodAction(takeaway, 650).setDelay(10));
 		}
 		food.addAction(GroceriesActionMenu.buyWaterBottleAction);
 		food.addAction(GroceriesActionMenu.buySnackAction);
