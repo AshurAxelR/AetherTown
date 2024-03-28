@@ -373,7 +373,7 @@ public class Tunnels {
 	private void addTop(TunnelTile tile) {
 		TunnelInfo tunnel = tile.tunnel;
 		HillTile top = (HillTile) Hill.template.createTile();
-		top.place(tile.level, tile.x, tunnel.topy, tile.z, tile.d);
+		top.attach(tile.level, tile.x, tunnel.topy, tile.z, tile.d);
 		Hill.recalcBase(top);
 		tunnel.top = top;
 	}
@@ -398,6 +398,7 @@ public class Tunnels {
 		
 		for(TunnelInfo tunnel : tunnels) {
 			checkTerrain(tunnel);
+			checkConnection(tunnel.below);
 			if(tunnel.rank==0 && tunnel.topy>tunnel.basey+1)
 				addTop(tunnel.below);
 			// System.err.printf("  -- tunnel@[%d, %d] : %s\n", tunnel.below.x, tunnel.below.z, tunnel.type.name());
@@ -414,6 +415,28 @@ public class Tunnels {
 			int hy = tunnel.below.level.h.y[x+c.tx+1][z+c.tz+1];
 			if(ty!=hy)
 				GeneratorException.raise("Broken tunnel geometry [%d, %d].%s: %d!=%d\n", x, z, c.name(), ty, hy);
+		}
+	}
+	
+	private static void checkConnection(TunnelTile tile) {
+		TunnelInfo tunnel = tile.tunnel;
+		if(tunnel.type==TunnelType.straight) {
+			int adj = 0;
+			if(adjTunnel(tile, tile.d)!=null)
+				adj++;
+			if(adjTunnel(tile, tile.d.flip())!=null)
+				adj++;
+			
+			int req;
+			if(tunnel.rank==0) // not entrance
+				req = 2;
+			else if(tunnel.rank==1) // 1 tile tunnel
+				req = 0;
+			else
+				req = 1;
+			
+			if(adj!=req)
+				GeneratorException.warning("Connecting tunnel count mismatch [%d, %d]: adj=%d, req=%d\n", tile.x, tile.z, adj, req);
 		}
 	}
 

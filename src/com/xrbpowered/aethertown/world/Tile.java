@@ -43,13 +43,17 @@ public class Tile {
 	public void place(Level level, int x, int y, int z, Dir d) {
 		if(d==null)
 			throw new NullPointerException();
+		attach(level, x, y, z, d);
+		level.map[x][z] = this;
+		this.ref = new TileRef(this);
+	}
+
+	public void attach(Level level, int x, int y, int z, Dir d) {
 		this.level = level;
 		this.x = x;
 		this.basey = y;
 		this.z = z;
 		this.d = d;
-		level.map[x][z] = this;
-		this.ref = new TileRef(this);
 	}
 
 	public void place(Token t) {
