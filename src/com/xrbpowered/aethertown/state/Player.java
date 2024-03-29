@@ -18,11 +18,14 @@ import com.xrbpowered.gl.scene.CameraActor;
 
 public class Player {
 
-	private static final String formatId = "AetherTown.Player.0";
+	private static final String formatId = "AetherTown.Player.1";
 
 	public static final int maxInspiration = 100;
 	
 	public int cash = 0;
+	public int ubiCollectedDay = -1;
+	public int earnings = 0;
+	
 	private int inspiration = 0;
 	private int xp = 0;
 	
@@ -38,13 +41,18 @@ public class Player {
 	public int getXP() {
 		return xp;
 	}
-	
+
 	public int addInspiration(int ins) {
 		inspiration += ins;
 		if(inspiration>maxInspiration) {
 			int added = ins - (inspiration - maxInspiration);
 			inspiration = maxInspiration;
 			return added;
+		}
+		else if(inspiration<0) {
+			int removed = ins - inspiration;
+			inspiration = 0;
+			return removed;
 		}
 		else
 			return ins;
@@ -97,6 +105,8 @@ public class Player {
 			player.cameraRotation = new Vector3f(cameraLookX, cameraLookY, 0f);
 			
 			player.cash = in.readInt();
+			player.ubiCollectedDay = in.readInt();
+			player.earnings = in.readInt();
 			player.inspiration = in.readInt();
 			player.xp = in.readInt();
 			player.backpack.loadItems(in);
@@ -125,6 +135,8 @@ public class Player {
 			out.writeFloat(player.cameraRotation.y);
 
 			out.writeInt(player.cash);
+			out.writeInt(player.ubiCollectedDay);
+			out.writeInt(player.earnings);
 			out.writeInt(player.inspiration);
 			out.writeInt(player.xp);
 			player.backpack.saveItems(out);

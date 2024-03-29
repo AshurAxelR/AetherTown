@@ -24,27 +24,33 @@ public class ConfirmDialog extends UIPane implements KeyInputHandler {
 		super(parent, false);
 		setSize(400, h);
 		this.title = title;
+		boolean ok = (confirm==null || action==null);
 		
 		InfoBox infoBox = new InfoBox(this, html);
 		infoBox.setPosition(20, 50);
 		infoBox.setSize(getWidth()-40, getHeight()-100);
 		
-		buttonCancel = new ClickButton(this, "CANCEL") {
+		buttonCancel = new ClickButton(this, ok ? "OK" : "CANCEL") {
 			@Override
 			public void onAction() {
 				close();
 			}
 		};
-		buttonCancel.setPosition(20, getHeight()-buttonCancel.getHeight()-10);
+		if(ok)
+			buttonCancel.setPosition(getWidth()-buttonCancel.getWidth()-20, getHeight()-buttonCancel.getHeight()-10);
+		else
+			buttonCancel.setPosition(20, getHeight()-buttonCancel.getHeight()-10);
 		
-		buttonConfirm = new ClickButton(this, confirm) {
-			@Override
-			public void onAction() {
-				action.run();
-				close();
-			}
-		};
-		buttonConfirm.setPosition(getWidth()-buttonConfirm.getWidth()-20, getHeight()-buttonConfirm.getHeight()-10);
+		if(!ok) {
+			buttonConfirm = new ClickButton(this, confirm) {
+				@Override
+				public void onAction() {
+					action.run();
+					close();
+				}
+			};
+			buttonConfirm.setPosition(getWidth()-buttonConfirm.getWidth()-20, getHeight()-buttonConfirm.getHeight()-10);
+		}
 	}
 
 	@Override
@@ -78,6 +84,11 @@ public class ConfirmDialog extends UIPane implements KeyInputHandler {
 	
 	public static void show(String title, String html, int h, String confirm, Runnable action) {
 		new ConfirmDialog(ui, title, html, h, confirm, action);
+		ui.reveal();
+	}
+
+	public static void show(String title, String html, int h) {
+		new ConfirmDialog(ui, title, html, h, null, null);
 		ui.reveal();
 	}
 

@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.actions;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
+import com.xrbpowered.aethertown.actions.menus.OfficeActionMenu;
 import com.xrbpowered.aethertown.actions.menus.RoomMenu;
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HomeImprovement;
@@ -153,7 +154,7 @@ public class EnterHomeAction extends HouseTileAction {
 		home.addMenu("LIVING ROOM", living);
 
 		TileActionMenu office = new TileActionMenu();
-		office.addAction(new DummyAction("Work").setEnabled(false)); // TODO work action
+		office.addAction(new ReqImprovementAction(HomeImprovement.computer, OfficeActionMenu.workAction));
 		office.addAction(new ReqImprovementAction(HomeImprovement.computer, LeisureActions.playVideoGames));
 		office.addAction(new ReqImprovementAction(HomeImprovement.art, LeisureActions.paintArt));
 		office.addAction(new ReqImprovementAction(HomeImprovement.books, LeisureActions.study));

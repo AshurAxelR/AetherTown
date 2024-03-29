@@ -2,21 +2,44 @@ package com.xrbpowered.aethertown.actions.menus;
 
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
-import com.xrbpowered.aethertown.actions.DummyAction;
 import com.xrbpowered.aethertown.actions.GetItemAction;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.actions.WaitAction;
+import com.xrbpowered.aethertown.state.Earnings;
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HomeImprovement;
 import com.xrbpowered.aethertown.state.items.HouseKeyItem;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.ItemType;
+import com.xrbpowered.aethertown.ui.dialogs.ConfirmDialog;
 import com.xrbpowered.aethertown.ui.dialogs.HomeListDialog;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
 
 public class CivicCentreActionMenu extends TileActionMenu {
 
+	public static final TileAction collectEarningsAction = new TileAction("Collect earnings") {
+		@Override
+		public boolean isEnabled(Tile tile, boolean alt) {
+			return !Earnings.isEmpty();
+		}
+		
+		@Override
+		protected void onFail(Tile tile, boolean alt) {
+			if(Earnings.isEmpty())
+				showToast("Nothing to collect");
+			else
+				super.onFail(tile, alt);
+		}
+		
+		@Override
+		protected void onSuccess(Tile tile, boolean alt) {
+			super.onSuccess(tile, alt);
+			String report = Earnings.collect();
+			ConfirmDialog.show("Summary", report, 250);
+		}
+	};
+	
 	public static final TileAction claimHomeUIAction = new TileAction("Claim home") {
 		@Override
 		public boolean isEnabled(Tile tile, boolean alt) {
@@ -95,7 +118,7 @@ public class CivicCentreActionMenu extends TileActionMenu {
 			addMenu("HOME OFFICE", res);
 		}
 		if(post) {
-			addAction(new DummyAction("Collect earnings").setEnabled(false)); // TODO collect earnings
+			addAction(collectEarningsAction);
 			
 			TileActionMenu order = new TileActionMenu();
 			for(HomeImprovement imp : HomeImprovement.values())

@@ -294,7 +294,10 @@ public class Tunnels {
 		TunnelInfo adjTunnel = adjTunnel(tunnel.below, d);
 		if(adjTunnel==null) {
 			System.err.printf("Missing connecting tunnel [%d, %d]\n", tunnel.below.x, tunnel.below.z);
-			tunnel.type = TunnelType.junction;
+			if(tunnel.rank==0)
+				tunnel.type = TunnelType.junction;
+			else
+				tunnel.type = TunnelType.object;
 			return tunnel.topy;
 		}
 		int y = adjTunnel.type==TunnelType.fixed ? adjTunnel.topy : Math.max(tunnel.topy, adjTunnel.topy);

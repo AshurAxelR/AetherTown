@@ -86,7 +86,7 @@ public class NavBox extends Bench {
 		float dx = -tile.d.dx*0.25f;
 		float dz = -tile.d.dz*0.25f;
 		box.addInstance(r, new IllumTileObjectInfo(tile, dx, 0f, dz));
-		r.pointLights.setLight(tile, dx, 3f, dz, 2.5f);
+		// r.pointLights.setLight(tile, dx, 3f, dz, 2.5f);
 		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+3, Lamps.lampLightColor, 0.2f, false);
 	}
 	

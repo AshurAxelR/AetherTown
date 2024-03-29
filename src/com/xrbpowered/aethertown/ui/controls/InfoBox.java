@@ -23,10 +23,15 @@ public class InfoBox extends UIFormattedLabel {
 	public void setupHtmlKit() {
 		htmlKit.defaultFont = Fonts.small;
 		htmlKit.defaultColor = textColor;
-		htmlKit.zoomableCss = new ZoomableCss(
-			"p{text-align:left;margin-bottom:10} "+
-			"span.w{color:#ffffff} span.d{color:#"+Integer.toHexString(darkColor.getRGB())+"}"
+		ZoomableCss css = new ZoomableCss(
+			"p{text-align:left} "+
+			"td.v{text-align:right} "+
+			".w{color:#ffffff} .d{color:#555555}"
 		);
+		css.addZoomRule("p", "margin-bottom", 10);
+		css.addZoomRule("td.v", "padding-left", 30);
+		css.addZoomRule("tr.total td", "padding-top", 10);
+		htmlKit.zoomableCss = css;
 	}
 
 }

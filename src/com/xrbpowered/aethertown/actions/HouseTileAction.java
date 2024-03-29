@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.actions.menus.CivicCentreActionMenu;
 import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
 import com.xrbpowered.aethertown.actions.menus.GroceriesActionMenu;
 import com.xrbpowered.aethertown.actions.menus.HotelActionMenu;
+import com.xrbpowered.aethertown.actions.menus.OfficeActionMenu;
 import com.xrbpowered.aethertown.actions.menus.ShopActionMenu;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
@@ -35,7 +36,9 @@ public class HouseTileAction extends EnterTileAction {
 		LeisureActions.playMusic("Piano", true),
 		LeisureActions.watchMovies(true)
 	));
-	
+
+	public static final HouseTileAction office = new HouseTileAction(new OfficeActionMenu());
+
 	public static final HouseTileAction restaurant = new HouseTileAction(FoodActionMenu.restaurant);
 	public static final HouseTileAction coffeeShop = new HouseTileAction(FoodActionMenu.cafeteria);
 	

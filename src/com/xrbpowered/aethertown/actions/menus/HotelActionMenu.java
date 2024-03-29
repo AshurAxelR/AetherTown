@@ -15,7 +15,7 @@ public class HotelActionMenu extends TileActionMenu {
 		reception.addAction(new DummyAction("Check in").setDelay(5).setCost(500));
 		reception.addAction(new DummyAction("Check out").setEnabled(false));
 		reception.addMenu("MAPS", MapsMenu.menu);
-		reception.addAction(new DummyAction("Collect earnings").setEnabled(false));
+		reception.addAction(CivicCentreActionMenu.collectEarningsAction);
 		addMenu("RECEPTION", reception);
 
 		if(inn)

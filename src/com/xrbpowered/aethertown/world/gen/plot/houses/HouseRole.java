@@ -126,7 +126,7 @@ public class HouseRole {
 	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture, HouseTileAction.concertHall,
 		new ArchitectureStyle.BlankNotFront(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant, IllumLayer.leisure)
 	);
-	public static final HouseRole office = new HouseRole("Office", colorOffice, null, // TODO office action
+	public static final HouseRole office = new HouseRole("Office", colorOffice, HouseTileAction.office,
 		new ArchitectureStyle(3, ArchitectureTileSet.officeSet).setIllum(IllumPattern.officeLobby, IllumPattern.office)
 	);
 	
