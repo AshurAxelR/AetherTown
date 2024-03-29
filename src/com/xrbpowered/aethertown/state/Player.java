@@ -23,13 +23,14 @@ public class Player {
 	public static final int maxInspiration = 100;
 	
 	public int cash = 0;
-	public int ubiCollectedDay = -1;
-	public int earnings = 0;
+	int ubiCollectedDay = -1;
+	int earnings = 0;
 	
 	private int inspiration = 0;
 	private int xp = 0;
 	
 	public final Inventory backpack = new Inventory();
+	HotelBooking hotelBooking = null;
 	
 	public Vector3f cameraPosition = null;
 	public Vector3f cameraRotation = null;
@@ -111,6 +112,14 @@ public class Player {
 			player.xp = in.readInt();
 			player.backpack.loadItems(in);
 			
+			if(in.readBoolean()) {
+				HouseTileRef hotel = HouseTileRef.load(in);
+				double expires = in.readDouble();
+				player.hotelBooking = new HotelBooking(hotel, expires);
+			}
+			else
+				player.hotelBooking = null;
+			
 			AetherTown.player = player;
 			System.out.println("Player state loaded");
 			return true;
@@ -140,6 +149,14 @@ public class Player {
 			out.writeInt(player.inspiration);
 			out.writeInt(player.xp);
 			player.backpack.saveItems(out);
+			
+			if(player.hotelBooking!=null) {
+				out.writeBoolean(true);
+				HouseTileRef.save(out, player.hotelBooking.hotel);
+				out.writeDouble(player.hotelBooking.expires);
+			}
+			else
+				out.writeBoolean(false);
 			
 			System.out.println("Player state saved");
 			return true;

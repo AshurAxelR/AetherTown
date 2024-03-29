@@ -94,7 +94,7 @@ public class Earnings {
 		total += c;
 		reportRowCost(sb, String.format("from %d INS", ins), c);
 
-		c = (int) Math.round((random.nextDouble()*0.5+0.5)*diminish(xp, 3000, 1/2500.0));
+		c = (int) Math.round((random.nextDouble()*0.5+0.5)*diminish(xp, 2000, 1/2500.0));
 		total += c;
 		reportRowCost(sb, String.format("from %d XP", xp), c);
 

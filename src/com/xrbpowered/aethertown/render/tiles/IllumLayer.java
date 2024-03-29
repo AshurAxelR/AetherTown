@@ -7,7 +7,7 @@ public class IllumLayer {
 	
 	public static final IllumLayer alwaysOn = new IllumLayer(0, 24);
 	public static final IllumLayer living = new IllumLayer(6, 23);
-	public static final IllumLayer officeHours = new IllumLayer(8, 18);
+	public static final IllumLayer officeHours = new IllumLayer(8, 19);
 	public static final IllumLayer leisure = new IllumLayer(9, 22);
 	public static final IllumLayer shopping = new IllumLayer(9, 20);
 	public static final IllumLayer education = new IllumLayer(7, 21);
