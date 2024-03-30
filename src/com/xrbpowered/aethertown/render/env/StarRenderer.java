@@ -26,8 +26,6 @@ public class StarRenderer {
 			.addAttrib("in_Magnitude", 1)
 			.addAttrib("in_Color", 3);
 
-	public static final float latitude = (float)Math.toRadians(45); // 0 - north pole, 180 - south pole
-
 	public class StarShader extends CameraShader {
 		private int modelMatrixLocation;
 		
@@ -88,7 +86,7 @@ public class StarRenderer {
 	
 	public void update(Vector4f sun) {
 		float y = WorldTime.getTimeOfYear();
-		transform.rotationXYZ(-latitude, (float)(-(WorldTime.time-0.5+y)*Math.PI*2f), 0);
+		transform.rotationXYZ(-StarData.latitude, (float)(-(WorldTime.time-0.5+y)*Math.PI*2f), 0);
 		StarData.updateSun(y);
 		starPos(StarData.sun.ra, StarData.sun.de, sun);
 		transform.transform(sun);

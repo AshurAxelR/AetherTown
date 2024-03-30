@@ -6,6 +6,8 @@ import java.util.Random;
 public class StarData {
 
 	public static final float axialTilt = (float)Math.toRadians(23.45); // Earth: 23.45
+	public static final float latitude = (float)Math.toRadians(45); // 0 - north pole, 180 - south pole
+
 	public static final int numStars = 100000;
 	public static final boolean debugSun = false;
 	

@@ -70,7 +70,7 @@ public class TileActionMenuDialog extends DialogBase {
 			float x = getWidth()-10;
 			float y = getHeight()/2;
 			if(item.isMenu()) {
-				paintArrow(g, (int)x, (int)y);
+				paintArrow(g, (int)x, (int)y, 1);
 				x -= 20;
 			}
 			if(info!=null) {
@@ -188,12 +188,12 @@ public class TileActionMenuDialog extends DialogBase {
 		return menu.getSize() * 32 + (hasTitle ? 170 : 120);
 	}
 	
-	private static void paintArrow(GraphAssist g, int w, int h) {
+	public static void paintArrow(GraphAssist g, int x, int y, int d) {
 		g.pushAntialiasing(true);
 		g.pushPureStroke(true);
 		g.graph.fillPolygon(
-				new int[] {w-8, w-5, w, w-5, w-8, w-3},
-				new int[] {h-8, h-8, h, h+8, h+8, h}, 6);
+				new int[] {x-d*8, x-d*5, x, x-d*5, x-d*8, x-d*3},
+				new int[] {y-8, y-8, y, y+8, y+8, y}, 6);
 		g.popPureStroke();
 		g.popAntialiasing();
 	}
