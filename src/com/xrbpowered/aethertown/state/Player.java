@@ -87,11 +87,6 @@ public class Player {
 			endAction();
 		}
 		else {
-			camera.position.x = cameraPosition.x;
-			camera.position.z = cameraPosition.z;
-			camera.rotation.x = cameraRotation.x;
-			camera.rotation.y = cameraRotation.y;
-			
 			if(actionTile!=null) {
 				if(actionTile.isValid(level)) {
 					Tile tile = level.map[actionTile.x][actionTile.z];
@@ -103,6 +98,10 @@ public class Player {
 					endAction();
 				}
 			}
+			camera.position.x = cameraPosition.x;
+			camera.position.z = cameraPosition.z;
+			camera.rotation.x = cameraRotation.x;
+			camera.rotation.y = cameraRotation.y;
 		}
 		camera.position.y = (HeightLimiter.maxHeight+1) * Tile.ysize;
 		updateCamera(camera);

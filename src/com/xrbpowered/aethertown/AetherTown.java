@@ -239,7 +239,7 @@ public class AetherTown extends UIClient {
 				activateLevel(startLevel);
 				player.initCamera(camera, level, false);
 				updateWalkY();
-				Hud.fadeIn(Color.BLACK, 2f);
+				Hud.fadeIn(Color.BLACK, 1f);
 
 				// setup child resources
 				super.setupResources();
@@ -490,7 +490,7 @@ public class AetherTown extends UIClient {
 						updateWalkY();
 						showToast("Flying OFF");
 					}
-					else {
+					else if(activeController==walkController) {
 						hud.setLookAtTile(null);
 						activeController = flyController;
 						flyController.moveSpeed = settings.flySpeed;
