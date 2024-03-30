@@ -19,7 +19,7 @@ public abstract class DialogBase extends UIPane implements KeyInputHandler {
 	public static final Color borderColor = new Color(0xdddddd);
 
 	protected final boolean showStats;
-	protected ClickButton buttonClose, buttonStats;
+	protected ClickButton buttonClose;
 	
 	public DialogBase(UIContainer parent, int w, int h, boolean showStats) {
 		super(parent, false);
@@ -33,11 +33,6 @@ public abstract class DialogBase extends UIPane implements KeyInputHandler {
 			}
 		};
 		buttonClose.setPosition(10, getHeight()-buttonClose.getHeight()-10);
-		
-		buttonStats = new ClickButton(this, "STATS");
-		buttonStats.setEnabled(false);
-		buttonStats.setSize(80, buttonStats.getHeight());
-		buttonStats.setPosition(getWidth()-buttonStats.getWidth()-10, 10);
 	}
 
 	public String getCloseLabel() {
@@ -56,7 +51,7 @@ public abstract class DialogBase extends UIPane implements KeyInputHandler {
 			g.setFont(Fonts.large);
 			g.drawString(TileAction.formatCurrency(player.cash), 30, 26, GraphAssist.LEFT, GraphAssist.CENTER);
 			g.setFont(Fonts.small);
-			g.drawString(String.format("%d INS, %d XP", player.getInspiration(), player.getXP()), buttonStats.getX()-10, 26, GraphAssist.RIGHT, GraphAssist.CENTER);
+			g.drawString(String.format("%d INS, %d XP", player.getInspiration(), player.getXP()), getWidth()-20, 26, GraphAssist.RIGHT, GraphAssist.CENTER);
 		}
 	}
 	

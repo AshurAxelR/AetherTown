@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.actions;
 
+import static com.xrbpowered.aethertown.AetherTown.player;
 import static com.xrbpowered.aethertown.AetherTown.ui;
 
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
@@ -25,8 +26,10 @@ public class EnterTileAction extends TileAction {
 	
 	@Override
 	protected void onSuccess(Tile tile, boolean alt) {
+		super.onSuccess(tile, alt);
 		new TileActionMenuDialog(ui, menu, tile, alt, getMenuTitle(tile, alt), getSubtitle(tile, alt));
 		ui.reveal();
+		player.beginAction(tile, alt);
 	}
 	
 }

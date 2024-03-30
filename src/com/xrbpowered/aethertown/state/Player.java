@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import org.joml.Vector3f;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -18,7 +19,7 @@ import com.xrbpowered.gl.scene.CameraActor;
 
 public class Player {
 
-	private static final String formatId = "AetherTown.Player.1";
+	private static final String formatId = "AetherTown.Player.2";
 
 	public static final int maxInspiration = 100;
 	
@@ -34,6 +35,9 @@ public class Player {
 	
 	public Vector3f cameraPosition = null;
 	public Vector3f cameraRotation = null;
+	
+	private TileVisit actionTile = null;
+	private boolean actionAlt = false;
 	
 	public int getInspiration() {
 		return inspiration;
@@ -64,18 +68,41 @@ public class Player {
 		return xp;
 	}
 
+	public void beginAction(Tile tile, boolean alt) {
+		this.actionTile = new TileVisit(tile);
+		this.actionAlt = alt;
+	}
+	
+	public void endAction() {
+		this.actionTile = null;
+		this.actionAlt = false;
+	}
+	
 	public void initCamera(CameraActor camera, Level level, boolean resetPosition) {
 		if(resetPosition || cameraPosition==null || cameraRotation==null) {
 			camera.position.x = level.getStartX()*Tile.size;
 			camera.position.z = level.getStartZ()*Tile.size;
 			camera.rotation.x = 0;
 			camera.rotation.y = 0;
+			endAction();
 		}
 		else {
 			camera.position.x = cameraPosition.x;
 			camera.position.z = cameraPosition.z;
 			camera.rotation.x = cameraRotation.x;
 			camera.rotation.y = cameraRotation.y;
+			
+			if(actionTile!=null) {
+				if(actionTile.isValid(level)) {
+					Tile tile = level.map[actionTile.x][actionTile.z];
+					TileAction action = actionAlt ? tile.t.getTileAltAction(tile) : tile.t.getTileAction(tile);
+					action.performAt(tile, actionAlt);
+				}
+				else {
+					System.err.println("Action in progress is not valid");
+					endAction();
+				}
+			}
 		}
 		camera.position.y = (HeightLimiter.maxHeight+1) * Tile.ysize;
 		updateCamera(camera);
@@ -104,6 +131,8 @@ public class Player {
 			float cameraLookY = in.readFloat();
 			player.cameraPosition = new Vector3f(cameraPosX, 0f, cameraPosZ);
 			player.cameraRotation = new Vector3f(cameraLookX, cameraLookY, 0f);
+			player.actionTile = TileVisit.loadNullable(in);
+			player.actionAlt = in.readBoolean();
 			
 			player.cash = in.readInt();
 			player.ubiCollectedDay = in.readInt();
@@ -142,6 +171,8 @@ public class Player {
 			out.writeFloat(player.cameraPosition.z);
 			out.writeFloat(player.cameraRotation.x);
 			out.writeFloat(player.cameraRotation.y);
+			TileVisit.saveNullable(out, player.actionTile);
+			out.writeBoolean(player.actionAlt);
 
 			out.writeInt(player.cash);
 			out.writeInt(player.ubiCollectedDay);

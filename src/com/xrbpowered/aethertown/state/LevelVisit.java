@@ -11,20 +11,6 @@ import com.xrbpowered.aethertown.world.region.LevelInfo;
 
 public class LevelVisit extends LevelRef {
 
-	private static class TileVisit extends TileRef {
-		public final int templateHash;
-		
-		public TileVisit(int x, int z, int templateHash) {
-			super(x, z);
-			this.templateHash = templateHash;
-		}
-		
-		public TileVisit(Tile tile) {
-			super(tile);
-			this.templateHash = calcTileTemplateHash(tile.t);
-		}
-	}
-
 	private final HashMap<TileRef, TileVisit> visitedTiles = new HashMap<>();
 
 	private boolean validated = false;
@@ -46,15 +32,16 @@ public class LevelVisit extends LevelRef {
 			return true;
 		if(!this.isLevel(level.info))
 			return false;
+		
+		boolean res = true;
 		for(TileVisit v : visitedTiles.values()) {
-			if(!level.isInside(v.x, v.z))
-				return false;
-			Tile tile = level.map[v.x][v.z];
-			if(TileRef.calcTileTemplateHash(tile.t)!=v.templateHash)
-				return false;
+			if(!v.isValid(level)) {
+				res = false;
+				break;
+			}
 		}
 		validated = true;
-		return true;
+		return res;
 	}
 	
 	public boolean isVisited(Tile tile) {
@@ -72,21 +59,14 @@ public class LevelVisit extends LevelRef {
 	
 	public void loadVisits(DataInputStream in) throws IOException {
 		int n = in.readInt();
-		for(int i=0; i<n; i++) {
-			int x = in.readShort();
-			int z = in.readShort();
-			int hash = in.readInt();
-			add(new TileVisit(x, z, hash));
-		}
+		for(int i=0; i<n; i++)
+			add(TileVisit.load(in));
 	}
 
 	public void saveVisits(DataOutputStream out) throws IOException {
 		out.writeInt(visitedTiles.size());
-		for(TileVisit v : visitedTiles.values()) {
-			out.writeShort(v.x);
-			out.writeShort(v.z);
-			out.writeInt(v.templateHash);
-		}
+		for(TileVisit v : visitedTiles.values())
+			TileVisit.save(out, v);
 	}
 
 }

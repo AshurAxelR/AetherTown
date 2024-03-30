@@ -27,7 +27,7 @@ import com.xrbpowered.gl.res.texture.Texture;
 
 public class Park extends TileTemplate {
 
-	private static final boolean useBranchTexture = true;
+	private static final boolean useBranchTexture = false;
 	
 	private enum ParkType {
 		common, lawn, xmas

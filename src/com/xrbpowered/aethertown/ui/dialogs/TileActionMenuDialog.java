@@ -1,6 +1,7 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
 import static com.xrbpowered.aethertown.AetherTown.aether;
+import static com.xrbpowered.aethertown.AetherTown.player;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -161,6 +162,7 @@ public class TileActionMenuDialog extends DialogBase {
 		history.pop();
 		if(history.isEmpty()) {
 			super.close();
+			player.endAction();
 			aether.flipCamera();
 		}
 		else {

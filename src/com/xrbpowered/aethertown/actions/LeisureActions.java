@@ -1,6 +1,9 @@
 package com.xrbpowered.aethertown.actions;
 
+import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
+
 import com.xrbpowered.aethertown.state.GlobalCooldowns;
+import com.xrbpowered.aethertown.state.RegionVisits;
 
 public abstract class LeisureActions {
 
@@ -22,5 +25,21 @@ public abstract class LeisureActions {
 				.setInsCooldown(GlobalCooldowns.moviesIns.daily())
 				.setDelay(90);
 	}
-	
+
+	public static final TileAction discover = new InspirationAction("Discover", 0, 5) {
+		@Override
+		public boolean isEnabled(com.xrbpowered.aethertown.world.Tile tile, boolean alt) {
+			if(oncePerTile && RegionVisits.isTileVisited(tile))
+				return false;
+			else
+				return super.isEnabled(tile, alt);
+		}
+		protected void onFail(com.xrbpowered.aethertown.world.Tile tile, boolean alt) {
+			if(oncePerTile && RegionVisits.isTileVisited(tile))
+				showToast("Already discovered");
+			else
+				super.onFail(tile, alt);
+		}
+	}.oncePerTile().setDelay(30);
+
 }

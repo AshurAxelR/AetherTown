@@ -21,7 +21,7 @@ public class OfficeActionMenu extends TileActionMenu {
 	public OfficeActionMenu() {
 		addAction(workAction);
 		addAction(LeisureActions.playVideoGames);
-		addAction(FoodActionMenu.drinkAction);
+		addAction(FoodActionMenu.freeDrinkAction);
 	}
 
 }

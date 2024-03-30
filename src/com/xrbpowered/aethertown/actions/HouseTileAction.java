@@ -28,6 +28,7 @@ public class HouseTileAction extends EnterTileAction {
 		LeisureActions.viewMuseum
 	));
 	public static final HouseTileAction library = new HouseTileAction(new TileActionMenu(
+		LeisureActions.discover,
 		LeisureActions.study,
 		LeisureActions.readBooks
 	));
