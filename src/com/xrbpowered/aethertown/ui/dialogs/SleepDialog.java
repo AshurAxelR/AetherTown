@@ -12,6 +12,7 @@ import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.InfoBox;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
+import com.xrbpowered.aethertown.ui.hud.Hud;
 import com.xrbpowered.aethertown.world.stars.Sunrise;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.ui.pane.UIPane;
@@ -92,6 +93,7 @@ public class SleepDialog extends UIPane implements KeyInputHandler {
 			public void onAction() {
 				sleep();
 				close();
+				Hud.fadeIn(Color.BLACK, 2f);
 			}
 		};
 		buttonSleep.setPosition(getWidth()-buttonSleep.getWidth()-10, getHeight()-buttonSleep.getHeight()-10);

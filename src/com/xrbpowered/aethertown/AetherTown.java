@@ -79,13 +79,13 @@ public class AetherTown extends UIClient {
 		public int noVsyncSleep = 2;
 		public boolean showFps = false;
 		public float mouseSensitivity = 0.002f;
-		public float walkSpeed = 4.8f; // meters per second. Human: 1.35
+		public float walkSpeed = 2.2f; // meters per second. Human: 1.35
 		public float flySpeed = 24f;
 		
 		public float startTime = 0.25f;
 		public float startSeason = 0.75f; // 0f - spring equinox, 0.25f - summer solstice, 0.5f - autumn equinox, 0.75f - winter solstice
-		public float timeSpeed = 20f;
-		public float timeSpeedUp = 100f;
+		public float timeSpeed = 5f;
+		public float timeSpeedUp = 200f;
 		
 		public float screenshotScale = 1f;
 		
@@ -105,7 +105,11 @@ public class AetherTown extends UIClient {
 		public ClientConfig() {
 			super("./client.cfg", true);
 		}
-		
+
+		public ClientConfig(String path) {
+			super(path, false);
+		}
+
 		@Override
 		public ClientConfig reset() {
 			return new ClientConfig();
@@ -134,7 +138,7 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
-	public static ClientConfig settings = new ClientConfig();
+	public static ClientConfig settings = null;
 	
 	private DaytimeEnvironment environment = new DaytimeEnvironment();
 
@@ -235,6 +239,7 @@ public class AetherTown extends UIClient {
 				activateLevel(startLevel);
 				player.initCamera(camera, level, false);
 				updateWalkY();
+				Hud.fadeIn(Color.BLACK, 2f);
 
 				// setup child resources
 				super.setupResources();
@@ -275,7 +280,7 @@ public class AetherTown extends UIClient {
 				float dtDay = dt;
 				if(settings.allowTimeControl && input.isKeyDown(KeyEvent.VK_OPEN_BRACKET))
 					dtDay = -settings.timeSpeedUp*dt;
-				if(settings.allowTimeControl && input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET)) // TODO time-forwarding allowed by actions
+				if(input.isKeyDown(KeyEvent.VK_CLOSE_BRACKET)) // fast-forward time is always allowed 
 					dtDay = settings.timeSpeedUp*dt; 
 				sky.updateTime(dtDay);
 				
@@ -521,6 +526,7 @@ public class AetherTown extends UIClient {
 				break;
 			case KeyEvent.VK_F10:
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
+				Hud.fadeIn(new Color(0x55ffffff, true), 0.25f);
 				break;
 			case KeyEvent.VK_B:
 				if(level!=null && settings.allowBookmaks) {
@@ -584,18 +590,27 @@ public class AetherTown extends UIClient {
 		return info;
 	}
 	
+	private static void parseParams(String[] args) {
+		final ClientConfig argCfg = new ClientConfig();
+		ParseParams params = new ParseParams();
+		params.addFlagParam("-nosave", x -> { argCfg.nosave = x; }, "ignore save file");
+		params.addStrParam("-cfg", x -> { settings = new ClientConfig(x); }, "use config file");
+		params.parseParams(args);
+
+		if(settings==null)
+			settings = new ClientConfig();
+		settings.load();
+		settings.nosave = argCfg.nosave;
+	}
+	
 	public static void main(String[] args) {
 		AssetManager.defaultAssets = new FileAssetManager("assets", AssetManager.defaultAssets);
 		if(useDebugAssets)
 			AssetManager.defaultAssets = new FileAssetManager("assets_src", AssetManager.defaultAssets);
-		
 		LevelNames.load();
-		settings.load();
-
-		ParseParams params = new ParseParams();
-		params.addFlagParam("-nosave", x -> { settings.nosave = x; }, "ignore save file");
-		params.parseParams(args);
-
+		
+		parseParams(args);
+		
 		SaveState save = new SaveState();
 		if(!settings.nosave)
 			save = save.load();

@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.state.items.TravelTokenItem;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
+import com.xrbpowered.aethertown.ui.hud.Hud;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -98,6 +99,7 @@ public class FastTravelDialog extends UIPane implements KeyInputHandler {
 				aether.teleportTo(tokens.get(selected).destination.find(regionCache));
 				cooldown.start();
 				close();
+				Hud.fadeIn(Color.WHITE, 1f);
 			}
 		};
 		buttonTravel.setSize(200, buttonTravel.getHeight());

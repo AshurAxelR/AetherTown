@@ -13,6 +13,7 @@ import com.xrbpowered.aethertown.world.gen.plot.PlotGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseRole;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
+import com.xrbpowered.aethertown.world.tiles.Alcove;
 import com.xrbpowered.aethertown.world.tiles.Bench;
 import com.xrbpowered.aethertown.world.tiles.Bench.BenchTile;
 import com.xrbpowered.aethertown.world.tiles.Bench.BenchType;
@@ -239,6 +240,11 @@ public class LevelMapImage extends ImageGenerator {
 				}
 				else if(tile.t instanceof Bench && ((Bench) tile.t).type!=BenchType.empty) {
 					g.setColor(colorInfoText);
+					g.fillRect(x*tileSize+tileSize/2-benchMarkerSize/2, z*tileSize+tileSize/2-benchMarkerSize/2,
+							benchMarkerSize, benchMarkerSize);
+				}
+				else if(tile.t==Alcove.template) {
+					g.setColor(colorWater);
 					g.fillRect(x*tileSize+tileSize/2-benchMarkerSize/2, z*tileSize+tileSize/2-benchMarkerSize/2,
 							benchMarkerSize, benchMarkerSize);
 				}

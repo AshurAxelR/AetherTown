@@ -25,6 +25,7 @@ public class Hud extends UINode {
 	
 	private UIPane uiTime, uiLookInfo, uiActionInfo, uiDebugInfo;
 	private ToastPane uiToast;
+	private FadeInPane uiFadeIn;
 
 	public Hud(UIContainer parent) {
 		super(parent);
@@ -85,6 +86,7 @@ public class Hud extends UINode {
 		uiActionInfo.setVisible(false);
 
 		uiToast = new ToastPane(this);
+		uiFadeIn = new FadeInPane(this);
 	}
 	
 	@Override
@@ -165,6 +167,10 @@ public class Hud extends UINode {
 
 	public static void showToast(String fmt, Object... args) {
 		showToast(String.format(fmt, args));
+	}
+	
+	public static void fadeIn(Color color, float duration) {
+		hud.uiFadeIn.start(color, duration);
 	}
 
 }
