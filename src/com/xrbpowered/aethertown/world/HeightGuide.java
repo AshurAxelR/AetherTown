@@ -32,17 +32,19 @@ public class HeightGuide {
 	}
 	
 	private static void checkTerrainBorder(Level level, int x, int z, int x1, int z1) {
-		for(int ax=x-1; ax<=x+1; ax++)
-			for(int az=z-1; az<=z+1; az++) {
-				if(level.isInside(ax, az) && level.map[ax][az]!=null && Street.isAnyPath(level.map[ax][az].t))
+		for(int ax=x-1; ax<x+1; ax++)
+			for(int az=z-1; az<z+1; az++) {
+				if(level.isInside(ax, az) && level.map[ax][az]!=null && Street.isAnyPath(level.map[ax][az].t)) {
+					// System.err.printf(" - level [%d, %d] skip terrain check at [%d, %d]: road at [%d, %d]\n", level.info.x0, level.info.z0, x, z, ax, az);
 					return;
+				}
 			}
 		int h = level.h.y[x][z];
 		int g0 = level.heightGuide.gety(x, z);
 		int g1 = (x1<0 || z1<0) ? g0 : level.heightGuide.gety(x1, z1);
 		int g = Math.max(g0, g1);
 		if(h!=g) {
-			// System.out.printf(" - border terrain mismatch at [%d, %d]: %d fixed to %d\n", x, z, h, g);
+			// System.err.printf(" - level [%d, %d] border terrain mismatch at [%d, %d]: %d fixed to %d\n", level.info.x0, level.info.z0, x, z, h, g);
 			level.h.y[x][z] = g;
 		}
 	}
