@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.actions;
 
+import static com.xrbpowered.aethertown.actions.menus.FoodActionMenu.hangOutAction;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
@@ -143,6 +144,7 @@ public class EnterHomeAction extends HouseTileAction {
 		kitchen.addAction(FoodActionMenu.freeDrinkAction);
 		kitchen.addAction(eatAction);
 		kitchen.addAction(cookAction);
+		kitchen.addAction(hangOutAction);
 		home.addMenu("KITCHEN", kitchen);
 
 		TileActionMenu living = new TileActionMenu();
@@ -151,6 +153,7 @@ public class EnterHomeAction extends HouseTileAction {
 		living.addAction(new ReqImprovementAction(HomeImprovement.piano, LeisureActions.playMusic("Piano", false)));
 		living.addAction(new ReqImprovementAction(HomeImprovement.tv, LeisureActions.watchMovies(false)));
 		living.addAction(new ReqImprovementAction(HomeImprovement.console, LeisureActions.playVideoGames));
+		living.addAction(hangOutAction);
 		home.addMenu("LIVING ROOM", living);
 
 		TileActionMenu office = new TileActionMenu();

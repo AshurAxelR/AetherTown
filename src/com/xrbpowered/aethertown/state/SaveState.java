@@ -29,10 +29,6 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 	public float time = settings.startTime;
 	
 	public boolean defaultStart = true;
-	public float cameraPosX = 0f;
-	public float cameraPosZ = 0f;
-	public float cameraLookX = 0f;
-	public float cameraLookY = 0f;
 
 	public SaveState() {
 	}

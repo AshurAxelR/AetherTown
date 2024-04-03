@@ -238,6 +238,10 @@ public class LevelMapImage extends ImageGenerator {
 					g.setColor(colorPavillionBorder);
 					g.drawRect(x*tileSize, z*tileSize, tileSize-1, tileSize-1);
 				}
+				else if(tile.t==Monument.template) {
+					g.setColor(colorStreetBorder);
+					g.drawRect(x*tileSize, z*tileSize, tileSize-1, tileSize-1);
+				}
 				else if(tile.t instanceof Bench && ((Bench) tile.t).type!=BenchType.empty) {
 					g.setColor(colorInfoText);
 					g.fillRect(x*tileSize+tileSize/2-benchMarkerSize/2, z*tileSize+tileSize/2-benchMarkerSize/2,

@@ -97,6 +97,7 @@ public class ShopActionMenu extends TileActionMenu {
 		shop.addMenu("FOOD ISLE", GroceriesActionMenu.groceries);
 		shop.addAction(buyNewClothesAction);
 		shop.addAction(buyKitchenwareAction);
+		shop.addMenu("MAPS", MapsMenu.noToken);
 		return shop;
 	}
 
@@ -120,6 +121,7 @@ public class ShopActionMenu extends TileActionMenu {
 		}.setCost(250));
 		
 		shop.addMenu("CAFETERIA", FoodActionMenu.cafeteria);
+		shop.addMenu("MAPS", MapsMenu.noToken);
 		return shop;
 	}
 

@@ -526,7 +526,8 @@ public class AetherTown extends UIClient {
 				break;
 			case KeyEvent.VK_F10:
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
-				Hud.fadeIn(new Color(0x55ffffff, true), 0.25f);
+				showToast("Screenshot saved");
+				Hud.fadeIn(new Color(0x33ffffff, true), 0.5f);
 				break;
 			case KeyEvent.VK_B:
 				if(level!=null && settings.allowBookmaks) {

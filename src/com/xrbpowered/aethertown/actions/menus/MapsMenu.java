@@ -14,9 +14,10 @@ import com.xrbpowered.aethertown.world.Tile;
 
 public class MapsMenu extends TileActionMenu {
 
-	public static final TileActionMenu menu = new MapsMenu(); 
+	public static final TileActionMenu menu = new MapsMenu(true); 
+	public static final TileActionMenu noToken = new MapsMenu(false); 
 	
-	private MapsMenu() {
+	private MapsMenu(boolean token) {
 		addAction(new TileAction("View map") {
 			@Override
 			public void onSuccess(Tile tile, boolean alt) {
@@ -53,21 +54,23 @@ public class MapsMenu extends TileActionMenu {
 			}
 		});
 		
-		addAction(new GetItemAction("Get", ItemType.travelToken) {
-			@Override
-			protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
-				if(aitem.type==ItemType.travelToken) {
-					TravelTokenItem item = (TravelTokenItem) aitem;
-					if(item.destination.isLevel(tile.level.info))
-						return true;
+		if(token) {
+			addAction(new GetItemAction("Get", ItemType.travelToken) {
+				@Override
+				protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
+					if(aitem.type==ItemType.travelToken) {
+						TravelTokenItem item = (TravelTokenItem) aitem;
+						if(item.destination.isLevel(tile.level.info))
+							return true;
+					}
+					return false;
 				}
-				return false;
-			}
-			@Override
-			protected Item generateItem(Tile tile, boolean alt) {
-				return new TravelTokenItem(tile.level.info);
-			}
-		});
+				@Override
+				protected Item generateItem(Tile tile, boolean alt) {
+					return new TravelTokenItem(tile.level.info);
+				}
+			});
+		}
 	}
 
 }

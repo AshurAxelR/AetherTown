@@ -23,6 +23,7 @@ public class HouseRole {
 	public static final Color colorFoodSmall = new Color(0x9999ff);
 	public static final Color colorFood = new Color(0x7777dd);
 	public static final Color colorShopSmall = new Color(0x5599ff);
+	public static final Color colorGiftShop = new Color(0x7700ff);
 	public static final Color colorShop = new Color(0x0000dd);
 	public static final Color colorShopLarge = new Color(0x0077cc);
 	public static final Color colorChurch = new Color(0xffdd77);
@@ -113,7 +114,7 @@ public class HouseRole {
 	public static final HouseRole clothesShop = new ShopRole("Fashion Shop", new HouseTileAction(ShopActionMenu.clothesShop), IllumPattern.shop);
 	public static final HouseRole homeShop = new ShopRole("Home Goods", new HouseTileAction(ShopActionMenu.homeShop), IllumPattern.shop);
 	
-	public static final HouseRole giftShop = new HouseRole("Gift Shop + Cafeteria", colorShop, HouseTileAction.giftShop,
+	public static final HouseRole giftShop = new HouseRole("Gift Shop + Cafeteria", colorGiftShop, HouseTileAction.giftShop,
 		new ArchitectureStyle.BlankBack(1, ArchitectureTileSet.shopSet).setIllum(IllumPattern.shop, IllumLayer.living).setDoorInfo(DoorInfo.coffeeShop)
 	);
 	
