@@ -80,7 +80,7 @@ public class Earnings {
 		int xp = player.getXP();
 		int addXP = player.addXP(workXP);
 		if(ins>0)
-			sb.append(String.format("<p>&ndash;%d inspiration, %+d XP</p>", ins, addXP));
+			sb.append(String.format("<p>&minus;%d inspiration, %+d XP</p>", ins, addXP));
 		else
 			sb.append(String.format("<p>No inspiration, %+d XP</p>", addXP));
 		sb.append("<p>Earned:</p><table style=\"width:100%\">");
@@ -90,7 +90,7 @@ public class Earnings {
 		total += c;
 		reportRowCost(sb, "Baseline", c);
 		
-		c = (random.nextInt(21)+10) * ins;
+		c = (random.nextInt(16)+15) * ins;
 		total += c;
 		reportRowCost(sb, String.format("from %d INS", ins), c);
 
