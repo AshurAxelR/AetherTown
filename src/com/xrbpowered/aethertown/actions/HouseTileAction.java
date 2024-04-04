@@ -38,7 +38,7 @@ public class HouseTileAction extends EnterTileAction {
 		LeisureActions.watchMovies(true)
 	));
 
-	public static final HouseTileAction office = new HouseTileAction(new OfficeActionMenu());
+	public static final HouseTileAction office = new HouseTileAction(OfficeActionMenu.menu);
 
 	public static final HouseTileAction restaurant = new HouseTileAction(FoodActionMenu.restaurant);
 	public static final HouseTileAction coffeeShop = new HouseTileAction(FoodActionMenu.cafeteria);

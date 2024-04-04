@@ -127,6 +127,7 @@ public class CivicCentreActionMenu extends TileActionMenu {
 		}
 
 		addMenu("MAPS", MapsMenu.menu);
+		addMenu("OFFICE", OfficeActionMenu.menu);
 		addAction(new WaitAction(20));
 	}
 

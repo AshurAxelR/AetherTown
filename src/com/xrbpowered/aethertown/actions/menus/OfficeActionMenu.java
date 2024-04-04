@@ -16,9 +16,11 @@ public class OfficeActionMenu extends TileActionMenu {
 			ConfirmDialog.show("Work", report, 350);
 			super.onSuccess(tile, alt);
 		}
-	}.setDelay(120);
+	}.setDelay(90);
 	
-	public OfficeActionMenu() {
+	public static final OfficeActionMenu menu = new OfficeActionMenu();
+	
+	private OfficeActionMenu() {
 		addAction(workAction);
 		addAction(LeisureActions.playVideoGames);
 		addAction(FoodActionMenu.freeDrinkAction);

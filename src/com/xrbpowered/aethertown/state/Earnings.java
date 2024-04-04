@@ -9,8 +9,8 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class Earnings {
 
-	public static final int initialPay = 7500;
-	public static final int dailyPay = 2500;
+	public static final int initialPay = 8000;
+	public static final int dailyPay = 2000;
 	public static final int workXP = 2;
 	
 	private Earnings() {
@@ -76,7 +76,7 @@ public class Earnings {
 		Random random = new Random(t);
 		
 		StringBuilder sb = new StringBuilder();
-		int ins = -player.addInspiration(-20);
+		int ins = -player.addInspiration(-50);
 		int xp = player.getXP();
 		int addXP = player.addXP(workXP);
 		if(ins>0)
@@ -86,15 +86,15 @@ public class Earnings {
 		sb.append("<p>Earned:</p><table style=\"width:100%\">");
 		
 		int total = 0;
-		int c = random.nextInt(501)+500;
+		int c = random.nextInt(501)+250;
 		total += c;
 		reportRowCost(sb, "Baseline", c);
 		
-		c = (random.nextInt(26)+25) * ins;
+		c = (random.nextInt(21)+10) * ins;
 		total += c;
 		reportRowCost(sb, String.format("from %d INS", ins), c);
 
-		c = (int) Math.round((random.nextDouble()*0.5+0.5)*diminish(xp, 2000, 1/2500.0));
+		c = (int) Math.round((random.nextDouble()*0.5+0.5)*diminish(xp, 1500, 2500));
 		total += c;
 		reportRowCost(sb, String.format("from %d XP", xp), c);
 
@@ -105,8 +105,8 @@ public class Earnings {
 		return sb.toString();
 	}
 
-	private static double diminish(double x, double max, double growth) {
-		return max*growth*x / (1+growth*x);
+	private static double diminish(double x, double max, double lambda) {
+		return max*x / (x+lambda);
 	}
 	
 }
