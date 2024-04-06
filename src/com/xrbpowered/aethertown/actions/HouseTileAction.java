@@ -92,8 +92,15 @@ public class HouseTileAction extends EnterTileAction {
 		if(house.isClosed(alt, 0f))
 			showToast("%s is closed until %02d:00", house.getRole(alt).title, house.arch.getIllumLayer(alt ? 1 : 0).open);
 	}
-	
-	public static boolean closingSoon(Tile tile, boolean alt, TileAction action) {
+
+	public static boolean isClosed(Tile tile, boolean alt) {
+		if(tile.t==HouseT.template)
+			return ((HouseGenerator) tile.sub.parent).isClosed(alt, 0);
+		else
+			return false;
+	}
+
+	public static boolean isClosingSoon(Tile tile, boolean alt, TileAction action) {
 		if(tile.t==HouseT.template) {
 			float addTime = (action==null) ? 0f : action.getDelay(tile, alt) * (float) WorldTime.minute;
 			return ((HouseGenerator) tile.sub.parent).isClosed(alt, addTime);

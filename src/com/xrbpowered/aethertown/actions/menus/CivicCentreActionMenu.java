@@ -116,6 +116,7 @@ public class CivicCentreActionMenu extends TileActionMenu {
 			res.addAction(recoverKeyAction);
 			res.addAction(listHomesUIAction);
 			addMenu("HOME OFFICE", res);
+			addMenu("OFFICE", OfficeActionMenu.menu);
 		}
 		if(post) {
 			addAction(collectEarningsAction);
@@ -127,7 +128,6 @@ public class CivicCentreActionMenu extends TileActionMenu {
 		}
 
 		addMenu("MAPS", MapsMenu.menu);
-		addMenu("OFFICE", OfficeActionMenu.menu);
 		addAction(new WaitAction(20));
 	}
 

@@ -1,7 +1,8 @@
 package com.xrbpowered.aethertown.actions;
 
 import static com.xrbpowered.aethertown.AetherTown.player;
-import static com.xrbpowered.aethertown.actions.HouseTileAction.closingSoon;
+import static com.xrbpowered.aethertown.actions.HouseTileAction.isClosed;
+import static com.xrbpowered.aethertown.actions.HouseTileAction.isClosingSoon;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.state.HomeData;
@@ -28,7 +29,7 @@ public abstract class TileAction {
 		else if(cooldown!=null && cooldown.isOnCooldown())
 			return false;
 		else
-			return !closingSoon(tile, alt, this);
+			return !isClosingSoon(tile, alt, this);
 	}
 	
 	public TileAction setCost(int cost) {
@@ -85,7 +86,9 @@ public abstract class TileAction {
 	protected void onFail(Tile tile, boolean alt) {
 		if(isReqHome() && !HomeData.hasLocalHome(tile.level.info))
 			showToast("Requires local home");
-		else if(closingSoon(tile, alt, this))
+		else if(isClosed(tile, alt))
+			showToast("Closed");
+		else if(isClosingSoon(tile, alt, this))
 			showToast("Closing soon");
 		else if(cooldown!=null && cooldown.isOnCooldown())
 			showToast(cooldown.cooldown.formatRemaining());
