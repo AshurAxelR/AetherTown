@@ -1,19 +1,27 @@
 package com.xrbpowered.aethertown.ui;
 
+import static com.xrbpowered.aethertown.AetherTown.player;
 import static com.xrbpowered.aethertown.AetherTown.settings;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 
 import com.xrbpowered.aethertown.state.Bookmarks;
+import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.state.RegionVisits;
+import com.xrbpowered.aethertown.state.items.Item;
+import com.xrbpowered.aethertown.state.items.ItemType;
+import com.xrbpowered.aethertown.state.items.TravelTokenItem;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.LevelSettlementType;
 import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
 import com.xrbpowered.aethertown.world.region.Region;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.zoomui.GraphAssist;
 
 public class RegionMapImage extends ImageGenerator {
@@ -29,11 +37,14 @@ public class RegionMapImage extends ImageGenerator {
 	private static final Color colorLevelBorder = new Color(0xdddddd);
 	private static final Color colorPaths = new Color(0x777777);
 	private static final Color colorTown = new Color(0x000000);
+	private static final Color colorTownNotVisited = new Color(0x777777);
 
 	public final Region region;
 	public final LevelInfo active;
 	
 	private final int minx, minz, maxx, maxz;
+	private final ArrayList<LevelInfo> settlements;
+	private final HashSet<LevelInfo> travelTokens;
 	
 	public RegionMapImage(Region region, LevelInfo active) {
 		this.region = region;
@@ -42,13 +53,15 @@ public class RegionMapImage extends ImageGenerator {
 		minz = getMapMinZ(region);
 		maxx = getMapMaxX(region);
 		maxz = getMapMaxZ(region);
+		settlements = listSettlements(region, LevelSettlementType.inn);
+		travelTokens = listTravelTokens(region);
 	}
 	
 	@Override
 	public BufferedImage create() {
 		return create(
-			(maxx-minx)*tileSize + margin*2,
-			(maxz-minz)*tileSize + margin + marginTop
+			Math.max(16, maxx-minx)*tileSize + margin*2,
+			(maxz-minz)*tileSize + margin*2 + marginTop  + lineSize*countSettlementLines(maxx-minx, settlements.size())
 		);
 	}
 
@@ -61,9 +74,44 @@ public class RegionMapImage extends ImageGenerator {
 		g.drawString(RegionVisits.getRegionTitle(region.seed, false)+" Map", w/2, y, GraphAssist.CENTER, GraphAssist.CENTER);
 		
 		g.translate(margin - minx*tileSize, marginTop - minz*tileSize);
-		paintMap(g, region, active, !settings.revealRegion, minx, minz, maxx, maxz);
+		paintMap(g, region, active, !settings.revealRegion, minx, minz, maxx, maxz, travelTokens);
+		
+		g.translate(minx*tileSize, maxz*tileSize+margin);
+		paintSettlementList(g, maxx-minx, settlements, travelTokens);
+	}
+	
+	private static int countSettlementLines(int width, int numSettlements) {
+		int cols = Math.max(1, width/16);
+		return (numSettlements+cols-1)/cols;
 	}
 
+	private static void paintSettlementList(GraphAssist g, int width, ArrayList<LevelInfo> settlements, HashSet<LevelInfo> tokens) {
+		int lines = countSettlementLines(width, settlements.size());
+		float y = lineSize/2;
+		float x = 0;
+		int row = 0;
+		g.setFont(Fonts.small);
+		for(LevelInfo level : settlements) {
+			g.setColor(colorMarginText);
+			g.drawString(level.name, x+80, y, GraphAssist.LEFT, GraphAssist.CENTER);
+			g.setColor(colorMarginTextDim);
+			g.drawString(String.format("%d, %d", level.x0, level.z0), x+64, y, GraphAssist.RIGHT, GraphAssist.CENTER);
+			
+			if(HomeData.hasLocalHome(level))
+				g.fillRect(x+72, y-lineSize/2, 2, lineSize, colorActive);
+			else if(tokens!=null && tokens.contains(level))
+				g.fillRect(x+72, y-lineSize/2, 2, lineSize, colorPortal);
+			
+			y += lineSize;
+			row++;
+			if(row==lines) {
+				row = 0;
+				y = lineSize/2;
+				x += tileSize*16;
+			}
+		}
+	}
+	
 	public static void paintInfo(GraphAssist g, Region region, int hoverx, int hoverz, boolean showVisited) {
 		if(!region.isInside(hoverx, hoverz))
 			return;
@@ -101,6 +149,44 @@ public class RegionMapImage extends ImageGenerator {
 	private static int getSettlementRectSize(LevelSettlementType settlement) {
 		return settlement.ordinal()+1;
 	}
+	
+	public static ArrayList<LevelInfo> listSettlements(Region region, LevelSettlementType smallest) {
+		ArrayList<LevelInfo> list = new ArrayList<>();
+		for(int x=region.getMinX(); x<=region.getMaxX(); x++)
+			for(int z=region.getMinZ(); z<=region.getMaxZ(); z++) {
+				LevelInfo level = region.map[x][z];
+				if(level!=null && level.x0==x && level.z0==z && level.settlement.maxHouses>=smallest.maxHouses)
+					list.add(level);
+			}
+		list.sort(new Comparator<LevelInfo>() {
+			@Override
+			public int compare(LevelInfo level1, LevelInfo level2) {
+				int res = level1.name.compareTo(level2.name);
+				if(res==0)
+					res = Integer.compare(level1.x0, level2.x0);
+				if(res==0)
+					res = Integer.compare(level1.z0, level2.z0);
+				return res;
+			}
+		});
+		return list;
+	}
+	
+	public static HashSet<LevelInfo> listTravelTokens(Region region) {
+		HashSet<LevelInfo> tokens = new HashSet<>();
+		for(int i=0; i<player.backpack.size; i++) {
+			Item aitem = player.backpack.get(i);
+			if(aitem!=null && aitem.type==ItemType.travelToken) {
+				TravelTokenItem item = (TravelTokenItem) aitem;
+				if(item.destination.regionSeed==region.seed) {
+					LevelInfo level = item.destination.find(region);
+					if(level!=null)
+						tokens.add(level);
+				}
+			}
+		}
+		return tokens;
+	}
 
 	public static int getMapMinX(Region region) {
 		return Math.max(0, ((region.getMinX()-2)/8)*8);
@@ -119,11 +205,11 @@ public class RegionMapImage extends ImageGenerator {
 	}
 
 	public static void paintMap(GraphAssist g, Region region, LevelInfo active, boolean showVisited) {
-		paintMap(g, region, active, showVisited, 0, 0, region.sizex, region.sizez);
+		paintMap(g, region, active, showVisited, 0, 0, region.sizex, region.sizez, null);
 	}
-
+	
 	public static void paintMap(GraphAssist g, Region region, LevelInfo active, boolean showVisited,
-			int minx, int minz, int maxx, int maxz) {
+			int minx, int minz, int maxx, int maxz, HashSet<LevelInfo> tokens) {
 		g.pushAntialiasing(false);
 		
 		HashSet<LevelInfo> bookmarks = new HashSet<>();
@@ -179,11 +265,20 @@ public class RegionMapImage extends ImageGenerator {
 					
 					if(level.settlement!=LevelSettlementType.none) {
 						int s = getSettlementRectSize(level.settlement);
-						g.setColor(colorTown);
+						if(HomeData.hasLocalHome(level))
+							g.setColor(colorActive);
+						else if(RegionVisits.isVisited(level))
+							g.setColor(colorTown);
+						else
+							g.setColor(colorTownNotVisited);
 						g.fillRect(x*tileSize+level.size*tileSize/2-s, z*tileSize+level.size*tileSize/2-s, s*2+1, s*2+1);
 					}
 					if(bookmarks.contains(level)) {
 						g.setColor(colorActive);
+						g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
+					}
+					else if(tokens!=null && tokens.contains(level)) {
+						g.setColor(colorPortal);
 						g.drawRect(x*tileSize, z*tileSize, level.size*tileSize-1, level.size*tileSize-1);
 					}
 				}
@@ -191,19 +286,29 @@ public class RegionMapImage extends ImageGenerator {
 					g.setColor(colorNotVisited);
 					g.fillRect(x*tileSize, z*tileSize, level.size*tileSize, level.size*tileSize);
 				}
-				
-				if(level.isPortal()) {
-					g.pushAntialiasing(true);
-					g.pushPureStroke(true);
-					g.setColor(colorPortal);
-					g.setStroke(2f);
-					g.graph.drawOval(level.x0*tileSize+3, level.z0*tileSize+3, tileSize-6, tileSize-6);
-					g.popAntialiasing();
-					g.resetStroke();
-					g.popPureStroke();
-				}
 			}
 
+		if(region.portals!=null) {
+			float[] dx = {0.6f, 0, 0.6f, 0};
+			float[] dz = {0, -1, 0, -1};
+			for(LevelInfo level : region.portals) {
+				g.pushAntialiasing(true);
+				g.pushPureStroke(true);
+				g.setColor(colorPortal);
+				g.setStroke(2f);
+				g.graph.drawOval(level.x0*tileSize+3, level.z0*tileSize+3, tileSize-6, tileSize-6);
+				g.popAntialiasing();
+				g.resetStroke();
+				g.popPureStroke();
+				
+				float ldx = dx[level.portal.d.ordinal()];
+				float x = (level.x0 + ldx)*tileSize+tileSize/2;
+				float z = (level.z0 + dz[level.portal.d.ordinal()])*tileSize+tileSize/2;
+				String name = WorldTime.romanNumeral(level.portal.index+1);
+				g.drawString(name, x, z, ldx==0 ? GraphAssist.CENTER : GraphAssist.LEFT, GraphAssist.CENTER);
+			}
+		}
+		
 		if(active!=null) {
 			g.pushAntialiasing(true);
 			g.pushPureStroke(true);

@@ -37,12 +37,18 @@ public class MoveItemDialog extends UIPane implements KeyInputHandler {
 				@Override
 				public void onAction() {
 					if(inv!=current) {
+						if(inv.isFull())
+							return;
 						Item item = current.remove(itemIndex);
 						inv.put(item);
 						if(after!=null)
 							after.run();
 					}
 					close();
+				}
+				@Override
+				public boolean isEnabled() {
+					return !inv.isFull();
 				}
 				@Override
 				public boolean isEmpty() {
@@ -54,7 +60,10 @@ public class MoveItemDialog extends UIPane implements KeyInputHandler {
 				}
 				@Override
 				public String getItemName() {
-					return inv.name;
+					if(inv.isFull())
+						return inv.name + " (full)";
+					else
+						return inv.name;
 				}
 				@Override
 				public void paint(GraphAssist g) {

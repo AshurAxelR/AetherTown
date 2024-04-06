@@ -31,8 +31,8 @@ public class TravelTokenItem extends Item {
 		return String.format(
 			"<p>Use at monuments to instantly travel to a location. "+
 			"Monuments can be used only once every 2h.</p>"+
-			"<p>Destination:<br><span class=\"w\">%s</span>%s</p>",
-			destination.getFullName(),
+			"<p>Destination:<br><span class=\"w\">%s</span> <span class=\"d\">[%d, %d]</span>%s</p>",
+			destination.getFullName(), destination.x, destination.z,
 			markDot(tile, alt) ? "<br>(You are here)": "");
 	}
 

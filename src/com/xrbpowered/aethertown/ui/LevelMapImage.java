@@ -164,6 +164,9 @@ public class LevelMapImage extends ImageGenerator {
 			g.drawString(s, 24, tz, GraphAssist.CENTER, GraphAssist.CENTER);
 			g.drawString(s, level.levelSize*tileSize-24, tz, GraphAssist.CENTER, GraphAssist.CENTER);
 		}
+		g.setFont(Fonts.small);
+		g.drawString(String.format("[%d, %d]", level.info.x0, level.info.z0), 16, 16,
+				GraphAssist.LEFT, GraphAssist.TOP);
 		
 		for(int x=0; x<level.levelSize; x++)
 			for(int z=0; z<level.levelSize; z++) {

@@ -43,9 +43,10 @@ public class LevelMapItem extends Item {
 	@Override
 	public String getInfoHtml(Tile tile, boolean alt) {
 		return String.format(
-			"<p><span class=\"w\">%s</span>%s</p>"+
+			"<p><span class=\"w\">%s</span> <span class=\"d\">[%d, %d]</span>%s</p>"+
 			"<p>Map of location.</p>",
-			level.getFullName(), markDot(tile, alt) ? "<br>(You are here)": "");
+			level.getFullName(), level.x, level.z,
+			markDot(tile, alt) ? "<br>(You are here)": "");
 	}
 	
 	@Override
