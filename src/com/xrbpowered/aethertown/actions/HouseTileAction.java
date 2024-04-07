@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.actions.menus.CivicCentreActionMenu;
 import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
 import com.xrbpowered.aethertown.actions.menus.GroceriesActionMenu;
 import com.xrbpowered.aethertown.actions.menus.HotelActionMenu;
+import com.xrbpowered.aethertown.actions.menus.MapsMenu;
 import com.xrbpowered.aethertown.actions.menus.OfficeActionMenu;
 import com.xrbpowered.aethertown.actions.menus.ShopActionMenu;
 import com.xrbpowered.aethertown.render.tiles.IllumLayer;
@@ -25,10 +26,14 @@ public class HouseTileAction extends EnterTileAction {
 	public static final HouseTileAction inn = new HouseTileAction(new HotelActionMenu(true));
 	
 	public static final HouseTileAction museum = new HouseTileAction(new TileActionMenu(
-		LeisureActions.viewMuseum
+		LeisureActions.viewMuseum,
+		LeisureActions.portalKnowledge,
+		MapsMenu.regionMapAction
 	));
 	public static final HouseTileAction library = new HouseTileAction(new TileActionMenu(
 		LeisureActions.discover,
+		LeisureActions.portalKnowledge,
+		MapsMenu.regionMapAction,
 		LeisureActions.study,
 		LeisureActions.readBooks
 	));

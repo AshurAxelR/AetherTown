@@ -225,7 +225,7 @@ public class Region {
 		if(!canGeneratePortal(x0, z0))
 			return false;
 		
-		PortalInfo portal = cache.portals.createPortalInfo(this.seed, index);
+		PortalInfo portal = cache.portals.createPortalInfo(index);
 		if(portal.d!=d)
 			throw new RuntimeException("Portal direction mismatch");
 		

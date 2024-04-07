@@ -20,7 +20,7 @@ public class FoodActionMenu extends TileActionMenu {
 			super.applyCost(tile, alt);
 			GlobalCooldowns.eat.pushBackH(1);
 		}
-	}.setDelay(20).setCost(350).setCooldown(GlobalCooldowns.drink.hours(2));
+	}.setDelay(20).setCost(400).setCooldown(GlobalCooldowns.drink.hours(2));
 	
 	public static final TileAction hangOutAction = new WaitAction("Hang out", 20);
 
@@ -52,8 +52,8 @@ public class FoodActionMenu extends TileActionMenu {
 			food.addAction(dessertAction);
 		}
 		else {
-			food.addAction(new InspirationAction("Eat-in meal", 3).setDelay(30).setCost(650).setCooldown(GlobalCooldowns.eat.hours(2.5)));
-			food.addAction(new BuyFoodAction(takeaway, 650).setDelay(10));
+			food.addAction(new InspirationAction("Eat-in meal", 3).setDelay(30).setCost(550).setCooldown(GlobalCooldowns.eat.hours(2.5)));
+			food.addAction(new BuyFoodAction(takeaway, 550).setDelay(10));
 		}
 		food.addAction(GroceriesActionMenu.buyWaterBottleAction);
 		food.addAction(GroceriesActionMenu.buySnackAction);

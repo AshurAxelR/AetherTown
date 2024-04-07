@@ -9,8 +9,8 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class Earnings {
 
-	public static final int initialPay = 8000;
-	public static final int dailyPay = 2000;
+	public static final int initialPay = 7500;
+	public static final int dailyPay = 2500;
 	public static final int workXP = 2;
 	
 	private Earnings() {
@@ -86,7 +86,7 @@ public class Earnings {
 		sb.append("<p>Earned:</p><table style=\"width:100%\">");
 		
 		int total = 0;
-		int c = random.nextInt(501)+250;
+		int c = random.nextInt(251)+500;
 		total += c;
 		reportRowCost(sb, "Baseline", c);
 		

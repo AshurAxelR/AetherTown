@@ -14,8 +14,22 @@ import com.xrbpowered.aethertown.world.Tile;
 
 public class MapsMenu extends TileActionMenu {
 
+	public static final TileAction regionMapAction = createRegionMapAction(false);
+	
 	public static final TileActionMenu menu = new MapsMenu(true); 
 	public static final TileActionMenu noToken = new MapsMenu(false); 
+	
+	private static TileAction createRegionMapAction(boolean level) {
+		return new TileAction("View region map") {
+			@Override
+			public void onSuccess(Tile tile, boolean alt) {
+				if(level)
+					RegionMapDialog.show(tile.level);
+				else
+					RegionMapDialog.show(tile.level.info.region);
+			}
+		};
+	}
 	
 	private MapsMenu(boolean token) {
 		addAction(new TileAction("View map") {
@@ -25,12 +39,7 @@ public class MapsMenu extends TileActionMenu {
 			}
 		});
 		
-		addAction(new TileAction("View region map") {
-			@Override
-			public void onSuccess(Tile tile, boolean alt) {
-				RegionMapDialog.show(tile.level);
-			}
-		});
+		addAction(createRegionMapAction(true));
 		
 		addAction(new GetItemAction("Get", ItemType.map) {
 			@Override

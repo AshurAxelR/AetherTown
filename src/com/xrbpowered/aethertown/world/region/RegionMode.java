@@ -70,7 +70,7 @@ public abstract class RegionMode {
 		public void coreGenerate(Region region, Random random) {
 			new LinearRegionPaths(region, random).generatePaths();
 			for(int index=0; index<getNumPortals(); index++) {
-				Dir d = region.cache.portals.getPortalDir(region.seed, index);
+				Dir d = region.cache.portals.getPortalDir(index);
 				if(!new PortalRegionPaths(region, d.flip()).scanAndPlace(index, 56, random))
 					GeneratorException.raise("Can't connect portal %d (%s)", index, d.name());
 			}
@@ -173,7 +173,7 @@ public abstract class RegionMode {
 		public void coreGenerate(Region region, Random random) {
 			int x0 = sizex/2;
 			int z0 = sizez/2;
-			Dir[] dirs = new Dir[] {region.cache.portals.getPortalDir(region.seed, 0), region.cache.portals.getPortalDir(region.seed, 1)};
+			Dir[] dirs = new Dir[] {region.cache.portals.getPortalDir(0), region.cache.portals.getPortalDir(1)};
 			int index = 0;
 			for(Dir d : dirs) {
 				region.generatePortal(index, x0+2*d.flip().dx, z0+2*d.flip().dz, d, random);
@@ -181,6 +181,7 @@ public abstract class RegionMode {
 			}
 			LevelInfo level = new LevelInfo(region, x0, z0, 1, random.nextLong());
 			level.setTerrain(LevelTerrainModel.low);
+			level.setSettlement(LevelSettlementType.inn);
 			level.place();
 			region.startLevel = level;
 			for(Dir d : dirs)

@@ -16,7 +16,7 @@ public class RegionCache {
 	
 	public RegionCache(RegionMode mode) {
 		this.mode = mode;
-		this.portals = new PortalSystem(this);
+		this.portals = PortalSystem.create(this);
 	}
 	
 	public void cleanup() {
@@ -27,7 +27,7 @@ public class RegionCache {
 	}
 	
 	public Region get(long seed) {
-		seed = PortalSystem.getRegionSeed(seed);
+		seed = portals.getRegionSeed(seed);
 		Region r = regions.get(seed);
 		if(r==null) {
 			if(regions.size()>=capacity)

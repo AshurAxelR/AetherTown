@@ -8,13 +8,10 @@ import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
-public class PortalSystem {
+public abstract class PortalSystem {
 
-	private static final int maxUpdateDist = 8;
+	private static final int maxUpdateDist = 4;
 	private static final Dir[] preferredPortalDirs = {Dir.north, Dir.east, Dir.south};
-	
-	public Region otherRegion = null;
-	public LevelInfo otherLevel = null;
 
 	public static class PortalInfo {
 		public int index;
@@ -26,22 +23,85 @@ public class PortalSystem {
 		}
 	}
 	
+	private static class Two extends PortalSystem {
+		public Two(RegionCache regions) {
+			super(regions, 2, 0x7fff_ffff_ffff_ffffL);
+		}
+
+		@Override
+		public long getOtherSeed(long seed, int index, int phase) {
+			int d = index==0 ? +1 : -1;
+			return alterTrigram(seed, phase, d);
+		}
+
+		@Override
+		public Dir getPortalDir(int index) {
+			Dir d = preferredPortalDirs[0];
+			return (index==1) ? d.flip() : d;
+		}
+		
+		@Override
+		public int getOtherIndex(int index) {
+			return 1-index;
+		}
+	}
+
+	private static class Six extends PortalSystem {
+		public Six(RegionCache regions) {
+			super(regions, 6, 0x7fff_ffff_ffff_ffffL);
+		}
+
+		@Override
+		public long getOtherSeed(long seed, int index, int phase) {
+			int n = phase * 3 + (index % 3);
+			int d = index<3 ? +1 : -1;
+			return alterTrigram(seed, n, d);
+		}
+
+		@Override
+		public Dir getPortalDir(int index) {
+			Dir d = preferredPortalDirs[index%3];
+			return (index>=3) ? d.flip() : d;
+		}
+		
+		@Override
+		public int getOtherIndex(int index) {
+			return (index+3)%6;
+		}
+	}
+
+	public Region otherRegion = null;
+	public LevelInfo otherLevel = null;
+
 	public final RegionCache regions;
 	public final int numPortals;
 	public final int period;
+	public final long regionSeedMask;
 	
 	private int phase = -1;
 	private LevelInfo portal = null;
 	private boolean portalPrimed = false;
-	
-	public PortalSystem(RegionCache regions) {
+
+	private PortalSystem(RegionCache regions, int n, long seedMask) {
 		this.regions = regions;
-		int n = regions.mode.getNumPortals();
-		if(n<4 || n==6)
-			this.numPortals = n;
-		else
-			throw new InvalidParameterException("Unsupported number of portals: "+n);
+		this.numPortals = n;
 		this.period = n>0 ? 42/n : 0;
+		this.regionSeedMask = seedMask;
+	}
+
+	private static PortalSystem create(RegionCache regions, int n) {
+		switch(n) {
+			case 2:
+				return new Two(regions);
+			case 6:
+				return new Six(regions);
+			default:
+				throw new InvalidParameterException("Unsupported number of portals: "+n);
+		}
+	}
+
+	public static PortalSystem create(RegionCache regions) {
+		return create(regions, regions.mode.getNumPortals());
 	}
 	
 	public int getPhase() {
@@ -124,91 +184,62 @@ public class PortalSystem {
 		}
 	}
 	
-	public long getOtherSeed(long seed, int index, int phase) {
-		int n = 0;
-		int d = 0;
-		switch(numPortals) {
-			case 1:
-			case 3:
-				n = phase/2;
-				d = (phase&1)==0 ? +1 : -1;
-				break;
-			case 2:
-				n = phase;
-				d = index==0 ? +1 : -1;
-				break;
-			case 6:
-				n = phase;
-				d = index<3 ? +1 : -1;
-				break;
-		}
-		return alterTrigram(seed, n, d);
-	}
+	public abstract long getOtherSeed(long seed, int index, int phase);
+	public abstract Dir getPortalDir(int index);
+	public abstract int getOtherIndex(int index);
 	
-	public int getPortalSeed(long seed, int index) {
-		// FIXME 2 and 6 patterns don't work with phase
-		switch(numPortals) {
-			case 2:
-				if(index==0)
-					return getTrigram(seed, 0);
-				else
-					return (getTrigram(seed, 0)-1)&7;
-			case 3:
-				return index;
-			case 6:
-				if(index<3)
-					return getTrigram(seed, index);
-				else
-					return (getTrigram(seed, index-3)-1)&7;
-			default:
-				return 0;
-		}
+	public long getRegionSeed(long seed) {
+		return seed<0L ? new Random().nextLong() & regionSeedMask : seed;
 	}
 
-	public Dir getPortalDir(long seed, int index) {
-		int i = 0;
-		boolean flip = false;
-		switch(numPortals) {
-			case 1:
-				flip = (getTrigram(seed, 0) & 1)==1;
-				break;
-			case 2:
-				flip = index==1;
-				break;
-			case 3:
-				i = index;
-				flip = (getTrigram(seed, index) & 1)==1;
-				break;
-			case 6:
-				i = index%3;
-				flip = index>=3;
-				break;
-		}
-		Dir d = preferredPortalDirs[i];
-		return flip ? d.flip() : d;
-	}
-	
-	public int getOtherIndex(int index) {
-		switch(numPortals) {
-			case 2:
-				return 1-index;
-			case 3:
-				return index;
-			case 6:
-				return (index+3)%6;
-			default:
-				return 0;
-		}
-	}
-	
-	public PortalInfo createPortalInfo(long seed, int index) {
+	public PortalInfo createPortalInfo(int index) {
 		PortalInfo p = new PortalInfo();
 		p.index = index;
-		p.d = getPortalDir(seed, index);
+		p.d = getPortalDir(index);
 		p.otherIndex = getOtherIndex(index);
 		return p;
 	}
 	
+	public String createKnowledgeReport(Region region) {
+		int phase = calcPhase();
+		StringBuilder sb = new StringBuilder();
+		sb.append("<p>Portal knowledge for ");
+		sb.append(WorldTime.getFormattedDate());
+		sb.append("<table style=\"width:100%\">");
+		for(int i=0; i<numPortals; i++) {
+			long seed = getOtherSeed(region.seed, i, phase);
+			sb.append("<tr><td class=\"w\" style=\"width:20%;text-align:center\">");
+			sb.append(WorldTime.romanNumeral(i+1));
+			sb.append("</td>");
+			for(int j=0; j<4; j++) {
+				String s = String.format("%04X", (seed >> (j*16)) & 0xffffL);
+				sb.append("<td style=\"width:20%;text-align:center\">");
+				sb.append(s);
+				sb.append("</td>");
+			}
+			sb.append("</tr>");
+		}
+		sb.append("</table>");
+		return sb.toString();
+	}
+	
+	private boolean roundtripTestSeed(long seed, int index, int phase) {
+		long otherSeed = getOtherSeed(seed, index, phase);
+		int otherIndex = getOtherIndex(index);
+		long back = getOtherSeed(otherSeed, otherIndex, phase);
+		// System.out.printf("seed=%016X, other=%016X, back=%016X\n", seed, otherSeed, back);
+		return back==seed;
+	}
+
+	private boolean roundtripTestIndex(int index) {
+		int otherIndex = getOtherIndex(index);
+		return getOtherIndex(otherIndex)==index;
+	}
+
+	private boolean roundtripTestDir(int index) {
+		return getPortalDir(index)==getPortalDir(getOtherIndex(index)).flip();
+	}
+
 	public static int getTrigram(long seed, int n) {
 		return (int)(seed>>(n*3)) & 7;
 	}
@@ -219,8 +250,38 @@ public class PortalSystem {
 		return (seed&mask) | (tri<<(n*3));
 	}
 	
-	public static long getRegionSeed(long seed) {
-		return seed<0L ? new Random().nextLong() & 0x7fff_ffff_ffff_ffffL : seed;
+	public static void main(String[] args) {
+		int[] nump = {2, 6};
+		Random random = new Random();
+		for(int numPortals : nump) {
+			PortalSystem psys = create(null, numPortals);
+			System.out.printf("\n%d PORTALS\n-----------------\n", numPortals);
+			for(int index=0; index<numPortals; index++) {
+				System.out.printf("%d/%d : ", index, numPortals);
+				for(int phase=0; phase<42/numPortals; phase++) {
+					int n = 0;
+					int d = 0;
+					switch(numPortals) {
+						case 2:
+							n = phase;
+							d = index==0 ? +1 : -1;
+							break;
+						case 6:
+							n = phase * 3 + (index % 3);
+							d = index<3 ? +1 : -1;
+							break;
+					}
+					
+					System.out.printf("%d%s, ", n, d>0 ? "+" : "-");
+					if(!psys.roundtripTestSeed(random.nextLong() & psys.regionSeedMask, index, phase))
+						System.err.printf("Round trip failed: seed\n");
+				}
+				System.out.println();
+				if(!psys.roundtripTestIndex(index))
+					System.err.printf("Round trip failed: index\n");
+				if(!psys.roundtripTestDir(index))
+					System.err.printf("Round trip failed: dir\n");
+			}
+		}
 	}
-
 }

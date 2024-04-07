@@ -38,7 +38,6 @@ import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
-import com.xrbpowered.aethertown.world.region.PortalSystem;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
@@ -580,9 +579,9 @@ public class AetherTown extends UIClient {
 	public static LevelInfo generateRegion(SaveState save) {
 		WorldTime.setTime(save.startSeason, save.day, save.time);
 		
-		long seed = PortalSystem.getRegionSeed(save.regionSeed);
-		System.out.printf("Region seed: %dL\n", seed);
 		regionCache = new RegionCache(save.regionMode);
+		long seed = regionCache.portals.getRegionSeed(save.regionSeed);
+		System.out.printf("Region seed: %dL\n", seed);
 		region = regionCache.get(seed);
 
 		levelCache = new LevelCache();
