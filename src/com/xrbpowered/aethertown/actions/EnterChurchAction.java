@@ -21,7 +21,7 @@ public class EnterChurchAction extends EnterTileAction {
 	private static TileActionMenu createMenu() {
 		TileActionMenu m = new TileActionMenu();
 		m.addAction(new InspirationAction("Look around", 2, 2).oncePerTile().setDelay(10));
-		m.addAction(new InspirationAction("Pray", 5).setInsCooldown(GlobalCooldowns.prayIns.daily()).setDelay(15));
+		m.addAction(new InspirationAction("Meditate", 5).setInsCooldown(GlobalCooldowns.prayIns.daily()).setDelay(15));
 		m.addAction(new WaitAction("Shelter", 30));
 		return m;
 	}

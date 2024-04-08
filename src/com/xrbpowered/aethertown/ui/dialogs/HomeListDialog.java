@@ -29,7 +29,7 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class HomeListDialog extends UIPane implements KeyInputHandler {
 
-	public static final int costPerHome = 10000;
+	public static final int costPerHome = 7500;
 	
 	private class HouseInfo {
 		public final int index;

@@ -4,6 +4,7 @@ import java.security.InvalidParameterException;
 import java.util.Random;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
@@ -25,7 +26,7 @@ public abstract class PortalSystem {
 	
 	private static class Two extends PortalSystem {
 		public Two(RegionCache regions) {
-			super(regions, 2, 0x7fff_ffff_ffff_ffffL);
+			super(regions, 2, 42/2, 0x7fff_ffff_ffff_ffffL);
 		}
 
 		@Override
@@ -48,7 +49,7 @@ public abstract class PortalSystem {
 
 	private static class Six extends PortalSystem {
 		public Six(RegionCache regions) {
-			super(regions, 6, 0x7fff_ffff_ffff_ffffL);
+			super(regions, 6, 42/6, 0x7fff_ffff_ffff_ffffL);
 		}
 
 		@Override
@@ -82,10 +83,12 @@ public abstract class PortalSystem {
 	private LevelInfo portal = null;
 	private boolean portalPrimed = false;
 
-	private PortalSystem(RegionCache regions, int n, long seedMask) {
+	private PortalSystem(RegionCache regions, int n, int period, long seedMask) {
 		this.regions = regions;
 		this.numPortals = n;
-		this.period = n>0 ? 42/n : 0;
+		if(WorldTime.daysInYear%period!=0)
+			throw new InvalidParameterException("Portal period is not year-aligned: "+period);
+		this.period = period;
 		this.regionSeedMask = seedMask;
 	}
 
@@ -203,15 +206,16 @@ public abstract class PortalSystem {
 	public String createKnowledgeReport(Region region) {
 		int phase = calcPhase();
 		StringBuilder sb = new StringBuilder();
-		sb.append("<p>Portal knowledge for ");
-		sb.append(WorldTime.getFormattedDate());
+		sb.append(String.format("<p>%s portal knowledge for %s<br>%d day period</p>",
+				RegionVisits.getRegionTitle(region.seed, false),
+				WorldTime.getFormattedDate(), period));
 		sb.append("<table style=\"width:100%\">");
 		for(int i=0; i<numPortals; i++) {
 			long seed = getOtherSeed(region.seed, i, phase);
 			sb.append("<tr><td class=\"w\" style=\"width:20%;text-align:center\">");
 			sb.append(WorldTime.romanNumeral(i+1));
 			sb.append("</td>");
-			for(int j=0; j<4; j++) {
+			for(int j=3; j>=0; j--) {
 				String s = String.format("%04X", (seed >> (j*16)) & 0xffffL);
 				sb.append("<td style=\"width:20%;text-align:center\">");
 				sb.append(s);

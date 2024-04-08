@@ -11,7 +11,7 @@ import com.xrbpowered.aethertown.world.Tile;
 public abstract class LeisureActions {
 
 	public static final TileAction viewMuseum = new InspirationAction("View collection", 5, 5).oncePerTile().setDelay(30);
-	public static final TileAction study = new InspirationAction("Study", 0, 1).setDelay(30);
+	public static final TileAction study = new InspirationAction("Study", 0, 3).setDelay(30);
 	public static final TileAction readBooks = new InspirationAction("Read books", 1).setInsCooldown(GlobalCooldowns.readIns.daily()).setDelay(30);
 	public static final TileAction playBoardGames = new InspirationAction("Play board games", 1).setDelay(60);
 	public static final TileAction playVideoGames = new InspirationAction("Play video games", 1).setDelay(45);
@@ -65,7 +65,7 @@ public abstract class LeisureActions {
 		protected void onSuccess(Tile tile, boolean alt) {
 			String report = AetherTown.regionCache.portals.createKnowledgeReport(tile.level.info.region);
 			int lines = AetherTown.regionCache.portals.numPortals;
-			ConfirmDialog.show("Portals", report, lines*20+160);
+			ConfirmDialog.show("Portals", report, lines*20+180);
 			super.onSuccess(tile, alt);
 		}
 	};
