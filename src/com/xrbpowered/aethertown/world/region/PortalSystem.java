@@ -143,6 +143,8 @@ public abstract class PortalSystem {
 		System.out.printf("otherRegion: %dL\n", seed);
 		otherRegion = regions.get(seed);
 		otherLevel = otherRegion.portals[portal.portal.otherIndex];
+		if(otherLevel==null)
+			System.err.println("Warning: unexpected null otherLevel");
 		portalPrimed = false;
 		
 		AetherTown.levelCache.addAllAdj(AetherTown.levelInfo, false, false);

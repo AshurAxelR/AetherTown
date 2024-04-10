@@ -64,6 +64,11 @@ public class LevelCache {
 	}
 	
 	public CacheEntry add(LevelInfo info, boolean markVisited) {
+		if(info==null) {
+			System.err.println("Warning: unexpected null level");
+			return null;
+		}
+		
 		CacheEntry c;
 		if(!infoMap.containsKey(info)) {
 			c = new CacheEntry(info);
@@ -104,9 +109,7 @@ public class LevelCache {
 			for(int z=info.z0-1; z<info.z0+info.size+1; z++) {
 				if(x==info.x0 && z==info.z0)
 					continue;
-				LevelInfo level = add(info.region.getLevel(x, z), markVisited).info;
-				if(followPortals && level.isPortal())
-					add(info.region.cache.portals.otherLevel, markVisited);
+				add(info.region.getLevel(x, z), markVisited);
 			}
 	}
 

@@ -25,7 +25,7 @@ public class Monument extends Plaza {
 
 	@Override
 	public TileAction getTileAction(Tile tile) {
-		return FastTravelAction.action;
+		return tile.level.info.isPortal() ? null : FastTravelAction.action;
 	}
 	
 	protected boolean canGenerate(Token t) {
