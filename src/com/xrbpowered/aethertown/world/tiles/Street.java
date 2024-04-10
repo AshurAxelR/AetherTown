@@ -95,7 +95,10 @@ public class Street extends TunnelTileTemplate {
 	@Override
 	public void maybeAddTunnel(TunnelTile tile) {
 		if(straightTunnelCondition(tile)) {
-			tile.addTunnel(TunnelType.straight);
+			if(isAnyStreet(tile.getAdj(tile.d).t) && isAnyStreet(tile.getAdj(tile.d.flip()).t))
+				tile.addTunnel(TunnelType.straight);
+			else
+				tile.addTunnel(TunnelType.junction);
 			return;
 		}
 		
