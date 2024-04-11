@@ -90,8 +90,8 @@ public abstract class AbstractConfig {
 		return def;
 	}
 	
-	public void save() {
-		save(this.path);
+	public boolean save() {
+		return save(this.path);
 	}
 	
 	protected HashMap<String, String> collectValues() {
@@ -127,9 +127,13 @@ public abstract class AbstractConfig {
 		}
 	}
 	
-	public void save(String path) {
-		if(saveValues(collectValues(), path))
+	public boolean save(String path) {
+		if(saveValues(collectValues(), path)) {
 			System.out.printf("%s saved.\n", path);
+			return true;
+		}
+		else
+			return false;
 	}
 
 	public static HashMap<String, String> loadValues(InputStream in) throws IOException {

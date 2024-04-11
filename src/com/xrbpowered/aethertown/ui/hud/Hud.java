@@ -22,6 +22,7 @@ public class Hud extends UINode {
 	private TileAction tileAltAction = null;
 
 	private int shownHour = -1;
+	private float autosaveTimer = 0f;
 	
 	private UIPane uiTime, uiLookInfo, uiActionInfo, uiDebugInfo;
 	private ToastPane uiToast;
@@ -115,6 +116,21 @@ public class Hud extends UINode {
 			repaint();
 		}
 		
+		if(!levelCache.generatorQueue.isAlive())
+			uiToast.showCritical("Generator thread stopped!");
+		
+		if(settings.autosave>0) {
+			autosaveTimer += dt;
+			if(autosaveTimer > settings.autosave*60f) {
+				if(saveState()) {
+					showToast("Autosave");
+					autosaveTimer = 0f;
+				}
+				else
+					showToast("Autosave failed!");
+			}
+		}
+		
 		super.updateTime(dt);
 	}
 	
@@ -151,6 +167,10 @@ public class Hud extends UINode {
 		}
 	}
 	
+	public void resetAutosaveTimer() {
+		autosaveTimer = 0f;
+	}
+	
 	public static void performAction(boolean alt) {
 		if(hud==null)
 			return;
@@ -161,7 +181,7 @@ public class Hud extends UINode {
 	
 	public static void showToast(String msg) {
 		if(hud!=null)
-			hud.uiToast.queue.addLast(msg);
+			hud.uiToast.push(msg);
 		System.out.printf("> %s\n", msg);
 	}
 

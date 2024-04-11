@@ -149,8 +149,8 @@ public class SaveState extends AbstractConfig implements ZipBuilder.DataPack {
 	}
 	
 	@Override
-	public void save() {
-		ZipBuilder.save(savePath, this);
+	public boolean save() {
+		return ZipBuilder.save(savePath, this);
 	}
 	
 }

@@ -14,6 +14,7 @@ import javax.imageio.ImageIO;
 import org.lwjgl.opengl.GL11;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.hud.Hud;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
@@ -101,7 +102,7 @@ public class Screenshot {
 			g.drawString(s, width-40, y, GraphAssist.RIGHT, GraphAssist.CENTER); y += h;
 			if(AetherTown.level!=null) {
 				LevelInfo level = AetherTown.level.info;
-				s = String.format("%s [%d, %d]", level.name, level.x0, level.z0);
+				s = String.format("%s %s [%d, %d]", RegionVisits.getRegionTitle(level.region.seed, true), level.name, level.x0, level.z0);
 				g.drawString(s, width-40, y, GraphAssist.RIGHT, GraphAssist.CENTER);
 			}
 		}

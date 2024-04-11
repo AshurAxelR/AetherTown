@@ -99,7 +99,9 @@ public class AetherTown extends UIClient {
 		public boolean allowFlying = false;
 		public boolean allowTimeControl = false;
 		public boolean allowBookmaks = false;
-		public boolean nosave = false;
+		public boolean startNew = false;
+		public int autosave = 10;
+		public boolean saveOnExit = true;
 		
 		public ClientConfig() {
 			super("./client.cfg", true);
@@ -520,8 +522,12 @@ public class AetherTown extends UIClient {
 				}
 				break;
 			case KeyEvent.VK_F5:
-				saveState();
-				showToast("Saved");
+				if(saveState()) {
+					showToast("Saved");
+					hud.resetAutosaveTimer();
+				}
+				else
+					showToast("Save failed!");
 				break;
 			case KeyEvent.VK_F10:
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());
@@ -565,13 +571,13 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
-	public static void saveState() {
-		new SaveState().update().save();
+	public static boolean saveState() {
+		return new SaveState().update().save();
 	}
 	
 	@Override
 	public void destroyWindow() {
-		if(!settings.nosave)
+		if(settings.saveOnExit)
 			saveState();
 		super.destroyWindow();
 	}
@@ -591,16 +597,13 @@ public class AetherTown extends UIClient {
 	}
 	
 	private static void parseParams(String[] args) {
-		final ClientConfig argCfg = new ClientConfig();
 		ParseParams params = new ParseParams();
-		params.addFlagParam("-nosave", x -> { argCfg.nosave = x; }, "ignore save file");
 		params.addStrParam("-cfg", x -> { settings = new ClientConfig(x); }, "use config file");
 		params.parseParams(args);
 
 		if(settings==null)
 			settings = new ClientConfig();
 		settings.load();
-		settings.nosave = argCfg.nosave;
 	}
 	
 	public static void main(String[] args) {
@@ -612,7 +615,7 @@ public class AetherTown extends UIClient {
 		parseParams(args);
 		
 		SaveState save = new SaveState();
-		if(!settings.nosave)
+		if(!settings.startNew)
 			save = save.load();
 		
 		LevelInfo startLevel = generateRegion(save);
