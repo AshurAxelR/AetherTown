@@ -1,7 +1,8 @@
 package com.xrbpowered.aethertown.world.stars;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import com.xrbpowered.aethertown.utils.Rand;
 
 public class StarData {
 
@@ -48,7 +49,7 @@ public class StarData {
 			this.max = sum;
 		}
 		
-		private int select(Random random) {
+		private int select(Rand random) {
 			if(max<=0.0)
 				return 0;
 			double x = random.nextDouble() * max;
@@ -59,7 +60,7 @@ public class StarData {
 			}
 		}
 		
-		public double next(Random random) {
+		public double next(Rand random) {
 			int s = select(random);
 			double x = random.nextGaussian()*sigma[s]+mean[s];
 			while(x<limLow || x>limHigh) {
@@ -79,7 +80,7 @@ public class StarData {
 		sun.de = axialTilt*Math.sin(sun.ra);
 	}
 	
-	public static ArrayList<Star> generate(Random random) {
+	public static ArrayList<Star> generate(Rand random) {
 		ArrayList<Star> stars = new ArrayList<>();
 		for(int i=0; i<numStars; i++) {
 			Star star = new Star();

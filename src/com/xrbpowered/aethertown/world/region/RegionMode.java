@@ -1,8 +1,7 @@
 package com.xrbpowered.aethertown.world.region;
 
-import java.util.Random;
-
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Rand;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.region.paths.LinearRegionPaths;
 import com.xrbpowered.aethertown.world.region.paths.PortalRegionPaths;
@@ -16,7 +15,7 @@ public abstract class RegionMode {
 		this.sizez = sizez;
 	}
 	
-	public abstract void coreGenerate(Region region, Random random);
+	public abstract void coreGenerate(Region region, Rand random);
 	public abstract String formatValue();
 	
 	public int getNumPortals() {
@@ -67,7 +66,7 @@ public abstract class RegionMode {
 			return 6;
 		}
 		@Override
-		public void coreGenerate(Region region, Random random) {
+		public void coreGenerate(Region region, Rand random) {
 			new LinearRegionPaths(region, random).generatePaths();
 			for(int index=0; index<getNumPortals(); index++) {
 				Dir d = region.cache.portals.getPortalDir(index);
@@ -90,7 +89,7 @@ public abstract class RegionMode {
 			this.settlement = settlement;
 		}
 		@Override
-		public void coreGenerate(Region region, Random random) {
+		public void coreGenerate(Region region, Rand random) {
 			LevelInfo level = new LevelInfo(region, sizex/2, sizez/2, size, random.nextLong());
 			level.setTerrain(LevelTerrainModel.hill);
 			level.setSettlement(settlement);
@@ -111,7 +110,7 @@ public abstract class RegionMode {
 			this.settlement = settlement;
 			this.terrain = terrain;
 		}
-		private LevelInfo makeLevel(Region region, int x, int z, Random random) {
+		private LevelInfo makeLevel(Region region, int x, int z, Rand random) {
 			LevelInfo level = new LevelInfo(region, x, z, 2, random.nextLong());
 			level.setTerrain(terrain);
 			level.setSettlement(settlement);
@@ -119,7 +118,7 @@ public abstract class RegionMode {
 			return level;
 		}
 		@Override
-		public void coreGenerate(Region region, Random random) {
+		public void coreGenerate(Region region, Rand random) {
 			int x0 = sizex/2;
 			int z0 = sizez/2;
 			region.startLevel = makeLevel(region, x0, z0, random);
@@ -142,7 +141,7 @@ public abstract class RegionMode {
 			this.sideSettlement = sideSettlement;
 		}
 		@Override
-		public void coreGenerate(Region region, Random random) {
+		public void coreGenerate(Region region, Rand random) {
 			int x0 = sizex/2;
 			int z0 = sizez/2;
 			LevelInfo level = new LevelInfo(region, x0, z0, 1, random.nextLong());
@@ -170,7 +169,7 @@ public abstract class RegionMode {
 			return 2;
 		}
 		@Override
-		public void coreGenerate(Region region, Random random) {
+		public void coreGenerate(Region region, Rand random) {
 			int x0 = sizex/2;
 			int z0 = sizez/2;
 			Dir[] dirs = new Dir[] {region.cache.portals.getPortalDir(0), region.cache.portals.getPortalDir(1)};

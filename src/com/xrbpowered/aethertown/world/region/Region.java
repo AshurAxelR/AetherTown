@@ -1,10 +1,10 @@
 package com.xrbpowered.aethertown.world.region;
 
 import java.util.LinkedList;
-import java.util.Random;
 
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
+import com.xrbpowered.aethertown.utils.Rand;
 import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightGuideChunk;
@@ -104,7 +104,7 @@ public class Region {
 	}
 	
 	public void generate() {
-		Random random = new Random(seed);
+		Rand random = RegionCache.getRand(seed);
 		for(int att = 0; att<maxGeneratorAttempts; att++) {
 			if(att>0)
 				System.out.printf("Retrying...\nAttempt #%d\n", att+1);
@@ -119,7 +119,7 @@ public class Region {
 		throw new RuntimeException("Generator attempts limit reached");
 	}
 
-	private boolean expand(Random random, int minAdj, boolean all) {
+	private boolean expand(Rand random, int minAdj, boolean all) {
 		int minx = Math.max(this.minx-2, 1);
 		int maxx = Math.min(this.maxx+2, sizex-2);
 		int minz = Math.max(this.minz-2, 1);
@@ -193,7 +193,7 @@ public class Region {
 			}
 	}
 	
-	private void generate(Random random) {
+	private void generate(Rand random) {
 		System.out.printf("Generating region... *%04dL (%s)\n", this.seed%10000L, this.cache.mode.formatValue());
 		resetGenerator();
 		cache.mode.coreGenerate(this, random);
@@ -221,7 +221,7 @@ public class Region {
 		return true;
 	}
 
-	public boolean generatePortal(int index, int x0, int z0, Dir d, Random random) {
+	public boolean generatePortal(int index, int x0, int z0, Dir d, Rand random) {
 		if(!canGeneratePortal(x0, z0))
 			return false;
 		

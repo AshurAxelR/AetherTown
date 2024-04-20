@@ -56,6 +56,10 @@ public enum Dir {
 		return permutations[random.nextInt(permutations.length)];
 	}
 
+	public static Dir[] shuffle(Rand random) {
+		return permutations[random.nextInt(permutations.length)];
+	}
+
 	public static final Dir[][] next = {
 		{north, east, west},
 		{east, south, north},

@@ -1,8 +1,7 @@
 package com.xrbpowered.aethertown.world.region.paths;
 
-import java.util.Random;
-
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Rand;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
@@ -24,11 +23,11 @@ public class LinearRegionPaths {
 	}
 
 	public final Region region;
-	public final Random random;
+	public final Rand random;
 	
 	private PathToken token;
 
-	public LinearRegionPaths(Region region, Random random) {
+	public LinearRegionPaths(Region region, Rand random) {
 		this.region = region;
 		this.random = random;
 	}

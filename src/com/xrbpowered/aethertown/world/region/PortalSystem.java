@@ -23,10 +23,41 @@ public abstract class PortalSystem {
 			return String.format("Portal %s.", WorldTime.romanNumeral(index+1));
 		}
 	}
-	
+
+	private static class None extends PortalSystem {
+		public None(RegionCache regions) {
+			super(regions, 0, 1, 0x7fff_ffff_ffff_ffffL);
+		}
+
+		@Override
+		public int bits() {
+			return 0;
+		}
+		
+		@Override
+		public long getOtherSeed(long seed, int index, int phase) {
+			return seed;
+		}
+
+		@Override
+		public Dir getPortalDir(int index) {
+			return null;
+		}
+		
+		@Override
+		public int getOtherIndex(int index) {
+			return 0;
+		}
+	}
+
 	private static class Two extends PortalSystem {
 		public Two(RegionCache regions) {
 			super(regions, 2, 42/2, 0x7fff_ffff_ffff_ffffL);
+		}
+
+		@Override
+		public int bits() {
+			return 63;
 		}
 
 		@Override
@@ -50,6 +81,11 @@ public abstract class PortalSystem {
 	private static class Six extends PortalSystem {
 		public Six(RegionCache regions) {
 			super(regions, 6, 42/6, 0x7fff_ffff_ffff_ffffL);
+		}
+
+		@Override
+		public int bits() {
+			return 63;
 		}
 
 		@Override
@@ -94,6 +130,8 @@ public abstract class PortalSystem {
 
 	private static PortalSystem create(RegionCache regions, int n) {
 		switch(n) {
+			case 0:
+				return new None(regions);
 			case 2:
 				return new Two(regions);
 			case 6:
@@ -189,6 +227,7 @@ public abstract class PortalSystem {
 		}
 	}
 	
+	public abstract int bits();
 	public abstract long getOtherSeed(long seed, int index, int phase);
 	public abstract Dir getPortalDir(int index);
 	public abstract int getOtherIndex(int index);

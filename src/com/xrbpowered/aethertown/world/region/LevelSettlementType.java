@@ -1,7 +1,6 @@
 package com.xrbpowered.aethertown.world.region;
 
-import java.util.Random;
-
+import com.xrbpowered.aethertown.utils.Rand;
 import com.xrbpowered.aethertown.utils.WRandom;
 
 public enum LevelSettlementType {
@@ -49,7 +48,7 @@ public enum LevelSettlementType {
 		new WRandom(0.4, 0.2, 0.04, 0.15, 0.1, 0.1, 0.01),
 		new WRandom(0, 0, 0, 0.05, 0.25, 0.55, 0.2, 0.05),
 	};
-	public static LevelSettlementType random(int levelSize, Random random) {
+	public static LevelSettlementType random(int levelSize, Rand random) {
 		return values()[w[levelSize-1].next(random)];
 	}
 	

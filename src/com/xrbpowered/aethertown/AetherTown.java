@@ -90,6 +90,7 @@ public class AetherTown extends UIClient {
 		
 		public RegionMode regionMode = RegionMode.defaultMode;
 		public long regionSeed = -1L;
+		public boolean legacyRandom = false;
 		public boolean residentialLighting = true;
 		public boolean revealRegion = true;
 		public boolean mapRequireItem = true;
@@ -585,7 +586,7 @@ public class AetherTown extends UIClient {
 	public static LevelInfo generateRegion(SaveState save) {
 		WorldTime.setTime(save.startSeason, save.day, save.time);
 		
-		regionCache = new RegionCache(save.regionMode);
+		regionCache = new RegionCache(save.regionMode, settings.legacyRandom);
 		long seed = regionCache.portals.getRegionSeed(save.regionSeed);
 		System.out.printf("Region seed: %dL\n", seed);
 		region = regionCache.get(seed);

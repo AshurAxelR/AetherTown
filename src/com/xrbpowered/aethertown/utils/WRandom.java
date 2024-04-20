@@ -15,15 +15,24 @@ public class WRandom {
 		this.max = sum;
 	}
 
-	public int next(Random random) {
-		if(max<=0.0)
-			return 0;
-		double x = random.nextDouble() * max;
+	private int next(double x) {
 		for(int i=0;; i++) {
 			if(x<w[i])
 				return i;
 			x -= w[i];
 		}
+	}
+	
+	public int next(Random random) {
+		if(max<=0.0)
+			return 0;
+		return next(random.nextDouble() * max);
+	}
+
+	public int next(Rand random) {
+		if(max<=0.0)
+			return 0;
+		return next(random.nextDouble() * max);
 	}
 
 }

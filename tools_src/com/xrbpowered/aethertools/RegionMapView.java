@@ -1,11 +1,11 @@
 package com.xrbpowered.aethertools;
 
+import static com.xrbpowered.aethertown.AetherTown.settings;
 import static com.xrbpowered.aethertown.ui.ImageGenerator.colorMargin;
 import static com.xrbpowered.aethertown.ui.RegionMapImage.*;
 
 import java.awt.Rectangle;
 
-import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.state.SaveState;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
@@ -82,9 +82,9 @@ public class RegionMapView extends UIElement {
 		LevelNames.load();
 		Fonts.load();
 
-		AetherTown.settings.load();
+		settings.load();
 		SaveState save = new SaveState();
-		region = new RegionCache(save.regionMode).get(save.regionSeed);
+		region = new RegionCache(save.regionMode, settings.legacyRandom).get(save.regionSeed);
 		
 		active = region.startLevel;
 		showVisited = false;

@@ -1,8 +1,7 @@
 package com.xrbpowered.aethertown.world.region.paths;
 
-import java.util.Random;
-
 import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.utils.Rand;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelTerrainModel;
 import com.xrbpowered.aethertown.world.region.Region;
@@ -19,7 +18,7 @@ public class PortalRegionPaths {
 		this.dnext = d.cw();
 	}
 	
-	public boolean scanAndPlace(int index, int startMargin, Random random) {
+	public boolean scanAndPlace(int index, int startMargin, Rand random) {
 		int isize = dnext.dx!=0 ? region.sizex : region.sizez;
 		int jsize = din.dx!=0 ? region.sizex : region.sizez;
 		int startx, startz;
@@ -74,7 +73,7 @@ public class PortalRegionPaths {
 			return canConnectWithPath(x+d.dx, z+d.dz, d, next);
 	}
 
-	private void connectWithPath(int index, int x, int z, Dir d, LevelTerrainModel path, Random random) {
+	private void connectWithPath(int index, int x, int z, Dir d, LevelTerrainModel path, Rand random) {
 		LevelTerrainModel next;
 		if(path==null) {
 			next = region.map[x][z].terrain.pathToBottom;

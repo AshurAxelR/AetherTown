@@ -2,6 +2,7 @@ package com.xrbpowered.aethertown.world.region;
 
 import java.util.Random;
 
+import com.xrbpowered.aethertown.utils.Rand;
 import com.xrbpowered.aethertown.utils.WRandom;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Token;
@@ -86,7 +87,7 @@ public class LevelTerrainModel {
 	private static final WRandom wpark = new WRandom(0.4, 0.15, 0.35, 0.1);
 	private static final WRandom wexpand = new WRandom(0.1, 0.2, 0.4, 0.3);
 	private static final LevelTerrainModel[] list = {low, flat, hill, peak};
-	public static LevelTerrainModel random(LevelInfo level, Random random) {
+	public static LevelTerrainModel random(LevelInfo level, Rand random) {
 		if(level.settlement.getStreetMargin(level.getLevelSize(), true)<18)
 			return flat;
 		else if(level.settlement==LevelSettlementType.none && level.conns.isEmpty())

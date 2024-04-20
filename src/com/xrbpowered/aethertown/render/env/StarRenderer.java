@@ -3,7 +3,6 @@ package com.xrbpowered.aethertown.render.env;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
@@ -11,6 +10,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 
+import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.stars.BlackBodySpectrum;
 import com.xrbpowered.aethertown.world.stars.StarData;
 import com.xrbpowered.aethertown.world.stars.StarData.Star;
@@ -138,7 +138,7 @@ public class StarRenderer {
 				stars.release();
 			this.seed = seed;
 			System.out.printf("Generating stars for *%04d\n", seed%10000L);
-			ArrayList<Star> data = StarData.generate(new Random(seed));
+			ArrayList<Star> data = StarData.generate(RegionCache.getRand(seed));
 			stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
 		}
 	}
