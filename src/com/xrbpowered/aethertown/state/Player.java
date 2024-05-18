@@ -12,6 +12,7 @@ import org.joml.Vector3f;
 
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.actions.TileAction;
+import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.world.HeightLimiter;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
@@ -22,6 +23,7 @@ public class Player {
 	private static final String formatId = "AetherTown.Player.2";
 
 	public static final int maxInspiration = 100;
+	private static final float maxCameraY = (HeightLimiter.maxHeight+1) * Tile.ysize;
 	
 	public int cash = 0;
 	int ubiCollectedDay = -1;
@@ -77,33 +79,43 @@ public class Player {
 		this.actionTile = null;
 		this.actionAlt = false;
 	}
+
+	public void resetCamera(CameraActor camera, int x, int z, Dir d) {
+		camera.position.x = x * Tile.size;
+		camera.position.y = maxCameraY;
+		camera.position.z = z * Tile.size;
+		camera.rotation.x = 0;
+		camera.rotation.y = -d.rotation;
+		endAction();
+		updateCamera(camera);
+	}
+
+	public void resetCamera(CameraActor camera, Level level) {
+		resetCamera(camera, level.getStartX(), level.getStartZ(), Dir.north);
+	}
 	
-	public void initCamera(CameraActor camera, Level level, boolean resetPosition) {
-		if(resetPosition || cameraPosition==null || cameraRotation==null) {
-			camera.position.x = level.getStartX()*Tile.size;
-			camera.position.z = level.getStartZ()*Tile.size;
-			camera.rotation.x = 0;
-			camera.rotation.y = 0;
-			endAction();
+	public void initCamera(CameraActor camera, Level level) {
+		if(cameraPosition==null || cameraRotation==null) {
+			resetCamera(camera, level);
+			return;
 		}
-		else {
-			if(actionTile!=null) {
-				if(actionTile.isValid(level)) {
-					Tile tile = level.map[actionTile.x][actionTile.z];
-					TileAction action = actionAlt ? tile.t.getTileAltAction(tile) : tile.t.getTileAction(tile);
-					action.performAt(tile, actionAlt);
-				}
-				else {
-					System.err.println("Action in progress is not valid");
-					endAction();
-				}
+		
+		if(actionTile!=null) {
+			if(actionTile.isValid(level)) {
+				Tile tile = level.map[actionTile.x][actionTile.z];
+				TileAction action = actionAlt ? tile.t.getTileAltAction(tile) : tile.t.getTileAction(tile);
+				action.performAt(tile, actionAlt);
 			}
-			camera.position.x = cameraPosition.x;
-			camera.position.z = cameraPosition.z;
-			camera.rotation.x = cameraRotation.x;
-			camera.rotation.y = cameraRotation.y;
+			else {
+				System.err.println("Action in progress is not valid");
+				endAction();
+			}
 		}
-		camera.position.y = (HeightLimiter.maxHeight+1) * Tile.ysize;
+		camera.position.x = cameraPosition.x;
+		camera.position.y = maxCameraY;
+		camera.position.z = cameraPosition.z;
+		camera.rotation.x = cameraRotation.x;
+		camera.rotation.y = cameraRotation.y;
 		updateCamera(camera);
 	}
 	

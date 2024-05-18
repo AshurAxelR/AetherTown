@@ -6,6 +6,7 @@ import static com.xrbpowered.zoomui.MouseInfo.RIGHT;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
@@ -21,6 +22,7 @@ import com.xrbpowered.aethertown.state.items.LevelMapItem;
 import com.xrbpowered.aethertown.state.items.RegionMapItem;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
 import com.xrbpowered.aethertown.ui.Fonts;
+import com.xrbpowered.aethertown.ui.RegionMapImage;
 import com.xrbpowered.aethertown.ui.dialogs.DialogContainer;
 import com.xrbpowered.aethertown.ui.dialogs.InventoryDialog;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
@@ -36,8 +38,11 @@ import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.TunnelTileTemplate.TunnelTile;
 import com.xrbpowered.aethertown.world.gen.Tunnels.TunnelInfo;
+import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
+import com.xrbpowered.aethertown.world.gen.plot.houses.HouseRole;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
+import com.xrbpowered.aethertown.world.region.LevelSettlementType;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.region.RegionMode;
@@ -239,7 +244,7 @@ public class AetherTown extends UIClient {
 				pointActor.setTextures(new Texture[] {new Texture(Color.RED)});
 
 				activateLevel(startLevel);
-				player.initCamera(camera, level, false);
+				player.initCamera(camera, level);
 				updateWalkY();
 				Hud.fadeIn(Color.BLACK, 1f);
 
@@ -352,9 +357,45 @@ public class AetherTown extends UIClient {
 		tiles.updateEnvironment(environment);
 	}
 	
+	public void teleportToHospital() {
+		ArrayList<LevelInfo> settlements = RegionMapImage.listSettlements(region, LevelSettlementType.outpost, false);
+		LevelInfo targetLevel = null;
+		int minDist = Math.max(region.sizex, region.sizez);
+		for(LevelInfo info : settlements) {
+			int dist = MathUtils.mdist(levelInfo.x0, levelInfo.z0, info.x0, info.z0);
+			if(dist<minDist) {
+				minDist = dist;
+				targetLevel = info;
+			}
+		}
+		if(targetLevel==null) {
+			showToast("No hospital in a region");
+			return;
+		}
+		
+		activateLevel(targetLevel);
+		HouseGenerator hospital = null;
+		for(HouseGenerator house : level.houses) {
+			if(house.role==HouseRole.hospital) {
+				hospital = house;
+				break;
+			}
+		}
+		if(hospital==null)
+			player.resetCamera(camera, level);
+		else {
+			player.resetCamera(camera, hospital.startToken.x - hospital.d.dx, hospital.startToken.z - hospital.d.dz, hospital.d);
+			hospital.getAction(false).performAt(level.map[hospital.startToken.x][hospital.startToken.z], false);
+		}
+		activeController = walkController;
+		updateWalkY();
+		WorldTime.time += WorldTime.hour;
+		Hud.fadeIn(Color.BLACK, 1f);
+	}
+	
 	public void teleportTo(LevelInfo info) {
 		activateLevel(info);
-		player.initCamera(camera, level, true);
+		player.resetCamera(camera, level);
 		activeController = walkController;
 		updateWalkY();
 	}
@@ -529,6 +570,9 @@ public class AetherTown extends UIClient {
 				}
 				else
 					showToast("Save failed!");
+				break;
+			case KeyEvent.VK_F6:
+				teleportToHospital();
 				break;
 			case KeyEvent.VK_F10:
 				Screenshot.screenshot.make(uiRender.pane.getBuffer());

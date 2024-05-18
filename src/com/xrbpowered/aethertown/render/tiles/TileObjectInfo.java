@@ -43,7 +43,7 @@ public class TileObjectInfo extends ObjectInfo {
 	}
 	
 	public TileObjectInfo rotate(Dir d) {
-		this.rotation = (float)Math.PI*d.ordinal()*0.5f;
+		this.rotation = d.rotation;
 		return this;
 	}
 

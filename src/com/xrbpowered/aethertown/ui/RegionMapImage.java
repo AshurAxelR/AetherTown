@@ -53,7 +53,7 @@ public class RegionMapImage extends ImageGenerator {
 		minz = getMapMinZ(region);
 		maxx = getMapMaxX(region);
 		maxz = getMapMaxZ(region);
-		settlements = listSettlements(region, LevelSettlementType.inn);
+		settlements = listSettlements(region, LevelSettlementType.inn, true);
 		travelTokens = listTravelTokens(region);
 	}
 	
@@ -150,7 +150,7 @@ public class RegionMapImage extends ImageGenerator {
 		return settlement.ordinal()+1;
 	}
 	
-	public static ArrayList<LevelInfo> listSettlements(Region region, LevelSettlementType smallest) {
+	public static ArrayList<LevelInfo> listSettlements(Region region, LevelSettlementType smallest, boolean sort) {
 		ArrayList<LevelInfo> list = new ArrayList<>();
 		for(int x=region.getMinX(); x<=region.getMaxX(); x++)
 			for(int z=region.getMinZ(); z<=region.getMaxZ(); z++) {
@@ -158,17 +158,19 @@ public class RegionMapImage extends ImageGenerator {
 				if(level!=null && level.x0==x && level.z0==z && level.settlement.maxHouses>=smallest.maxHouses)
 					list.add(level);
 			}
-		list.sort(new Comparator<LevelInfo>() {
-			@Override
-			public int compare(LevelInfo level1, LevelInfo level2) {
-				int res = level1.name.compareTo(level2.name);
-				if(res==0)
-					res = Integer.compare(level1.x0, level2.x0);
-				if(res==0)
-					res = Integer.compare(level1.z0, level2.z0);
-				return res;
-			}
-		});
+		if(sort) {
+			list.sort(new Comparator<LevelInfo>() {
+				@Override
+				public int compare(LevelInfo level1, LevelInfo level2) {
+					int res = level1.name.compareTo(level2.name);
+					if(res==0)
+						res = Integer.compare(level1.x0, level2.x0);
+					if(res==0)
+						res = Integer.compare(level1.z0, level2.z0);
+					return res;
+				}
+			});
+		}
 		return list;
 	}
 	

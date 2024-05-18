@@ -10,10 +10,12 @@ public enum Dir {
 	west(-1, 0);
 	
 	public final int dx, dz;
+	public final float rotation;
 	
 	private Dir(int dx, int dz) {
 		this.dx = dx;
 		this.dz = dz;
+		this.rotation = (float)Math.PI*ordinal()*0.5f;
 	}
 	
 	public Dir cw() {
