@@ -14,13 +14,17 @@ import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HomeImprovement;
+import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.state.items.HouseKeyItem;
+import com.xrbpowered.aethertown.state.items.ItemType;
+import com.xrbpowered.aethertown.state.items.TravelTokenItem;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.InfoBox;
 import com.xrbpowered.aethertown.ui.controls.SelectButton;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
+import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.InputInfo;
@@ -29,8 +33,6 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class HomeListDialog extends UIPane implements KeyInputHandler {
 
-	public static final int costPerHome = 7500;
-	
 	private class HouseInfo {
 		public final int index;
 		public final String level;
@@ -65,7 +67,7 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 	private HouseInfo selectedInfo = null;
 	private int cost = 0;
 	
-	private ClickButton buttonClose, buttonMap, buttonAction;
+	private ClickButton buttonClose, buttonMap, buttonAction, buttonTravel;
 	
 	public HomeListDialog(UIContainer parent, ArrayList<HouseGenerator> claimOptions) {
 		super(parent, false);
@@ -169,7 +171,7 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 			buttonMap.setSize(80, buttonMap.getHeight());
 			buttonMap.setPosition(getWidth()-buttonMap.getWidth()-10, 10);
 			
-			cost = HomeData.totalClaimed() * costPerHome;
+			cost = HomeData.totalClaimed() * settings.costPerHome;
 		}
 
 		buttonClose = new ClickButton(this, "CLOSE") {
@@ -214,8 +216,8 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 			}
 			
 			@Override
-			protected Color getTextColor() {
-				return !claim || canClaim() ? textColor : textColorDisabled;
+			protected boolean showEnabled() {
+				return !claim || canClaim();
 			}
 			
 			@Override
@@ -223,7 +225,7 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 				if(claim)
 					return super.getBackgroundColor();
 				else
-					return isHover() ? bgDeleteColorHover : bgDeleteColor;
+					return isHover() && showEnabled() ? bgDeleteColorHover : bgDeleteColor;
 			}
 			
 			@Override
@@ -235,7 +237,31 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 				}
 			}
 		};
-		buttonAction.setPosition(getWidth()-buttonAction.getWidth()-10, getHeight()-buttonClose.getHeight()-10);
+		buttonAction.setPosition(getWidth()-buttonAction.getWidth()-10, buttonClose.getY());
+		
+		if(!claim) {
+			buttonTravel = new ClickButton(this, "TOKEN") {
+				@Override
+				public void onAction() {
+					NamedLevelRef level = selectedInfo.home.ref.level;
+					if(TravelTokenItem.hasTravelToken(level))
+						showToast("Already have this travel token");
+					else if(player.backpack.isFull())
+						showToast("Inventory full");
+					else {
+						player.backpack.put(new TravelTokenItem(level, WorldTime.time));
+						showToast(ItemType.travelToken.name + " added");
+					}
+				}
+
+				@Override
+				protected boolean showEnabled() {
+					return !TravelTokenItem.hasTravelToken(selectedInfo.home.ref.level) && !player.backpack.isFull();
+				}
+			};
+			buttonTravel.setPosition(buttonAction.getX() - buttonTravel.getWidth() - 5, buttonClose.getY());
+		}
+		
 		select(selected);
 	}
 	

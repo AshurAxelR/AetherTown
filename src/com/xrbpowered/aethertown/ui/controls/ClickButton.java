@@ -35,8 +35,12 @@ public class ClickButton extends UIButtonBase {
 		return label;
 	}
 	
+	protected boolean showEnabled() {
+		return isEnabled();
+	}
+	
 	protected Color getBackgroundColor() {
-		return isHover() ? bgColorHover : bgColor;
+		return isHover() && showEnabled() ? bgColorHover : bgColor;
 	}
 
 	protected Font getFont() {
@@ -44,7 +48,7 @@ public class ClickButton extends UIButtonBase {
 	}
 	
 	protected Color getTextColor() {
-		return isEnabled() ? textColor : textColorDisabled;
+		return showEnabled() ? textColor : textColorDisabled;
 	}
 	
 	protected float getLabelAnchorX() {

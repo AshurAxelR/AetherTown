@@ -15,6 +15,7 @@ import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
+import com.xrbpowered.aethertown.state.Earnings;
 import com.xrbpowered.aethertown.state.Player;
 import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.state.SaveState;
@@ -96,12 +97,17 @@ public class AetherTown extends UIClient {
 		public RegionMode regionMode = RegionMode.defaultMode;
 		public long regionSeed = -1L;
 		public boolean legacyRandom = false;
+		
 		public boolean residentialLighting = true;
 		public boolean revealRegion = true;
 		public boolean mapRequireItem = true;
-		public boolean homeCrediting = false;
 		public boolean markAdjVisited = false;
-		
+
+		public boolean homeCrediting = false;
+		public int costPerHome = 5000;
+		public int initialPay = 7500;
+		public int dailyPay = 2500;
+
 		public boolean allowFlying = false;
 		public boolean allowTimeControl = false;
 		public boolean allowBookmaks = false;
@@ -130,6 +136,8 @@ public class AetherTown extends UIClient {
 				return WorldTime.parseDate(value);
 			else if(name.equals("regionMode"))
 				return RegionMode.parseValue(value);
+			else if(name.equals("costPerHome") || name.equals("initialPay") || name.equals("dailyPay"))
+				return Earnings.parseCost(value);
 			else
 				return super.parseValue(name, value, type);
 		}
@@ -140,6 +148,8 @@ public class AetherTown extends UIClient {
 				return WorldTime.getFormattedTime((Float) obj);
 			else if(name.equals("regionMode"))
 				return ((RegionMode) obj).formatValue();
+			else if(name.equals("costPerHome") || name.equals("initialPay") || name.equals("dailyPay"))
+				return Earnings.formatCost((Integer) obj);
 			else
 				return super.formatValue(name, obj);
 		}

@@ -1,7 +1,7 @@
 package com.xrbpowered.aethertown.state;
 
 import static com.xrbpowered.aethertown.AetherTown.player;
-import static com.xrbpowered.aethertown.actions.TileAction.formatCost;
+import static com.xrbpowered.aethertown.AetherTown.settings;
 
 import java.util.Random;
 
@@ -9,8 +9,6 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class Earnings {
 
-	public static final int initialPay = 7500;
-	public static final int dailyPay = 2500;
 	public static final int workXP = 2;
 	
 	private Earnings() {
@@ -46,13 +44,13 @@ public class Earnings {
 		int total = 0;
 		if(player.ubiCollectedDay<0) {
 			player.ubiCollectedDay = 0;
-			total += initialPay;
-			reportRowCost(sb, "Initial payment", initialPay);
+			total += settings.initialPay;
+			reportRowCost(sb, "Initial payment", settings.initialPay);
 		}
 		
 		int days = today - player.ubiCollectedDay;
 		if(days>=0) {
-			int ubi = days * dailyPay;
+			int ubi = days * settings.dailyPay;
 			total += ubi;
 			reportRowCost(sb, String.format("UBI (%d %s)", days, days!=1 ? "days" : "day"), ubi);
 		}
@@ -107,6 +105,14 @@ public class Earnings {
 
 	private static double diminish(double x, double max, double lambda) {
 		return max*x / (x+lambda);
+	}
+	
+	public static int parseCost(String s) {
+		return Math.round(Float.parseFloat(s) * 100);
+	}
+	
+	public static String formatCost(int cost) {
+		return String.format("%.2f", cost/100f);
 	}
 	
 }

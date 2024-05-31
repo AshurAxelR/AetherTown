@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.state.items;
 import static com.xrbpowered.aethertown.AetherTown.levelInfo;
 import static com.xrbpowered.aethertown.AetherTown.player;
 
+import com.xrbpowered.aethertown.state.LevelRef;
 import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
@@ -48,6 +49,20 @@ public class TravelTokenItem extends Item {
 				break;
 			if(aitem.type==ItemType.travelToken)
 				return true;
+		}
+		return false;
+	}
+	
+	public static boolean hasTravelToken(LevelRef ref) {
+		for(int i=0; i<player.backpack.size; i++) {
+			Item aitem = player.backpack.get(i);
+			if(aitem==null)
+				break;
+			if(aitem.type==ItemType.travelToken) {
+				TravelTokenItem item = (TravelTokenItem) aitem;
+				if(item.destination.equals(ref))
+					return true;
+			}
 		}
 		return false;
 	}
