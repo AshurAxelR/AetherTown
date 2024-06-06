@@ -122,7 +122,7 @@ public class HouseRole {
 		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.library)
 	);
 	public static final HouseRole library = new HouseRole("Library", colorCulture, HouseTileAction.library,
-		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.library)
+		new ArchitectureStyle(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.library, IllumLayer.alwaysOn)
 	);
 	public static final HouseRole concertHall = new HouseRole("Concert Hall", colorCulture, HouseTileAction.concertHall,
 		new ArchitectureStyle.BlankNotFront(2, ArchitectureTileSet.officeSet).setIllum(IllumPattern.restaurant, IllumLayer.leisure)

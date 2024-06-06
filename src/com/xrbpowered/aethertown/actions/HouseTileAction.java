@@ -6,6 +6,7 @@ import com.xrbpowered.aethertown.actions.menus.CivicCentreActionMenu;
 import com.xrbpowered.aethertown.actions.menus.FoodActionMenu;
 import com.xrbpowered.aethertown.actions.menus.GroceriesActionMenu;
 import com.xrbpowered.aethertown.actions.menus.HotelActionMenu;
+import com.xrbpowered.aethertown.actions.menus.LibraryActionMenu;
 import com.xrbpowered.aethertown.actions.menus.MapsMenu;
 import com.xrbpowered.aethertown.actions.menus.OfficeActionMenu;
 import com.xrbpowered.aethertown.actions.menus.ShopActionMenu;
@@ -30,13 +31,7 @@ public class HouseTileAction extends EnterTileAction {
 		LeisureActions.portalKnowledge,
 		MapsMenu.regionMapAction
 	));
-	public static final HouseTileAction library = new HouseTileAction(new TileActionMenu(
-		LeisureActions.discover,
-		LeisureActions.portalKnowledge,
-		MapsMenu.regionMapAction,
-		LeisureActions.study,
-		LeisureActions.readBooks
-	));
+	public static final HouseTileAction library = new HouseTileAction(new LibraryActionMenu());
 	public static final HouseTileAction concertHall = new HouseTileAction(new TileActionMenu(
 		LeisureActions.playMusic("Guitar", true),
 		LeisureActions.playMusic("Piano", true),

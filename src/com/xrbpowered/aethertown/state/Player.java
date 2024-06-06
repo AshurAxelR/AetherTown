@@ -22,7 +22,7 @@ public class Player {
 
 	private static final String formatId = "AetherTown.Player.2";
 
-	public static final int maxInspiration = 100;
+	public static final int maxInspiration = 500;
 	private static final float maxCameraY = (HeightLimiter.maxHeight+1) * Tile.ysize;
 	
 	public int cash = 0;

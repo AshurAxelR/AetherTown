@@ -11,7 +11,7 @@ import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.InfoBox;
-import com.xrbpowered.aethertown.ui.controls.SlotButton;
+import com.xrbpowered.aethertown.ui.controls.OptionBox;
 import com.xrbpowered.aethertown.ui.hud.Hud;
 import com.xrbpowered.aethertown.world.stars.Sunrise;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
@@ -23,52 +23,24 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class SleepDialog extends UIPane implements KeyInputHandler {
 
-	private int hours = 1;
 	private String repaintTime = null;
 	
-	private ClickButton buttonDec, buttonInc;
+	private OptionBox optHours;
 	private ClickButton buttonClose, buttonSleep, buttonExit;
 	
 	private SleepDialog(UIContainer parent) {
 		super(parent, false);
 		setSize(440, 200);
 		
-		float t = WorldTime.getTimeOfDay();
-		hours = (t<0.1f || t>0.8) ? 7 : 1;
-
-		buttonDec = new ClickButton(this, null) {
+		optHours = new OptionBox(this, 1, 8, 1) {
 			@Override
-			public void onAction() {
-				if(hours>1) {
-					hours--;
-					repaint();
-				}
-			}
-			@Override
-			protected void paintLabel(GraphAssist g) {
-				g.setColor(getTextColor());
-				TileActionMenuDialog.paintArrow(g, 16, (int)getHeight()/2, -1);
+			public String getText(int value) {
+				float until = WorldTime.getTimeOfDay(value * (float)WorldTime.hour);
+				return String.format("%d %s until %s", value, value!=1 ? "hours" : "hour", WorldTime.getFormattedTime(until));
 			}
 		};
-		buttonDec.setSize(40, buttonDec.getHeight());
-		buttonDec.setPosition(10, 40);
-
-		buttonInc = new ClickButton(this, null) {
-			@Override
-			public void onAction() {
-				if(hours<8) {
-					hours++;
-					repaint();
-				}
-			}
-			@Override
-			protected void paintLabel(GraphAssist g) {
-				g.setColor(getTextColor());
-				TileActionMenuDialog.paintArrow(g, (int)getWidth()-16, (int)getHeight()/2, 1);
-			}
-		};
-		buttonInc.setSize(40, buttonInc.getHeight());
-		buttonInc.setPosition(getWidth()-buttonInc.getWidth()-10, 40);
+		optHours.setPosition(10, 40);
+		optHours.setSize(getWidth()-20, optHours.getHeight());
 
 		buttonClose = new ClickButton(this, "CANCEL") {
 			@Override
@@ -100,13 +72,13 @@ public class SleepDialog extends UIPane implements KeyInputHandler {
 	}
 	
 	private void sleep() {
-		WorldTime.time += hours * WorldTime.hour;
+		WorldTime.time += optHours.value * WorldTime.hour;
 		int ins = player.addInspiration(getIns());
 		showToast(String.format("%+d inspiration", ins));
 	}
 
 	private int getIns() {
-		return (hours+1)/2;
+		return (optHours.value+1)/2;
 	}
 	
 	@Override
@@ -121,19 +93,14 @@ public class SleepDialog extends UIPane implements KeyInputHandler {
 	@Override
 	protected void paintBackground(GraphAssist g) {
 		clear(g, bgColor);
-		g.fillRect(50, 40, getWidth()-100, 32, SlotButton.bgColorEmpty);
 		g.fillRect(10, 80, getWidth()-20, getHeight()-130, Color.BLACK);
 		
 		g.setColor(Color.WHITE);
 		g.setFont(Fonts.small);
 		g.drawString("Sleep for:", getWidth()/2, 26, GraphAssist.CENTER, GraphAssist.CENTER);
 		
-		float until = WorldTime.getTimeOfDay(hours * (float)WorldTime.hour);
-		String s = String.format("%d %s until %s", hours, hours!=1 ? "hours" : "hour", WorldTime.getFormattedTime(until));
-		g.drawString(s, getWidth()/2, 56, GraphAssist.CENTER, GraphAssist.CENTER);
-		
 		g.setColor(InfoBox.textColor);
-		s = String.format("%+d inspiration", getIns());
+		String s = String.format("%+d inspiration", getIns());
 		float y = 104;
 		y = g.drawString(s, 30, y, GraphAssist.LEFT, GraphAssist.CENTER);
 		

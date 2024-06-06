@@ -100,6 +100,11 @@ public class RegionVisits {
 		}
 	}
 	
+	public static int getRegionIndex(long regionSeed) {
+		RegionVisits r = regions.get(regionSeed);
+		return (r==null) ? -1 : r.index;
+	}
+	
 	public static String getRegionTitle(long regionSeed, boolean brief) {
 		RegionVisits r = regions.get(regionSeed);
 		if(r==null)

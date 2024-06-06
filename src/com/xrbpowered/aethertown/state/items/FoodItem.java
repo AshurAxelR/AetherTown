@@ -13,9 +13,9 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 public class FoodItem extends Item {
 
 	public enum FoodItemType {
-		water(new InspirationAction("Bottle of water", 0).setDelay(5).setCooldown(GlobalCooldowns.drink.hours(0.5))),
-		snack(new InspirationAction("Snack", 0).setDelay(10).setCooldown(GlobalCooldowns.eat.hours(0.5))),
-		homeCooked(new InspirationAction("Home-cooked meal", 4).setDelay(25).setCooldown(GlobalCooldowns.eat.hours(3))),
+		water(new InspirationAction("Bottle of water", 1).setDelay(5).setCooldown(GlobalCooldowns.drink.hours(0.5))),
+		snack(new InspirationAction("Snack", 2).setDelay(10).setCooldown(GlobalCooldowns.eat.hours(0.5))),
+		homeCooked(new InspirationAction("Home-cooked meal", 7).setDelay(25).setCooldown(GlobalCooldowns.eat.hours(3))),
 		
 		takeawaySandwich(takeaway("sandwich")),
 		takeawayBurrito(takeaway("burrito")),
@@ -36,7 +36,7 @@ public class FoodItem extends Item {
 	}
 	
 	private static TileAction takeaway(String name) {
-		return new InspirationAction("Takeaway "+name, 3).setDelay(20).setCooldown(GlobalCooldowns.eat.hours(2.5));
+		return new InspirationAction("Takeaway "+name, 5).setDelay(20).setCooldown(GlobalCooldowns.eat.hours(2.5));
 	}
 	
 	public final FoodItemType food;

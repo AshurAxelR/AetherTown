@@ -24,7 +24,6 @@ import com.xrbpowered.aethertown.ui.controls.InfoBox;
 import com.xrbpowered.aethertown.ui.controls.SelectButton;
 import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
-import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.InputInfo;
@@ -249,7 +248,7 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 					else if(player.backpack.isFull())
 						showToast("Inventory full");
 					else {
-						player.backpack.put(new TravelTokenItem(level, WorldTime.time));
+						player.backpack.put(new TravelTokenItem(level));
 						showToast(ItemType.travelToken.name + " added");
 					}
 				}

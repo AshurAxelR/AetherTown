@@ -1,42 +1,39 @@
 package com.xrbpowered.aethertown.ui.dialogs;
 
-import static com.xrbpowered.aethertown.AetherTown.*;
+import static com.xrbpowered.aethertown.AetherTown.player;
+import static com.xrbpowered.aethertown.AetherTown.ui;
 import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.bgColor;
 
 import java.awt.Color;
 import java.util.ArrayList;
 
-import com.xrbpowered.aethertown.AetherTown;
-import com.xrbpowered.aethertown.actions.CooldownSettings;
-import com.xrbpowered.aethertown.actions.FastTravelAction;
-import com.xrbpowered.aethertown.state.NamedLevelRef;
+import com.xrbpowered.aethertown.actions.TileAction;
+import com.xrbpowered.aethertown.state.TokenArchive;
 import com.xrbpowered.aethertown.state.items.TravelTokenItem;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
-import com.xrbpowered.aethertown.ui.hud.Hud;
-import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.gl.ui.pane.UIPane;
 import com.xrbpowered.zoomui.GraphAssist;
 import com.xrbpowered.zoomui.InputInfo;
 import com.xrbpowered.zoomui.KeyInputHandler;
 import com.xrbpowered.zoomui.UIContainer;
 
-public class FastTravelDialog extends UIPane implements KeyInputHandler {
+public class ArchiveAddDialog extends UIPane implements KeyInputHandler {
 
-	private final CooldownSettings cooldown;
+	public static final int cost = 500;
+	
 	private final ArrayList<TravelTokenItem> tokens;
 	private int selected = -1;
 
-	private ClickButton buttonClose, buttonTravel;
-
-	private FastTravelDialog(UIContainer parent) {
+	private ClickButton buttonClose, buttonAdd;
+	
+	private ArchiveAddDialog(UIContainer parent) {
 		super(parent, false);
-		this.cooldown = FastTravelAction.action.getCooldown();
 		
 		tokens = TravelTokenItem.listTravelTokens();
 		setSize(500, 100+tokens.size()*32);
-
+		
 		for(int i=0; i<tokens.size(); i++) {
 			final int index = i;
 			final TravelTokenItem token = tokens.get(index);
@@ -45,10 +42,12 @@ public class FastTravelDialog extends UIPane implements KeyInputHandler {
 				@Override
 				public void onAction() {
 					selected = index;
-					NamedLevelRef ref = token.destination;
-					LevelInfo active = AetherTown.level.info;
-					buttonTravel.setEnabled(!active.isRef(ref) && !cooldown.isOnCooldown());
+					buttonAdd.setEnabled(!TokenArchive.contains(token.destination));
 					repaint();
+				}
+				@Override
+				public boolean isEnabled() {
+					return !TokenArchive.contains(token.destination);
 				}
 				@Override
 				public boolean isEmpty() {
@@ -65,8 +64,8 @@ public class FastTravelDialog extends UIPane implements KeyInputHandler {
 				@Override
 				public void paint(GraphAssist g) {
 					super.paint(g);
-					if(levelInfo.isRef(token.destination))
-						paintDot(g);
+					if(!TokenArchive.contains(token.destination))
+						g.drawString("NEW", getWidth()-10, getHeight()/2f, GraphAssist.RIGHT, GraphAssist.CENTER);
 				}
 			};
 			
@@ -82,20 +81,19 @@ public class FastTravelDialog extends UIPane implements KeyInputHandler {
 		};
 		buttonClose.setPosition(10, getHeight()-buttonClose.getHeight()-10);
 		
-		buttonTravel = new ClickButton(this, "TRAVEL") {
+		buttonAdd = new ClickButton(this, "RECORD") {
 			@Override
 			public void onAction() {
-				if(cooldown.isOnCooldown())
-					return;
-				aether.teleportTo(tokens.get(selected).destination.find(regionCache));
-				cooldown.start();
-				close();
-				Hud.fadeIn(Color.WHITE, 1f);
+				player.cash -= cost;
+				TokenArchive.add(tokens.get(selected));
+				buttonAdd.setEnabled(false);
+				selected = -1;
+				repaint();
 			}
 		};
-		buttonTravel.setSize(160, buttonTravel.getHeight());
-		buttonTravel.setEnabled(false);
-		buttonTravel.setPosition(getWidth()-buttonTravel.getWidth()-10, getHeight()-buttonTravel.getHeight()-10);
+		buttonAdd.setSize(160, buttonAdd.getHeight());
+		buttonAdd.setEnabled(false);
+		buttonAdd.setPosition(getWidth()-buttonAdd.getWidth()-10, getHeight()-buttonAdd.getHeight()-10);
 	}
 
 	@Override
@@ -103,7 +101,9 @@ public class FastTravelDialog extends UIPane implements KeyInputHandler {
 		clear(g, bgColor);
 		g.setColor(Color.WHITE);
 		g.setFont(Fonts.small);
-		g.drawString("Select destination:", 30, 26, GraphAssist.LEFT, GraphAssist.CENTER);
+		g.drawString("Record Travel Tokens into Archive:", 30, 26, GraphAssist.LEFT, GraphAssist.CENTER);
+		g.drawString(TileAction.formatCost(cost), buttonAdd.getX()-10,
+				buttonAdd.getY()+buttonAdd.getHeight()/2, GraphAssist.RIGHT, GraphAssist.CENTER);
 	}
 	
 	public void close() {
@@ -119,7 +119,8 @@ public class FastTravelDialog extends UIPane implements KeyInputHandler {
 
 	public static void show() {
 		ui.hideTop();
-		new FastTravelDialog(ui);
+		new ArchiveAddDialog(ui);
 		ui.reveal();
 	}
+
 }

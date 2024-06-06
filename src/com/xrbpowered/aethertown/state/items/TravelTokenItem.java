@@ -3,6 +3,8 @@ package com.xrbpowered.aethertown.state.items;
 import static com.xrbpowered.aethertown.AetherTown.levelInfo;
 import static com.xrbpowered.aethertown.AetherTown.player;
 
+import java.util.ArrayList;
+
 import com.xrbpowered.aethertown.state.LevelRef;
 import com.xrbpowered.aethertown.state.NamedLevelRef;
 import com.xrbpowered.aethertown.world.Tile;
@@ -20,6 +22,10 @@ public class TravelTokenItem extends Item {
 
 	public TravelTokenItem(LevelInfo level) {
 		this(new NamedLevelRef(level), WorldTime.time);
+	}
+
+	public TravelTokenItem(NamedLevelRef ref) {
+		this(ref, WorldTime.time);
 	}
 
 	@Override
@@ -65,6 +71,18 @@ public class TravelTokenItem extends Item {
 			}
 		}
 		return false;
+	}
+	
+	public static ArrayList<TravelTokenItem> listTravelTokens() {
+		ArrayList<TravelTokenItem> list = new ArrayList<>();
+		for(int i=0; i<player.backpack.size; i++) {
+			Item aitem = player.backpack.get(i);
+			if(aitem==null)
+				break;
+			if(aitem instanceof TravelTokenItem)
+				list.add((TravelTokenItem) aitem);
+		}
+		return list;
 	}
 
 }

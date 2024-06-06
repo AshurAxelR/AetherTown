@@ -11,10 +11,10 @@ import com.xrbpowered.aethertown.world.Tile;
 
 public class FoodActionMenu extends TileActionMenu {
 
-	public static final TileAction drinkAction = new InspirationAction("Drink tea/coffee", 1).setDelay(15).setCost(150).setCooldown(GlobalCooldowns.drink.hours(1));
-	public static final TileAction freeDrinkAction = new InspirationAction("Drink tea/coffee", 1).setDelay(15).setCooldown(GlobalCooldowns.drink.hours(1));
+	public static final TileAction drinkAction = new InspirationAction("Drink tea/coffee", 2).setDelay(15).setCost(150).setCooldown(GlobalCooldowns.drink.hours(1));
+	public static final TileAction freeDrinkAction = new InspirationAction("Drink tea/coffee", 2).setDelay(15).setCooldown(GlobalCooldowns.drink.hours(1));
 	
-	public static final TileAction dessertAction = new InspirationAction("Drink tea/coffee with dessert", 2) {
+	public static final TileAction dessertAction = new InspirationAction("Drink tea/coffee with dessert", 4) {
 		@Override
 		public void applyCost(Tile tile, boolean alt) {
 			super.applyCost(tile, alt);
@@ -37,8 +37,8 @@ public class FoodActionMenu extends TileActionMenu {
 		food.addAction(dessertAction);
 		
 		if(restaurant) {
-			food.addAction(new InspirationAction("Eat main course", 4).setDelay(40).setCost(750).setCooldown(GlobalCooldowns.eat.hours(3)));
-			food.addAction(new InspirationAction("Eat starter and main course", 5).setDelay(50).setCost(1000).setCooldown(GlobalCooldowns.eat.hours(4)));
+			food.addAction(new InspirationAction("Eat main course", 8).setDelay(40).setCost(750).setCooldown(GlobalCooldowns.eat.hours(3)));
+			food.addAction(new InspirationAction("Eat starter and main course", 10).setDelay(50).setCost(1000).setCooldown(GlobalCooldowns.eat.hours(4)));
 		}
 		
 		food.addAction(hangOutAction);
@@ -52,7 +52,7 @@ public class FoodActionMenu extends TileActionMenu {
 			food.addAction(dessertAction);
 		}
 		else {
-			food.addAction(new InspirationAction("Eat-in meal", 3).setDelay(30).setCost(550).setCooldown(GlobalCooldowns.eat.hours(2.5)));
+			food.addAction(new InspirationAction("Eat-in meal", 6).setDelay(30).setCost(550).setCooldown(GlobalCooldowns.eat.hours(2.5)));
 			food.addAction(new BuyFoodAction(takeaway, 550).setDelay(10));
 		}
 		food.addAction(GroceriesActionMenu.buyWaterBottleAction);
