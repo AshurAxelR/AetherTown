@@ -4,15 +4,12 @@ import static com.xrbpowered.aethertown.AetherTown.player;
 
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HouseTileRef;
-import com.xrbpowered.aethertown.state.Inventory;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class HouseKeyItem extends Item {
 
 	public final HouseTileRef house;
-	
-	private transient int index = -1;
 	
 	public HouseKeyItem(HouseTileRef house, double time) {
 		super(ItemType.houseKey, time);
@@ -23,20 +20,18 @@ public class HouseKeyItem extends Item {
 		this(home.ref, WorldTime.time);
 	}
 	
-	public void updateHomeIndex() {
-		HomeData h = HomeData.forHouse(house);
-		index = (h==null) ? -1 : h.getIndex();
-	}
-	
 	public int getHomeIndex() {
-		if(index<0)
-			updateHomeIndex();
-		return index;
+		HomeData h = HomeData.forHouse(house);
+		return (h==null) ? -1 : h.getIndex();
 	}
 	
 	@Override
 	public String getName() {
-		return String.format("%s #%d", super.getName(), getHomeIndex()+1);
+		int index = getHomeIndex();
+		if(index>=0)
+			return String.format("%s #%d", super.getName(), index+1);
+		else
+			return "Abandoned "+super.getName();
 	}
 	
 	@Override
@@ -46,16 +41,19 @@ public class HouseKeyItem extends Item {
 
 	@Override
 	public String getInfoHtml(Tile tile, boolean alt) {
-		return String.format(
-			"<p>A door key for your home at<br>"+
-			"<span class=\"w\">%s</span></p>"+
-			"<p>If you lose a key, you can always request a copy at Civic Centre.</p>",
-			house.getFullAddress());
+		if(getHomeIndex()>=0)
+			return String.format(
+				"<p>A door key for your home at<br>"+
+				"<span class=\"w\">%s</span></p>"+
+				"<p>If you lose a key, you can always request a copy at Civic Centre.</p>",
+				house.getFullAddress());
+		else
+			return "<p>A door key for a house that has been abandoned.<br>It no longer works.</p>";
 	}
 	
 	@Override
 	public boolean markDot(Tile tile, boolean alt) {
-		return house.level.isLevel(tile.level.info); 
+		return getHomeIndex()>=0 && house.level.isLevel(tile.level.info); 
 	}
 
 	public static boolean hasKey(HouseTileRef ref) {
@@ -72,22 +70,4 @@ public class HouseKeyItem extends Item {
 		return false;
 	}
 
-	public static void removeKeys(Inventory inv, HouseTileRef ref) {
-		boolean removed = false;
-		for(int i=0; i<inv.size; i++) {
-			Item item = inv.get(i);
-			if(item==null)
-				break;
-			if(item.type==ItemType.houseKey) {
-				HouseKeyItem key = (HouseKeyItem) item;
-				key.index = -1;
-				if(ref.equals(key.house)) {
-					inv.remove(i, false);
-					removed = true;
-				}
-			}
-		}
-		if(removed)
-			inv.sort();
-	}
 }

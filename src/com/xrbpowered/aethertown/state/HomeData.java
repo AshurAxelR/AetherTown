@@ -1,7 +1,5 @@
 package com.xrbpowered.aethertown.state;
 
-import static com.xrbpowered.aethertown.AetherTown.player;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,7 +12,6 @@ import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Random;
 
-import com.xrbpowered.aethertown.state.items.HouseKeyItem;
 import com.xrbpowered.aethertown.utils.RandomSeed;
 import com.xrbpowered.aethertown.utils.Shuffle;
 import com.xrbpowered.aethertown.world.Level;
@@ -176,10 +173,10 @@ public class HomeData {
 	}
 	
 	public static boolean abandon(HomeData home) {
-		if(!homes.remove(home.ref.level.hashCode(), home))
+		if(!homes.remove(home.ref.level, home))
 			return false;
+		home.index = -1;
 		updateIndices();
-		HouseKeyItem.removeKeys(player.backpack, home.ref); // TODO remove from all inventories
 		return true;
 	}
 
