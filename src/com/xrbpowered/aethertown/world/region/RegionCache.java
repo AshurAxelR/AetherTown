@@ -12,7 +12,7 @@ public class RegionCache {
 
 	private static final int targetCapacity = 8;
 
-	private static boolean legacyRandom;
+	private static boolean legacyRandom = false;
 
 	public final RegionMode mode;
 	public final PortalSystem portals;
@@ -21,10 +21,7 @@ public class RegionCache {
 	private HashMap<Long, Region> regions = new HashMap<>();
 	private int capacity = targetCapacity;
 	
-	public RegionCache(RegionMode mode, boolean legacyRandom) {
-		RegionCache.legacyRandom = legacyRandom;
-		RandomSeed.useLegacy = legacyRandom;
-		
+	public RegionCache(RegionMode mode) {
 		this.mode = mode;
 		this.portals = PortalSystem.create(this);
 		checkBits();
@@ -55,6 +52,11 @@ public class RegionCache {
 		int rbits = getRand(0L).bits();
 		if(pbits > rbits)
 			System.err.printf("Portal system bits (%d) exceeds random seed bits (%d)\n", pbits, rbits);
+	}
+	
+	public static void useLegacy(boolean legacy) {
+		RegionCache.legacyRandom = legacy;
+		RandomSeed.useLegacy = legacy;
 	}
 	
 	public static Rand getRand(long seed) {

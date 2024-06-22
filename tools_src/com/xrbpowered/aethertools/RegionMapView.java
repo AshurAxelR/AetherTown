@@ -84,7 +84,8 @@ public class RegionMapView extends UIElement {
 
 		settings.load();
 		SaveState save = new SaveState();
-		region = new RegionCache(save.regionMode, settings.legacyRandom).get(save.regionSeed);
+		RegionCache.useLegacy(settings.legacyRandom);
+		region = new RegionCache(save.regionMode).get(save.regionSeed);
 		
 		active = region.startLevel;
 		showVisited = false;
