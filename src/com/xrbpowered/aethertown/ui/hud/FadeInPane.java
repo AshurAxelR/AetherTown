@@ -18,7 +18,7 @@ public class FadeInPane extends UITexture {
 	}
 	
 	@Override
-	public boolean isInside(float px, float py) {
+	public boolean isInteractive() {
 		return false;
 	}
 	

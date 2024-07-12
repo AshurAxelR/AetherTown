@@ -54,7 +54,7 @@ public class ConfirmDialog extends UIPane implements KeyInputHandler {
 	}
 
 	@Override
-	public boolean isInside(float px, float py) {
+	public boolean isHit(float px, float py) {
 		return true;
 	}
 	

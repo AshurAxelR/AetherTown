@@ -91,7 +91,7 @@ public class Hud extends UINode {
 	}
 	
 	@Override
-	public boolean isInside(float px, float py) {
+	public boolean isInteractive() {
 		return false;
 	}
 	

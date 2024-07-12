@@ -61,7 +61,7 @@ public class RegionMapView extends UIElement {
 	}
 
 	@Override
-	public boolean isInside(float x, float y) {
+	public boolean isHit(float x, float y) {
 		return true;
 	}
 	
