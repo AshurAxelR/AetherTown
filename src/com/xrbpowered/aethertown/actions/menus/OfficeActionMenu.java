@@ -38,7 +38,7 @@ public class OfficeActionMenu extends TileActionMenu {
 	
 	@Override
 	public void disabledAction(Tile tile, TileActionMenuDialog dialog) {
-		showToast("Office closed until %02d:00", IllumLayer.officeHours.open);
+		showToast("Office closed until %02d:00", IllumLayer.officeHours.getOpenTime());
 	}
 
 }

@@ -1,5 +1,7 @@
 package com.xrbpowered.aethertown.render.tiles;
 
+import com.xrbpowered.aethertown.AetherTown;
+
 public class IllumLayer {
 
 	public static final IllumLayer[] layers = new IllumLayer[8];
@@ -14,8 +16,8 @@ public class IllumLayer {
 
 	public final int index;
 	
-	public final int open;
-	public final int close;
+	private final int open;
+	private final int close;
 
 	private IllumLayer(int open, int close) {
 		this.index = nextIndex++;
@@ -24,8 +26,19 @@ public class IllumLayer {
 		this.close = close;
 	}
 
+	public int getOpenTime() {
+		return AetherTown.settings.noClosingTime ? 0 : open;
+	}
+	
+	public int getCloseTime() {
+		return AetherTown.settings.noClosingTime ? 24 : close;
+	}
+	
 	public boolean isActive(int hour) {
-		return hour>=open && hour<close;
+		if(AetherTown.settings.noClosingTime)
+			return true;
+		else
+			return hour>=open && hour<close;
 	}
 	
 	public int mask() {

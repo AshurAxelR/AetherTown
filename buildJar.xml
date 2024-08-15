@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<project name="AetherTown">
+<target name="buildJar">
+
+<jar destfile="./aethertown.jar" manifest="./manifest.txt">
+	<fileset dir="bin">
+		<include name="com/xrbpowered/aethertown/**" />
+	</fileset>
+	<fileset dir="${xrbengine}/bin">
+		<exclude name="com/xrbpowered/gl/examples/**" />
+		<exclude name="assets/points_*.glsl" />
+		<exclude name="assets/simple_*.glsl" />
+		<exclude name="assets/std_*.glsl" />
+	</fileset>
+	<fileset dir="${zoomui}/bin">
+		<include name="com/xrbpowered/zoomui/*.class" />
+		<include name="com/xrbpowered/zoomui/base/**" />
+		<include name="com/xrbpowered/zoomui/icons/**" />
+		<include name="com/xrbpowered/zoomui/std/UIButton*.class" />
+		<include name="com/xrbpowered/zoomui/std/UIFormattedLabel*.class" />
+	</fileset>
+</jar>
+
+</target>
+</project>

@@ -107,6 +107,7 @@ public class AetherTown extends UIClient {
 		public int costPerHome = 5000;
 		public int initialPay = 7500;
 		public int dailyPay = 2500;
+		public boolean noClosingTime = false;
 
 		public boolean allowFlying = false;
 		public boolean allowTimeControl = false;

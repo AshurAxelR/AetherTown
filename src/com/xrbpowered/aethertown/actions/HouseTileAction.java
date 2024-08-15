@@ -79,10 +79,10 @@ public class HouseTileAction extends EnterTileAction {
 			return house.getAddress();
 		else {
 			IllumLayer illum = house.arch.getIllumLayer(alt ? 1 : 0);
-			if(illum.open==0 && illum.close==24)
+			if(illum.getOpenTime()==0 && illum.getCloseTime()==24)
 				return "Open 24h";
 			else
-				return String.format("Open %02d:00\u2014%02d:00", illum.open, illum.close);
+				return String.format("Open %02d:00\u2014%02d:00", illum.getOpenTime(), illum.getCloseTime());
 		}
 	}
 	
@@ -90,7 +90,7 @@ public class HouseTileAction extends EnterTileAction {
 	protected void onFail(Tile tile, boolean alt) {
 		HouseGenerator house = house(tile);
 		if(house.isClosed(alt, 0f))
-			showToast("%s is closed until %02d:00", house.getRole(alt).title, house.arch.getIllumLayer(alt ? 1 : 0).open);
+			showToast("%s is closed until %02d:00", house.getRole(alt).title, house.arch.getIllumLayer(alt ? 1 : 0).getOpenTime());
 	}
 
 	public static boolean isClosed(Tile tile, boolean alt) {
