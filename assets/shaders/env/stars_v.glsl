@@ -2,6 +2,11 @@
 
 #define MAX_SIZE 32
 
+uniform sampler2D dataBlockLighting;
+uniform float levelSize;
+uniform float illumTrigger = 2;
+uniform vec4 lightColor = vec4(1, 0.949, 0.850, 1);
+
 uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
@@ -35,11 +40,16 @@ void main(void) {
 	else
 		lightWash = mix(lightWashBottom, 1, -hdot*20);
 	float yfog = clamp((cameraPosition.y-cloudTop)/(cloudBottom-cloudTop), 0, 1);
-	float mag = in_Magnitude + 10*yfog*yfog + 10*lightWash*lightWash;
-	float con = contrast * (1+2*yfog*lightWash);
 
-	pass_Brightness = 100 * exposure * pow(10, -0.4 * con * mag);
-	pass_Brightness *= (1-yfog)*(1-lightWash);
+	vec4 blockLight = vec4(0);
+	float illum = lightColor.x+lightColor.y+lightColor.z;
+	if(illum<illumTrigger && levelSize>0) {
+		blockLight = texture(dataBlockLighting, (cameraPosition.xz/4+0.5)/levelSize)*(1-illum/illumTrigger);
+	}
+	float blockWash = 0.6 * (blockLight.x+blockLight.y+blockLight.z) / 3.0;
+	
+	pass_Brightness = 100 * exposure * pow(10, -0.4 * contrast * in_Magnitude);
+	pass_Brightness *= pow((1-yfog)*(1-lightWash)*(1-blockWash), 4);
 	if(pass_Brightness>1)
 	 	pass_Brightness = pow(pass_Brightness, saturation);
 	

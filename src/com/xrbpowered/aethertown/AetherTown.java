@@ -97,6 +97,7 @@ public class AetherTown extends UIClient {
 		public RegionMode regionMode = RegionMode.defaultMode;
 		public long regionSeed = -1L;
 		public boolean legacyRandom = false;
+		public boolean improvedStars = false;
 		
 		public boolean residentialLighting = true;
 		public boolean revealRegion = true;

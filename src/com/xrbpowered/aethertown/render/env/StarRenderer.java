@@ -10,6 +10,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 
+import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.world.region.RegionCache;
 import com.xrbpowered.aethertown.world.stars.BlackBodySpectrum;
 import com.xrbpowered.aethertown.world.stars.StarData;
@@ -39,6 +41,7 @@ public class StarRenderer {
 		protected void storeUniformLocations() {
 			super.storeUniformLocations();
 			modelMatrixLocation = GL20.glGetUniformLocation(pId, "modelMatrix");
+			initSamplers(new String[] {"dataBlockLighting"});
 		}
 		
 		@Override
@@ -55,9 +58,9 @@ public class StarRenderer {
 		}
 		
 		public void updateRenderScale(float renderScale) {
-			double exposure = 0.33 / Math.pow(renderScale, 2.7);
-			double contrast = 1.4 - Math.log(renderScale) / Math.log(2) * 0.3;
-			double saturation = 0.5;
+			double exposure = /*0.75*/ 0.33 / Math.pow(renderScale, 2.7);
+			double contrast = /*1.3*/ 1.4 - Math.log(renderScale) / Math.log(2) * 0.3;
+			double saturation = /*0.45*/ 0.5;
 			GL20.glUseProgram(pId);
 			GL20.glUniform1f(GL20.glGetUniformLocation(pId, "exposure"), (float) exposure);
 			GL20.glUniform1f(GL20.glGetUniformLocation(pId, "contrast"), (float) contrast);
@@ -138,14 +141,22 @@ public class StarRenderer {
 				stars.release();
 			this.seed = seed;
 			System.out.printf("Generating stars for *%04d\n", seed%10000L);
-			ArrayList<Star> data = StarData.generate(RegionCache.getRand(seed));
+			ArrayList<Star> data = StarData.generate(RegionCache.getRand(seed), AetherTown.settings.improvedStars);
 			stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
 		}
 	}
-	
-	public void render() {
+
+	public void setLevel(LevelRenderer level) {
+		int pId = starShader.getProgramId();
+		GL20.glUseProgram(pId);
+		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "levelSize"), level==null ? 0 : level.level.levelSize);
+		level.blockLighting.bind(level.tiles.illumMask, 0);
+	}
+
+	public void render(LevelRenderer level) {
 		if(stars==null)
 			return;
+		setLevel(level);
 		starShader.use();
 		stars.draw();
 		starShader.unuse();

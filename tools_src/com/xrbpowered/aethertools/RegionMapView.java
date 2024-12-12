@@ -6,12 +6,14 @@ import static com.xrbpowered.aethertown.ui.RegionMapImage.*;
 
 import java.awt.Rectangle;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.state.SaveState;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
 import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.region.RegionCache;
+import com.xrbpowered.aethertown.world.region.RegionMode;
 import com.xrbpowered.gl.res.asset.AssetManager;
 import com.xrbpowered.gl.res.asset.FileAssetManager;
 import com.xrbpowered.zoomui.GraphAssist;
@@ -82,7 +84,12 @@ public class RegionMapView extends UIElement {
 		LevelNames.load();
 		Fonts.load();
 
-		settings.load();
+		settings = new AetherTown.ClientConfig();
+		//settings.load();
+		settings.regionMode = new RegionMode.Linear(64);
+		settings.regionSeed = 5764483515444918203L;
+		settings.legacyRandom = false;
+		
 		SaveState save = new SaveState();
 		RegionCache.useLegacy(settings.legacyRandom);
 		region = new RegionCache(save.regionMode).get(save.regionSeed);

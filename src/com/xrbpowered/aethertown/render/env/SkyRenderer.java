@@ -41,7 +41,7 @@ public class SkyRenderer {
 	public void render(RenderTarget target, LevelRenderer level) {
 		buffer.render(target, level);
 		if(renderStars)
-			stars.render();
+			stars.render(level);
 		sun.render(level);
 	}
 

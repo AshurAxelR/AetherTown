@@ -8,10 +8,12 @@ public class StarData {
 
 	public static final float axialTilt = (float)Math.toRadians(23.45); // Earth: 23.45
 	public static final float latitude = (float)Math.toRadians(45); // 0 - north pole, 180 - south pole
+	public static final boolean debugSun = false;
 
 	public static final int numStars = 100000;
-	public static final boolean debugSun = false;
-	
+	public static final int improveNumStars = 42000;
+	public static final double improvedLambda = 1.115;
+
 	public static class Star {
 		public double ra, de;
 		public float mag, temp;
@@ -73,6 +75,21 @@ public class StarData {
 		}
 	}
 
+	public static double nextImprovedMag(Rand rand, boolean first) {
+		double mag;
+		if(first) {
+			do {
+				mag = -1.5 - Math.log(1.0 - rand.nextDouble()) / (-improvedLambda*9.5);
+			} while(mag < -4.0);
+		}
+		else {
+			do {
+				mag = 8.0 - Math.log(1.0 - rand.nextDouble()) / (-improvedLambda);
+			} while(mag < -4.0);
+		}
+		return mag;
+	}
+	
 	public static Star sun = null;
 	
 	public static void updateSun(float timeOfYear) {
@@ -80,13 +97,14 @@ public class StarData {
 		sun.de = axialTilt*Math.sin(sun.ra);
 	}
 	
-	public static ArrayList<Star> generate(Rand random) {
+	public static ArrayList<Star> generate(Rand random, boolean improved) {
 		ArrayList<Star> stars = new ArrayList<>();
-		for(int i=0; i<numStars; i++) {
+		int num = improved ? improveNumStars : numStars;
+		for(int i=0; i<num; i++) {
 			Star star = new Star();
 			star.ra = random.nextDouble()*2.0*Math.PI;
 			star.de = Math.asin(2.0*random.nextDouble()-1.0);
-			star.mag = (float) magRand.next(random);
+			star.mag = (float)(improved ? nextImprovedMag(random, i==0) : magRand.next(random));
 			star.temp = (float) Math.pow(10, tempRand.next(random));
 			if(star.mag<8f)
 				stars.add(star);
