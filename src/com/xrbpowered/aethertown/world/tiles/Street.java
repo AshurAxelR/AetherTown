@@ -84,7 +84,7 @@ public class Street extends TunnelTileTemplate {
 	
 	@Override
 	public void createComponents() {
-		StaticMesh mesh = FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo, null); 
+		StaticMesh mesh = FastMeshBuilder.plane(Tile.size, 1, 1, ObjectShader.vertexInfo); 
 		street = new TileComponent(mesh, TexColor.get(streetColor));
 		tunnelStreet = new TunnelTileComponent(mesh, TexColor.get(streetColor));
 		Lamps.createComponents();

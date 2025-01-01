@@ -70,38 +70,38 @@ public class ChurchT extends TileTemplate {
 		roofTexture = new SeasonalTexture(new int[] {10, 77}, new Color[] {new Color(0x57554a), new Color(0xe0eef1)});
 		
 		mid = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/church/church_mid.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_mid.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/church/church_mid.png", false, true, false),
 				new Texture("models/church/church_mid_illum.png", false, true, false));
 		front1 = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/church/church_front_1.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_front_1.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/church/church_front_1.png", false, true, false),
 				new Texture("models/church/church_front_1_illum.png", false, true, false));
 		front2 = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/church/church_front_2.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_front_2.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/church/church_front_2.png", false, true, false),
 				new Texture("models/church/church_front_2_illum.png", false, true, false));
 		front3 = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/church/church_front_3.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_front_3.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/church/church_front_3.png", false, true, false),
 				TexColor.get(Color.BLACK));
 		front4 = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/church/church_front_4.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_front_4.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/church/church_front_4.png", false, true, false),
 				new Texture("models/church/church_front_4_illum.png", false, true, false));
 		back1 = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/church/church_back_1.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_back_1.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/church/church_front_1.png", false, true, false),
 				new Texture("models/church/church_front_1_illum.png", false, true, false));
 		back2 = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/church/church_back_2.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_back_2.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/church/church_back_2.png", false, true, false),
 				new Texture("models/church/church_back_2_illum.png", false, true, false));
 		midRoof = new TileComponent(
-				ObjMeshLoader.loadObj("models/church/church_mid_roof.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_mid_roof.obj", 0, 1f, ObjectShader.vertexInfo),
 				roofTexture);
 		chapelRoof = new TileComponent(
-				ObjMeshLoader.loadObj("models/church/church_chapel_roof.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/church/church_chapel_roof.obj", 0, 1f, ObjectShader.vertexInfo),
 				roofTexture);
 	}
 

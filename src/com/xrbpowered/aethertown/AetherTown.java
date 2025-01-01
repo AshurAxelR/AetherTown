@@ -251,7 +251,7 @@ public class AetherTown extends UIClient {
 				ComponentLibrary.createAllComponents();
 
 				pointActor = new TerrainMeshActor();
-				pointActor.setMesh(FastMeshBuilder.cube(0.5f, tiles.objShader.info, null));
+				pointActor.setMesh(FastMeshBuilder.cube(0.5f, tiles.objShader.info));
 				pointActor.setShader(tiles.objShader);
 				pointActor.setTextures(new Texture[] {new Texture(Color.RED)});
 

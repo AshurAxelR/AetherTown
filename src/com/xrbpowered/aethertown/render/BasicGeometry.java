@@ -4,16 +4,15 @@ import org.joml.Vector3f;
 
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder;
 import com.xrbpowered.gl.res.mesh.FastMeshBuilder.Vertex;
-import com.xrbpowered.gl.res.mesh.MeshBuilder.Options;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.shader.VertexInfo;
 
 public abstract class BasicGeometry {
 
-	public static StaticMesh wall(float size, float h, VertexInfo info, Options options) {
+	public static StaticMesh wall(float size, float h, VertexInfo info) {
 		float d = size / 2f;
 		Vector3f norm = new Vector3f();
-		FastMeshBuilder mb = new FastMeshBuilder(info, options, 4, 6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, 4, 6);
 		norm.set(0, 0, -1);
 		mb.getVertex(0).setPosition(-d, 0, -d).setTexCoord(1, 1).setNormal(norm);
 		mb.getVertex(1).setPosition(-d, h, -d).setTexCoord(1, 0).setNormal(norm);
@@ -23,10 +22,10 @@ public abstract class BasicGeometry {
 		return mb.create();
 	}
 	
-	public static StaticMesh slopeSideLeft(float size, float h, VertexInfo info, Options options) {
+	public static StaticMesh slopeSideLeft(float size, float h, VertexInfo info) {
 		float d = size / 2f;
 		Vector3f norm = new Vector3f();
-		FastMeshBuilder mb = new FastMeshBuilder(info, options, 4, 6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, 4, 6);
 		norm.set(0, 0, -1);
 		mb.getVertex(0).setPosition(-d, 0, -d).setTexCoord(1, 1).setNormal(norm);
 		mb.getVertex(1).setPosition(-d, h, -d).setTexCoord(0, 0).setNormal(norm);
@@ -35,10 +34,10 @@ public abstract class BasicGeometry {
 		return mb.create();
 	}
 	
-	public static StaticMesh slopeSideRight(float size, float h, VertexInfo info, Options options) {
+	public static StaticMesh slopeSideRight(float size, float h, VertexInfo info) {
 		float d = size / 2f;
 		Vector3f norm = new Vector3f();
-		FastMeshBuilder mb = new FastMeshBuilder(info, options, 4, 6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, 4, 6);
 		norm.set(0, 0, -1);
 		mb.getVertex(0).setPosition(-d, 0, -d).setTexCoord(1, 1).setNormal(norm);
 		mb.getVertex(1).setPosition(d, h, -d).setTexCoord(0, 0).setNormal(norm);
@@ -47,10 +46,10 @@ public abstract class BasicGeometry {
 		return mb.create();
 	}
 
-	public static StaticMesh slope(float size, float h, VertexInfo info, Options options) {
+	public static StaticMesh slope(float size, float h, VertexInfo info) {
 		float d = size / 2f;
 		Vector3f norm = new Vector3f();
-		FastMeshBuilder mb = new FastMeshBuilder(info, options, 4, 6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, 4, 6);
 		norm.set(0, d, -h).normalize();
 		mb.getVertex(0).setPosition(-d, 0, -d).setTexCoord(0, 0).setNormal(norm);
 		mb.getVertex(1).setPosition(-d, h, d).setTexCoord(0, 1).setNormal(norm);
@@ -60,10 +59,10 @@ public abstract class BasicGeometry {
 		return mb.create();
 	}
 
-	public static StaticMesh box(float size, float h, float pivotYRatio, VertexInfo info, Options options) {
+	public static StaticMesh box(float size, float h, float pivotYRatio, VertexInfo info) {
 		float d = size / 2f;
 		Vector3f norm = new Vector3f();
-		FastMeshBuilder mb = new FastMeshBuilder(info, options, 5*4, 5*6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, 5*4, 5*6);
 		
 		float y0 = -h/2f-pivotYRatio*h/2f;
 		float y1 = h/2f-pivotYRatio*h/2f;
@@ -116,7 +115,7 @@ public abstract class BasicGeometry {
 			cos[i] = (float) Math.cos(ai);
 		}
 		
-		FastMeshBuilder mb = new FastMeshBuilder(info, null, (segm+1)*(segm*2+1), segm*segm*2*6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, (segm+1)*(segm*2+1), segm*segm*2*6);
 		
 		Vector3f v = new Vector3f();
 		int index = 0;
@@ -160,7 +159,7 @@ public abstract class BasicGeometry {
 			cos[i] = (float) Math.cos(ai);
 		}
 		
-		FastMeshBuilder mb = new FastMeshBuilder(info, null, 2*(segm*2+1), segm*2*6);
+		FastMeshBuilder mb = new FastMeshBuilder(info, 2*(segm*2+1), segm*2*6);
 		
 		Vector3f v = new Vector3f();
 		int index = 0;
@@ -210,7 +209,7 @@ public abstract class BasicGeometry {
 			cos[i] = (float) Math.cos(ai);
 		}
 		
-		FastMeshBuilder mb = new FastMeshBuilder(info, null, 2*2*(segm*2+1), 2*segm*2*3);
+		FastMeshBuilder mb = new FastMeshBuilder(info, 2*2*(segm*2+1), 2*segm*2*3);
 		
 		Vector3f v = new Vector3f();
 		int index = 0;

@@ -92,8 +92,8 @@ public class Bench extends Plaza implements RequestLamp {
 		benchTexture = new SeasonalTexture(new int[] {10, 77},
 				new Texture("models/bench/bench.png", true, true, false),
 				new Texture("models/bench/bench_winter.png", true, true, false)); 
-		bench = new TileComponent(ObjMeshLoader.loadObj("models/bench/bench.obj", 0, 1f, ObjectShader.vertexInfo, null), benchTexture);
-		parkTable = new TileComponent(ObjMeshLoader.loadObj("models/bench/park_table.obj", 0, 1f, ObjectShader.vertexInfo, null), benchTexture);
+		bench = new TileComponent(ObjMeshLoader.loadObj("models/bench/bench.obj", 0, 1f, ObjectShader.vertexInfo), benchTexture);
+		parkTable = new TileComponent(ObjMeshLoader.loadObj("models/bench/park_table.obj", 0, 1f, ObjectShader.vertexInfo), benchTexture);
 	}
 	
 	@Override

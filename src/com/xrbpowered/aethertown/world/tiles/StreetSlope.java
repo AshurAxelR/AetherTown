@@ -102,45 +102,45 @@ public class StreetSlope extends TunnelTileTemplate {
 		Texture handrailTex = new Texture("models/fences/handrail.png", false, true, false);
 		StaticMesh mesh;
 		if(h==4) {
-			mesh = ObjMeshLoader.loadObj("models/stairs/stairs4.obj", 0, 1f, ObjectShader.vertexInfo, null); 
+			mesh = ObjMeshLoader.loadObj("models/stairs/stairs4.obj", 0, 1f, ObjectShader.vertexInfo); 
 			side = new TileComponent(
-					ObjMeshLoader.loadObj("models/stairs/stairs4side.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/stairs/stairs4side.obj", 0, 1f, ObjectShader.vertexInfo),
 					TexColor.get(TerrainBuilder.wallColor));
 			handrailL = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/handrail_s4l.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/handrail_s4l.obj", 0, 1f, ObjectShader.vertexInfo),
 					handrailTex);
 			handrailR = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/handrail_s4r.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/handrail_s4r.obj", 0, 1f, ObjectShader.vertexInfo),
 					handrailTex);
 		}
 		else if(h==2) {
-			mesh = ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null); 
+			mesh = ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo); 
 			street = new TileComponent(
-					ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/stairs/stairs2.obj", 0, 1f, ObjectShader.vertexInfo),
 					TexColor.get(Street.streetColor));
 			side = new TileComponent(
-					ObjMeshLoader.loadObj("models/stairs/stairs2side.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/stairs/stairs2side.obj", 0, 1f, ObjectShader.vertexInfo),
 					TexColor.get(TerrainBuilder.wallColor));
 			handrailL = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/handrail_s2l.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/handrail_s2l.obj", 0, 1f, ObjectShader.vertexInfo),
 					handrailTex);
 			handrailR = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/handrail_s2r.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/handrail_s2r.obj", 0, 1f, ObjectShader.vertexInfo),
 					handrailTex);
 		}
 		else {
-			mesh = BasicGeometry.slope(Tile.size, Tile.ysize*h, ObjectShader.vertexInfo, null);
+			mesh = BasicGeometry.slope(Tile.size, Tile.ysize*h, ObjectShader.vertexInfo);
 			handrailL = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/handrail_s1l.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/handrail_s1l.obj", 0, 1f, ObjectShader.vertexInfo),
 					handrailTex);
 			handrailR = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/handrail_s1r.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/handrail_s1r.obj", 0, 1f, ObjectShader.vertexInfo),
 					handrailTex);
 			stepsL = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/steps_out_s1l.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/steps_out_s1l.obj", 0, 1f, ObjectShader.vertexInfo),
 					TexColor.get(TerrainBuilder.wallColor));
 			stepsR = new TileComponent(
-					ObjMeshLoader.loadObj("models/fences/steps_out_s1r.obj", 0, 1f, ObjectShader.vertexInfo, null),
+					ObjMeshLoader.loadObj("models/fences/steps_out_s1r.obj", 0, 1f, ObjectShader.vertexInfo),
 					TexColor.get(TerrainBuilder.wallColor));
 		}
 		street = new TileComponent(mesh, TexColor.get(Street.streetColor));

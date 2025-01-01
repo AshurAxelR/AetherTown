@@ -78,19 +78,19 @@ public class Tunnels {
 	
 	public static void createComponents() {
 		wall = new TunnelTileComponent(
-				BasicGeometry.wall(Tile.size, Tile.ysize, ObjectShader.vertexInfo, null),
+				BasicGeometry.wall(Tile.size, Tile.ysize, ObjectShader.vertexInfo),
 				TexColor.get(TerrainBuilder.wallColor));
 		bridge = new TunnelTileComponent(
-				ObjMeshLoader.loadObj("models/tunnel/bridge.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/bridge.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(TerrainBuilder.wallColor));
 		bridgeSupport = new TunnelTileComponent(
-				ObjMeshLoader.loadObj("models/tunnel/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/bridge_support.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(TerrainBuilder.wallColor));
 		tunnelj = new TunnelTileComponent(
-				ObjMeshLoader.loadObj("models/tunnel/tunnelj.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/tunnelj.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(TerrainBuilder.wallColor));
 		tunneljSupport = new TunnelTileComponent(
-				ObjMeshLoader.loadObj("models/tunnel/tunnelj_support.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/tunnelj_support.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(TerrainBuilder.wallColor));
 	}
 	

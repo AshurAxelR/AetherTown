@@ -70,7 +70,7 @@ public class NavBox extends Bench {
 	@Override
 	public void createComponents() {
 		box = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/bench/navbox.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/bench/navbox.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/bench/navbox.png", false, true, false),
 				new Texture("models/bench/navbox_illum.png", false, true, false));
 	}

@@ -38,7 +38,7 @@ public class Alcove extends TunnelTileTemplate {
 	@Override
 	public void createComponents() {
 		spring = new TunnelTileComponent(
-				ObjMeshLoader.loadObj("models/tunnel/poi_spring.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/tunnel/poi_spring.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.getPalette());
 	}
 	

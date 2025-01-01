@@ -35,19 +35,19 @@ public abstract class Fences {
 
 	public static void createComponents() {
 		handrail = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/handrail.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/fences/handrail.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/fences/handrail.png", false, true, false));
 		handrailPole = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/handrail_pole.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/fences/handrail_pole.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(Plaza.plazaColor));
 		steps = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/steps_out.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/fences/steps_out.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(Street.streetColor));
 		stepsCorner = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/steps_out_c.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/fences/steps_out_c.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(Street.streetColor));
 		retWall = new TileComponent(
-				ObjMeshLoader.loadObj("models/fences/ret_wall.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/fences/ret_wall.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(TerrainBuilder.wallColor));
 	}
 	

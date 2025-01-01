@@ -65,9 +65,9 @@ public class TerrainChunkBuilder {
 		this.cz = cz;
 		
 		color = new TerrainTexture(chunkSize, chunkSize);
-		grassBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
-		cliffBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
-		wallBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
+		grassBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo);
+		cliffBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo);
+		wallBuilder = new AdvancedMeshBuilder(ObjectShader.vertexInfo);
 		if(enableSmooth) {
 			grassVertexMap = new Vertex[chunkSize+1][chunkSize+1];
 			if(enableDebugNormals)
@@ -247,7 +247,7 @@ public class TerrainChunkBuilder {
 
 	private StaticMesh createDebugMesh(float debugVectorSize) {
 		Vector3f up = new Vector3f(0, 1, 0);
-		AdvancedMeshBuilder debug = new AdvancedMeshBuilder(ObjectShader.vertexInfo, null);
+		AdvancedMeshBuilder debug = new AdvancedMeshBuilder(ObjectShader.vertexInfo);
 		for(int x=0; x<=level.levelSize; x++)
 			for(int z=0; z<=level.levelSize; z++) {
 				Vector3f o = pos(new Vector3i(x, level.h.y[x][z], z));

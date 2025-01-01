@@ -40,10 +40,10 @@ public class Pavillion extends Plaza {
 	@Override
 	public void createComponents() {
 		pavillion = new TileComponent(
-				ObjMeshLoader.loadObj("models/pavillion/pavillion.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/pavillion/pavillion.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.getPalette());
 		pavBenches = new TileComponent(
-				ObjMeshLoader.loadObj("models/pavillion/pav_benches.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/pavillion/pav_benches.obj", 0, 1f, ObjectShader.vertexInfo),
 				Bench.benchTexture);
 	}
 

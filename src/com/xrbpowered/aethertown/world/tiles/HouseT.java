@@ -122,13 +122,13 @@ public class HouseT extends TileTemplate {
 	public void createComponents() {
 		ArchitectureTileSet.createComponents();
 		roof = new TileComponent(
-				BasicGeometry.slope(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo, null),
+				BasicGeometry.slope(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo),
 				ChurchT.roofTexture);
 		roofEndLeft = new TileComponent(
-				BasicGeometry.slopeSideLeft(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo, null),
+				BasicGeometry.slopeSideLeft(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo),
 				TexColor.get(upperWallColor));
 		roofEndRight = new TileComponent(
-				BasicGeometry.slopeSideRight(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo, null),
+				BasicGeometry.slopeSideRight(Tile.size, roofHeight*Tile.ysize, ObjectShader.vertexInfo),
 				TexColor.get(upperWallColor));
 	}
 

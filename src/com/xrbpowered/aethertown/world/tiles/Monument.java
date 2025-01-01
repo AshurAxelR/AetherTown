@@ -40,10 +40,10 @@ public class Monument extends Plaza {
 	@Override
 	public void createComponents() {
 		pillar = new TileComponent(
-				ObjMeshLoader.loadObj("models/monument/pillar.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/monument/pillar.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(plazaColor));
 		statue = new TileComponent(
-				ObjMeshLoader.loadObj("models/monument/angel.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/monument/angel.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(statueColor));
 	}
 

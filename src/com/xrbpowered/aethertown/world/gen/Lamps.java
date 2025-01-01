@@ -49,12 +49,12 @@ public class Lamps {
 
 	public static void createComponents() {
 		lantern = new IllumTileComponent(
-				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/lamp/lamp.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/lamp/lamp.png", false, true, false),
 				new Texture("models/lamp/lamp_illum.png", false, true, false));
 		coronaSprite = new SpriteComponent(new Texture("models/lamp/corona.png"));
 		lampPost = new TileComponent(
-				ObjMeshLoader.loadObj("models/lamp/lamp_post.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/lamp/lamp_post.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.get(lampPostColor));
 	}
 	

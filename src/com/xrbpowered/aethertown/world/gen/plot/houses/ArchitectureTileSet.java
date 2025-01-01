@@ -230,16 +230,16 @@ public abstract class ArchitectureTileSet {
 	public static IllumTileComponent hotelSign;
 	
 	public static void createComponents() {
-		wall = BasicGeometry.wall(Tile.size, 6*Tile.ysize, ObjectShader.vertexInfo, null);
+		wall = BasicGeometry.wall(Tile.size, 6*Tile.ysize, ObjectShader.vertexInfo);
 		
-		StaticMesh sign = ObjMeshLoader.loadObj("models/house/sign/sign.obj", 0, 1f, ObjectShader.vertexInfo, null);
+		StaticMesh sign = ObjMeshLoader.loadObj("models/house/sign/sign.obj", 0, 1f, ObjectShader.vertexInfo);
 		postSign = new IllumTileComponent(sign,
 				new Texture("models/house/sign/post.png", false, true, false),
 				new Texture("models/house/sign/post_illum.png", false, true, false));
 		hospitalSign = new IllumTileComponent(sign,
 				new Texture("models/house/sign/hospital.png", false, true, false),
 				new Texture("models/house/sign/hospital_illum.png", false, true, false));
-		hotelSign = new IllumTileComponent(ObjMeshLoader.loadObj("models/house/sign/sign2.obj", 0, 1f, ObjectShader.vertexInfo, null),
+		hotelSign = new IllumTileComponent(ObjMeshLoader.loadObj("models/house/sign/sign2.obj", 0, 1f, ObjectShader.vertexInfo),
 				new Texture("models/house/sign/hotel.png", false, true, false),
 				new Texture("models/house/sign/hotel_illum.png", false, true, false));
 		

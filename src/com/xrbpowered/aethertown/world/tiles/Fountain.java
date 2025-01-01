@@ -30,7 +30,7 @@ public class Fountain extends Plaza {
 	@Override
 	public void createComponents() {
 		fountain = new TileComponent(
-				ObjMeshLoader.loadObj("models/monument/fountain.obj", 0, 1f, ObjectShader.vertexInfo, null),
+				ObjMeshLoader.loadObj("models/monument/fountain.obj", 0, 1f, ObjectShader.vertexInfo),
 				TexColor.getPalette());
 	}
 
