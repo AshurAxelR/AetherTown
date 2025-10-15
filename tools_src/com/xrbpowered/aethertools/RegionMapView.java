@@ -4,10 +4,11 @@ import static com.xrbpowered.aethertown.AetherTown.settings;
 import static com.xrbpowered.aethertown.ui.ImageGenerator.colorMargin;
 import static com.xrbpowered.aethertown.ui.RegionMapImage.*;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 
+import com.xrbpowered.aethertools.ui.UISeedControls;
 import com.xrbpowered.aethertown.AetherTown;
-import com.xrbpowered.aethertown.state.SaveState;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.world.region.LevelInfo;
 import com.xrbpowered.aethertown.world.region.LevelNames;
@@ -21,6 +22,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 import com.xrbpowered.zoomui.UIContainer;
 import com.xrbpowered.zoomui.UIElement;
 import com.xrbpowered.zoomui.base.UIPanView;
+import com.xrbpowered.zoomui.std.UIButton;
 import com.xrbpowered.zoomui.swing.SwingFrame;
 import com.xrbpowered.zoomui.swing.SwingWindowFactory;
 
@@ -29,6 +31,8 @@ public class RegionMapView extends UIElement {
 	public static Region region;
 	public static LevelInfo active = null;
 	public static boolean showVisited = true;
+	
+	public static UIRoot root;
 	
 	private static int hoverx, hoverz;
 	
@@ -41,13 +45,10 @@ public class RegionMapView extends UIElement {
 			@Override
 			protected void paintChildren(GraphAssist g) {
 				super.paintChildren(g);
-				paintInfo(g, region, hoverx, hoverz, showVisited);
+				if(region!=null)
+					paintInfo(g, region, hoverx, hoverz, showVisited);
 			}
 		});
-		UIPanView view = (UIPanView) getParent();
-		view.setSize(getRoot().getWindow().getClientWidth(), getRoot().getWindow().getClientHeight());
-		if(region!=null)
-			centerAt(region.sizez/2, region.sizez/2);
 	}
 	
 	public void centerAt(int x, int z) {
@@ -69,7 +70,8 @@ public class RegionMapView extends UIElement {
 	
 	@Override
 	public void paint(GraphAssist g) {
-		paintMap(g, region, active, showVisited);
+		if(region!=null)
+			paintMap(g, region, active, showVisited);
 	}
 	
 	@Override
@@ -79,6 +81,73 @@ public class RegionMapView extends UIElement {
 		repaint();
 	}
 
+	private static class UITopControls extends UIContainer {
+
+		public static final Color colorPanel = new Color(0xf2f2f2);
+		public static final Color colorPanelBorder = new Color(0xcccccc);
+		
+		public final UISeedControls seedControls;
+		
+		public UITopControls(UIContainer parent) {
+			super(parent);
+			setSize(0, UIButton.defaultHeight+16);
+			seedControls = new UISeedControls(this) {
+				@Override
+				public void apply(long seed) {
+					startRegion(seed);
+				}
+			};
+		}
+		
+		@Override
+		public void layout() {
+			seedControls.setPosition(getWidth() - seedControls.getWidth(), 0);
+			super.layout();
+		}
+		
+		@Override
+		protected void paintBackground(GraphAssist g) {
+			g.fill(this, colorPanel);
+			g.resetStroke();
+			g.hborder(this, GraphAssist.BOTTOM, colorPanelBorder);
+		}
+
+	}
+	
+	private static class UIRoot extends UIContainer {
+		public final UITopControls top;
+		public final RegionMapView map;
+		public final UIContainer view;
+
+		public UIRoot(UIContainer parent) {
+			super(parent);
+			map = new RegionMapView(this);
+			view = map.getParent();
+			top = new UITopControls(this);
+		}
+		
+		@Override
+		public void layout() {
+			float htop = top.getHeight();
+			top.setPosition(0, 0);
+			top.setSize(getWidth(), htop);
+			view.setPosition(0, htop);
+			view.setSize(getWidth(), getHeight() - htop);
+			super.layout();
+		}
+	}
+	
+	public static void startRegion(long regionSeed) {
+		RegionCache.useLegacy(settings.legacyRandom);
+		region = new RegionCache(settings.regionMode).get(regionSeed);
+		
+		if(region!=null) {
+			root.map.centerAt(region.sizez/2, region.sizez/2);
+			active = region.startLevel;
+		}
+		root.repaint();
+	}
+	
 	public static void main(String[] args) {
 		AssetManager.defaultAssets = new FileAssetManager("assets_src", new FileAssetManager("assets", AssetManager.defaultAssets));
 		LevelNames.load();
@@ -87,18 +156,15 @@ public class RegionMapView extends UIElement {
 		settings = new AetherTown.ClientConfig();
 		//settings.load();
 		settings.regionMode = new RegionMode.Linear(64);
-		settings.regionSeed = 5764483515444918203L;
+		settings.regionSeed = 2211452794341358531L;
 		settings.legacyRandom = false;
 		
-		SaveState save = new SaveState();
-		RegionCache.useLegacy(settings.legacyRandom);
-		region = new RegionCache(save.regionMode).get(save.regionSeed);
-		
-		active = region.startLevel;
 		showVisited = false;
 		SwingFrame frame = SwingWindowFactory.use(1f).createFrame("AetherTown region map", 1920, 1080);
-		new RegionMapView(frame.getContainer());
+		root = new UIRoot(frame.getContainer());
 		frame.show();
+		
+		startRegion(settings.regionSeed);
 	}
 
 }

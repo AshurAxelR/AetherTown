@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.AetherTown.ClientConfig;
 import com.xrbpowered.aethertown.state.SaveState;
 import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.utils.ColorBlend;
@@ -186,6 +187,8 @@ public class HeightMapView extends UIElement {
 		LevelNames.load();
 		Fonts.load();
 
+		if(AetherTown.settings==null)
+			AetherTown.settings = new ClientConfig();
 		AetherTown.settings.load();
 		SaveState save = new SaveState();
 		AetherTown.generateRegion(save);
