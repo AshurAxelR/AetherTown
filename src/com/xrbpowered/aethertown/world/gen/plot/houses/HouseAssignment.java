@@ -380,7 +380,7 @@ public abstract class HouseAssignment {
 		}
 	}
 	
-	public static void assignHouses(Level level, Random random) {
+	public static void assignHouses(Level level, Random random, boolean permissive) {
 		if(level.houseCount==0)
 			return;
 		HouseRole.resetShuffle();
@@ -394,8 +394,13 @@ public abstract class HouseAssignment {
 		}
 		ha.assign(random);
 		System.out.printf("%d houses: %d (%d) res\n", level.houseCount, ha.countRes, ha.countResOnly);
-		if(level.info.settlement!=LevelSettlementType.inn && ha.countRes<minResidential)
-			GeneratorException.raise("Not enough residential (%d)", ha.countRes);
+		if(level.info.settlement!=LevelSettlementType.inn && ha.countRes<minResidential) {
+			String msg = String.format("Not enough residential (%d)", ha.countRes);
+			if(permissive && ha.countRes>=level.info.settlement.claimOptions)
+				GeneratorException.warning(msg + " -- permitted");
+			else
+				GeneratorException.raise(msg);
+		}
 	}
 	
 }

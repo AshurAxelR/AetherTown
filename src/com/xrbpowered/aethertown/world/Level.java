@@ -110,7 +110,7 @@ public class Level {
 			if(att>0)
 				System.out.printf("Retrying...\nAttempt #%d\n", att+1);
 			try {
-				generate(random);
+				generate(random, att>=maxGeneratorAttempts/2);
 				System.gc();
 				System.out.println("Done.");
 				return;
@@ -122,13 +122,18 @@ public class Level {
 		throw new RuntimeException("Generator attempts limit reached");
 	}
 
-	private void checkHouseCount() {
-		if(houseCount<info.settlement.minHouses)
-			GeneratorException.raise("Settlement is too small: %d vs %d min for %s",
+	private void checkHouseCount(boolean permissive) {
+		if(houseCount<info.settlement.minHouses) {
+			String msg = String.format("Settlement is too small: %d vs %d min for %s",
 					houseCount, info.settlement.minHouses, info.settlement.title);
+			if(permissive)
+				GeneratorException.warning(msg + " -- permitted");
+			else
+				GeneratorException.raise(msg);
+		}
 	}
 	
-	private void generate(Random random) {
+	private void generate(Random random, boolean permissive) {
 		resetGenerator();
 		
 		startx = levelSize/2;
@@ -141,7 +146,7 @@ public class Level {
 			gen.generate(startToken, random);
 			startx = gen.startToken.x;
 			startz = gen.startToken.z;
-			checkHouseCount();
+			checkHouseCount(permissive);
 			StreetLayoutGenerator.finishLayout(this, random);
 		}
 		else {
@@ -167,8 +172,8 @@ public class Level {
 			if(houses==null) {
 				houses = HouseGenerator.listHouses(this, random);
 				houseCount = houses.size();
-				checkHouseCount();
-				HouseAssignment.assignHouses(this, random);
+				checkHouseCount(permissive);
+				HouseAssignment.assignHouses(this, random, permissive);
 			}
 			
 			if(finalizeTiles(random))
