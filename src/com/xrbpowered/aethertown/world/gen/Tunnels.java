@@ -170,8 +170,11 @@ public class Tunnels {
 		while(upd) {
 			upd = false;
 			for(TunnelInfo tunnel : tunnels) {
-				if(tunnel.depth==0)
+				if(tunnel.depth==0) {
+					if(tunnel.type==TunnelType.junction)
+						tunnel.type = TunnelType.straight;
 					continue;
+				}
 				for(Dir d : Dir.values()) {
 					TunnelInfo adjTunnel = adjTunnel(tunnel.below, d);
 					if(adjTunnel!=null) {
