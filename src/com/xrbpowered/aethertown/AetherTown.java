@@ -69,6 +69,8 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
+	public static final String version = "a.0.3.5 (dev)";
+	
 	public static final float pawnHeight = 1.55f;
 	
 	private static final boolean useDebugAssets = false; 
@@ -665,6 +667,8 @@ public class AetherTown extends UIClient {
 	}
 	
 	public static void main(String[] args) {
+		System.out.printf("AetherTown version %s\n", version);
+		
 		AssetManager.defaultAssets = new FileAssetManager("assets", AssetManager.defaultAssets);
 		if(useDebugAssets)
 			AssetManager.defaultAssets = new FileAssetManager("assets_src", AssetManager.defaultAssets);

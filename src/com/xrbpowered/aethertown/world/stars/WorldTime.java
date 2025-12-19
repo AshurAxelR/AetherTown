@@ -56,7 +56,7 @@ public class WorldTime {
 	}
 	
 	public static int getDayOfYear(double time) {
-		return ((int)(Math.floor(time) + yearPhase*daysInYear) + equinoxDay + daysInYear) % daysInYear;
+		return ((int)Math.floor(time) + (int)Math.round(yearPhase*daysInYear) + equinoxDay + daysInYear) % daysInYear;
 	}
 
 	public static int getDayOfYear() {
@@ -106,7 +106,7 @@ public class WorldTime {
 			return Float.parseFloat(value);
 		int m = -1;
 		for(int i=0; i<monthNames.length; i++)
-			if(s[0].equals(monthNames[i])) {
+			if(s[0].equalsIgnoreCase(monthNames[i])) {
 				m = i;
 				break;
 			}
