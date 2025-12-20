@@ -24,7 +24,7 @@ public class Hud extends UINode {
 	private int shownHour = -1;
 	private float autosaveTimer = 0f;
 	
-	private UIPane uiTime, uiLookInfo, uiActionInfo, uiDebugInfo;
+	private UIPane uiTime, uiLookInfo, uiActionInfo, uiDebugInfo, uiVersionInfo;
 	private ToastPane uiToast;
 	private FadeInPane uiFadeIn;
 
@@ -47,6 +47,25 @@ public class Hud extends UINode {
 			};
 			uiDebugInfo.setSize(180, 50);
 			uiDebugInfo.setPosition(20, 20);
+		}
+		
+		if(settings.showVersion) {
+			uiVersionInfo = new UIPane(this, false) {
+				@Override
+				protected void paintBackground(GraphAssist g) {
+					clear(g, transparent);
+					g.setFont(Fonts.small);
+					float w = g.getFontMetrics().stringWidth(version) + 20;
+					g.fillRect(getWidth()-w, 0, w, getHeight(), bgColor);
+					g.setColor(Color.WHITE);
+					g.drawString(version, getWidth()-10, getHeight()/2, GraphAssist.RIGHT, GraphAssist.CENTER);
+				}
+				@Override
+				public void updateTime(float dt) {
+					repaint();
+				}
+			};
+			uiVersionInfo.setSize(240, 32);
 		}
 		
 		uiTime = new UIPane(this, false) {
@@ -97,6 +116,7 @@ public class Hud extends UINode {
 	
 	@Override
 	public void layout() {
+		uiVersionInfo.setPosition(getWidth()-20-uiVersionInfo.getWidth(), 20);
 		uiTime.setPosition(20, getHeight()-uiTime.getHeight()-20);
 		uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
 		uiActionInfo.setPosition(getWidth()/2-uiActionInfo.getWidth()/2, uiTime.getY()-uiActionInfo.getHeight()-60);

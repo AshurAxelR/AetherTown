@@ -69,7 +69,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.5 (dev)";
+	public static final String version = "a.0.3.5-dev1.2";
 	
 	public static final float pawnHeight = 1.55f;
 	
@@ -85,6 +85,7 @@ public class AetherTown extends UIClient {
 		public boolean vsync = true;
 		public int noVsyncSleep = 2;
 		public boolean showFps = false;
+		public boolean showVersion = false;
 		public float mouseSensitivity = 0.002f;
 		public float walkSpeed = 2.2f; // meters per second. Human: 1.35
 		public float flySpeed = 24f;
