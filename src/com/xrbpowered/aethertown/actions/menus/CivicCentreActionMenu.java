@@ -116,7 +116,7 @@ public class CivicCentreActionMenu extends TileActionMenu {
 			res.addAction(recoverKeyAction);
 			res.addAction(listHomesUIAction);
 			addMenu("HOME OFFICE", res);
-			addMenu("OFFICE", OfficeActionMenu.menu);
+			// addMenu("OFFICE", OfficeActionMenu.menu);
 		}
 		if(post) {
 			addAction(collectEarningsAction);

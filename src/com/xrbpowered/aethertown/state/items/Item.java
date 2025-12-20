@@ -77,6 +77,8 @@ public abstract class Item implements Comparable<Item> {
 				return new FoodItem(FoodItemType.values()[in.readInt()], time);
 			case groceries:
 				return new GroceriesItem(time);
+			case laptop:
+				return new LaptopItem(time);
 		}
 		return null; // should not happen
 	}
@@ -104,6 +106,7 @@ public abstract class Item implements Comparable<Item> {
 				out.writeInt(((FoodItem) aitem).food.ordinal());
 				return;
 			case groceries:
+			case laptop:
 				return;
 		}
 	}

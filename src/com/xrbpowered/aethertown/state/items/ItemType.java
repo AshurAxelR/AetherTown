@@ -8,7 +8,8 @@ public enum ItemType {
 	regionMap("Region Map"),
 	trinket("Trinket"),
 	foodItem(null),
-	groceries("Groceries");
+	groceries("Groceries"),
+	laptop("Laptop");
 	
 	public final String name;
 	

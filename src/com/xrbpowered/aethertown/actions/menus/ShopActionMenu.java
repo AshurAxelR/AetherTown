@@ -11,6 +11,7 @@ import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HomeImprovement;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.ItemType;
+import com.xrbpowered.aethertown.state.items.LaptopItem;
 import com.xrbpowered.aethertown.state.items.TrinketItem;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
@@ -70,7 +71,17 @@ public class ShopActionMenu extends TileActionMenu {
 	public static final TileActionMenu techShop = new ShopActionMenu(2,
 			new BuyHomeImprovementAction(HomeImprovement.tv),
 			new BuyHomeImprovementAction(HomeImprovement.console),
-			new BuyHomeImprovementAction(HomeImprovement.computer));
+			new BuyHomeImprovementAction(HomeImprovement.computer),
+			new GetItemAction("Buy", ItemType.laptop) {
+				@Override
+				protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
+					return (aitem instanceof LaptopItem);
+				}
+				@Override
+				protected Item generateItem(Tile tile, boolean alt) {
+					return new LaptopItem();
+				}
+			}.setCost(15000));
 
 	public static final TileActionMenu bookShop = new ShopActionMenu(3,
 			new BuyHomeImprovementAction(HomeImprovement.books),

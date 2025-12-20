@@ -14,14 +14,14 @@ import com.xrbpowered.aethertown.world.stars.WorldTime;
 
 public class OfficeActionMenu extends TileActionMenu {
 
+	public static final int workTime = 90;
+	
 	public static final TileAction workAction = new TileAction("Work") {
 		@Override
 		protected void onSuccess(Tile tile, boolean alt) {
-			String report = Earnings.work();
-			ConfirmDialog.show("Work", report, 350);
-			super.onSuccess(tile, alt);
+			doWork();
 		}
-	}.setDelay(90);
+	}.setDelay(workTime);
 	
 	public static final OfficeActionMenu menu = new OfficeActionMenu();
 	
@@ -39,6 +39,12 @@ public class OfficeActionMenu extends TileActionMenu {
 	@Override
 	public void disabledAction(Tile tile, TileActionMenuDialog dialog) {
 		showToast("Office closed until %02d:00", IllumLayer.officeHours.getOpenTime());
+	}
+	
+	public static void doWork() {
+		String report = Earnings.work();
+		ConfirmDialog.show("Work", report, 350);
+		WorldTime.time += workTime * WorldTime.minute;
 	}
 
 }
