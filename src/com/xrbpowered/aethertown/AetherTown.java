@@ -246,7 +246,7 @@ public class AetherTown extends UIClient {
 				activeController = walkController;
 				
 				sky = new SkyRenderer(bufferScale).setCamera(camera);
-				sky.stars.updateStars(region.seed);
+				sky.stars.updateStars(region);
 				// updateEnvironment();
 				
 				tiles = new TileRenderer().setCamera(camera);
@@ -425,7 +425,7 @@ public class AetherTown extends UIClient {
 	private void activateLevel(LevelInfo info) {
 		if(region!=info.region) {
 			region = info.region;
-			sky.stars.updateStars(region.seed);
+			sky.stars.updateStars(region);
 			System.out.printf("\nREGION switched to *%04dL\n\n", region.seed%10000L);
 		}
 		levelCache.addAllAdj(info, true);

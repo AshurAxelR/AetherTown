@@ -1,7 +1,9 @@
 package com.xrbpowered.aethertown.world.region;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
+import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.Rand;
@@ -10,6 +12,8 @@ import com.xrbpowered.aethertown.world.GeneratorException;
 import com.xrbpowered.aethertown.world.HeightGuideChunk;
 import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.PortalSystem.PortalInfo;
+import com.xrbpowered.aethertown.world.stars.Star;
+import com.xrbpowered.aethertown.world.stars.StarData;
 
 public class Region {
 
@@ -25,6 +29,9 @@ public class Region {
 	public LevelInfo[] portals = null;
 	public LevelInfo startLevel = null;
 	
+	private ArrayList<Star> starData = null;
+	private ArrayList<Star> starChartData = null;
+	
 	private boolean empty = true;
 	private int minx, minz, maxx, maxz;
 	
@@ -33,6 +40,24 @@ public class Region {
 		this.sizex = cache.mode.sizex;
 		this.sizez = cache.mode.sizez;
 		this.seed = seed;
+	}
+	
+	public ArrayList<Star> getStarData() {
+		if(starData==null)
+			starData = StarData.generate(RegionCache.getRand(seed), AetherTown.settings.improvedStars);
+		return starData;
+	}
+
+	public ArrayList<Star> getStarChartData() {
+		if(starChartData==null) {
+			starChartData = new ArrayList<>();
+			for(Star s : getStarData()) {
+				if(s.mag<StarData.chartMinMag)
+					starChartData.add(s.toChart());
+			}
+			starChartData.sort(null);
+		}
+		return starChartData;
 	}
 
 	public long seedXZ(int x, int z, int offs, long add) {

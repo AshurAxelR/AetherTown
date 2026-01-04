@@ -10,12 +10,11 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL32;
 
-import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.render.LevelRenderer;
-import com.xrbpowered.aethertown.world.region.RegionCache;
+import com.xrbpowered.aethertown.world.region.Region;
 import com.xrbpowered.aethertown.world.stars.BlackBodySpectrum;
+import com.xrbpowered.aethertown.world.stars.Star;
 import com.xrbpowered.aethertown.world.stars.StarData;
-import com.xrbpowered.aethertown.world.stars.StarData.Star;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.res.mesh.StaticMesh;
 import com.xrbpowered.gl.res.shader.CameraShader;
@@ -127,7 +126,8 @@ public class StarRenderer {
 		return data;
 	}
 	
-	public void updateStars(long seed) {
+	public void updateStars(Region region) {
+		long seed = region.seed;
 		if(this.seed!=seed) {
 			StaticMesh m = stars;
 			long s = this.seed;
@@ -141,7 +141,7 @@ public class StarRenderer {
 				stars.release();
 			this.seed = seed;
 			System.out.printf("Generating stars for *%04d\n", seed%10000L);
-			ArrayList<Star> data = StarData.generate(RegionCache.getRand(seed), AetherTown.settings.improvedStars);
+			ArrayList<Star> data = region.getStarData();
 			stars = new StaticMesh(vertexInfo, createPointData(data), 1, data.size(), false);
 		}
 	}
