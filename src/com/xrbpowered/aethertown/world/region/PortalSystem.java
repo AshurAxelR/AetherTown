@@ -256,8 +256,8 @@ public abstract class PortalSystem {
 			sb.append("<tr><td class=\"w\" style=\"width:20%;text-align:center\">");
 			sb.append(WorldTime.romanNumeral(i+1));
 			sb.append("</td>");
-			for(int j=3; j>=0; j--) {
-				String s = String.format("%04X", (seed >> (j*16)) & 0xffffL);
+			for(int j=6; j>=0; j--) {
+				String s = String.format("%03o", (seed >> (j*9)) & 0x1ff);
 				sb.append("<td style=\"width:20%;text-align:center\">");
 				sb.append(s);
 				sb.append("</td>");

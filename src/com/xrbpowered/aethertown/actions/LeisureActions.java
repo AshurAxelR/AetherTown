@@ -73,12 +73,12 @@ public abstract class LeisureActions {
 		}
 	};
 	
-	public static final TileAction starInfo = new TileAction("Star info") {
+	public static final TileAction starInfo = new TileAction("Star knowledge") {
 		@Override
 		protected void onSuccess(Tile tile, boolean alt) {
 			ArrayList<String> lines = StarData.getStarInfo(tile.level.info.region.getStarChartData());
 			if(lines.isEmpty())
-				ConfirmDialog.show("Star info", "<p>No notable stars.</p>", 120);
+				ConfirmDialog.show("Star knowledge", "<p>No notable stars.</p>", 120);
 			else {
 				StringBuilder sb = new StringBuilder();
 				sb.append("<table>");

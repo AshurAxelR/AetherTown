@@ -148,7 +148,6 @@ public class StarData {
 					season += " (low)";
 			}
 			
-			System.out.printf(" * 1 %s star (%.2f%s) %s\n", tier, s.mag, getSpectralClass(s.temp), season);
 			out.add(String.format("%s star (%.2f%s) %s\n", tier, s.mag, getSpectralClass(s.temp), season));
 		}
 		return out;
