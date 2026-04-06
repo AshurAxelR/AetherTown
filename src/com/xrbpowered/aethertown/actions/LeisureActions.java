@@ -2,14 +2,11 @@ package com.xrbpowered.aethertown.actions;
 
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
-import java.util.ArrayList;
-
 import com.xrbpowered.aethertown.AetherTown;
 import com.xrbpowered.aethertown.state.GlobalCooldowns;
 import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.ui.dialogs.ConfirmDialog;
 import com.xrbpowered.aethertown.world.Tile;
-import com.xrbpowered.aethertown.world.stars.StarData;
 
 public abstract class LeisureActions {
 
@@ -69,27 +66,6 @@ public abstract class LeisureActions {
 			String report = AetherTown.regionCache.portals.createKnowledgeReport(tile.level.info.region);
 			int lines = AetherTown.regionCache.portals.numPortals;
 			ConfirmDialog.show("Portals", report, lines*20+180);
-			super.onSuccess(tile, alt);
-		}
-	};
-	
-	public static final TileAction starInfo = new TileAction("Star knowledge") {
-		@Override
-		protected void onSuccess(Tile tile, boolean alt) {
-			ArrayList<String> lines = StarData.getStarInfo(tile.level.info.region.getStarChartData());
-			if(lines.isEmpty())
-				ConfirmDialog.show("Star knowledge", "<p>No notable stars.</p>", 120);
-			else {
-				StringBuilder sb = new StringBuilder();
-				sb.append("<table>");
-				for(String s : lines) {
-					sb.append("<tr><td>&bull; ");
-					sb.append(s);
-					sb.append("</td></tr>");
-				}
-				sb.append("</table>");
-				ConfirmDialog.show("Star info", sb.toString(), lines.size()*20+120);
-			}
 			super.onSuccess(tile, alt);
 		}
 	};

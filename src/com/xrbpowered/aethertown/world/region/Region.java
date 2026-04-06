@@ -14,6 +14,7 @@ import com.xrbpowered.aethertown.world.region.LevelInfo.LevelConnection;
 import com.xrbpowered.aethertown.world.region.PortalSystem.PortalInfo;
 import com.xrbpowered.aethertown.world.stars.Star;
 import com.xrbpowered.aethertown.world.stars.StarData;
+import com.xrbpowered.aethertown.world.stars.chart.ChartStar;
 
 public class Region {
 
@@ -30,7 +31,7 @@ public class Region {
 	public LevelInfo startLevel = null;
 	
 	private ArrayList<Star> starData = null;
-	private ArrayList<Star> starChartData = null;
+	private ArrayList<ChartStar> starChartData = null;
 	
 	private boolean empty = true;
 	private int minx, minz, maxx, maxz;
@@ -48,7 +49,7 @@ public class Region {
 		return starData;
 	}
 
-	public ArrayList<Star> getStarChartData() {
+	public ArrayList<ChartStar> getStarChartData() {
 		if(starChartData==null) {
 			starChartData = new ArrayList<>();
 			for(Star s : getStarData()) {

@@ -16,8 +16,8 @@ public class MapsMenu extends TileActionMenu {
 
 	public static final TileAction regionMapAction = createRegionMapAction(false);
 	
-	public static final TileActionMenu menu = new MapsMenu(true); 
-	public static final TileActionMenu noToken = new MapsMenu(false); 
+	public static final TileActionMenu menu = new MapsMenu(true);
+	public static final TileActionMenu noToken = new MapsMenu(false);
 	
 	private static TileAction createRegionMapAction(boolean level) {
 		return new TileAction("View region map") {
