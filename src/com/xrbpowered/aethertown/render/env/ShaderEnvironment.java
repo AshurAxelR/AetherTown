@@ -18,6 +18,9 @@ import com.xrbpowered.gl.res.shader.Shader;
 
 public class ShaderEnvironment {
 
+	public static boolean flashOn = false;
+	public static Color flashColor = new Color(0x777777);
+	
 	public Vector3f lightDirection = new Vector3f(-0.55f, -0.65f, -0.45f);
 	public Vector3f lightSkyDirection = new Vector3f(-0.55f, -0.65f, -0.45f);
 	public Color lightColor = new Color(0xffffff);
@@ -109,6 +112,8 @@ public class ShaderEnvironment {
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "lightWashTop"), lightWashTop);
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "lightWashBottom"), lightWashBottom);
 		GL20.glUniform1f(GL20.glGetUniformLocation(pId, "lightSkyWash"), lightSkyWash);
+
+		uniform(GL20.glGetUniformLocation(pId, "flashColor"), flashOn ? flashColor : Color.BLACK);
 
 		GL20.glUseProgram(0);
 	}

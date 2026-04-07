@@ -3,6 +3,7 @@
 #define MIN_FOG_DIST 4
 #define POINT_LIGHT_R 1
 #define EPSILON 0.001
+#define FLASH_DIST 8
 
 #ifdef TUNNEL_TILE
 	#define LIGHT_FALLOFF 3.0
@@ -31,6 +32,7 @@ uniform vec4 midColor = vec4(0.301, 0.450, 0.8, 1);
 uniform vec4 shadowColor = vec4(0.250, 0.349, 0.6, 1);
 
 uniform vec4 pointLightColor = vec4(1.0, 0.98, 0.9, 1);
+uniform vec4 flashColor = vec4(0, 0, 0, 1);
 uniform float illumTrigger = 2;
 
 uniform float fogNear = 40;
@@ -122,6 +124,9 @@ void main(void) {
 			diffuseLight += 0.4*blockLight;
 		}
 	#endif
+
+    float flashFalloff = clamp(1 - viewDist / FLASH_DIST, 0, 1) / sqrt(brightness+1);
+    diffuseLight += flashColor*flashFalloff*flashFalloff;
 	
 	out_Color = diffuseColor * diffuseLight; // + specColor * lightColor * spec;
 	#ifdef ILLUM_TILE
@@ -133,7 +138,7 @@ void main(void) {
 		float lightDist = viewDist * (1 - 0.5 * illumBrigtness);
 		viewDist = mix(lightDist, viewDist, clamp((viewDist-fogFar+12)/12, 0, 1));
 	#endif
-	
+    
 	vec4 fogColor = texture(texSky, pass_SkyCoord);
 	float lowNear = clamp((viewDist - MIN_FOG_DIST) / (cloudNear - MIN_FOG_DIST), 0, 1);
 	vec4 highColor = mix(out_Color, fogColor, clamp((viewDist - fogNear) / (fogFar - fogNear), 0, 1));

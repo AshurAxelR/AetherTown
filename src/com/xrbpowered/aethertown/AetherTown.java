@@ -12,6 +12,7 @@ import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
 import com.xrbpowered.aethertown.render.env.DaytimeEnvironment;
+import com.xrbpowered.aethertown.render.env.ShaderEnvironment;
 import com.xrbpowered.aethertown.render.env.SkyRenderer;
 import com.xrbpowered.aethertown.render.tiles.ComponentLibrary;
 import com.xrbpowered.aethertown.render.tiles.TileRenderer;
@@ -69,7 +70,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.5-dev1.5";
+	public static final String version = "a.0.3.5-dev1.6";
 	
 	public static final float pawnHeight = 1.55f;
 	
@@ -615,6 +616,9 @@ public class AetherTown extends UIClient {
 					else
 						showToast("You don't have a local map");
 				}
+				break;
+			case KeyEvent.VK_F:
+				ShaderEnvironment.flashOn = !ShaderEnvironment.flashOn;
 				break;
 			case KeyEvent.VK_Q:
 				if(level!=null && level.isInside(hoverx, hoverz))

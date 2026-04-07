@@ -12,6 +12,7 @@ Actions:
 * **E** - interact
 * **R** - alternative interaction
 * **Q** - open inventory
+* **F** - flash light on/off
 * **M** - view local map
 * **N** - view region map
 * **B** - bookmarks UI (if allowed)
