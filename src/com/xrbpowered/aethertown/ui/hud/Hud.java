@@ -26,6 +26,7 @@ public class Hud extends UINode {
 	
 	private UIPane uiTime, uiLookInfo, uiActionInfo, uiDebugInfo, uiVersionInfo;
 	private ToastPane uiToast;
+	private UIRotatedTexture uiCompass;
 	private FadeInPane uiFadeIn;
 
 	public Hud(UIContainer parent) {
@@ -107,6 +108,17 @@ public class Hud extends UINode {
 
 		uiToast = new ToastPane(this);
 		uiFadeIn = new FadeInPane(this);
+		
+		uiCompass = new UIRotatedTexture(this) {
+			@Override
+			public void setupResources() {
+				setTexture(CompassTexture.create());
+				setClip(true);
+				super.setupResources();
+			}
+		};
+		uiCompass.setRadius(CompassTexture.radius);
+		uiCompass.setVisible(false);
 	}
 	
 	@Override
@@ -121,6 +133,7 @@ public class Hud extends UINode {
 		uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
 		uiActionInfo.setPosition(getWidth()/2-uiActionInfo.getWidth()/2, uiTime.getY()-uiActionInfo.getHeight()-60);
 		uiToast.setPosition(20, getHeight()/2-uiToast.getHeight()/2);
+		uiCompass.setPosition(getWidth()-20-uiCompass.getRadius(), getHeight()-20-uiCompass.getRadius());
 		super.layout();
 	}
 
@@ -164,6 +177,18 @@ public class Hud extends UINode {
 	
 	public TileAction getTileAltAction() {
 		return tileAltAction;
+	}
+	
+	public void showCompass(boolean visible) {
+		uiCompass.setVisible(visible);
+	}
+	
+	public void toggleCompass() {
+		uiCompass.setVisible(!uiCompass.isVisible());
+	}
+	
+	public void setLookDirection(float angle) {
+		uiCompass.setAngle(angle);
 	}
 	
 	public void setLookAtTile(Tile tile) {

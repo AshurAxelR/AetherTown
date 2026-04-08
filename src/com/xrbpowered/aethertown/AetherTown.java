@@ -30,10 +30,10 @@ import com.xrbpowered.aethertown.ui.dialogs.InventoryDialog;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.ui.dialogs.RegionMapDialog;
 import com.xrbpowered.aethertown.ui.hud.Hud;
+import com.xrbpowered.aethertown.ui.hud.RotatedPaneShader;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
 import com.xrbpowered.aethertown.utils.Dir;
-import com.xrbpowered.aethertown.utils.Dir8;
 import com.xrbpowered.aethertown.utils.MathUtils;
 import com.xrbpowered.aethertown.utils.ParseParams;
 import com.xrbpowered.aethertown.world.Level;
@@ -70,7 +70,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.5-dev1.6";
+	public static final String version = "a.0.3.5-dev1.7";
 	
 	public static final float pawnHeight = 1.55f;
 	
@@ -106,6 +106,7 @@ public class AetherTown extends UIClient {
 		public boolean residentialLighting = true;
 		public boolean revealRegion = true;
 		public boolean mapRequireItem = true;
+		public boolean compassRequireItem = false;
 		public boolean markAdjVisited = false;
 
 		public boolean homeCrediting = false;
@@ -332,9 +333,14 @@ public class AetherTown extends UIClient {
 		
 		ui = new DialogContainer(getContainer());
 		hud = new Hud(getContainer());
+		hud.showCompass(!settings.compassRequireItem);
 	}
 	
-	private int compass = -1;
+	@Override
+	public void createResources() {
+		super.createResources();
+		RotatedPaneShader.createInstance();
+	}
 	
 	private void updateWalkY() {
 		boolean inside = Level.hoverInside(level.levelSize, camera.position.x, camera.position.z);
@@ -348,11 +354,7 @@ public class AetherTown extends UIClient {
 			Dir d = Dir.values()[(int)Math.round(-camera.rotation.y*2.0/Math.PI) & 0x03];
 			hud.setLookAtTile(level.getAdj(hoverx, hoverz, d));
 		}
-		
-		int comp = (int)Math.round(-camera.rotation.y*4.0/Math.PI) & 0x07;
-		if(comp!=compass) {
-			compass = comp;
-		}
+		hud.setLookDirection(camera.rotation.y);
 		
 		pointActor.position.x = camera.position.x;
 		pointActor.position.z = camera.position.z;
@@ -498,7 +500,7 @@ public class AetherTown extends UIClient {
 		
 		// float a = 90f - (float)Math.toDegrees(Math.acos(sky.sun.position.dot(0, 1, 0, 0)));
 		// y = g.drawString(String.format("Sun angle: %.1f\u00b0", a), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
-		s = String.format("[%d, %d] %s", hoverx, hoverz, Dir8.values()[compass].name().toUpperCase());
+		s = String.format("[%d, %d]", hoverx, hoverz);
 		if(level!=null && level.isInside(hoverx, hoverz) && level.map[hoverx][hoverz]!=null)
 			s += String.format(" y:%d", level.map[hoverx][hoverz].basey);
 		y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
@@ -616,6 +618,12 @@ public class AetherTown extends UIClient {
 					else
 						showToast("You don't have a local map");
 				}
+				break;
+			case KeyEvent.VK_C:
+				if(!settings.compassRequireItem) // TODO || CompassItem.hasCompass())
+					hud.toggleCompass();
+				else
+					showToast("You don't have a compass");
 				break;
 			case KeyEvent.VK_F:
 				ShaderEnvironment.flashOn = !ShaderEnvironment.flashOn;
