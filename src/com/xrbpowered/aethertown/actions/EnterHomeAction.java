@@ -13,6 +13,7 @@ import com.xrbpowered.aethertown.state.items.FoodItem;
 import com.xrbpowered.aethertown.state.items.FoodItem.FoodItemType;
 import com.xrbpowered.aethertown.state.items.GroceriesItem;
 import com.xrbpowered.aethertown.state.items.HouseKeyItem;
+import com.xrbpowered.aethertown.state.items.ItemType;
 import com.xrbpowered.aethertown.ui.dialogs.TileActionMenu;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
@@ -110,7 +111,7 @@ public class EnterHomeAction extends HouseTileAction {
 			super.onSuccess(tile, alt);
 			HomeData home = HomeData.getLocal(tile.level.info);
 			Inventory inv = GroceriesItem.findGroceries(home);
-			inv.remove(GroceriesItem.findGroceries(inv));
+			inv.remove(inv.find(ItemType.groceries));
 			home.storage[0].put(new FoodItem(FoodItemType.homeCooked));
 			home.storage[0].put(new FoodItem(FoodItemType.homeCooked));
 			showToast(String.format("2x %s added", FoodItemType.homeCooked.getName()));

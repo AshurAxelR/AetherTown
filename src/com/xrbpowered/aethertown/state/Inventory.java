@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import com.xrbpowered.aethertown.state.items.Item;
+import com.xrbpowered.aethertown.state.items.ItemType;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseRole;
@@ -75,6 +76,25 @@ public class Inventory {
 		return slots[index];
 	}
 	
+	public int find(ItemType type, int startIndex) {
+		for(int i=startIndex; i<size; i++) {
+			Item aitem = get(i);
+			if(aitem==null)
+				break;
+			if(aitem.type==type)
+				return i;
+		}
+		return -1;
+	}
+
+	public int find(ItemType type) {
+		return find(type, 0);
+	}
+	
+	public boolean has(ItemType type) {
+		return find(type)>=0;
+	}
+
 	public Item remove(int index, boolean sort) {
 		if(slots[index]!=null) {
 			Item item = slots[index];

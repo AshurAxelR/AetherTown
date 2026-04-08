@@ -79,6 +79,8 @@ public abstract class Item implements Comparable<Item> {
 				return new GroceriesItem(time);
 			case laptop:
 				return new LaptopItem(time);
+			case compass:
+				return new CompassItem(time);
 		}
 		return null; // should not happen
 	}
@@ -107,6 +109,7 @@ public abstract class Item implements Comparable<Item> {
 				return;
 			case groceries:
 			case laptop:
+			case compass:
 				return;
 		}
 	}

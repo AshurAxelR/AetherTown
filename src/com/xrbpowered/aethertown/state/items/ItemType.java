@@ -9,7 +9,8 @@ public enum ItemType {
 	trinket("Trinket"),
 	foodItem(null),
 	groceries("Groceries"),
-	laptop("Laptop");
+	laptop("Laptop"),
+	compass("Compass");
 	
 	public final String name;
 	

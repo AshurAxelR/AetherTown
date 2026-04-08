@@ -64,7 +64,7 @@ public abstract class LeisureActions {
 		@Override
 		protected void onSuccess(Tile tile, boolean alt) {
 			String report = AetherTown.regionCache.portals.createKnowledgeReport(tile.level.info.region);
-			int lines = AetherTown.regionCache.portals.numPortals;
+			int lines = AetherTown.regionCache.portals.numPortals+1;
 			ConfirmDialog.show("Portals", report, lines*20+180);
 			super.onSuccess(tile, alt);
 		}

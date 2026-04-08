@@ -23,22 +23,11 @@ public class GroceriesItem extends Item {
 				"One groceries item produces two home-cooked meals.</p>";
 	}
 	
-	public static int findGroceries(Inventory inv) {
-		for(int i=0; i<inv.size; i++) {
-			Item aitem = inv.get(i);
-			if(aitem==null)
-				break;
-			if(aitem.type==ItemType.groceries)
-				return i;
-		}
-		return -1;
-	}
-
 	public static Inventory findGroceries(HomeData home) {
-		if(findGroceries(player.backpack)>=0)
+		if(player.backpack.has(ItemType.groceries))
 			return player.backpack;
 		for(Inventory inv : home.storage) {
-			if(findGroceries(inv)>=0)
+			if(inv.has(ItemType.groceries))
 				return inv;
 		}
 		return null;

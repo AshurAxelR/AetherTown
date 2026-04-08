@@ -251,10 +251,10 @@ public abstract class PortalSystem {
 				RegionVisits.getRegionTitle(region.seed, false),
 				WorldTime.getFormattedDate(), period));
 		sb.append("<table style=\"width:100%\">");
-		for(int i=0; i<numPortals; i++) {
-			long seed = getOtherSeed(region.seed, i, phase);
+		for(int i=-1; i<numPortals; i++) {
+			long seed = (i<0) ? region.seed : getOtherSeed(region.seed, i, phase);
 			sb.append("<tr><td class=\"w\" style=\"width:20%;text-align:center\">");
-			sb.append(WorldTime.romanNumeral(i+1));
+			sb.append((i<0) ? "-" : WorldTime.romanNumeral(i+1));
 			sb.append("</td>");
 			for(int j=6; j>=0; j--) {
 				String s = String.format("%03o", (seed >> (j*9)) & 0x1ff);

@@ -20,6 +20,7 @@ import com.xrbpowered.aethertown.state.Earnings;
 import com.xrbpowered.aethertown.state.Player;
 import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.state.SaveState;
+import com.xrbpowered.aethertown.state.items.ItemType;
 import com.xrbpowered.aethertown.state.items.LevelMapItem;
 import com.xrbpowered.aethertown.state.items.RegionMapItem;
 import com.xrbpowered.aethertown.ui.BookmarkPane;
@@ -70,7 +71,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.5-dev1.7";
+	public static final String version = "a.0.3.5-dev1.8";
 	
 	public static final float pawnHeight = 1.55f;
 	
@@ -106,7 +107,7 @@ public class AetherTown extends UIClient {
 		public boolean residentialLighting = true;
 		public boolean revealRegion = true;
 		public boolean mapRequireItem = true;
-		public boolean compassRequireItem = false;
+		public boolean compassRequireItem = true;
 		public boolean markAdjVisited = false;
 
 		public boolean homeCrediting = false;
@@ -620,8 +621,10 @@ public class AetherTown extends UIClient {
 				}
 				break;
 			case KeyEvent.VK_C:
-				if(!settings.compassRequireItem) // TODO || CompassItem.hasCompass())
+				if(!settings.compassRequireItem || player.backpack.has(ItemType.compass)) {
 					hud.toggleCompass();
+					hud.repaint();
+				}
 				else
 					showToast("You don't have a compass");
 				break;

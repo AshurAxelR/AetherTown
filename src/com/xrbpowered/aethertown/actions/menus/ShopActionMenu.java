@@ -9,6 +9,7 @@ import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.actions.WaitAction;
 import com.xrbpowered.aethertown.state.HomeData;
 import com.xrbpowered.aethertown.state.HomeImprovement;
+import com.xrbpowered.aethertown.state.items.CompassItem;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.ItemType;
 import com.xrbpowered.aethertown.state.items.LaptopItem;
@@ -58,6 +59,18 @@ public class ShopActionMenu extends TileActionMenu {
 			home.improvements.add(improvement);
 		}
 	}
+
+	public static final TileAction buyCompassAction = new GetItemAction("Buy", ItemType.compass) {
+		@Override
+		protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
+			return aitem instanceof CompassItem;
+		}
+		
+		@Override
+		protected Item generateItem(Tile tile, boolean alt) {
+			return new CompassItem();
+		}
+	}.setCost(150);
 	
 	public static final TileAction buyNewClothesAction = new WaitAction("Buy new clothes", 10).setCost(2500);
 	public static final TileAction buyKitchenwareAction = new BuyHomeImprovementAction(HomeImprovement.kitchenware);
@@ -86,6 +99,7 @@ public class ShopActionMenu extends TileActionMenu {
 	public static final TileActionMenu bookShop = new ShopActionMenu(3,
 			new BuyHomeImprovementAction(HomeImprovement.books),
 			new BuyHomeImprovementAction(HomeImprovement.boardGames),
+			buyCompassAction,
 			LeisureActions.playBoardGames);
 
 	public static final TileActionMenu artShop = new ShopActionMenu(5, new BuyHomeImprovementAction(HomeImprovement.art));
@@ -108,6 +122,7 @@ public class ShopActionMenu extends TileActionMenu {
 		shop.addMenu("FOOD ISLE", GroceriesActionMenu.groceries);
 		shop.addAction(buyNewClothesAction);
 		shop.addAction(buyKitchenwareAction);
+		shop.addAction(buyCompassAction);
 		shop.addMenu("MAPS", MapsMenu.noToken);
 		return shop;
 	}
@@ -130,6 +145,8 @@ public class ShopActionMenu extends TileActionMenu {
 				return new TrinketItem(tile.level.info);
 			}
 		}.setCost(250));
+	
+		shop.addAction(buyCompassAction);
 		
 		shop.addMenu("CAFETERIA", FoodActionMenu.cafeteria);
 		shop.addMenu("MAPS", MapsMenu.noToken);
