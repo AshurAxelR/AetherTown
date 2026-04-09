@@ -128,7 +128,8 @@ public class Hud extends UINode {
 	
 	@Override
 	public void layout() {
-		uiVersionInfo.setPosition(getWidth()-20-uiVersionInfo.getWidth(), 20);
+		if(uiVersionInfo!=null)
+			uiVersionInfo.setPosition(getWidth()-20-uiVersionInfo.getWidth(), 20);
 		uiTime.setPosition(20, getHeight()-uiTime.getHeight()-20);
 		uiLookInfo.setPosition(getWidth()/2-uiLookInfo.getWidth()/2, uiTime.getY());
 		uiActionInfo.setPosition(getWidth()/2-uiActionInfo.getWidth()/2, uiTime.getY()-uiActionInfo.getHeight()-60);

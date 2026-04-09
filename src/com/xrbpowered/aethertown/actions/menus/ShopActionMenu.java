@@ -1,5 +1,6 @@
 package com.xrbpowered.aethertown.actions.menus;
 
+import static com.xrbpowered.aethertown.AetherTown.*;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.actions.GetItemAction;
@@ -65,10 +66,16 @@ public class ShopActionMenu extends TileActionMenu {
 		protected boolean isSameItem(Item aitem, Tile tile, boolean alt) {
 			return aitem instanceof CompassItem;
 		}
-		
 		@Override
 		protected Item generateItem(Tile tile, boolean alt) {
 			return new CompassItem();
+		}
+		public void onSuccess(Tile tile, boolean alt) {
+			super.onSuccess(tile, alt);
+			if(player.backpack.has(ItemType.compass)) {
+				hud.showCompass(true);
+				hud.repaint();
+			}
 		}
 	}.setCost(150);
 	
