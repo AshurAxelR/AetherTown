@@ -134,6 +134,10 @@ public class ArchitectureStyle {
 		return getWall(floor, d, tile, isObstructed(tile, yloc, tile.basey+obsy[floor], tile.d.apply(d)));
 	}
 	
+	public boolean isBlankWall(int floor, Dir d, HouseTile tile, int[] yloc) {
+		return forceBlank(floor, d, tile) || isObstructed(tile, yloc, tile.basey+obsy[floor], tile.d.apply(d));
+	}
+	
 	public int getFloorY(int floor) {
 		return floory[floor];
 	}

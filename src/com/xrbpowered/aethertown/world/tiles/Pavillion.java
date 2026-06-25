@@ -72,7 +72,7 @@ public class Pavillion extends Plaza implements ObserverPointProvider {
 			float a = (i+0.5f) * (float)Math.PI / 2f;
 			float dx = 0.45f * (float)Math.cos(a);
 			float dz = 0.45f * (float)Math.sin(a);
-			points[0][i] = new TileObjectInfo(tile, dx, Bench.benchSitY+1, dz)
+			points[0][3-i] = new TileObjectInfo(tile, dx, Bench.benchSitY+1, dz)
 					.rotate(a-(float)Math.PI / 2f);
 		}
 		return points;

@@ -75,7 +75,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.5-dev1.9";
+	public static final String version = "a.0.3.5-dev1.10";
 	
 	public static final float pawnHeight = 1.55f;
 	
@@ -547,8 +547,8 @@ public class AetherTown extends UIClient {
 			camera.rotation.set(savedCameraRotation);
 		
 		activeController = walkController;
-		enableController();
 		updateWalkY();
+		enableController();
 	}
 	
 	public void flipCamera() {
@@ -569,9 +569,9 @@ public class AetherTown extends UIClient {
 	
 	@Override
 	public void keyPressed(char c, int code) {
-		if(ui.onKeyPressed(c, code, input.getInputInfo()))
-			return;
 		if(observer!=null && observer.keyPressed(c, code))
+			return;
+		if(ui.onKeyPressed(c, code, input.getInputInfo()))
 			return;
 		
 		switch(code) {
@@ -684,8 +684,19 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
-	public static boolean saveState() {
-		return new SaveState().update().save();
+	public boolean saveState() {
+		Vector3f cameraPosition = new Vector3f(camera.position);
+		Vector3f cameraRotation = new Vector3f(camera.rotation);
+		if(observer!=null && observer.restoreCamera) {
+			camera.position.set(observer.savedCameraPosition);
+			camera.rotation.set(observer.savedCameraRotation);
+		}
+		
+		boolean success = new SaveState().update().save();
+		
+		camera.position.set(cameraPosition);
+		camera.rotation.set(cameraRotation);
+		return success;
 	}
 	
 	@Override

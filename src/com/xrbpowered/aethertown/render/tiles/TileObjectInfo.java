@@ -42,9 +42,13 @@ public class TileObjectInfo extends ObjectInfo {
 		return this;
 	}
 	
+	public static TileObjectInfo forDOut(Tile tile, Dir d, float dout, float dright, float dy) {
+		Dir cw = d.cw();
+		return new TileObjectInfo(tile, d.dx*dout+cw.dx*dright, dy, d.dz*dout+cw.dz*dright).rotate(d);
+	}
+
 	public static TileObjectInfo forDOut(Tile tile, float dout, float dright, float dy) {
-		Dir cw = tile.d.cw();
-		return new TileObjectInfo(tile, tile.d.dx*dout+cw.dx*dright, dy, tile.d.dz*dout+cw.dz*dright).rotate(tile.d);
+		return forDOut(tile, tile.d, dout, dright, dy);
 	}
 
 }

@@ -45,6 +45,7 @@ public class HouseTileAction extends EnterTileAction {
 
 	public HouseTileAction(TileActionMenu menu) {
 		super(menu);
+		menu.addAction(ObserverAction.lookout);
 	}
 	
 	@Override

@@ -158,7 +158,7 @@ public class Hud extends UINode {
 		if(settings.autosave>0) {
 			autosaveTimer += dt;
 			if(autosaveTimer > settings.autosave*60f) {
-				if(saveState()) {
+				if(aether.saveState()) {
 					showToast("Autosave");
 					autosaveTimer = 0f;
 				}

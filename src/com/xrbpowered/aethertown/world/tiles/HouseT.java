@@ -5,6 +5,8 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 
+import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.actions.ObserverPointProvider;
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.BasicGeometry;
 import com.xrbpowered.aethertown.render.LevelRenderer;
@@ -23,13 +25,15 @@ import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.Tile.SubInfo;
 import com.xrbpowered.aethertown.world.TileTemplate;
+import com.xrbpowered.aethertown.world.Token;
 import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.plot.houses.ArchitectureStyle;
 import com.xrbpowered.aethertown.world.gen.plot.houses.ArchitectureTileSet;
 import com.xrbpowered.aethertown.world.gen.plot.houses.HouseGenerator;
 
-public class HouseT extends TileTemplate {
+public class HouseT extends TileTemplate implements ObserverPointProvider {
 
+	public static final float lookoutY = AetherTown.pawnHeight / Tile.ysize;
 	public static final Color upperWallColor = new Color(0xd5ceba);
 	public static final int roofHeight = 6;
 	
@@ -205,6 +209,77 @@ public class HouseT extends TileTemplate {
 			if(sub.i==right)
 				(sub.j==house.fwd ? roofEndRight : roofEndLeft).addInstance(r, new TileObjectInfo(tile, 0, roofy, 0).rotate(tile.d.cw()));
 		}
+	}
+	
+	private TileObjectInfo getObserverPoint(HouseGenerator house, int i, int j, Dir d, int f, int dright) {
+		Token t = house.tokenAt(i, j);
+		Tile atile = t.level.map[t.x][t.z];
+		if(!(atile instanceof HouseTile)) {
+			System.err.printf("getObserverPoint(): Tile at[%d, %d] is not HouseTile\n", i, j);
+			return null;
+		}
+		HouseTile tile = (HouseTile) atile;
+
+		ArchitectureStyle arch = house.arch;
+		int[] yloc = tile.level.h.yloc(tile.x, tile.z);
+		if(arch.isBlankWall(f, d, tile, yloc))
+			return null;
+
+		Dir td = tile.d.apply(d);
+		return TileObjectInfo.forDOut(tile, td, 0.52f, dright*0.22f, arch.getFloorY(f) + lookoutY);
+	}
+	
+	@Override
+	public TileObjectInfo[][] getObserverPoints(Tile tile, boolean alt) {
+		HouseGenerator house = (HouseGenerator) tile.sub.parent;
+		ArchitectureStyle arch = house.arch;
+		
+		int left = -house.left+house.marginLeft;
+		int right = house.right-house.marginRight;
+		int front = house.marginFront;
+		int back = house.fwd-house.marginBack;
+		
+		int row0, rows;
+		if(house.addRole==null) {
+			row0 = 0;
+			rows = arch.floorCount;
+		}
+		else if(alt) {
+			row0 = 1;
+			rows = arch.floorCount-1;
+		}
+		else {
+			row0 = 0;
+			rows = 1;
+		}
+		int cols = (right-left+back-front+2)*4;
+		TileObjectInfo[][] points = new TileObjectInfo[rows][cols];
+		
+		for(int row=0; row<rows; row++) {
+			int f = row+row0;
+			int col = 0;
+			for(int i=0; i>=left; i--) {
+				points[row][col++] = getObserverPoint(house, i, front, Dir.south, f, -1);
+				points[row][col++] = getObserverPoint(house, i, front, Dir.south, f, 1);
+			}
+			for(int j=front; j<=back; j++) {
+				points[row][col++] = getObserverPoint(house, left, j, Dir.west, f, -1);
+				points[row][col++] = getObserverPoint(house, left, j, Dir.west, f, 1);
+			}
+			for(int i=left; i<=right; i++) {
+				points[row][col++] = getObserverPoint(house, i, back, Dir.north, f, -1);
+				points[row][col++] = getObserverPoint(house, i, back, Dir.north, f, 1);
+			}
+			for(int j=back; j>=front; j--) {
+				points[row][col++] = getObserverPoint(house, right, j, Dir.east, f, -1);
+				points[row][col++] = getObserverPoint(house, right, j, Dir.east, f, 1);
+			}
+			for(int i=right; i>0; i--) {
+				points[row][col++] = getObserverPoint(house, i, front, Dir.south, f, -1);
+				points[row][col++] = getObserverPoint(house, i, front, Dir.south, f, 1);
+			}
+		}
+		return points;
 	}
 	
 	@Override
