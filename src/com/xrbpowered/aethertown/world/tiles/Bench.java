@@ -2,6 +2,9 @@ package com.xrbpowered.aethertown.world.tiles;
 
 import java.util.Random;
 
+import com.xrbpowered.aethertown.actions.ObserverAction;
+import com.xrbpowered.aethertown.actions.ObserverPointProvider;
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TerrainMaterial;
@@ -20,7 +23,7 @@ import com.xrbpowered.aethertown.world.gen.Lamps.RequestLamp;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 import com.xrbpowered.gl.res.texture.Texture;
 
-public class Bench extends Plaza implements RequestLamp {
+public class Bench extends Plaza implements RequestLamp, ObserverPointProvider {
 
 	public enum BenchType {
 		bench(new Dir[] {Dir.east, Dir.west}),
@@ -41,6 +44,8 @@ public class Bench extends Plaza implements RequestLamp {
 	public static final Bench templatePlazaLampR = new Bench(BenchType.bench, true, null);
 	public static final Bench templateParkTable = new Bench(BenchType.table, false);
 	public static final Bench templatePlazaTable = new Bench(BenchType.table, true, null);
+	
+	public static final float benchSitY = 1.2f / Tile.ysize;
 	
 	public static Texture benchTexture;
 	private static TileComponent bench, parkTable;
@@ -80,6 +85,17 @@ public class Bench extends Plaza implements RequestLamp {
 		this.plaza = plaza;
 		this.lampReq = true;
 		this.lampDirs = (lampReq==null) ? type.lampDirs : lampReq;
+	}
+	
+	@Override
+	public TileAction getTileAction(Tile tile) {
+		switch(type) {
+			case bench:
+			case table:
+				return ObserverAction.sit;
+			default:
+				return null;
+		}
 	}
 	
 	@Override
@@ -170,7 +186,7 @@ public class Bench extends Plaza implements RequestLamp {
 		switch(type) {
 			case bench: {
 				float dout = tile.plaza ? 0.25f : -0.25f;
-				bench.addInstance(r, new TileObjectInfo(tile, dout, 0));
+				bench.addInstance(r, TileObjectInfo.forDOut(tile, dout, 0, 0));
 				Lamps.createLamp(tile, tile.lamp, r, 0, dout);
 				break;
 			}
@@ -184,6 +200,28 @@ public class Bench extends Plaza implements RequestLamp {
 				break;
 			case noLamp:
 				break;
+		}
+	}
+	
+	@Override
+	public TileObjectInfo[][] getObserverPoints(Tile atile, boolean alt) {
+		BenchTile tile = (BenchTile) atile;
+		switch(type) {
+			case bench: {
+				float dout = tile.plaza ? 0.25f : -0.25f;
+				return new TileObjectInfo[][] {{
+					TileObjectInfo.forDOut(tile, dout, -0.1f, benchSitY).rotate(tile.d.flip()),
+					TileObjectInfo.forDOut(tile, dout, 0.1f, benchSitY).rotate(tile.d.flip())
+				}};
+			}
+			case table: {
+				return new TileObjectInfo[][] {{
+					TileObjectInfo.forDOut(tile, 0, -0.1f, benchSitY).rotate(tile.d.cw()),
+					TileObjectInfo.forDOut(tile, 0, 0.1f, benchSitY).rotate(tile.d.ccw())
+				}};
+			}
+			default:
+				return null;
 		}
 	}
 }

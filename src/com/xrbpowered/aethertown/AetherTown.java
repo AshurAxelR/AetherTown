@@ -8,6 +8,9 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
+import org.joml.Vector3f;
+
+import com.xrbpowered.aethertown.actions.ObserverAction;
 import com.xrbpowered.aethertown.render.LevelCache;
 import com.xrbpowered.aethertown.render.Screenshot;
 import com.xrbpowered.aethertown.render.TerrainChunkBuilder.TerrainMeshActor;
@@ -31,6 +34,7 @@ import com.xrbpowered.aethertown.ui.dialogs.InventoryDialog;
 import com.xrbpowered.aethertown.ui.dialogs.LevelMapDialog;
 import com.xrbpowered.aethertown.ui.dialogs.RegionMapDialog;
 import com.xrbpowered.aethertown.ui.hud.Hud;
+import com.xrbpowered.aethertown.ui.hud.LookController;
 import com.xrbpowered.aethertown.ui.hud.RotatedPaneShader;
 import com.xrbpowered.aethertown.utils.AbstractConfig;
 import com.xrbpowered.aethertown.utils.Corner;
@@ -71,7 +75,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.5-dev1.8";
+	public static final String version = "a.0.3.5-dev1.9";
 	
 	public static final float pawnHeight = 1.55f;
 	
@@ -176,9 +180,11 @@ public class AetherTown extends UIClient {
 	public static LevelInfo levelInfo = null;
 	public static DialogContainer ui = null;
 	public static Hud hud = null;
-
+	public static ObserverAction observer = null;
+	
 	private CameraActor camera;
 	private Controller flyController, walkController;
+	private LookController lookController;
 	private Controller activeController = null;
 	private boolean controllerEnabled = false;
 	private boolean autoWalk = false;
@@ -246,6 +252,9 @@ public class AetherTown extends UIClient {
 				flyController = new Controller(input).setActor(camera);
 				flyController.moveSpeed = settings.flySpeed;
 				flyController.mouseSensitivity = settings.mouseSensitivity;
+				lookController = new LookController(input, true);
+				lookController.setActor(camera);
+				lookController.mouseSensitivity = settings.mouseSensitivity;
 				activeController = walkController;
 				
 				sky = new SkyRenderer(bufferScale).setCamera(camera);
@@ -272,11 +281,8 @@ public class AetherTown extends UIClient {
 			
 			@Override
 			public boolean onMouseDown(float x, float y, MouseInfo mouse) {
-				if(mouse.eventButton==RIGHT) {
-					controllerEnabled = true;
-					getRoot().resetFocus();
-					activeController.setMouseLook(true);
-				}
+				if(mouse.eventButton==RIGHT)
+					enableController();
 				return true;
 			}
 			
@@ -342,6 +348,10 @@ public class AetherTown extends UIClient {
 		super.createResources();
 		RotatedPaneShader.createInstance();
 	}
+
+	public CameraActor getCamera() {
+		return camera;
+	}
 	
 	private void updateWalkY() {
 		boolean inside = Level.hoverInside(level.levelSize, camera.position.x, camera.position.z);
@@ -353,7 +363,7 @@ public class AetherTown extends UIClient {
 		
 		if(activeController==walkController) {
 			Dir d = Dir.values()[(int)Math.round(-camera.rotation.y*2.0/Math.PI) & 0x03];
-			hud.setLookAtTile(level.getAdj(hoverx, hoverz, d));
+			hud.setLookAtTile(level, hoverx, hoverz, d);
 		}
 		hud.setLookDirection(camera.rotation.y);
 		
@@ -515,6 +525,32 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
+	public void enableController() {
+		controllerEnabled = true;
+		uiRender.getRoot().resetFocus();
+		activeController.setMouseLook(true);
+	}
+	
+	public void startLookController(Vector3f position, float centerY) {
+		hud.setLookAtTile(null);
+		camera.position.set(position);
+		camera.rotation.y = centerY;
+		lookController.centerY = centerY;
+		activeController = lookController;
+		enableController();
+	}
+	
+	public void stopLookController(Vector3f savedCameraPosition, Vector3f savedCameraRotation) {
+		if(savedCameraPosition!=null)
+			camera.position.set(savedCameraPosition);
+		if(savedCameraRotation!=null)
+			camera.rotation.set(savedCameraRotation);
+		
+		activeController = walkController;
+		enableController();
+		updateWalkY();
+	}
+	
 	public void flipCamera() {
 		camera.rotation.y += Math.PI;
 		if(activeController==walkController)
@@ -534,6 +570,8 @@ public class AetherTown extends UIClient {
 	@Override
 	public void keyPressed(char c, int code) {
 		if(ui.onKeyPressed(c, code, input.getInputInfo()))
+			return;
+		if(observer!=null && observer.keyPressed(c, code))
 			return;
 		
 		switch(code) {

@@ -29,10 +29,6 @@ public class ScaledTileObjectInfo extends TileObjectInfo {
 		super(tile, dx, dy, dz);
 	}
 
-	public ScaledTileObjectInfo(Tile tile, float dout, float dy) {
-		super(tile, dout, dy);
-	}
-	
 	public TileObjectInfo scale(float xz, float y) {
 		this.scaleXZ = xz;
 		this.scaleY = y;

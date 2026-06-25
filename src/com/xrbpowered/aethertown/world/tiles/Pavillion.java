@@ -1,5 +1,8 @@
 package com.xrbpowered.aethertown.world.tiles;
 
+import com.xrbpowered.aethertown.actions.ObserverAction;
+import com.xrbpowered.aethertown.actions.ObserverPointProvider;
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.render.LevelRenderer;
 import com.xrbpowered.aethertown.render.ObjectShader;
 import com.xrbpowered.aethertown.render.TexColor;
@@ -12,7 +15,7 @@ import com.xrbpowered.aethertown.world.gen.Fences;
 import com.xrbpowered.aethertown.world.gen.Lamps;
 import com.xrbpowered.gl.res.mesh.ObjMeshLoader;
 
-public class Pavillion extends Plaza {
+public class Pavillion extends Plaza implements ObserverPointProvider {
 
 	public static final Pavillion template = new Pavillion();
 	
@@ -22,6 +25,11 @@ public class Pavillion extends Plaza {
 		super(false);
 	}
 	
+	@Override
+	public TileAction getTileAction(Tile tile) {
+		return ObserverAction.sit;
+	}
+
 	@Override
 	public int getBlockY(Tile tile) {
 		return tile.basey+8;
@@ -57,5 +65,17 @@ public class Pavillion extends Plaza {
 		r.blockLighting.addLight(IllumLayer.alwaysOn, tile, tile.basey+4, Lamps.lampLightColor, 0.3f, true);
 	}
 
+	@Override
+	public TileObjectInfo[][] getObserverPoints(Tile tile, boolean alt) {
+		TileObjectInfo[][] points = new TileObjectInfo[1][4];
+		for(int i=0; i<4; i++) {
+			float a = (i+0.5f) * (float)Math.PI / 2f;
+			float dx = 0.45f * (float)Math.cos(a);
+			float dz = 0.45f * (float)Math.sin(a);
+			points[0][i] = new TileObjectInfo(tile, dx, Bench.benchSitY+1, dz)
+					.rotate(a-(float)Math.PI / 2f);
+		}
+		return points;
+	}
 
 }

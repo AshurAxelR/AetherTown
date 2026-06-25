@@ -6,6 +6,8 @@ import java.awt.Color;
 
 import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.ui.Fonts;
+import com.xrbpowered.aethertown.utils.Dir;
+import com.xrbpowered.aethertown.world.Level;
 import com.xrbpowered.aethertown.world.Tile;
 import com.xrbpowered.aethertown.world.stars.WorldTime;
 import com.xrbpowered.gl.ui.UINode;
@@ -212,7 +214,15 @@ public class Hud extends UINode {
 			}
 		}
 	}
-	
+
+	public void setLookAtTile(Level level, int x, int z, Dir d) {
+		Tile tile = level.isInside(x, z) ? level.map[x][z] : null;
+		if(tile!=null && (tile.t.getTileAction(tile)!=null || tile.t.getTileAltAction(tile)!=null))
+			setLookAtTile(tile);
+		else
+			setLookAtTile(level.getAdj(x, z, d));
+	}
+
 	public void resetAutosaveTimer() {
 		autosaveTimer = 0f;
 	}

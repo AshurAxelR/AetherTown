@@ -31,10 +31,6 @@ public class IllumTileObjectInfo extends TileObjectInfo {
 		super(tile, dx, dy, dz);
 	}
 
-	public IllumTileObjectInfo(Tile tile, float dout, float dy) {
-		super(tile, dout, dy);
-	}
-
 	public IllumTileObjectInfo illumMod(Vector3f mod) {
 		if(mod==null)
 			illumOff();
