@@ -145,7 +145,7 @@ public class Region {
 		throw new RuntimeException("Generator attempts limit reached");
 	}
 
-	private boolean expand(Rand random, int minAdj, boolean all) {
+	public boolean expand(Rand random, int minAdj, boolean all) {
 		int minx = Math.max(this.minx-2, 1);
 		int maxx = Math.min(this.maxx+2, sizex-2);
 		int minz = Math.max(this.minz-2, 1);
@@ -253,7 +253,7 @@ public class Region {
 		
 		PortalInfo portal = cache.portals.createPortalInfo(index);
 		if(portal.d!=d)
-			throw new RuntimeException("Portal direction mismatch");
+			throw new RuntimeException(String.format("Portal direction mismatch: expected %s, got %s", portal.d, d));
 		
 		for(int dx=-1; dx<=1; dx++)
 			for(int dz=-1; dz<=1; dz++) {

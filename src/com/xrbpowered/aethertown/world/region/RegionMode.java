@@ -3,6 +3,7 @@ package com.xrbpowered.aethertown.world.region;
 import com.xrbpowered.aethertown.utils.Dir;
 import com.xrbpowered.aethertown.utils.Rand;
 import com.xrbpowered.aethertown.world.GeneratorException;
+import com.xrbpowered.aethertown.world.region.paths.GridGeneratePaths;
 import com.xrbpowered.aethertown.world.region.paths.LinearRegionPaths;
 import com.xrbpowered.aethertown.world.region.paths.PortalRegionPaths;
 
@@ -43,6 +44,8 @@ public abstract class RegionMode {
 		switch(vs[0]) {
 			case "linear":
 				return new Linear(intParam(vs, 1, 64));
+			case "grid":
+				return new Grid(intParam(vs, 1, 2));
 			case "oneLevel":
 				return new OneLevel(intParam(vs, 1, 2), settlementParam(vs, 2, LevelSettlementType.village));
 			case "fewLevels":
@@ -77,6 +80,33 @@ public abstract class RegionMode {
 		@Override
 		public String formatValue() {
 			return String.format("linear,%d", sizex-128);
+		}
+	}
+	
+	public static class Grid extends RegionMode {
+		public final int radius;
+		private static int sizeForRadius(int radius) {
+			if(radius<1)
+				radius = 1;
+			return (radius*2+1)*3+32;
+		}
+		@Override
+		public int getNumPortals() {
+			return 6;
+		}
+		public Grid(int radius) {
+			super(sizeForRadius(radius), sizeForRadius(radius));
+			if(radius<1)
+				radius = 1;
+			this.radius = radius;
+		}
+		@Override
+		public void coreGenerate(Region region, Rand random) {
+			while(!new GridGeneratePaths(region, random, radius).generatePaths()) {}
+		}
+		@Override
+		public String formatValue() {
+			return String.format("grid,%d", radius);
 		}
 	}
 

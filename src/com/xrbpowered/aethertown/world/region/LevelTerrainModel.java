@@ -86,7 +86,7 @@ public class LevelTerrainModel {
 	private static final WRandom w = new WRandom(0, 0.1, 0.55, 0.35);
 	private static final WRandom wpark = new WRandom(0.4, 0.15, 0.35, 0.1);
 	private static final WRandom wexpand = new WRandom(0.1, 0.2, 0.4, 0.3);
-	private static final LevelTerrainModel[] list = {low, flat, hill, peak};
+	public static final LevelTerrainModel[] list = {low, flat, hill, peak};
 	public static LevelTerrainModel random(LevelInfo level, Rand random) {
 		if(level.settlement.getStreetMargin(level.getLevelSize(), true)<18)
 			return flat;

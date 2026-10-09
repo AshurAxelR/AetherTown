@@ -156,7 +156,8 @@ public class RegionMapView extends UIElement {
 		settings = new AetherTown.ClientConfig();
 		//settings.load();
 		settings.regionMode = new RegionMode.Linear(64);
-		settings.regionSeed = 2211452794341358531L;
+		//settings.regionMode = new RegionMode.Grid(2);
+		settings.regionSeed = -1L;
 		settings.legacyRandom = false;
 		
 		showVisited = false;

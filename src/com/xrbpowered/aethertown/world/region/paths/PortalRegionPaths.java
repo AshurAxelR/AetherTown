@@ -38,7 +38,7 @@ public class PortalRegionPaths {
 				if(!region.isInside(xj, zj))
 					break;
 				LevelInfo level = region.map[xj][zj];
-				if(level!=null) {
+				if(level!=null && !level.conns.isEmpty()) {
 					if(canConnectWithPath(xj, zj, dout, null)) {
 						connectWithPath(index, xj, zj, dout, null, random);
 						return true;
@@ -50,14 +50,14 @@ public class PortalRegionPaths {
 		return false;
 	}
 	
-	private boolean canConnectWithPath(int x, int z, Dir d, LevelTerrainModel path) {
+	public boolean canConnectWithPath(int x, int z, Dir d, LevelTerrainModel path) {
 		if(!region.isInside(x, z))
 			return false;
 		LevelInfo level = region.map[x][z];
 
 		LevelTerrainModel next;
 		if(path==null) {
-			if(level==null || level.fixed || level.conns.isEmpty())
+			if(level==null || level.fixed) // || level.conns.isEmpty())
 				return false;
 			next = level.terrain.pathToBottom;
 		}
@@ -73,7 +73,7 @@ public class PortalRegionPaths {
 			return canConnectWithPath(x+d.dx, z+d.dz, d, next);
 	}
 
-	private void connectWithPath(int index, int x, int z, Dir d, LevelTerrainModel path, Rand random) {
+	public void connectWithPath(int index, int x, int z, Dir d, LevelTerrainModel path, Rand random) {
 		LevelTerrainModel next;
 		if(path==null) {
 			next = region.map[x][z].terrain.pathToBottom;
