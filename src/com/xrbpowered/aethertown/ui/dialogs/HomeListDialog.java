@@ -209,7 +209,8 @@ public class HomeListDialog extends UIPane implements KeyInputHandler {
 								if(HomeData.abandon(selectedInfo.home)) {
 									showToast(selectedInfo.home.ref.getFullAddress()+" abandoned");
 									close();
-									showList();
+									if(HomeData.totalClaimed()>0)
+										showList();
 								}
 							});
 				}
