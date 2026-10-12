@@ -1,10 +1,11 @@
 package com.xrbpowered.aethertown.actions;
 
+import static com.xrbpowered.aethertown.actions.TileAction.formatCost;
 import static com.xrbpowered.aethertown.ui.hud.Hud.showToast;
 
 import com.xrbpowered.aethertown.AetherTown;
+import com.xrbpowered.aethertown.state.Earnings;
 import com.xrbpowered.aethertown.state.GlobalCooldowns;
-import com.xrbpowered.aethertown.state.RegionVisits;
 import com.xrbpowered.aethertown.ui.dialogs.ConfirmDialog;
 import com.xrbpowered.aethertown.world.Tile;
 
@@ -29,22 +30,19 @@ public abstract class LeisureActions {
 				.setDelay(90);
 	}
 
-	public static final TileAction discover = new InspirationAction("Discover", 0, 5) {
+	public static final int discoverPayout = 500;
+	
+	public static final TileAction discover = new InspirationAction(String.format("Discover (+%s)", formatCost(discoverPayout)), 0, 5) {
 		@Override
-		public boolean isEnabled(Tile tile, boolean alt) {
-			if(oncePerTile && RegionVisits.isTileVisited(tile))
-				return false;
-			else
-				return super.isEnabled(tile, alt);
+		protected void show(int ins, int xp) {
+			showGranted(ins, xp, discoverPayout);
 		}
 		@Override
-		protected void onFail(Tile tile, boolean alt) {
-			if(oncePerTile && RegionVisits.isTileVisited(tile))
-				showToast("Already discovered");
-			else
-				super.onFail(tile, alt);
+		protected void onSuccess(Tile tile, boolean alt) {
+			super.onSuccess(tile, alt);
+			Earnings.earn(discoverPayout);
 		}
-	}.oncePerTile().setDelay(20);
+	}.oncePerTile().setDelay(30);
 
 	public static final TileAction portalKnowledge = new TileAction("Portal knowledge") {
 		@Override

@@ -8,7 +8,19 @@ import com.xrbpowered.aethertown.world.Tile;
 
 public class InspirationAction extends TileAction {
 
-	public static final TileAction throwCoin = new InspirationAction("Throw coin", 1).oncePerTile().setCost(10);
+	public static final TileAction throwCoin = new InspirationAction("Throw coin", 1) {
+		@Override
+		public boolean isEnabled(Tile tile, boolean alt) {
+			return player.cash>=10 && super.isEnabled(tile, alt);
+		}
+		@Override
+		protected void onFail(Tile tile, boolean alt) {
+			if(player.cash<10)
+				showToast("No coins");
+			else
+				super.onFail(tile, alt);
+		}
+	}.oncePerTile().setCost(10);
 	
 	public final int inspiration;
 	public final int xp;
@@ -36,6 +48,30 @@ public class InspirationAction extends TileAction {
 		return this;
 	}
 	
+	@Override
+	public String getLabel(Tile tile, boolean alt) {
+		if(insCooldown!=null && insCooldown.isOnCooldown())
+			return name + " \u2014";
+		else
+			return name;
+	}
+	
+	@Override
+	public boolean isEnabled(Tile tile, boolean alt) {
+		if(oncePerTile && RegionVisits.isTileVisited(tile))
+			return false;
+		else
+			return super.isEnabled(tile, alt);
+	}
+	
+	@Override
+	protected void onFail(Tile tile, boolean alt) {
+		if(oncePerTile && RegionVisits.isTileVisited(tile))
+			showToast("Already visited");
+		else
+			super.onFail(tile, alt);
+	}
+	
 	protected boolean isGranting(Tile tile, boolean alt) {
 		if(oncePerTile && RegionVisits.isTileVisited(tile))
 			return false;
@@ -53,6 +89,10 @@ public class InspirationAction extends TileAction {
 		return isGranting(tile, alt) ? xp : 0;
 	}
 
+	protected void show(int ins, int xp) {
+		showGranted(ins, xp, 0);
+	}
+	
 	@Override
 	protected void onSuccess(Tile tile, boolean alt) {
 		super.onSuccess(tile, alt);
@@ -61,18 +101,35 @@ public class InspirationAction extends TileAction {
 		int xp = player.addXP(getXP(tile, alt));
 		
 		if(ins>0 || xp>0) {
-			if(ins>0 && xp>0)
-				showToast(String.format("%+d inspiration, %+d XP", ins, xp));
-			else if(ins>0)
-				showToast(String.format("%+d inspiration", ins));
-			else if(xp>0)
-				showToast(String.format("%+d XP", xp));
+			show(ins, xp);
 			if(insCooldown!=null)
 				insCooldown.start();
 		}
 		
 		if(oncePerTile)
 			RegionVisits.visitTile(tile);
+	}
+	
+	public static void showGranted(int ins, int xp, int pay) {
+		StringBuilder sb = new StringBuilder();
+		boolean first = true;
+		if(ins>0) {
+			sb.append(String.format("%+d inspiration", ins));
+			first = false;
+		}
+		if(xp>0) {
+			if(!first)
+				sb.append(", ");
+			sb.append(String.format("%+d XP", xp));
+			first = false;
+		}
+		if(pay>0) {
+			if(!first)
+				sb.append(", ");
+			sb.append(String.format("+%s earnings", formatCost(pay)));
+			first = false;
+		}
+		showToast(sb.toString());
 	}
 
 }

@@ -13,7 +13,7 @@ public class FastTravelAction extends TileAction {
 	
 	public FastTravelAction() {
 		super("Travel");
-		setCooldown(GlobalCooldowns.fastTravel.hours(2));
+		setCooldown(GlobalCooldowns.fastTravel.hours(1));
 	}
 
 	

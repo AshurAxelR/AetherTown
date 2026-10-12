@@ -75,7 +75,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.6-dev2";
+	public static final String version = "a.0.3.6-dev3";
 	
 	public static final float pawnHeight = 1.55f;
 	

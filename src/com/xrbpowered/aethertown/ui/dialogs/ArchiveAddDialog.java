@@ -21,7 +21,7 @@ import com.xrbpowered.zoomui.UIContainer;
 
 public class ArchiveAddDialog extends UIPane implements KeyInputHandler {
 
-	public static final int cost = 500;
+	public static int cost = 0;
 	
 	private final ArrayList<TravelTokenItem> tokens;
 	private int selected = -1;
@@ -102,8 +102,10 @@ public class ArchiveAddDialog extends UIPane implements KeyInputHandler {
 		g.setColor(Color.WHITE);
 		g.setFont(Fonts.small);
 		g.drawString("Record Travel Tokens into Archive:", 30, 26, GraphAssist.LEFT, GraphAssist.CENTER);
-		g.drawString(TileAction.formatCost(cost), buttonAdd.getX()-10,
-				buttonAdd.getY()+buttonAdd.getHeight()/2, GraphAssist.RIGHT, GraphAssist.CENTER);
+		if(cost>0) {
+			g.drawString(TileAction.formatCost(cost), buttonAdd.getX()-10,
+					buttonAdd.getY()+buttonAdd.getHeight()/2, GraphAssist.RIGHT, GraphAssist.CENTER);
+		}
 	}
 	
 	public void close() {

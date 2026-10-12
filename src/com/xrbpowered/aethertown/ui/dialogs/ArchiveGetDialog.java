@@ -7,11 +7,13 @@ import static com.xrbpowered.aethertown.ui.dialogs.DialogContainer.bgColor;
 import java.awt.Color;
 import java.util.ArrayList;
 
+import com.xrbpowered.aethertown.actions.TileAction;
 import com.xrbpowered.aethertown.state.TokenArchive;
 import com.xrbpowered.aethertown.state.TokenArchive.ArchiveEntry;
 import com.xrbpowered.aethertown.state.items.Item;
 import com.xrbpowered.aethertown.state.items.ItemType;
 import com.xrbpowered.aethertown.state.items.TravelTokenItem;
+import com.xrbpowered.aethertown.ui.Fonts;
 import com.xrbpowered.aethertown.ui.controls.ClickButton;
 import com.xrbpowered.aethertown.ui.controls.OptionBox;
 import com.xrbpowered.aethertown.ui.controls.SlotButton;
@@ -23,6 +25,8 @@ import com.xrbpowered.zoomui.KeyInputHandler;
 import com.xrbpowered.zoomui.UIContainer;
 
 public class ArchiveGetDialog extends UIPane implements KeyInputHandler {
+
+	public static int cost = 300;
 
 	public static final int itemsPerPage = 10;
 	
@@ -152,8 +156,10 @@ public class ArchiveGetDialog extends UIPane implements KeyInputHandler {
 		buttonGet = new ClickButton(this, "TOKEN") {
 			@Override
 			public void onAction() {
-				if(!player.backpack.isFull() && selectedItem!=null)
+				if(!player.backpack.isFull() && selectedItem!=null) {
+					player.cash -= cost;
 					player.backpack.put(new TravelTokenItem(selectedItem.destination));
+				}
 				else
 					Hud.showToast("Inventory full");
 				repaint();
@@ -177,6 +183,12 @@ public class ArchiveGetDialog extends UIPane implements KeyInputHandler {
 	@Override
 	protected void paintBackground(GraphAssist g) {
 		clear(g, bgColor);
+		if(cost>0) {
+			g.setColor(Color.WHITE);
+			g.setFont(Fonts.small);
+			g.drawString(TileAction.formatCost(cost), buttonGet.getX()-10,
+					buttonGet.getY()+buttonGet.getHeight()/2, GraphAssist.RIGHT, GraphAssist.CENTER);
+		}
 	}
 	
 	public void close() {

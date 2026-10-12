@@ -28,11 +28,7 @@ public class HouseTileAction extends EnterTileAction {
 	
 	public static final HouseTileAction museum = new HouseTileAction(new MuseumActionMenu());
 	public static final HouseTileAction library = new HouseTileAction(new LibraryActionMenu());
-	public static final HouseTileAction concertHall = new HouseTileAction(new TileActionMenu(
-		LeisureActions.playMusic("Guitar", true),
-		LeisureActions.playMusic("Piano", true),
-		LeisureActions.watchMovies(true)
-	));
+	public static final HouseTileAction concertHall = new HouseTileAction(createConcertHallMenu());
 
 	public static final HouseTileAction office = new HouseTileAction(OfficeActionMenu.menu);
 
@@ -104,6 +100,15 @@ public class HouseTileAction extends EnterTileAction {
 		}
 		else
 			return false;
+	}
+	
+	private static TileActionMenu createConcertHallMenu() {
+		TileActionMenu menu = new TileActionMenu(
+				LeisureActions.playMusic("Guitar", true),
+				LeisureActions.playMusic("Piano", true),
+				LeisureActions.watchMovies(true));
+		menu.addMenu("CAFETERIA", FoodActionMenu.cafeteria);
+		return menu;
 	}
 
 }

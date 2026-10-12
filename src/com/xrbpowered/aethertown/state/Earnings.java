@@ -69,6 +69,10 @@ public class Earnings {
 		return sb.toString();
 	}
 
+	public static void earn(int payout) {
+		player.earnings += payout;
+	}
+	
 	public static String work() {
 		long t = Math.round(WorldTime.time/WorldTime.minute);
 		Random random = new Random(t);
@@ -84,15 +88,15 @@ public class Earnings {
 		sb.append("<p>Earned:</p><table style=\"width:100%\">");
 		
 		int total = 0;
-		int c = random.nextInt(251)+500;
+		int c = random.nextInt(251)+750;
 		total += c;
 		reportRowCost(sb, "Baseline", c);
 		
-		c = (random.nextInt(16)+15) * ins;
+		c = (random.nextInt(21)+20) * ins;
 		total += c;
 		reportRowCost(sb, String.format("from %d INS", ins), c);
 
-		c = (int) Math.round((random.nextDouble()*0.5+0.5)*diminish(xp, 1500, 2500));
+		c = (int) Math.round((random.nextDouble()+0.5)*diminish(xp, 1500, 2500));
 		total += c;
 		reportRowCost(sb, String.format("from %d XP", xp), c);
 
