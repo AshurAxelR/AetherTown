@@ -28,7 +28,7 @@ public class ShaderEnvironment {
 	public Color shadowColor = new Color(0x8899bb);
 
 	public Color cloudColor = new Color(0xf1f8fa);
-	public Color bgColor = new Color(0xdaefef);
+	public Color horizonColor = new Color(0xdaefef);
 	public Color zenithColor = new Color(0x98d3ef);
 	public Color lightSkyColor = new Color(0xf2f7ff);
 	
@@ -52,17 +52,20 @@ public class ShaderEnvironment {
 	public ShaderEnvironment(ShaderEnvironment s) {
 		copyFrom(s);
 	}
-	
-	public ShaderEnvironment(Vector3f lightDirection, Color lightColor, Color midColor, Color shadowColor, Color cloudColor, Color bgColor, Color zenithColor, Color lightSkyColor) {
-		this.lightDirection.set(lightDirection);
-		this.lightSkyDirection.set(lightDirection);
+
+	public ShaderEnvironment setLightColors(Color lightColor, Color midColor, Color shadowColor) {
 		this.lightColor = lightColor;
 		this.midColor = midColor;
 		this.shadowColor = shadowColor;
+		return this;
+	}
+	
+	public ShaderEnvironment setSkyColors(Color cloudColor, Color bgColor, Color zenithColor, Color lightSkyColor) {
 		this.cloudColor = cloudColor;
-		this.bgColor = bgColor;
+		this.horizonColor = bgColor;
 		this.zenithColor = zenithColor;
 		this.lightSkyColor = lightSkyColor;
+		return this;
 	}
 
 	public ShaderEnvironment setRenderStars(boolean r, float lightWashTop, float lightWashBottom, float lightSkyWash) {
@@ -73,15 +76,15 @@ public class ShaderEnvironment {
 		return this;
 	}
 	
-	public ShaderEnvironment setLightSkyDirection(float x, float y, float z) {
-		this.lightSkyDirection.set(x, y, z);
+	public ShaderEnvironment setLighting(Vector4f sun, int hourOfDay) {
+		lightDirection.set(-sun.x, -Math.abs(sun.y), -sun.z);
+		lightSkyDirection.set(-sun.x, -sun.y, -sun.z);
+		illumMask = IllumLayer.getMask(hourOfDay);
 		return this;
 	}
 	
 	public void recalc(Vector4f sun) {
-		lightDirection.set(-sun.x, -Math.abs(sun.y), -sun.z);
-		lightSkyDirection.set(-sun.x, -sun.y, -sun.z);
-		illumMask = IllumLayer.getMask(WorldTime.getHourOfDay());
+		setLighting(sun, WorldTime.getHourOfDay());
 	}
 
 	public void updateShader(Shader shader) {
@@ -89,7 +92,7 @@ public class ShaderEnvironment {
 		GL20.glUseProgram(pId);
 		
 		uniform(GL20.glGetUniformLocation(pId, "cloudColor"), cloudColor);
-		uniform(GL20.glGetUniformLocation(pId, "bgColor"), bgColor);
+		uniform(GL20.glGetUniformLocation(pId, "horizonColor"), horizonColor);
 		uniform(GL20.glGetUniformLocation(pId, "zenithColor"), zenithColor);
 		uniform(GL20.glGetUniformLocation(pId, "lightSkyColor"), lightSkyColor);
 		uniform(GL20.glGetUniformLocation(pId, "lightSkyDirection"), lightSkyDirection);
@@ -126,7 +129,7 @@ public class ShaderEnvironment {
 		shadowColor = s.shadowColor;
 
 		cloudColor = s.cloudColor;
-		bgColor = s.bgColor;
+		horizonColor = s.horizonColor;
 		zenithColor = s.zenithColor;
 		lightSkyColor = s.lightSkyColor;
 		
@@ -145,7 +148,7 @@ public class ShaderEnvironment {
 		shadowColor = ColorBlend.blend(s0.shadowColor, s1.shadowColor, s);
 
 		cloudColor = ColorBlend.blend(s0.cloudColor, s1.cloudColor, s);
-		bgColor = ColorBlend.blend(s0.bgColor, s1.bgColor, s);
+		horizonColor = ColorBlend.blend(s0.horizonColor, s1.horizonColor, s);
 		zenithColor = ColorBlend.blend(s0.zenithColor, s1.zenithColor, s);
 		lightSkyColor = ColorBlend.blend(s0.lightSkyColor, s1.lightSkyColor, s);
 		
@@ -160,52 +163,51 @@ public class ShaderEnvironment {
 	
 	public static ShaderEnvironment clearDay = new ShaderEnvironment();
 
-	public static ShaderEnvironment evening = new ShaderEnvironment(
-			new Vector3f(-0.55f, -0.25f, -0.45f),
-			new Color(0xfff2d9),
-			new Color(0x4d73cc),
-			new Color(0x405999),
-			new Color(0xefe8db),
-			new Color(0xccd1e6),
-			new Color(0x99a3bb),
-			new Color(0xf2f7ff)
-		);
-	
-	public static ShaderEnvironment dawn = new ShaderEnvironment(
-			new Vector3f(-0.55f, -0.02f, -0.45f),
-			new Color(0xaa776d),
-			new Color(0x444455),
-			new Color(0x22273e),
-			new Color(0x50546d),
-			new Color(0x5b6682), // 0x6b7692
-			new Color(0x353c5a),
-			new Color(0x8baacc)
-		)
-		.setRenderStars(true, 0.3f, 0.5f, 1f)
-		.setLightSkyDirection(-0.55f, 0.45f, -0.45f);
+	public static ShaderEnvironment evening = new ShaderEnvironment()
+			.setLightColors(
+					new Color(0xfff2d9),
+					new Color(0x4d73cc),
+					new Color(0x405999))
+			.setSkyColors(
+					new Color(0xefe8db),
+					new Color(0xccd1e6),
+					new Color(0x99a3bb),
+					new Color(0xf2f7ff));
 
-	public static ShaderEnvironment clearNight = new ShaderEnvironment(
-			new Vector3f(-0.55f, -1.75f, -0.45f),
-			new Color(0x03040b), // 0x111527 // 0x03040b
-			new Color(0x010103), // 0x020407 // 0x010103
-			new Color(0x000000),
-			new Color(0x0e1520), // 0x0e1520 // 171c22),
-			new Color(0x050b13),
-			new Color(0x000204),
-			new Color(0x00050e19, true)
-		)
-		.setRenderStars(true, 0f, 0.4f, 0f);
+	public static ShaderEnvironment dawn = new ShaderEnvironment()
+			.setLightColors(
+					new Color(0xaa776d),
+					new Color(0x444455),
+					new Color(0x22273e))
+			.setSkyColors(
+					new Color(0x50546d),
+					new Color(0x5b6682), // 0x6b7692
+					new Color(0x353c5a),
+					new Color(0x8baacc))
+			.setRenderStars(true, 0.3f, 0.5f, 1f);
 
-	public static ShaderEnvironment cloudyNight = new ShaderEnvironment(
-			new Vector3f(-0.45f, -1.85f, -0.35f),
-			new Color(0x111517),
-			new Color(0x07090a),
-			new Color(0x030505),
-			new Color(0x17150e),
-			new Color(0x0b0b07),
-			new Color(0x12110b),
-			new Color(0x0015140e, true)
-		);
+	public static ShaderEnvironment clearNight = new ShaderEnvironment()
+			.setLightColors(
+					new Color(0x03040b), // 0x111527 // 0x03040b
+					new Color(0x010103), // 0x020407 // 0x010103
+					new Color(0x000000))
+			.setSkyColors(
+					new Color(0x0e1520), // 0x0e1520 // 171c22),
+					new Color(0x050b13),
+					new Color(0x000204),
+					new Color(0x00050e19, true))
+			.setRenderStars(true, 0f, 0.4f, 0f);
+
+	public static ShaderEnvironment cloudyNight = new ShaderEnvironment()
+			.setLightColors(
+					new Color(0x111517),
+					new Color(0x07090a),
+					new Color(0x030505))
+			.setSkyColors(
+					new Color(0x17150e),
+					new Color(0x0b0b07),
+					new Color(0x12110b),
+					new Color(0x0015140e, true));
 
 	public static ShaderEnvironment[] environments = {clearDay, evening, dawn, clearNight, cloudyNight, dawn, evening};
 

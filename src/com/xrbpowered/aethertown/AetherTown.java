@@ -75,7 +75,7 @@ import com.xrbpowered.zoomui.MouseInfo;
 
 public class AetherTown extends UIClient {
 
-	public static final String version = "a.0.3.6-dev3";
+	public static final String version = "a.0.3.6-dev4";
 	
 	public static final float pawnHeight = 1.55f;
 	
@@ -189,7 +189,7 @@ public class AetherTown extends UIClient {
 	private boolean controllerEnabled = false;
 	private boolean autoWalk = false;
 	
-	private SkyRenderer sky;
+	protected SkyRenderer sky;
 	private TileRenderer tiles;
 	
 	private StaticMeshActor pointActor;
@@ -231,7 +231,7 @@ public class AetherTown extends UIClient {
 				Shader.resolveIncludes = true;
 				Shader.xunifyDefs = true;
 				
-				clearColor = environment.bgColor;
+				clearColor = environment.horizonColor;
 				camera = new CameraActor.Perspective().setFov(settings.fov).setRange(0.05f, environment.fogFar).setAspectRatio(getWidth(), getHeight());
 				
 				walkController = new WalkController(input) {
@@ -501,20 +501,26 @@ public class AetherTown extends UIClient {
 		}
 	}
 	
-	public void paintDebugInfo(GraphAssist g) {
-		float y = 10;
+	public String getDebugInfo() {
 		String s = String.format("%.1f fps", getFps());
 		Color c = environment.lightColor;
 		float illum = c.getRed()/255f + c.getGreen()/255f + c.getBlue()/255f;
 		s += String.format(" illum:%.2f", illum);
-		y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+		s += "\n";
 		
 		// float a = 90f - (float)Math.toDegrees(Math.acos(sky.sun.position.dot(0, 1, 0, 0)));
 		// y = g.drawString(String.format("Sun angle: %.1f\u00b0", a), 10, y, GraphAssist.LEFT, GraphAssist.TOP);
-		s = String.format("[%d, %d]", hoverx, hoverz);
+		s += String.format("[%d, %d]", hoverx, hoverz);
 		if(level!=null && level.isInside(hoverx, hoverz) && level.map[hoverx][hoverz]!=null)
 			s += String.format(" y:%d", level.map[hoverx][hoverz].basey);
-		y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
+		return s;
+	}
+	
+	public void paintDebugInfo(GraphAssist g) {
+		String info = getDebugInfo();
+		float y = 10;
+		for(String s : info.split("\\n"))
+			y = g.drawString(s, 10, y, GraphAssist.LEFT, GraphAssist.TOP);
 	}
 	
 	public void disableController() {
@@ -721,7 +727,7 @@ public class AetherTown extends UIClient {
 		return info;
 	}
 	
-	private static void parseParams(String[] args) {
+	protected static void parseParams(String[] args) {
 		ParseParams params = new ParseParams();
 		params.addStrParam("-cfg", x -> { settings = new ClientConfig(x); }, "use config file");
 		params.parseParams(args);
