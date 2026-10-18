@@ -12,6 +12,11 @@ public abstract class ProxyAction extends TileAction {
 	}
 	
 	@Override
+	public String getLabel(Tile tile, boolean alt) {
+		return action.getLabel(tile, alt);
+	}
+	
+	@Override
 	public boolean isEnabled(Tile tile, boolean alt) {
 		return action.isEnabled(tile, alt);
 	}
