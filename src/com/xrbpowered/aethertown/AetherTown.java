@@ -569,9 +569,9 @@ public class AetherTown extends UIClient {
 	
 	@Override
 	public void keyPressed(char c, int code) {
-		if(observer!=null && observer.keyPressed(c, code))
-			return;
 		if(ui.onKeyPressed(c, code, input.getInputInfo()))
+			return;
+		if(observer!=null && observer.keyPressed(c, code))
 			return;
 		
 		switch(code) {
