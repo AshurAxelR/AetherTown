@@ -56,7 +56,7 @@ public class TweakAetherTown extends AetherTown {
 		return align(parentSize, align) + margins - align(margins*2f, align) - align(size, align);
 	}
 	
-	private static final ShaderEnvironment[] environments = {clearDay, evening, dawn, clearNight};
+	private static final ShaderEnvironment[] environments = {newDay, newDawn, dawn, clearNight};
 	private static final String[] environmentNames = {"day", "dawn", "twilight", "night"};
 	private static final int numColors = 7;
 
@@ -78,7 +78,7 @@ public class TweakAetherTown extends AetherTown {
 			}
 		};
 		
-		UIContainer wpane = new UIWidgetPane(widgets, 296, 100, GraphAssist.CENTER, GraphAssist.BOTTOM, 8);
+		UIContainer wpane = new UIWidgetPane(widgets, 296, 112, GraphAssist.CENTER, GraphAssist.BOTTOM, 8);
 		UIOptionBox<String> optSelTexture = new UIOptionBox<String>(wpane, environmentNames) {
 			@Override
 			protected void onOptionSelected(String value) {
@@ -106,9 +106,15 @@ public class TweakAetherTown extends AetherTown {
 			cbox.setPosition(8+i*cbox.getWidth(), optSelTexture.getHeight() + 16);
 			colorBoxes[i] = cbox;
 		}
+		UIButton btnPrint = new UIButton(wpane, "Print" ) {
+			public void onAction() {
+				printEnvTemplate(selectedEnvironment);
+			}
+		};
+		btnPrint.setPosition(wpane.getWidth()-btnPrint.getWidth()-8, wpane.getHeight()-btnPrint.getHeight()-8);
 
 		colorPickerPane = new UIWidgetPane(widgets, UIColorBrowser.defaultWidth,
-				UIColorBrowser.defaultHeightAlpha, GraphAssist.CENTER, GraphAssist.BOTTOM, 116);
+				UIColorBrowser.defaultHeightAlpha, GraphAssist.CENTER, GraphAssist.BOTTOM, wpane.getHeight()+16);
 		ResultHandler<Color> colorResult = new ResultHandler<Color>() {
 			@Override
 			public void onResult(Color result) {
@@ -191,6 +197,23 @@ public class TweakAetherTown extends AetherTown {
 			default:
 				throw new IllegalArgumentException("index "+index);
 		}
+	}
+	
+	private static void printEnvTemplate(ShaderEnvironment env) {
+		System.out.println("new ShaderEnvironment()");
+		System.out.println("\t\t.setLightColors(");
+		System.out.printf("\t\t\t\tnew Color(0x%06x),%n", env.lightColor.getRGB() & 0xffffff);
+		System.out.printf("\t\t\t\tnew Color(0x%06x),%n", env.midColor.getRGB() & 0xffffff);
+		System.out.printf("\t\t\t\tnew Color(0x%06x))%n", env.shadowColor.getRGB() & 0xffffff);
+		System.out.println("\t\t.setSkyColors(");
+		System.out.printf("\t\t\t\tnew Color(0x%06x),%n", env.cloudColor.getRGB() & 0xffffff);
+		System.out.printf("\t\t\t\tnew Color(0x%06x),%n", env.horizonColor.getRGB() & 0xffffff);
+		System.out.printf("\t\t\t\tnew Color(0x%06x),%n", env.zenithColor.getRGB() & 0xffffff);
+		System.out.printf("\t\t\t\tnew Color(0x%08x, true))", env.lightSkyColor.getRGB());
+		if(env.renderStars)
+			System.out.printf("%n\t\t.setRenderStars(true, %ff, %ff, %ff);%n", env.lightWashTop, env.lightWashBottom, env.lightSkyWash);
+		else
+			System.out.println(";");
 	}
 	
 	@Override

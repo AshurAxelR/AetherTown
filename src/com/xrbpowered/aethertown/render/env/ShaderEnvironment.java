@@ -60,9 +60,9 @@ public class ShaderEnvironment {
 		return this;
 	}
 	
-	public ShaderEnvironment setSkyColors(Color cloudColor, Color bgColor, Color zenithColor, Color lightSkyColor) {
+	public ShaderEnvironment setSkyColors(Color cloudColor, Color horizonColor, Color zenithColor, Color lightSkyColor) {
 		this.cloudColor = cloudColor;
-		this.horizonColor = bgColor;
+		this.horizonColor = horizonColor;
 		this.zenithColor = zenithColor;
 		this.lightSkyColor = lightSkyColor;
 		return this;
@@ -209,6 +209,28 @@ public class ShaderEnvironment {
 					new Color(0x12110b),
 					new Color(0x0015140e, true));
 
+	public static ShaderEnvironment newDay = new ShaderEnvironment()
+			.setLightColors(
+					new Color(0xffffff),
+					new Color(0xb0aea1),
+					new Color(0x4a5f7d))
+			.setSkyColors(
+					new Color(0xf1f8fa),
+					new Color(0xdae9ee),
+					new Color(0x4099e8),
+					new Color(0xffd6eefa, true));
+
+	public static ShaderEnvironment newDawn = new ShaderEnvironment()
+			.setLightColors(
+					new Color(0xffe2b9),
+					new Color(0x4d73cc),
+					new Color(0x405999))
+			.setSkyColors(
+					new Color(0xf0e8d4),
+					new Color(0xd4e1ec),
+					new Color(0x6883c4),
+					new Color(0xffd7e8ee, true));
+	
 	public static ShaderEnvironment[] environments = {clearDay, evening, dawn, clearNight, cloudyNight, dawn, evening};
 
 }

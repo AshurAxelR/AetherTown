@@ -19,11 +19,11 @@ public class DaytimeEnvironment extends ShaderEnvironment {
 		else if(c<-6f)
 			blend(clearNight, dawn, (c+18f)/12f);
 		else if(c<6f)
-			blend(dawn, evening, (c+6f)/12f);
+			blend(dawn, newDawn, (c+6f)/12f);
 		else if(c<18f)
-			blend(evening, clearDay, (c-6f)/12f);
+			blend(newDawn, newDay, (c-6f)/12f);
 		else
-			copyFrom(clearDay);
+			copyFrom(newDay);
 		
 		super.recalc(sun);
 	}
